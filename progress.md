@@ -6,3 +6,7 @@ Original prompt: 밴픽 방송 화면 와이어프레임 구현
 - Updated the draft timeline interaction to use event delegation so phase chips still work after repeated rerenders.
 - Verified the page serves over a local Python HTTP server and confirmed `/`, `/main.js`, and `/styles.css` respond successfully.
 - Environment note: Node, npm, Playwright, and a local WebDriver listener were not available, so the usual automated browser loop could not be run in this workspace.
+- Added a shared `draft-state.js` store backed by `localStorage` so the broadcast page and a new `admin.html` control room can stay in sync.
+- Reworked `main.js` to read/write shared draft state and added an admin link on the broadcast page footer.
+- Added `admin.html`, `admin.css`, and `admin.js` with live controls, series meta editing, active phase editing, and full team roster / pick / ban / fearless editors.
+- Verified local serving for `/`, `/admin.html`, `/draft-state.js`, `/admin.js`, and `/admin.css` via the Python HTTP server.

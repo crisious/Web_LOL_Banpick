@@ -11,8 +11,10 @@
       <header class="topbar">
         <section class="topcard topcard--event">
           <p class="eyebrow">Global Stage</p>
-          <h1>Fearless Draft Wireframe</h1>
-          <p class="subline">Broadcast layout study for a live League of Legends draft show.</p>
+          <h1 data-broadcast-title>Fearless Draft Wireframe</h1>
+          <p class="subline" data-broadcast-subtitle>
+            Broadcast layout study for a live League of Legends draft show.
+          </p>
         </section>
 
         <section class="topcard topcard--score">
@@ -151,10 +153,14 @@
 
       <footer class="control-dock">
         <div class="dock-pill">Keys: Left/Right move turns, Space pause, R reset timer, F fullscreen</div>
-        <div class="dock-pill">Status output: open the console and call window.render_game_to_text()</div>
+        <div class="dock-pill">
+          Status output: call `window.render_game_to_text()` or open
+          <a class="dock-link" href="./admin.html">admin panel</a>
+        </div>
       </footer>
     </div>
 
+    <script src="./draft-state.js"></script>
     <script src="./main.js"></script>
   </body>
 </html>

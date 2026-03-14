@@ -211,6 +211,12 @@ h1 {
   color: var(--muted);
 }
 
+.dock-link {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(241, 245, 255, 0.28);
+}
+
 .status-grid {
   grid-template-columns: repeat(3, 1fr);
   margin-top: 8px;

@@ -1,110 +1,9 @@
-const seriesData = {
-  patch: "26.05",
-  format: "Fearless Bo5",
-  gameLabel: "Game 3",
-  firstSelection: "First selection: T1",
-  blue: {
-    name: "T1",
-    score: 1,
-    coach: "Tom",
-    seed: "LCK #2",
-    roster: [
-      { role: "Top", player: "Doran" },
-      { role: "Jungle", player: "Oner" },
-      { role: "Mid", player: "Faker" },
-      { role: "Bot", player: "Gumayusi" },
-      { role: "Support", player: "Keria" },
-    ],
-    picks: [
-      { champion: "Azir", role: "Mid", player: "Faker", turn: 7 },
-      { champion: "Vi", role: "Jungle", player: "Oner", turn: 10 },
-      { champion: "Rell", role: "Support", player: "Keria", turn: 11 },
-      { champion: "Jhin", role: "Bot", player: "Gumayusi", turn: 18 },
-      { champion: "Gnar", role: "Top", player: "Doran", turn: 19 },
-    ],
-    bans: [
-      { champion: "Kalista", turn: 1 },
-      { champion: "Maokai", turn: 3 },
-      { champion: "Aurora", turn: 5 },
-      { champion: "Nautilus", turn: 14 },
-      { champion: "Renata", turn: 16 },
-    ],
-    fearless: [
-      { champion: "Corki", role: "Mid", game: "G1" },
-      { champion: "Xin Zhao", role: "Jungle", game: "G1" },
-      { champion: "KaiSa", role: "Bot", game: "G1" },
-      { champion: "Galio", role: "Mid", game: "G2" },
-      { champion: "Varus", role: "Bot", game: "G2" },
-      { champion: "Alistar", role: "Support", game: "G2" },
-    ],
-  },
-  red: {
-    name: "GEN",
-    score: 1,
-    coach: "Mata",
-    seed: "LCK #1",
-    roster: [
-      { role: "Top", player: "Kiin" },
-      { role: "Jungle", player: "Canyon" },
-      { role: "Mid", player: "Chovy" },
-      { role: "Bot", player: "Ruler" },
-      { role: "Support", player: "Duro" },
-    ],
-    picks: [
-      { champion: "Poppy", role: "Top", player: "Kiin", turn: 8 },
-      { champion: "Sejuani", role: "Jungle", player: "Canyon", turn: 9 },
-      { champion: "Orianna", role: "Mid", player: "Chovy", turn: 12 },
-      { champion: "Ezreal", role: "Bot", player: "Ruler", turn: 17 },
-      { champion: "Braum", role: "Support", player: "Duro", turn: 20 },
-    ],
-    bans: [
-      { champion: "Yone", turn: 2 },
-      { champion: "Skarner", turn: 4 },
-      { champion: "Pantheon", turn: 6 },
-      { champion: "Leona", turn: 13 },
-      { champion: "Poppy", turn: 15 },
-    ],
-    fearless: [
-      { champion: "Taliyah", role: "Mid", game: "G1" },
-      { champion: "Rumble", role: "Top", game: "G1" },
-      { champion: "Senna", role: "Bot", game: "G1" },
-      { champion: "Smolder", role: "Bot", game: "G2" },
-      { champion: "Wukong", role: "Jungle", game: "G2" },
-      { champion: "Neeko", role: "Mid", game: "G2" },
-    ],
-  },
-};
-
-const sequence = [
-  { turn: 1, team: "blue", type: "ban", slot: 0, label: "Ban 1", prompt: "Remove a comfort opener.", duration: 28 },
-  { turn: 2, team: "red", type: "ban", slot: 0, label: "Ban 1", prompt: "Answer the opener.", duration: 28 },
-  { turn: 3, team: "blue", type: "ban", slot: 1, label: "Ban 2", prompt: "Pressure the jungle pool.", duration: 28 },
-  { turn: 4, team: "red", type: "ban", slot: 1, label: "Ban 2", prompt: "Push a lane ban trade.", duration: 28 },
-  { turn: 5, team: "blue", type: "ban", slot: 2, label: "Ban 3", prompt: "Shape the first rotation.", duration: 28 },
-  { turn: 6, team: "red", type: "ban", slot: 2, label: "Ban 3", prompt: "Protect the side selection.", duration: 28 },
-  { turn: 7, team: "blue", type: "pick", slot: 0, label: "Pick 1", prompt: "Secure the priority mid lane.", duration: 35 },
-  { turn: 8, team: "red", type: "pick", slot: 0, label: "Pick 1", prompt: "Start the front line answer.", duration: 35 },
-  { turn: 9, team: "red", type: "pick", slot: 1, label: "Pick 2", prompt: "Pair engage with tempo.", duration: 35 },
-  { turn: 10, team: "blue", type: "pick", slot: 1, label: "Pick 2", prompt: "Lock the jungle bridge.", duration: 35 },
-  { turn: 11, team: "blue", type: "pick", slot: 2, label: "Pick 3", prompt: "Finish the support shell.", duration: 35 },
-  { turn: 12, team: "red", type: "pick", slot: 2, label: "Pick 3", prompt: "Reveal the scaling core.", duration: 35 },
-  { turn: 13, team: "red", type: "ban", slot: 3, label: "Ban 4", prompt: "Target the bot lane pool.", duration: 28 },
-  { turn: 14, team: "blue", type: "ban", slot: 3, label: "Ban 4", prompt: "Deny hard engage follow-up.", duration: 28 },
-  { turn: 15, team: "red", type: "ban", slot: 4, label: "Ban 5", prompt: "Force the top lane blind.", duration: 28 },
-  { turn: 16, team: "blue", type: "ban", slot: 4, label: "Ban 5", prompt: "Close the support counter pool.", duration: 28 },
-  { turn: 17, team: "red", type: "pick", slot: 3, label: "Pick 4", prompt: "Commit to long range damage.", duration: 35 },
-  { turn: 18, team: "blue", type: "pick", slot: 3, label: "Pick 4", prompt: "Match lane pressure.", duration: 35 },
-  { turn: 19, team: "blue", type: "pick", slot: 4, label: "Pick 5", prompt: "Hold the final counter pick.", duration: 35 },
-  { turn: 20, team: "red", type: "pick", slot: 4, label: "Pick 5", prompt: "Round out the composition.", duration: 35 },
-];
-
-const state = {
-  turnIndex: 16,
-  remainingMs: sequence[16].duration * 1000,
-  running: true,
-};
+const draftStore = window.LolDraftState;
+let store = draftStore.loadStore();
 
 const dom = {
+  broadcastTitle: document.querySelector("[data-broadcast-title]"),
+  broadcastSubtitle: document.querySelector("[data-broadcast-subtitle]"),
   bluePanel: document.querySelector('[data-team-panel="blue"]'),
   redPanel: document.querySelector('[data-team-panel="red"]'),
   phaseTrack: document.querySelector("[data-phase-track]"),
@@ -129,13 +28,15 @@ const dom = {
 };
 
 function currentStep() {
-  return sequence[state.turnIndex];
+  return draftStore.getCurrentStep(store);
 }
 
-function formatSeconds(ms) {
-  const seconds = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(seconds / 60);
-  return `${String(minutes).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+function currentTeam(teamKey) {
+  return store.teams[teamKey];
+}
+
+function formatSeconds(milliseconds) {
+  return draftStore.formatTimer(milliseconds);
 }
 
 function slotState(turn) {
@@ -150,19 +51,21 @@ function slotState(turn) {
 }
 
 function renderMeta() {
-  document.querySelector('[data-score-name="blue"]').textContent = seriesData.blue.name;
-  document.querySelector('[data-score-name="red"]').textContent = seriesData.red.name;
-  document.querySelector('[data-score="blue"]').textContent = seriesData.blue.score;
-  document.querySelector('[data-score="red"]').textContent = seriesData.red.score;
-  dom.seriesFormat.textContent = seriesData.format;
-  dom.seriesGame.textContent = seriesData.gameLabel;
-  dom.firstSelection.textContent = seriesData.firstSelection;
-  dom.patchVersion.textContent = seriesData.patch;
+  dom.broadcastTitle.textContent = store.broadcast.title;
+  dom.broadcastSubtitle.textContent = store.broadcast.subtitle;
+  document.querySelector('[data-score-name="blue"]').textContent = currentTeam("blue").name;
+  document.querySelector('[data-score-name="red"]').textContent = currentTeam("red").name;
+  document.querySelector('[data-score="blue"]').textContent = currentTeam("blue").score;
+  document.querySelector('[data-score="red"]').textContent = currentTeam("red").score;
+  dom.seriesFormat.textContent = store.series.format;
+  dom.seriesGame.textContent = store.series.gameLabel;
+  dom.firstSelection.textContent = store.series.firstSelection;
+  dom.patchVersion.textContent = store.series.patch;
 }
 
 function renderTeamPanel(teamKey) {
   const panel = teamKey === "blue" ? dom.bluePanel : dom.redPanel;
-  const team = seriesData[teamKey];
+  const team = currentTeam(teamKey);
   panel.querySelector(`[data-team-name="${teamKey}"]`).textContent = team.name;
   panel.querySelector(`[data-coach="${teamKey}"]`).textContent = team.coach;
   panel.querySelector(`[data-seed="${teamKey}"]`).textContent = team.seed;
@@ -184,9 +87,9 @@ function renderTeamPanel(teamKey) {
 }
 
 function renderPhaseTrack() {
-  dom.phaseTrack.innerHTML = sequence
+  dom.phaseTrack.innerHTML = store.sequence
     .map((step, index) => {
-      const stateLabel = index < state.turnIndex ? "done" : index === state.turnIndex ? "active" : "pending";
+      const stateLabel = index < store.live.turnIndex ? "done" : index === store.live.turnIndex ? "active" : "pending";
       return `
         <button class="phase-chip" type="button" data-state="${stateLabel}" data-team="${step.team}" data-turn-index="${index}">
           <div class="phase-chip__meta">
@@ -202,7 +105,7 @@ function renderPhaseTrack() {
 }
 
 function renderPickStack(teamKey) {
-  const team = seriesData[teamKey];
+  const team = currentTeam(teamKey);
   const host = teamKey === "blue" ? dom.bluePickStack : dom.redPickStack;
   host.innerHTML = team.picks
     .map((pick) => {
@@ -231,7 +134,7 @@ function renderPickStack(teamKey) {
 }
 
 function renderBanStrip(teamKey) {
-  const team = seriesData[teamKey];
+  const team = currentTeam(teamKey);
   const host = teamKey === "blue" ? dom.blueBanStrip : dom.redBanStrip;
   host.innerHTML = team.bans
     .map((ban) => {
@@ -249,7 +152,7 @@ function renderBanStrip(teamKey) {
 
 function renderFearless(teamKey) {
   const host = teamKey === "blue" ? dom.blueFearless : dom.redFearless;
-  const team = seriesData[teamKey];
+  const team = currentTeam(teamKey);
   host.dataset.team = teamKey;
   host.innerHTML = `
     <div class="fearless-column__header">
@@ -276,16 +179,16 @@ function renderFearless(teamKey) {
 
 function renderCurrentStep() {
   const step = currentStep();
-  const team = seriesData[step.team];
+  const team = currentTeam(step.team);
   const slotData = step.type === "pick" ? team.picks[step.slot] : team.bans[step.slot];
 
   dom.phaseTitle.textContent = `${team.name} ${step.label}`;
-  dom.phaseCounter.textContent = `${step.turn} / ${sequence.length}`;
-  dom.liveState.innerHTML = state.running ? '<span class="live-chip">live</span>' : "paused";
-  dom.timerValue.textContent = formatSeconds(state.remainingMs);
+  dom.phaseCounter.textContent = `${step.turn} / ${store.sequence.length}`;
+  dom.liveState.innerHTML = store.live.running ? '<span class="live-chip">live</span>' : "paused";
+  dom.timerValue.textContent = formatSeconds(store.live.remainingMs);
   dom.activeTeam.textContent = team.name;
   dom.activeCopy.textContent = step.prompt;
-  dom.activeRole.textContent = step.type === "pick" ? `${slotData.role} lane` : "team strategy";
+  dom.activeRole.textContent = step.type === "pick" && slotData.role ? `${slotData.role} lane` : "team strategy";
   dom.activeKind.textContent = `${step.type} slot ${step.slot + 1}`;
 }
 
@@ -303,34 +206,15 @@ function render() {
   renderCurrentStep();
 }
 
-function jumpToTurn(nextIndex) {
-  state.turnIndex = Math.max(0, Math.min(sequence.length - 1, nextIndex));
-  state.remainingMs = sequence[state.turnIndex].duration * 1000;
-  render();
+function persistStore() {
+  store = draftStore.saveStore(store);
 }
 
-function stepDraft(ms) {
-  if (!state.running) {
-    return;
-  }
-
-  let remaining = ms;
-  while (remaining > 0) {
-    const step = currentStep();
-    if (state.remainingMs > remaining) {
-      state.remainingMs -= remaining;
-      return;
-    }
-
-    remaining -= state.remainingMs;
-    if (state.turnIndex === sequence.length - 1) {
-      state.remainingMs = 0;
-      state.running = false;
-      return;
-    }
-
-    state.turnIndex += 1;
-    state.remainingMs = sequence[state.turnIndex].duration * 1000;
+function jumpToTurn(nextIndex, persist) {
+  store = draftStore.jumpToTurn(store, nextIndex);
+  render();
+  if (persist) {
+    persistStore();
   }
 }
 
@@ -338,15 +222,30 @@ let lastTick = performance.now();
 function animate(now) {
   const delta = Math.min(250, now - lastTick);
   lastTick = now;
-  if (state.running) {
-    stepDraft(delta);
-    renderCurrentStep();
-    renderPhaseTrack();
-    renderPickStack("blue");
-    renderPickStack("red");
-    renderBanStrip("blue");
-    renderBanStrip("red");
+
+  if (store.live.running) {
+    const previousTurnIndex = store.live.turnIndex;
+    const previousVisibleSeconds = Math.ceil(store.live.remainingMs / 1000);
+    const previousRunning = store.live.running;
+    store = draftStore.stepLive(store, delta);
+
+    const nextVisibleSeconds = Math.ceil(store.live.remainingMs / 1000);
+    const turnChanged = previousTurnIndex !== store.live.turnIndex;
+    const secondsChanged = previousVisibleSeconds !== nextVisibleSeconds;
+    const runningChanged = previousRunning !== store.live.running;
+
+    if (turnChanged) {
+      renderPhaseTrack();
+      renderPickStack("blue");
+      renderPickStack("red");
+      renderBanStrip("blue");
+      renderBanStrip("red");
+      renderCurrentStep();
+    } else if (secondsChanged || runningChanged) {
+      renderCurrentStep();
+    }
   }
+
   window.requestAnimationFrame(animate);
 }
 
@@ -358,17 +257,24 @@ function toggleFullscreen() {
   document.documentElement.requestFullscreen().catch(() => {});
 }
 
+function resetCurrentTimer() {
+  store.live.remainingMs = currentStep().duration * 1000;
+  renderCurrentStep();
+  persistStore();
+}
+
 function handleKeydown(event) {
   if (event.key === "ArrowRight") {
-    jumpToTurn(state.turnIndex + 1);
+    jumpToTurn(store.live.turnIndex + 1, true);
   } else if (event.key === "ArrowLeft") {
-    jumpToTurn(state.turnIndex - 1);
+    jumpToTurn(store.live.turnIndex - 1, true);
   } else if (event.key.toLowerCase() === "r") {
-    jumpToTurn(state.turnIndex);
+    resetCurrentTimer();
   } else if (event.key === " ") {
     event.preventDefault();
-    state.running = !state.running;
+    store.live.running = !store.live.running;
     renderCurrentStep();
+    persistStore();
   } else if (event.key.toLowerCase() === "f") {
     toggleFullscreen();
   }
@@ -379,32 +285,41 @@ function renderGameToText() {
   const payload = {
     view: "broadcast-wireframe",
     note: "origin at top-left, x grows right, y grows down",
-    live: state.running,
+    title: store.broadcast.title,
+    live: store.live.running,
     turn: step.turn,
-    phase: `${seriesData[step.team].name} ${step.label}`,
-    timer_seconds: Math.ceil(state.remainingMs / 1000),
-    active_team: seriesData[step.team].name,
+    phase: `${currentTeam(step.team).name} ${step.label}`,
+    timer_seconds: Math.ceil(store.live.remainingMs / 1000),
+    active_team: currentTeam(step.team).name,
     active_type: step.type,
-    blue_locked_picks: seriesData.blue.picks.filter((pick) => pick.turn < step.turn).map((pick) => pick.champion),
-    red_locked_picks: seriesData.red.picks.filter((pick) => pick.turn < step.turn).map((pick) => pick.champion),
-    blue_locked_bans: seriesData.blue.bans.filter((ban) => ban.turn < step.turn).map((ban) => ban.champion),
-    red_locked_bans: seriesData.red.bans.filter((ban) => ban.turn < step.turn).map((ban) => ban.champion),
+    blue_locked_picks: currentTeam("blue").picks
+      .filter((pick) => pick.turn < step.turn)
+      .map((pick) => pick.champion),
+    red_locked_picks: currentTeam("red").picks
+      .filter((pick) => pick.turn < step.turn)
+      .map((pick) => pick.champion),
+    blue_locked_bans: currentTeam("blue").bans
+      .filter((ban) => ban.turn < step.turn)
+      .map((ban) => ban.champion),
+    red_locked_bans: currentTeam("red").bans
+      .filter((ban) => ban.turn < step.turn)
+      .map((ban) => ban.champion),
   };
   return JSON.stringify(payload);
 }
 
 window.render_game_to_text = renderGameToText;
-window.advanceTime = (ms) => {
-  const wasRunning = state.running;
-  state.running = true;
-  stepDraft(ms);
-  state.running = wasRunning;
+window.advanceTime = (milliseconds) => {
+  const wasRunning = store.live.running;
+  const steppedStore = draftStore.clone(store);
+  steppedStore.live.running = true;
+  store = draftStore.stepLive(steppedStore, milliseconds);
+  store.live.running = wasRunning;
   render();
 };
 window.resetWireframe = () => {
-  state.turnIndex = 16;
-  state.remainingMs = sequence[16].duration * 1000;
-  state.running = true;
+  store = draftStore.resetStore();
+  lastTick = performance.now();
   render();
 };
 
@@ -415,7 +330,14 @@ dom.phaseTrack.addEventListener("click", (event) => {
     return;
   }
 
-  jumpToTurn(Number(button.dataset.turnIndex));
+  jumpToTurn(Number(button.dataset.turnIndex), true);
 });
+
+draftStore.subscribe((nextStore) => {
+  store = nextStore;
+  lastTick = performance.now();
+  render();
+});
+
 render();
 window.requestAnimationFrame(animate);

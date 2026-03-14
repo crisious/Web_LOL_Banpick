@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoL Draft Admin Panel</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-hero">
+        <div>
+          <p class="eyebrow">Control Room</p>
+          <h1>밴픽 방송 관리자 패널</h1>
+          <p class="hero-copy">
+            경기 메타, 현재 턴, 팀 정보, 픽/밴/페어리스 상태를 수정하면 방송 화면이 같은 브라우저 안에서
+            즉시 반영됩니다.
+          </p>
+        </div>
+        <a class="hero-link" href="./index.html">방송 화면 열기</a>
+      </header>
+
+      <main class="admin-main">
+        <section class="admin-card" data-admin-live></section>
+
+        <section class="admin-grid">
+          <section class="admin-card" data-admin-series></section>
+          <section class="admin-card" data-admin-phase></section>
+        </section>
+
+        <section class="team-grid">
+          <section class="admin-card" data-team-editor="blue"></section>
+          <section class="admin-card" data-team-editor="red"></section>
+        </section>
+      </main>
+    </div>
+
+    <script src="./draft-state.js"></script>
+    <script src="./admin.js"></script>
+  </body>
+</html>
