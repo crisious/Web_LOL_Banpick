@@ -21,3 +21,4 @@ Original prompt: 밴픽 방송 화면 와이어프레임 구현
 - Verification run: captured refreshed screenshots at `test-artifacts/broadcast-selection-flow.png` and `test-artifacts/admin-selection-flow.png`, then visually checked both layouts.
 - Verification run: no runtime exceptions or warning/error console entries were reported during the isolated selection-flow test.
 - Environment note: `npx` is still unavailable in this workspace, so the Playwright client from the web-game skill could not be used; verification stayed on the local headless Chrome DevTools path instead.
+- Added `README.md` with project overview, screenshots, local run instructions, admin flow description, keyboard controls, shared state explanation, testing hooks, and current limitations for GitHub presentation.
