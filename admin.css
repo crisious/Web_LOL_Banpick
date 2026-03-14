@@ -177,8 +177,12 @@ h1 {
 }
 
 .summary-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin-bottom: 16px;
+}
+
+.summary-grid--team .summary-tile strong {
+  font-size: 1.12rem;
 }
 
 .summary-tile,
@@ -193,6 +197,7 @@ h1 {
   display: block;
   margin: 10px 0 8px;
   font-size: 1.4rem;
+  line-height: 1.22;
 }
 
 .summary-tile p {

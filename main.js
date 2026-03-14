@@ -24,19 +24,59 @@ const dom = {
   activeKind: document.querySelector("[data-active-kind]"),
   seriesFormat: document.querySelector("[data-series-format]"),
   seriesGame: document.querySelector("[data-series-game]"),
-  firstSelection: document.querySelector("[data-first-selection]"),
+  priorityChoice: document.querySelector("[data-priority-choice]"),
+  counterChoice: document.querySelector("[data-counter-choice]"),
 };
 
 function currentStep() {
   return draftStore.getCurrentStep(store);
 }
 
-function currentTeam(teamKey) {
+function assignments() {
+  return draftStore.resolveAssignments(store);
+}
+
+function teamRecord(teamKey) {
   return store.teams[teamKey];
+}
+
+function teamBySide(side) {
+  return teamRecord(assignments().sideToTeam[side]);
+}
+
+function teamByPickOrder(order) {
+  return teamRecord(assignments().pickOrderToTeam[order]);
 }
 
 function formatSeconds(milliseconds) {
   return draftStore.formatTimer(milliseconds);
+}
+
+function sideLabel(side) {
+  return side === "blue" ? "Blue Side" : "Red Side";
+}
+
+function pickOrderLabel(order) {
+  return order === "first" ? "First Pick" : "Second Pick";
+}
+
+function selectionSummary() {
+  const resolved = assignments();
+  const priorityTeam = teamRecord(resolved.priorityTeam);
+  const otherTeam = teamRecord(resolved.otherTeam);
+  const priorityChoice =
+    store.selection.priorityChoiceType === "pickOrder"
+      ? pickOrderLabel(store.selection.priorityChoiceValue)
+      : sideLabel(store.selection.priorityChoiceValue);
+  const counterChoice =
+    store.selection.priorityChoiceType === "pickOrder"
+      ? sideLabel(store.selection.counterChoiceValue)
+      : pickOrderLabel(store.selection.counterChoiceValue);
+
+  return {
+    priorityChoice: `${priorityTeam.name} chose ${priorityChoice}`,
+    counterChoice: `${otherTeam.name} chose ${counterChoice}`,
+  };
 }
 
 function slotState(turn) {
@@ -51,26 +91,33 @@ function slotState(turn) {
 }
 
 function renderMeta() {
+  const summary = selectionSummary();
   dom.broadcastTitle.textContent = store.broadcast.title;
   dom.broadcastSubtitle.textContent = store.broadcast.subtitle;
-  document.querySelector('[data-score-name="blue"]').textContent = currentTeam("blue").name;
-  document.querySelector('[data-score-name="red"]').textContent = currentTeam("red").name;
-  document.querySelector('[data-score="blue"]').textContent = currentTeam("blue").score;
-  document.querySelector('[data-score="red"]').textContent = currentTeam("red").score;
+  document.querySelector('[data-score-name="blue"]').textContent = teamBySide("blue").name;
+  document.querySelector('[data-score-name="red"]').textContent = teamBySide("red").name;
+  document.querySelector('[data-score="blue"]').textContent = teamBySide("blue").score;
+  document.querySelector('[data-score="red"]').textContent = teamBySide("red").score;
   dom.seriesFormat.textContent = store.series.format;
   dom.seriesGame.textContent = store.series.gameLabel;
-  dom.firstSelection.textContent = store.series.firstSelection;
+  dom.priorityChoice.textContent = summary.priorityChoice;
+  dom.counterChoice.textContent = summary.counterChoice;
   dom.patchVersion.textContent = store.series.patch;
 }
 
-function renderTeamPanel(teamKey) {
-  const panel = teamKey === "blue" ? dom.bluePanel : dom.redPanel;
-  const team = currentTeam(teamKey);
-  panel.querySelector(`[data-team-name="${teamKey}"]`).textContent = team.name;
-  panel.querySelector(`[data-coach="${teamKey}"]`).textContent = team.coach;
-  panel.querySelector(`[data-seed="${teamKey}"]`).textContent = team.seed;
+function renderTeamPanel(side) {
+  const panel = side === "blue" ? dom.bluePanel : dom.redPanel;
+  const resolved = assignments();
+  const teamKey = resolved.sideToTeam[side];
+  const team = teamRecord(teamKey);
+  panel.querySelector(`[data-team-name="${side}"]`).textContent = team.name;
+  panel.querySelector(`[data-coach="${side}"]`).textContent = team.coach;
+  panel.querySelector(`[data-seed="${side}"]`).textContent = team.seed;
+  panel.querySelector(`[data-pick-order="${side}"]`).textContent = pickOrderLabel(
+    resolved.teamToPickOrder[teamKey],
+  );
 
-  const rosterHost = panel.querySelector(`[data-roster="${teamKey}"]`);
+  const rosterHost = panel.querySelector(`[data-roster="${side}"]`);
   rosterHost.innerHTML = team.roster
     .map(
       (entry) => `
@@ -79,7 +126,7 @@ function renderTeamPanel(teamKey) {
             <span class="roster-role">${entry.role}</span>
             <p class="roster-name">${entry.player}</p>
           </div>
-          <span>${teamKey === "blue" ? "Blue" : "Red"}</span>
+          <span>${sideLabel(side)}</span>
         </article>
       `,
     )
@@ -87,26 +134,30 @@ function renderTeamPanel(teamKey) {
 }
 
 function renderPhaseTrack() {
+  const resolved = assignments();
   dom.phaseTrack.innerHTML = store.sequence
     .map((step, index) => {
+      const actingTeamKey = resolved.pickOrderToTeam[step.order];
+      const actingSide = resolved.teamToSide[actingTeamKey];
       const stateLabel = index < store.live.turnIndex ? "done" : index === store.live.turnIndex ? "active" : "pending";
       return `
-        <button class="phase-chip" type="button" data-state="${stateLabel}" data-team="${step.team}" data-turn-index="${index}">
+        <button class="phase-chip" type="button" data-state="${stateLabel}" data-team="${actingSide}" data-turn-index="${index}">
           <div class="phase-chip__meta">
             <span>#${String(step.turn).padStart(2, "0")}</span>
-            <span class="phase-chip__team">${step.team}</span>
+            <span class="phase-chip__team">${actingSide}</span>
           </div>
           <strong class="phase-chip__title">${step.label}</strong>
-          <span class="phase-chip__copy">${step.type} slot ${step.slot + 1}</span>
+          <span class="phase-chip__copy">${pickOrderLabel(step.order)} · ${step.type} slot ${step.slot + 1}</span>
         </button>
       `;
     })
     .join("");
 }
 
-function renderPickStack(teamKey) {
-  const team = currentTeam(teamKey);
-  const host = teamKey === "blue" ? dom.bluePickStack : dom.redPickStack;
+function renderPickStack(side) {
+  const resolved = assignments();
+  const team = teamRecord(resolved.sideToTeam[side]);
+  const host = side === "blue" ? dom.bluePickStack : dom.redPickStack;
   host.innerHTML = team.picks
     .map((pick) => {
       const visualState = slotState(pick.turn);
@@ -118,7 +169,7 @@ function renderPickStack(teamKey) {
             ? "On the clock"
             : "Locked in";
       return `
-        <article class="pick-card" data-team="${teamKey}" data-state="${visualState}">
+        <article class="pick-card" data-team="${side}" data-state="${visualState}">
           <div class="pick-card__left">
             <span class="pick-role">${pick.role.slice(0, 3).toUpperCase()}</span>
             <div class="pick-copy">
@@ -133,15 +184,16 @@ function renderPickStack(teamKey) {
     .join("");
 }
 
-function renderBanStrip(teamKey) {
-  const team = currentTeam(teamKey);
-  const host = teamKey === "blue" ? dom.blueBanStrip : dom.redBanStrip;
+function renderBanStrip(side) {
+  const resolved = assignments();
+  const team = teamRecord(resolved.sideToTeam[side]);
+  const host = side === "blue" ? dom.blueBanStrip : dom.redBanStrip;
   host.innerHTML = team.bans
     .map((ban) => {
       const visualState = slotState(ban.turn);
       return `
-        <article class="ban-slot" data-team="${teamKey}" data-state="${visualState}">
-          <span class="ban-slot__team">${teamKey}</span>
+        <article class="ban-slot" data-team="${side}" data-state="${visualState}">
+          <span class="ban-slot__team">${side}</span>
           <strong class="ban-slot__name">${visualState === "pending" ? "Open ban" : ban.champion}</strong>
           <span class="ban-slot__state">${visualState}</span>
         </article>
@@ -150,10 +202,11 @@ function renderBanStrip(teamKey) {
     .join("");
 }
 
-function renderFearless(teamKey) {
-  const host = teamKey === "blue" ? dom.blueFearless : dom.redFearless;
-  const team = currentTeam(teamKey);
-  host.dataset.team = teamKey;
+function renderFearless(side) {
+  const resolved = assignments();
+  const host = side === "blue" ? dom.blueFearless : dom.redFearless;
+  const team = teamRecord(resolved.sideToTeam[side]);
+  host.dataset.team = side;
   host.innerHTML = `
     <div class="fearless-column__header">
       <strong class="fearless-column__team">${team.name}</strong>
@@ -178,8 +231,11 @@ function renderFearless(teamKey) {
 }
 
 function renderCurrentStep() {
+  const resolved = assignments();
   const step = currentStep();
-  const team = currentTeam(step.team);
+  const teamKey = resolved.pickOrderToTeam[step.order];
+  const side = resolved.teamToSide[teamKey];
+  const team = teamRecord(teamKey);
   const slotData = step.type === "pick" ? team.picks[step.slot] : team.bans[step.slot];
 
   dom.phaseTitle.textContent = `${team.name} ${step.label}`;
@@ -188,8 +244,8 @@ function renderCurrentStep() {
   dom.timerValue.textContent = formatSeconds(store.live.remainingMs);
   dom.activeTeam.textContent = team.name;
   dom.activeCopy.textContent = step.prompt;
-  dom.activeRole.textContent = step.type === "pick" && slotData.role ? `${slotData.role} lane` : "team strategy";
-  dom.activeKind.textContent = `${step.type} slot ${step.slot + 1}`;
+  dom.activeRole.textContent = step.type === "pick" && slotData.role ? `${slotData.role} lane` : sideLabel(side);
+  dom.activeKind.textContent = `${pickOrderLabel(step.order)} · ${step.type} slot ${step.slot + 1}`;
 }
 
 function render() {
@@ -281,27 +337,37 @@ function handleKeydown(event) {
 }
 
 function renderGameToText() {
+  const resolved = assignments();
   const step = currentStep();
+  const actingTeamKey = resolved.pickOrderToTeam[step.order];
   const payload = {
     view: "broadcast-wireframe",
     note: "origin at top-left, x grows right, y grows down",
     title: store.broadcast.title,
     live: store.live.running,
     turn: step.turn,
-    phase: `${currentTeam(step.team).name} ${step.label}`,
+    phase: `${teamRecord(actingTeamKey).name} ${step.label}`,
     timer_seconds: Math.ceil(store.live.remainingMs / 1000),
-    active_team: currentTeam(step.team).name,
+    active_team: teamRecord(actingTeamKey).name,
     active_type: step.type,
-    blue_locked_picks: currentTeam("blue").picks
+    blue_side_team: teamBySide("blue").name,
+    red_side_team: teamBySide("red").name,
+    first_pick_team: teamByPickOrder("first").name,
+    second_pick_team: teamByPickOrder("second").name,
+    selection_priority_team: teamRecord(resolved.priorityTeam).name,
+    selection_priority_pick_order: store.selection.priorityChoiceValue,
+    selection_counter_team: teamRecord(resolved.otherTeam).name,
+    selection_counter_side: store.selection.counterChoiceValue,
+    blue_locked_picks: teamBySide("blue").picks
       .filter((pick) => pick.turn < step.turn)
       .map((pick) => pick.champion),
-    red_locked_picks: currentTeam("red").picks
+    red_locked_picks: teamBySide("red").picks
       .filter((pick) => pick.turn < step.turn)
       .map((pick) => pick.champion),
-    blue_locked_bans: currentTeam("blue").bans
+    blue_locked_bans: teamBySide("blue").bans
       .filter((ban) => ban.turn < step.turn)
       .map((ban) => ban.champion),
-    red_locked_bans: currentTeam("red").bans
+    red_locked_bans: teamBySide("red").bans
       .filter((ban) => ban.turn < step.turn)
       .map((ban) => ban.champion),
   };

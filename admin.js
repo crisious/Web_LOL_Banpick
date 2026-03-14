@@ -1,5 +1,27 @@
 const draftStore = window.LolDraftState;
-let store = draftStore.loadStore();
+
+function coercePickOrderFlow(candidateStore) {
+  const nextStore = draftStore.clone(candidateStore);
+
+  if (nextStore.selection.priorityChoiceType === "pickOrder") {
+    return nextStore;
+  }
+
+  const resolved = draftStore.resolveAssignments(nextStore);
+  const priorityTeam = resolved.pickOrderToTeam.first;
+
+  nextStore.selection = {
+    priorityTeam,
+    priorityChoiceType: "pickOrder",
+    priorityChoiceValue: "first",
+    counterChoiceValue: resolved.teamToSide[draftStore.getOtherTeamKey(priorityTeam)],
+  };
+
+  return nextStore;
+}
+
+let store = coercePickOrderFlow(draftStore.loadStore());
+store = draftStore.saveStore(store);
 
 const dom = {
   live: document.querySelector("[data-admin-live]"),
@@ -13,6 +35,10 @@ const dom = {
 
 function currentStep() {
   return draftStore.getCurrentStep(store);
+}
+
+function assignments() {
+  return draftStore.resolveAssignments(store);
 }
 
 function currentTeam(teamKey) {
@@ -69,13 +95,50 @@ function inputField(config) {
   `;
 }
 
+function summaryTile(label, value, copy) {
+  return `
+    <article class="summary-tile">
+      <span class="tile-label">${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <p>${escapeHtml(copy)}</p>
+    </article>
+  `;
+}
+
+function sideLabel(side) {
+  return side === "blue" ? "Blue Side" : "Red Side";
+}
+
+function pickOrderLabel(order) {
+  return order === "first" ? "First Pick" : "Second Pick";
+}
+
+function choiceRoleLabel(teamKey) {
+  return teamKey === assignments().priorityTeam ? "선픽/후픽 선택" : "블루/레드 선택";
+}
+
+function decisionSummary(teamKey) {
+  const resolved = assignments();
+  if (teamKey === resolved.priorityTeam) {
+    return `${pickOrderLabel(store.selection.priorityChoiceValue)} 선택`;
+  }
+  return `${sideLabel(store.selection.counterChoiceValue)} 선택`;
+}
+
 function renderLivePanel() {
+  const resolved = assignments();
   const step = currentStep();
-  const team = currentTeam(step.team);
-  const turnOptions = store.sequence.map((entry, index) => ({
-    value: index,
-    label: `#${entry.turn} ${store.teams[entry.team].name} ${entry.label}`,
-  }));
+  const actingTeamKey = resolved.pickOrderToTeam[step.order];
+  const actingTeam = currentTeam(actingTeamKey);
+  const actingSide = resolved.teamToSide[actingTeamKey];
+  const turnOptions = store.sequence.map((entry, index) => {
+    const entryTeamKey = resolved.pickOrderToTeam[entry.order];
+    const entrySide = resolved.teamToSide[entryTeamKey];
+    return {
+      value: index,
+      label: `#${entry.turn} ${currentTeam(entryTeamKey).name} · ${pickOrderLabel(entry.order)} · ${sideLabel(entrySide)} · ${entry.label}`,
+    };
+  });
 
   dom.live.innerHTML = `
     <div class="card-head">
@@ -89,21 +152,10 @@ function renderLivePanel() {
     </div>
 
     <div class="summary-grid">
-      <article class="summary-tile">
-        <span class="tile-label">현재 단계</span>
-        <strong>${escapeHtml(team.name)} ${escapeHtml(step.label)}</strong>
-        <p>${escapeHtml(step.prompt)}</p>
-      </article>
-      <article class="summary-tile">
-        <span class="tile-label">턴 / 전체</span>
-        <strong>${step.turn} / ${store.sequence.length}</strong>
-        <p>${escapeHtml(step.type)} slot ${step.slot + 1}</p>
-      </article>
-      <article class="summary-tile">
-        <span class="tile-label">남은 시간</span>
-        <strong>${draftStore.formatTimer(store.live.remainingMs)}</strong>
-        <p>${escapeHtml(store.series.gameLabel)} · ${escapeHtml(store.series.format)}</p>
-      </article>
+      ${summaryTile("현재 단계", `${actingTeam.name} ${step.label}`, `${pickOrderLabel(step.order)} · ${sideLabel(actingSide)}`)}
+      ${summaryTile("턴 / 전체", `${step.turn} / ${store.sequence.length}`, `${step.type} slot ${step.slot + 1}`)}
+      ${summaryTile("현재 매칭", `${currentTeam(resolved.sideToTeam.blue).name} vs ${currentTeam(resolved.sideToTeam.red).name}`, `Blue ${currentTeam(resolved.sideToTeam.blue).name} · Red ${currentTeam(resolved.sideToTeam.red).name}`)}
+      ${summaryTile("남은 시간", draftStore.formatTimer(store.live.remainingMs), `${store.series.gameLabel} · ${store.series.format}`)}
     </div>
 
     <div class="action-row">
@@ -133,17 +185,30 @@ function renderLivePanel() {
       })}
     </div>
 
-    <p class="hint">관리자 페이지가 열려 있는 동안에는 이 패널이 타이머를 계속 갱신합니다.</p>
+    <p class="hint">현재 단계는 First Pick / Second Pick 기준으로 움직이고, 실제 Blue / Red 배정은 위 선택 정보에서 자동으로 따라옵니다.</p>
   `;
 }
 
 function renderSeriesPanel() {
+  const resolved = assignments();
+  const priorityTeam = currentTeam(resolved.priorityTeam);
+  const counterTeam = currentTeam(resolved.otherTeam);
+  const blueTeam = currentTeam(resolved.sideToTeam.blue);
+  const redTeam = currentTeam(resolved.sideToTeam.red);
+
   dom.series.innerHTML = `
     <div class="card-head">
       <div>
         <p class="eyebrow">Broadcast Meta</p>
         <h2>방송 기본 정보</h2>
       </div>
+    </div>
+
+    <div class="summary-grid">
+      ${summaryTile("선택 우선권", priorityTeam.name, `${priorityTeam.name}이 선픽/후픽을 먼저 선택합니다.`)}
+      ${summaryTile("우선권 팀 결정", pickOrderLabel(store.selection.priorityChoiceValue), `${priorityTeam.name} 선택`)}
+      ${summaryTile("상대 팀 결정", `${counterTeam.name} · ${sideLabel(store.selection.counterChoiceValue)}`, `${counterTeam.name}이 블루/레드를 선택합니다.`)}
+      ${summaryTile("최종 배치", `Blue ${blueTeam.name} / Red ${redTeam.name}`, `선픽 ${currentTeam(resolved.pickOrderToTeam.first).name} · 후픽 ${currentTeam(resolved.pickOrderToTeam.second).name}`)}
     </div>
 
     <div class="field-grid">
@@ -162,18 +227,47 @@ function renderSeriesPanel() {
       ${inputField({ name: "series.patch", label: "패치", value: store.series.patch })}
       ${inputField({ name: "series.format", label: "시리즈 형식", value: store.series.format })}
       ${inputField({ name: "series.gameLabel", label: "게임 라벨", value: store.series.gameLabel })}
-      ${inputField({
-        name: "series.firstSelection",
-        label: "퍼스트 셀렉션 문구",
-        value: store.series.firstSelection,
+      ${selectField({
+        name: "selection.priorityTeam",
+        label: "선택 우선권 팀",
+        value: store.selection.priorityTeam,
+        options: draftStore.TEAM_IDS.map((teamKey) => ({
+          value: teamKey,
+          label: currentTeam(teamKey).name,
+        })),
+      })}
+      ${selectField({
+        name: "selection.priorityChoiceValue",
+        label: `${priorityTeam.name} 선택`,
+        value: store.selection.priorityChoiceValue,
+        options: [
+          { value: "first", label: "First Pick" },
+          { value: "second", label: "Second Pick" },
+        ],
+      })}
+      ${selectField({
+        name: "selection.counterChoiceValue",
+        label: `${counterTeam.name} 사이드 선택`,
+        value: store.selection.counterChoiceValue,
+        options: [
+          { value: "blue", label: "Blue Side" },
+          { value: "red", label: "Red Side" },
+        ],
       })}
     </div>
+
+    <p class="hint">흐름은 고정입니다. 한 팀이 선픽/후픽을 고르면, 나머지 팀이 블루/레드 사이드를 고릅니다.</p>
   `;
 }
 
 function renderPhasePanel() {
+  const resolved = assignments();
   const step = currentStep();
+  const actingTeamKey = resolved.pickOrderToTeam[step.order];
+  const actingTeam = currentTeam(actingTeamKey);
+  const actingSide = resolved.teamToSide[actingTeamKey];
   const stepPath = `sequence.${store.live.turnIndex}`;
+
   dom.phase.innerHTML = `
     <div class="card-head">
       <div>
@@ -183,14 +277,20 @@ function renderPhasePanel() {
       <span class="turn-chip">Turn ${step.turn}</span>
     </div>
 
+    <div class="summary-grid">
+      ${summaryTile("실행 팀", actingTeam.name, `${actingTeam.name} 차례`)}
+      ${summaryTile("현재 사이드", sideLabel(actingSide), `${actingTeam.name} 기준`)}
+      ${summaryTile("픽 순서", pickOrderLabel(step.order), `${step.type} slot ${step.slot + 1}`)}
+    </div>
+
     <div class="field-grid">
       ${selectField({
-        name: `${stepPath}.team`,
-        label: "팀",
-        value: step.team,
+        name: `${stepPath}.order`,
+        label: "픽 순서",
+        value: step.order,
         options: [
-          { value: "blue", label: "Blue side" },
-          { value: "red", label: "Red side" },
+          { value: "first", label: "First Pick" },
+          { value: "second", label: "Second Pick" },
         ],
       })}
       ${selectField({
@@ -228,21 +328,32 @@ function renderPhasePanel() {
         full: true,
       })}
     </div>
+
+    <p class="hint">단계 순서는 Blue / Red가 아니라 First Pick / Second Pick 기준으로 저장됩니다.</p>
   `;
 }
 
 function renderTeamEditor(teamKey) {
   const team = currentTeam(teamKey);
-  const teamLabel = teamKey === "blue" ? "Blue Side" : "Red Side";
-  const sideShort = teamKey === "blue" ? "B" : "R";
+  const resolved = assignments();
+  const currentSide = resolved.teamToSide[teamKey];
+  const currentOrder = resolved.teamToPickOrder[teamKey];
+  const sideShort = currentSide === "blue" ? "B" : "R";
 
   dom.teams[teamKey].innerHTML = `
     <div class="card-head">
       <div>
-        <p class="eyebrow">${teamLabel}</p>
+        <p class="eyebrow">Team Record</p>
         <h2>${escapeHtml(team.name)}</h2>
       </div>
-      <span class="side-badge side-badge--${teamKey}">${sideShort}</span>
+      <span class="side-badge side-badge--${currentSide}">${sideShort}</span>
+    </div>
+
+    <div class="summary-grid summary-grid--team">
+      ${summaryTile("현재 사이드", sideLabel(currentSide), `${team.name} 배정`)}
+      ${summaryTile("픽 순서", pickOrderLabel(currentOrder), `${team.name} 차례 기준`)}
+      ${summaryTile("선택 역할", choiceRoleLabel(teamKey), teamKey === resolved.priorityTeam ? "이 팀이 선픽/후픽을 고릅니다." : "이 팀이 블루/레드를 고릅니다.")}
+      ${summaryTile("현재 결정", decisionSummary(teamKey), `${team.name} 관점 요약`)}
     </div>
 
     <div class="field-grid">
@@ -400,6 +511,7 @@ function renderTeamEditor(teamKey) {
 }
 
 function renderAll() {
+  store = coercePickOrderFlow(store);
   renderLivePanel();
   renderSeriesPanel();
   renderPhasePanel();
@@ -440,6 +552,7 @@ function readValue(element) {
 }
 
 function saveAndRender() {
+  store = coercePickOrderFlow(store);
   store = draftStore.saveStore(store);
   renderAll();
 }
@@ -470,7 +583,7 @@ function handleAction(action) {
   }
 
   if (action === "reset-store") {
-    store = draftStore.resetStore();
+    store = coercePickOrderFlow(draftStore.resetStore());
     renderAll();
   }
 }
@@ -498,6 +611,10 @@ document.addEventListener("change", (event) => {
 
   const nextValue = readValue(field);
   setByPath(store, field.name, nextValue);
+
+  if (field.name.startsWith("selection.")) {
+    store.selection.priorityChoiceType = "pickOrder";
+  }
 
   if (field.name === `sequence.${store.live.turnIndex}.duration`) {
     store.live.remainingMs = Math.min(store.live.remainingMs, Math.max(1000, nextValue * 1000));
@@ -535,7 +652,7 @@ function animate(now) {
 }
 
 draftStore.subscribe((nextStore) => {
-  store = nextStore;
+  store = coercePickOrderFlow(nextStore);
   lastTick = performance.now();
   renderAll();
 });

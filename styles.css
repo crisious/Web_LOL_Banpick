@@ -193,7 +193,7 @@ h1 {
 }
 
 .meta-row {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 18px;
 }
 
@@ -209,6 +209,8 @@ h1 {
   background: rgba(255, 255, 255, 0.03);
   text-align: center;
   color: var(--muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .dock-link {
@@ -284,7 +286,7 @@ h1 {
 }
 
 .detail-grid {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 18px 0 20px;
 }
 
@@ -737,6 +739,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .meta-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .pick-stage {
     flex-direction: column;
   }
@@ -768,6 +774,7 @@ h1 {
   }
 
   .meta-row,
+  .detail-grid,
   .status-grid,
   .signal-footer,
   .fearless-grid,

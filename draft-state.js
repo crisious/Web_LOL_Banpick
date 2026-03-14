@@ -1,5 +1,8 @@
 (function draftStateModule(global) {
   const STORAGE_KEY = "lol-banpick-broadcast-state";
+  const TEAM_IDS = ["blue", "red"];
+  const SIDE_IDS = ["blue", "red"];
+  const PICK_ORDER_IDS = ["first", "second"];
 
   const DEFAULT_STORE = {
     broadcast: {
@@ -10,7 +13,12 @@
       patch: "26.05",
       format: "Fearless Bo5",
       gameLabel: "Game 3",
-      firstSelection: "First selection: T1",
+    },
+    selection: {
+      priorityTeam: "blue",
+      priorityChoiceType: "pickOrder",
+      priorityChoiceValue: "first",
+      counterChoiceValue: "red",
     },
     teams: {
       blue: {
@@ -85,26 +93,26 @@
       },
     },
     sequence: [
-      { turn: 1, team: "blue", type: "ban", slot: 0, label: "Ban 1", prompt: "Remove a comfort opener.", duration: 28 },
-      { turn: 2, team: "red", type: "ban", slot: 0, label: "Ban 1", prompt: "Answer the opener.", duration: 28 },
-      { turn: 3, team: "blue", type: "ban", slot: 1, label: "Ban 2", prompt: "Pressure the jungle pool.", duration: 28 },
-      { turn: 4, team: "red", type: "ban", slot: 1, label: "Ban 2", prompt: "Push a lane ban trade.", duration: 28 },
-      { turn: 5, team: "blue", type: "ban", slot: 2, label: "Ban 3", prompt: "Shape the first rotation.", duration: 28 },
-      { turn: 6, team: "red", type: "ban", slot: 2, label: "Ban 3", prompt: "Protect the side selection.", duration: 28 },
-      { turn: 7, team: "blue", type: "pick", slot: 0, label: "Pick 1", prompt: "Secure the priority mid lane.", duration: 35 },
-      { turn: 8, team: "red", type: "pick", slot: 0, label: "Pick 1", prompt: "Start the front line answer.", duration: 35 },
-      { turn: 9, team: "red", type: "pick", slot: 1, label: "Pick 2", prompt: "Pair engage with tempo.", duration: 35 },
-      { turn: 10, team: "blue", type: "pick", slot: 1, label: "Pick 2", prompt: "Lock the jungle bridge.", duration: 35 },
-      { turn: 11, team: "blue", type: "pick", slot: 2, label: "Pick 3", prompt: "Finish the support shell.", duration: 35 },
-      { turn: 12, team: "red", type: "pick", slot: 2, label: "Pick 3", prompt: "Reveal the scaling core.", duration: 35 },
-      { turn: 13, team: "red", type: "ban", slot: 3, label: "Ban 4", prompt: "Target the bot lane pool.", duration: 28 },
-      { turn: 14, team: "blue", type: "ban", slot: 3, label: "Ban 4", prompt: "Deny hard engage follow-up.", duration: 28 },
-      { turn: 15, team: "red", type: "ban", slot: 4, label: "Ban 5", prompt: "Force the top lane blind.", duration: 28 },
-      { turn: 16, team: "blue", type: "ban", slot: 4, label: "Ban 5", prompt: "Close the support counter pool.", duration: 28 },
-      { turn: 17, team: "red", type: "pick", slot: 3, label: "Pick 4", prompt: "Commit to long range damage.", duration: 35 },
-      { turn: 18, team: "blue", type: "pick", slot: 3, label: "Pick 4", prompt: "Match lane pressure.", duration: 35 },
-      { turn: 19, team: "blue", type: "pick", slot: 4, label: "Pick 5", prompt: "Hold the final counter pick.", duration: 35 },
-      { turn: 20, team: "red", type: "pick", slot: 4, label: "Pick 5", prompt: "Round out the composition.", duration: 35 },
+      { turn: 1, order: "first", type: "ban", slot: 0, label: "Ban 1", prompt: "Remove a comfort opener.", duration: 28 },
+      { turn: 2, order: "second", type: "ban", slot: 0, label: "Ban 1", prompt: "Answer the opener.", duration: 28 },
+      { turn: 3, order: "first", type: "ban", slot: 1, label: "Ban 2", prompt: "Pressure the jungle pool.", duration: 28 },
+      { turn: 4, order: "second", type: "ban", slot: 1, label: "Ban 2", prompt: "Push a lane ban trade.", duration: 28 },
+      { turn: 5, order: "first", type: "ban", slot: 2, label: "Ban 3", prompt: "Shape the first rotation.", duration: 28 },
+      { turn: 6, order: "second", type: "ban", slot: 2, label: "Ban 3", prompt: "Protect the side selection.", duration: 28 },
+      { turn: 7, order: "first", type: "pick", slot: 0, label: "Pick 1", prompt: "Secure the priority mid lane.", duration: 35 },
+      { turn: 8, order: "second", type: "pick", slot: 0, label: "Pick 1", prompt: "Start the front line answer.", duration: 35 },
+      { turn: 9, order: "second", type: "pick", slot: 1, label: "Pick 2", prompt: "Pair engage with tempo.", duration: 35 },
+      { turn: 10, order: "first", type: "pick", slot: 1, label: "Pick 2", prompt: "Lock the jungle bridge.", duration: 35 },
+      { turn: 11, order: "first", type: "pick", slot: 2, label: "Pick 3", prompt: "Finish the support shell.", duration: 35 },
+      { turn: 12, order: "second", type: "pick", slot: 2, label: "Pick 3", prompt: "Reveal the scaling core.", duration: 35 },
+      { turn: 13, order: "second", type: "ban", slot: 3, label: "Ban 4", prompt: "Target the bot lane pool.", duration: 28 },
+      { turn: 14, order: "first", type: "ban", slot: 3, label: "Ban 4", prompt: "Deny hard engage follow-up.", duration: 28 },
+      { turn: 15, order: "second", type: "ban", slot: 4, label: "Ban 5", prompt: "Force the top lane blind.", duration: 28 },
+      { turn: 16, order: "first", type: "ban", slot: 4, label: "Ban 5", prompt: "Close the support counter pool.", duration: 28 },
+      { turn: 17, order: "second", type: "pick", slot: 3, label: "Pick 4", prompt: "Commit to long range damage.", duration: 35 },
+      { turn: 18, order: "first", type: "pick", slot: 3, label: "Pick 4", prompt: "Match lane pressure.", duration: 35 },
+      { turn: 19, order: "first", type: "pick", slot: 4, label: "Pick 5", prompt: "Hold the final counter pick.", duration: 35 },
+      { turn: 20, order: "second", type: "pick", slot: 4, label: "Pick 5", prompt: "Round out the composition.", duration: 35 },
     ],
     live: {
       turnIndex: 16,
@@ -150,20 +158,114 @@
     return Math.min(maximum, Math.max(minimum, value));
   }
 
+  function getOtherTeamKey(teamKey) {
+    return teamKey === "red" ? "blue" : "red";
+  }
+
+  function oppositeSide(side) {
+    return side === "red" ? "blue" : "red";
+  }
+
+  function oppositePickOrder(order) {
+    return order === "second" ? "first" : "second";
+  }
+
+  function normalizeSelection(selection) {
+    const safeSelection = isObject(selection) ? selection : {};
+    const priorityTeam = TEAM_IDS.includes(safeSelection.priorityTeam) ? safeSelection.priorityTeam : "blue";
+    const priorityChoiceType = safeSelection.priorityChoiceType === "side" ? "side" : "pickOrder";
+
+    if (priorityChoiceType === "pickOrder") {
+      return {
+        priorityTeam,
+        priorityChoiceType,
+        priorityChoiceValue: PICK_ORDER_IDS.includes(safeSelection.priorityChoiceValue)
+          ? safeSelection.priorityChoiceValue
+          : "first",
+        counterChoiceValue: SIDE_IDS.includes(safeSelection.counterChoiceValue)
+          ? safeSelection.counterChoiceValue
+          : "red",
+      };
+    }
+
+    return {
+      priorityTeam,
+      priorityChoiceType,
+      priorityChoiceValue: SIDE_IDS.includes(safeSelection.priorityChoiceValue)
+        ? safeSelection.priorityChoiceValue
+        : "blue",
+      counterChoiceValue: PICK_ORDER_IDS.includes(safeSelection.counterChoiceValue)
+        ? safeSelection.counterChoiceValue
+        : "first",
+    };
+  }
+
+  function normalizeSequenceStep(step, fallbackStep) {
+    const safeFallback = fallbackStep || DEFAULT_STORE.sequence[0];
+    const safeStep = isObject(step) ? step : {};
+    const derivedOrder =
+      safeStep.order ||
+      (safeStep.team === "red" ? "second" : safeStep.team === "blue" ? "first" : safeFallback.order);
+
+    return {
+      turn: clampNumber(safeStep.turn, 1, 99, safeFallback.turn),
+      order: PICK_ORDER_IDS.includes(derivedOrder) ? derivedOrder : safeFallback.order,
+      type: safeStep.type === "ban" ? "ban" : safeStep.type === "pick" ? "pick" : safeFallback.type,
+      slot: clampNumber(safeStep.slot, 0, 4, safeFallback.slot),
+      label: typeof safeStep.label === "string" && safeStep.label ? safeStep.label : safeFallback.label,
+      prompt: typeof safeStep.prompt === "string" && safeStep.prompt ? safeStep.prompt : safeFallback.prompt,
+      duration: clampNumber(safeStep.duration, 1, 999, safeFallback.duration),
+    };
+  }
+
+  function resolveAssignments(store) {
+    const safeStore = normalizeStore(store);
+    const priorityTeam = safeStore.selection.priorityTeam;
+    const otherTeam = getOtherTeamKey(priorityTeam);
+    const teamToSide = {};
+    const teamToPickOrder = {};
+
+    if (safeStore.selection.priorityChoiceType === "pickOrder") {
+      teamToPickOrder[priorityTeam] = safeStore.selection.priorityChoiceValue;
+      teamToPickOrder[otherTeam] = oppositePickOrder(safeStore.selection.priorityChoiceValue);
+      teamToSide[otherTeam] = safeStore.selection.counterChoiceValue;
+      teamToSide[priorityTeam] = oppositeSide(safeStore.selection.counterChoiceValue);
+    } else {
+      teamToSide[priorityTeam] = safeStore.selection.priorityChoiceValue;
+      teamToSide[otherTeam] = oppositeSide(safeStore.selection.priorityChoiceValue);
+      teamToPickOrder[otherTeam] = safeStore.selection.counterChoiceValue;
+      teamToPickOrder[priorityTeam] = oppositePickOrder(safeStore.selection.counterChoiceValue);
+    }
+
+    return {
+      priorityTeam,
+      otherTeam,
+      teamToSide,
+      teamToPickOrder,
+      sideToTeam: {
+        blue: teamToSide.blue === "blue" ? "blue" : teamToSide.red === "blue" ? "red" : "blue",
+        red: teamToSide.blue === "red" ? "blue" : teamToSide.red === "red" ? "red" : "red",
+      },
+      pickOrderToTeam: {
+        first: teamToPickOrder.blue === "first" ? "blue" : teamToPickOrder.red === "first" ? "red" : "blue",
+        second: teamToPickOrder.blue === "second" ? "blue" : teamToPickOrder.red === "second" ? "red" : "red",
+      },
+    };
+  }
+
   function normalizeStore(rawStore) {
     const store = mergeWithDefaults(DEFAULT_STORE, rawStore);
-    const maxTurnIndex = Math.max(0, store.sequence.length - 1);
+    const fallbackSequence = DEFAULT_STORE.sequence;
+    const nextSequence = Array.isArray(store.sequence) && store.sequence.length ? store.sequence : fallbackSequence;
 
-    store.live.turnIndex = clampNumber(
-      store.live.turnIndex,
-      0,
-      maxTurnIndex,
-      DEFAULT_STORE.live.turnIndex,
-    );
+    store.selection = normalizeSelection(store.selection);
+    store.sequence = nextSequence.map((step, index) => normalizeSequenceStep(step, fallbackSequence[index]));
+
+    const maxTurnIndex = Math.max(0, store.sequence.length - 1);
+    store.live.turnIndex = clampNumber(store.live.turnIndex, 0, maxTurnIndex, DEFAULT_STORE.live.turnIndex);
 
     const fallbackRemaining =
-      (store.sequence[store.live.turnIndex] && store.sequence[store.live.turnIndex].duration * 1000) ||
-      30000;
+      (store.sequence[store.live.turnIndex] && store.sequence[store.live.turnIndex].duration * 1000) || 30000;
 
     store.live.remainingMs = clampNumber(
       store.live.remainingMs,
@@ -173,7 +275,7 @@
     );
     store.live.running = Boolean(store.live.running);
 
-    ["blue", "red"].forEach((teamKey) => {
+    TEAM_IDS.forEach((teamKey) => {
       const team = store.teams[teamKey];
       team.score = clampNumber(team.score, 0, 99, 0);
       team.roster = Array.isArray(team.roster) ? team.roster : [];
@@ -288,6 +390,9 @@
 
   global.LolDraftState = {
     STORAGE_KEY,
+    TEAM_IDS,
+    SIDE_IDS,
+    PICK_ORDER_IDS,
     createDefaultStore,
     loadStore,
     saveStore,
@@ -297,6 +402,11 @@
     formatTimer,
     jumpToTurn,
     stepLive,
+    resolveAssignments,
+    normalizeStore,
+    getOtherTeamKey,
+    oppositeSide,
+    oppositePickOrder,
     clone,
   };
 })(window);

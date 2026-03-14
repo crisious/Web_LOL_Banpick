@@ -13,3 +13,11 @@ Original prompt: 밴픽 방송 화면 와이어프레임 구현
 - Verification run: used headless Chrome via the DevTools protocol to load both pages, inspect `window.render_game_to_text()`, confirm the timer counts down, verify pause / next-turn / previous-turn / reset-timer keyboard controls, and confirm admin edits sync to the broadcast page through `localStorage`.
 - Verification run: captured screenshots in `test-artifacts/` including `broadcast-initial.png`, `admin-initial.png`, `broadcast-synced-visible.png`, and `admin-synced-visible.png`, then visually checked the layouts.
 - Verification run: listened for runtime exceptions and console warnings/errors on both `/` and `/admin.html`; none were reported in the headless browser session.
+- Refactored the draft assignment flow so one team chooses `First Pick` or `Second Pick` first, then the other team chooses `Blue Side` or `Red Side`.
+- Reworked `admin.js` around the new flow: selection controls now edit `selection.priorityTeam`, `selection.priorityChoiceValue`, and `selection.counterChoiceValue`, while current phase editing uses `sequence.<idx>.order` instead of a fixed blue/red team field.
+- Updated the broadcast layout styling for four top meta pills and three-column team detail rows so the new selection summary stays readable.
+- Added selection metadata to `window.render_game_to_text()` for easier automated verification of priority team, chosen pick order, and chosen side.
+- Verification run: used an isolated headless Chrome browser context to confirm `GEN -> Second Pick` plus `T1 -> Blue Side` produces `T1` on blue with first pick, `GEN` on red with second pick, and the expected meta pill text on the broadcast page.
+- Verification run: captured refreshed screenshots at `test-artifacts/broadcast-selection-flow.png` and `test-artifacts/admin-selection-flow.png`, then visually checked both layouts.
+- Verification run: no runtime exceptions or warning/error console entries were reported during the isolated selection-flow test.
+- Environment note: `npx` is still unavailable in this workspace, so the Playwright client from the web-game skill could not be used; verification stayed on the local headless Chrome DevTools path instead.
