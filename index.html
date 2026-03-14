@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoL Draft Broadcast Wireframe</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="broadcast-shell">
+      <header class="topbar">
+        <section class="topcard topcard--event">
+          <p class="eyebrow">Global Stage</p>
+          <h1>Fearless Draft Wireframe</h1>
+          <p class="subline">Broadcast layout study for a live League of Legends draft show.</p>
+        </section>
+
+        <section class="topcard topcard--score">
+          <div class="scoreline">
+            <span class="score-team score-team--blue" data-score-name="blue"></span>
+            <span class="score-value" data-score="blue"></span>
+            <span class="score-separator">:</span>
+            <span class="score-value" data-score="red"></span>
+            <span class="score-team score-team--red" data-score-name="red"></span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-pill" data-series-format></span>
+            <span class="meta-pill" data-series-game></span>
+            <span class="meta-pill" data-first-selection></span>
+          </div>
+        </section>
+
+        <section class="topcard topcard--status">
+          <div class="status-grid">
+            <div>
+              <span class="status-label">Patch</span>
+              <strong data-patch-version></strong>
+            </div>
+            <div>
+              <span class="status-label">Phase</span>
+              <strong data-phase-counter></strong>
+            </div>
+            <div>
+              <span class="status-label">State</span>
+              <strong data-live-state></strong>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <main class="main-stage">
+        <section class="team-panel team-panel--blue" data-team-panel="blue">
+          <div class="team-header">
+            <div>
+              <p class="eyebrow">Blue Side</p>
+              <h2 data-team-name="blue"></h2>
+            </div>
+            <span class="side-tag">B</span>
+          </div>
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label">Coach</span>
+              <strong data-coach="blue"></strong>
+            </div>
+            <div>
+              <span class="detail-label">Seed</span>
+              <strong data-seed="blue"></strong>
+            </div>
+          </div>
+          <div class="roster-list" data-roster="blue"></div>
+        </section>
+
+        <section class="draft-core">
+          <section class="phase-banner">
+            <div>
+              <p class="eyebrow">Current Call</p>
+              <h2 data-phase-title></h2>
+            </div>
+            <div class="timer-card">
+              <span class="timer-label">Draft Clock</span>
+              <strong data-timer-value></strong>
+            </div>
+          </section>
+
+          <section class="phase-track" data-phase-track></section>
+
+          <section class="pick-stage">
+            <div class="pick-stack" data-pick-stack="blue"></div>
+
+            <div class="center-signal">
+              <div class="signal-ring"></div>
+              <div class="signal-copy">
+                <p class="eyebrow">Observer Prompt</p>
+                <h3 data-active-team></h3>
+                <p data-active-copy></p>
+              </div>
+              <div class="signal-footer">
+                <span data-active-role></span>
+                <span data-active-kind></span>
+              </div>
+            </div>
+
+            <div class="pick-stack" data-pick-stack="red"></div>
+          </section>
+
+          <section class="ban-stage">
+            <div class="ban-strip" data-ban-strip="blue"></div>
+            <div class="ban-strip" data-ban-strip="red"></div>
+          </section>
+        </section>
+
+        <section class="team-panel team-panel--red" data-team-panel="red">
+          <div class="team-header">
+            <div>
+              <p class="eyebrow">Red Side</p>
+              <h2 data-team-name="red"></h2>
+            </div>
+            <span class="side-tag">R</span>
+          </div>
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label">Coach</span>
+              <strong data-coach="red"></strong>
+            </div>
+            <div>
+              <span class="detail-label">Seed</span>
+              <strong data-seed="red"></strong>
+            </div>
+          </div>
+          <div class="roster-list" data-roster="red"></div>
+        </section>
+      </main>
+
+      <section class="fearless-board">
+        <div class="board-header">
+          <div>
+            <p class="eyebrow">Series Lockout</p>
+            <h2>Fearless Draft Memory</h2>
+          </div>
+          <p class="subline">
+            Champions already used earlier in the series stay visible here as a quick
+            production check.
+          </p>
+        </div>
+
+        <div class="fearless-columns">
+          <section class="fearless-column" data-fearless-column="blue"></section>
+          <section class="fearless-column" data-fearless-column="red"></section>
+        </div>
+      </section>
+
+      <footer class="control-dock">
+        <div class="dock-pill">Keys: Left/Right move turns, Space pause, R reset timer, F fullscreen</div>
+        <div class="dock-pill">Status output: open the console and call window.render_game_to_text()</div>
+      </footer>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>

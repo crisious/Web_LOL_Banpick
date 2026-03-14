@@ -1,0 +1,8 @@
+Original prompt: 밴픽 방송 화면 와이어프레임 구현
+
+- TODO: Build a static broadcast wireframe from scratch because the workspace started empty.
+- TODO: Add a lightweight interactive draft timeline and testing hooks for deterministic inspection.
+- Added index.html, styles.css, and main.js with a full broadcast wireframe, draft phase timeline, live timer, Fearless memory board, and keyboard controls.
+- Updated the draft timeline interaction to use event delegation so phase chips still work after repeated rerenders.
+- Verified the page serves over a local Python HTTP server and confirmed `/`, `/main.js`, and `/styles.css` respond successfully.
+- Environment note: Node, npm, Playwright, and a local WebDriver listener were not available, so the usual automated browser loop could not be run in this workspace.
