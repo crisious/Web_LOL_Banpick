@@ -57,6 +57,8 @@ const state = {
   view: "LOGGED_OUT",
   account: null,
   recentMatches: [],
+  prefetchedSamples: new Map(),
+  riotApiKey: "",
 };
 
 // ─── localStorage persistence ─────────────────────────────────────────────
@@ -67,6 +69,19 @@ function saveAccount(account) {
 
 function loadSavedAccount() {
   try { return JSON.parse(localStorage.getItem("lol-coach-account")); } catch { return null; }
+}
+
+function saveApiKey(key) {
+  if (key) localStorage.setItem("lol-coach-api-key", key);
+  else localStorage.removeItem("lol-coach-api-key");
+}
+
+function loadSavedApiKey() {
+  return localStorage.getItem("lol-coach-api-key") || "";
+}
+
+function getUserApiKey() {
+  return state.riotApiKey || "";
 }
 
 // ─── View state machine ──────────────────────────────────────────────────
@@ -627,6 +642,11 @@ async function loadSampleBundle(sampleId) {
       fetchJson(entry.analysisPath),
     ]);
 
+    // fallback에서도 comparison 로드 시도
+    let comparison = null;
+    const compPath = entry.normalizedPath.replace("normalized-match.json", "comparison-result.json");
+    try { comparison = await fetchJson(compPath); } catch {}
+
     return {
       sampleId: entry.id,
       publicAlias: entry.publicAlias,
@@ -634,6 +654,7 @@ async function loadSampleBundle(sampleId) {
       theme: entry.theme,
       normalized,
       analysis,
+      comparison,
     };
   }
 }
@@ -732,13 +753,13 @@ function renderHero(sample) {
     applyChampionAvatarPresentation(dom.snapshotChampionIcon, match.champion);
     queueChampionVersionLoad();
   }
-  dom.snapshotRole.textContent = match.role || "—";
-  dom.snapshotResult.textContent = resultText;
-  dom.snapshotQueue.textContent = compactQueueLabel(match.queueType);
-  dom.snapshotDuration.textContent = sample.normalized.matchInfo.durationLabel || "—";
+  if (dom.snapshotRole) dom.snapshotRole.textContent = match.role || "—";
+  if (dom.snapshotResult) dom.snapshotResult.textContent = resultText;
+  if (dom.snapshotQueue) dom.snapshotQueue.textContent = compactQueueLabel(match.queueType);
+  dom.snapshotDuration.textContent = sample.normalized?.matchInfo?.durationLabel || "—";
   dom.snapshotPatch.textContent = compactPatchLabel(match.gameVersion);
   dom.snapshotConfidence.textContent =
-    typeof sample.analysis.analysisMeta?.confidence === "number" ? formatPercent(sample.analysis.analysisMeta.confidence) : "—";
+    typeof sample.analysis?.analysisMeta?.confidence === "number" ? formatPercent(sample.analysis.analysisMeta.confidence) : "—";
 
   if (dom.heroPills) {
     dom.heroPills.innerHTML = [
@@ -755,36 +776,42 @@ function renderHero(sample) {
 }
 
 function renderStats(sample) {
+  const ps = sample.normalized?.playerStats;
+  const tc = sample.normalized?.teamContext;
+  if (!ps) {
+    dom.statRibbon.innerHTML = '<p class="muted">스탯 데이터가 없습니다.</p>';
+    return;
+  }
   const stats = [
     {
       label: "KDA",
-      value: `${sample.normalized.playerStats.kills}/${sample.normalized.playerStats.deaths}/${sample.normalized.playerStats.assists}`,
-      note: `배수 ${sample.normalized.playerStats.kda.toFixed(2)}`,
+      value: `${ps.kills ?? 0}/<span class="kda-death">${ps.deaths ?? 0}</span>/${ps.assists ?? 0}`,
+      note: `배수 ${(ps.kda ?? 0).toFixed(2)}`,
     },
     {
       label: "CS",
-      value: formatNumber(sample.normalized.playerStats.cs),
-      note: `분당 ${sample.normalized.playerStats.csPerMinute.toFixed(2)}`,
+      value: formatNumber(ps.cs ?? 0),
+      note: `분당 ${(ps.csPerMinute ?? 0).toFixed(2)}`,
     },
     {
       label: "Gold",
-      value: formatNumber(sample.normalized.playerStats.goldEarned),
+      value: formatNumber(ps.goldEarned ?? 0),
       note: "누적 획득 골드",
     },
     {
       label: "Damage",
-      value: formatNumber(sample.normalized.playerStats.damageToChampions),
+      value: formatNumber(ps.damageToChampions ?? 0),
       note: "챔피언 대상 피해",
     },
     {
       label: "Vision",
-      value: formatNumber(sample.normalized.playerStats.visionScore),
+      value: formatNumber(ps.visionScore ?? 0),
       note: "시야 점수",
     },
     {
       label: "KP",
-      value: formatPercent(sample.normalized.playerStats.killParticipation),
-      note: `팀 킬 ${sample.normalized.teamContext.teamTotalKills}`,
+      value: formatPercent(ps.killParticipation ?? 0),
+      note: `팀 킬 ${tc?.teamTotalKills ?? 0}`,
     },
   ];
 
@@ -973,7 +1000,7 @@ function renderPlaytimeScore(sample) {
   dom.scorePanel.innerHTML = `
     <div class="score-overall">
       <div class="score-overall-number" style="color: ${barColor(score.overall)}">${score.overall}</div>
-      <div class="score-overall-label">${score.label}</div>
+      <div class="score-overall-label">${score.label}<span class="score-badge score-badge--${score.overall >= 8 ? "mvp" : score.overall >= 6 ? "good" : "avg"}">${score.label}</span></div>
       <div class="score-overall-sub">/ 10</div>
     </div>
     <div class="score-bars">${bars}</div>
@@ -1118,14 +1145,36 @@ function renderComparison(sample) {
 }
 
 function renderSample(sample) {
+  state.currentSampleId = sample.sampleId || state.currentSampleId;
   state.currentSample = sample;
+
+  // 방어: analysis 객체 기본값 보장
+  if (!sample.analysis) sample.analysis = {};
+  if (!sample.analysis.coachSummary) sample.analysis.coachSummary = {};
+  if (!sample.analysis.matchSummary) sample.analysis.matchSummary = {};
+
   renderHero(sample);
   renderStats(sample);
   renderPhases(sample);
-  renderInsightCards(dom.strengths, sample.analysis.strengths, "strength", sample);
-  renderInsightCards(dom.weaknesses, sample.analysis.weaknesses, "weakness", sample);
-  renderChecklist(sample);
-  renderKeyMoments(sample);
+
+  // 배열 필드 가드
+  const strengths = Array.isArray(sample.analysis.strengths) ? sample.analysis.strengths : [];
+  const weaknesses = Array.isArray(sample.analysis.weaknesses) ? sample.analysis.weaknesses : [];
+  renderInsightCards(dom.strengths, strengths, "strength", sample);
+  renderInsightCards(dom.weaknesses, weaknesses, "weakness", sample);
+
+  if (Array.isArray(sample.analysis.actionChecklist) && sample.analysis.actionChecklist.length > 0) {
+    renderChecklist(sample);
+  } else {
+    dom.checklist.innerHTML = '<li class="muted">체크리스트 데이터 생성 중...</li>';
+  }
+
+  if (Array.isArray(sample.analysis.keyMoments) && sample.analysis.keyMoments.length > 0) {
+    renderKeyMoments(sample);
+  } else {
+    dom.keyMoments.innerHTML = '<p class="muted">핵심 장면 데이터 생성 중...</p>';
+  }
+
   renderEvidence(sample);
   renderComparison(sample);
   renderPlaytimeScore(sample);
@@ -1298,6 +1347,7 @@ async function handleGenerateSample(matchId) {
     platformRegion: platformRegion.trim(),
     matchId,
   };
+  if (getUserApiKey()) payload.riotApiKey = getUserApiKey();
 
   state.isGeneratePending = true;
   applyPendingUi();
@@ -1340,11 +1390,16 @@ async function handleLogin(event) {
     platformRegion: form.get("platformRegion") || "KR",
   };
   const remember = form.get("remember");
+  const userApiKey = (form.get("riotApiKey") || "").trim();
 
   if (account.gameName.length < 3 || account.tagLine.length < 2) {
     dom.loginStatus.textContent = "gameName(3자 이상)과 tagLine(2자 이상)을 입력하세요.";
     return;
   }
+
+  // API 키 저장
+  state.riotApiKey = userApiKey;
+  if (remember) saveApiKey(userApiKey);
 
   state.isLoginPending = true;
   applyPendingUi();
@@ -1352,10 +1407,13 @@ async function handleLogin(event) {
   dom.loginStatus.textContent = `${account.gameName}#${account.tagLine} 조회 중...`;
 
   try {
+    const payload = { ...account, matchCount: 10 };
+    if (userApiKey) payload.riotApiKey = userApiKey;
+
     const result = await fetchJson("/api/recent-matches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...account, matchCount: 10 }),
+      body: JSON.stringify(payload),
     });
 
     state.account = { ...account, riotId: result.riotId, puuid: result.puuid };
@@ -1364,6 +1422,7 @@ async function handleLogin(event) {
 
     renderMatchList();
     setView("MATCH_LIST");
+    prefetchAndAnalyzeAll();  // fire-and-forget: 기존 프리페치 + 미분석 자동 생성
   } catch (error) {
     dom.loginStatus.textContent = `조회 실패: ${formatRetryMessage(error)}`;
     setView("LOGGED_OUT");
@@ -1388,29 +1447,117 @@ function renderMatchList() {
 
   dom.matchListGrid.innerHTML = matches.map((m) => `
     <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
-      <div class="match-summary-champion">
-        ${championAvatarMarkup(m.champion, "small")}
-        <div>
-          <strong>${championDisplayName(m.champion)}</strong>
-          <span class="meta-label">${m.role}</span>
+      <div class="msc-row1">
+        <div class="match-summary-champion">
+          ${championAvatarMarkup(m.champion, "small")}
+          <div>
+            <strong>${championDisplayName(m.champion)}</strong>
+            <span class="meta-label">${m.role}</span>
+          </div>
         </div>
+        <span class="match-summary-kda"><span>${m.kills}</span>/<span class="kda-death">${m.deaths}</span>/<span>${m.assists}</span></span>
+        <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
       </div>
-      <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
-      <span class="match-summary-kda">${m.kills}/${m.deaths}/${m.assists}</span>
-      <span class="match-summary-cs">${m.csPerMin} CS/m</span>
-      <span class="match-summary-duration">${m.durationLabel}</span>
-      <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
-      <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
+      <div class="msc-row2">
+        <span class="match-summary-cs">${m.csPerMin} CS/m</span>
+        <span class="match-summary-duration">${m.durationLabel}</span>
+        <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
+        <span class="match-summary-patch">${compactPatchLabel(m.gameVersion)}</span>
+        <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
+      </div>
     </button>
   `).join("");
 
   applyPendingUi();
 }
 
+// ─── Background analysis queue ────────────────────────────────────────────
+
+function updateCardBadge(matchId, text, cssClass) {
+  const card = dom.matchListGrid.querySelector(`[data-match-detail="${matchId}"]`);
+  if (!card) return;
+  let badge = card.querySelector(".analyzed-badge");
+  if (!badge) {
+    card.insertAdjacentHTML("beforeend", `<span class="analyzed-badge ${cssClass}">${text}</span>`);
+  } else {
+    badge.textContent = text;
+    badge.className = `analyzed-badge ${cssClass}`;
+  }
+}
+
+async function prefetchAndAnalyzeAll() {
+  state.prefetchedSamples = new Map();
+  const unanalyzed = [];
+
+  // Phase 1: 기존 샘플 프리페치
+  for (const match of state.recentMatches) {
+    const sampleId = findSampleIdForMatch(match.matchId);
+    if (sampleId) {
+      try {
+        const bundle = await loadSampleBundle(sampleId);
+        state.prefetchedSamples.set(match.matchId, bundle);
+        updateCardBadge(match.matchId, "분석 완료", "badge--done");
+      } catch {}
+    } else {
+      unanalyzed.push(match.matchId);
+    }
+  }
+
+  // Phase 2: 미분석 매치 순차 백그라운드 생성 (rate limit 60초 간격)
+  if (unanalyzed.length === 0 || !state.account) return;
+
+  for (const matchId of unanalyzed) {
+    // 뷰가 바뀌었으면 중단
+    if (state.view !== "MATCH_LIST") return;
+    // 다른 generate가 진행 중이면 대기
+    while (state.isGeneratePending) {
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+
+    updateCardBadge(matchId, "분석 중...", "badge--pending");
+
+    try {
+      state.isGeneratePending = true;
+      const result = await fetchJson("/api/generate-sample", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameName: state.account.gameName,
+          tagLine: state.account.tagLine,
+          platformRegion: state.account.platformRegion,
+          matchId,
+          publicAlias: `${state.account.gameName}#${state.account.tagLine}`,
+          ...(getUserApiKey() ? { riotApiKey: getUserApiKey() } : {}),
+        }),
+      });
+      state.isGeneratePending = false;
+
+      // manifest 새로고침
+      try { state.manifest = (await fetchJson("/api/samples")).samples; } catch {}
+
+      // 프리페치 캐시에 추가
+      const sampleId = result.sampleId;
+      if (sampleId) {
+        try {
+          const bundle = await loadSampleBundle(sampleId);
+          state.prefetchedSamples.set(matchId, bundle);
+        } catch {}
+      }
+
+      updateCardBadge(matchId, "분석 완료", "badge--done");
+    } catch (err) {
+      state.isGeneratePending = false;
+      updateCardBadge(matchId, "분석 실패", "badge--fail");
+      // rate limit 대기 (서버 60초 제한)
+      await new Promise((r) => setTimeout(r, 65000));
+    }
+  }
+}
+
 // ─── Detail analysis from match list ──────────────────────────────────────
 
 async function startDetailAnalysis(matchId) {
-  if (state.isDetailPending || state.isGeneratePending) return;
+  if (state.isDetailPending) return;
 
   state.isDetailPending = true;
   applyPendingUi();
@@ -1418,17 +1565,61 @@ async function startDetailAnalysis(matchId) {
   syncRecentFormWithAccount();
 
   try {
+    // 1. 프리페치 캐시 확인 (즉시 렌더)
+    const prefetched = state.prefetchedSamples?.get(matchId);
+    if (prefetched) {
+      renderSample(prefetched);
+      setView("DETAIL_VIEW");
+      return;
+    }
+
+    // 2. manifest에서 기존 샘플 확인
     const cachedSampleId = findSampleIdForMatch(matchId);
 
     if (cachedSampleId) {
       dom.fetchStatus.textContent = `${matchId} 저장된 분석을 여는 중입니다.`;
       await selectSample(cachedSampleId);
-    } else {
-      dom.fetchStatus.textContent = `${matchId} AI 분석 진행 중... (2~5분 소요)`;
-      const result = await handleGenerateSample(matchId);
-      await selectSample(result.sampleId);
+      setView("DETAIL_VIEW");
+      return;
     }
 
+    // 3. 백그라운드 생성이 진행 중인 경우 → 완료 대기
+    if (state.isGeneratePending) {
+      dom.fetchStatus.textContent = `${matchId} 백그라운드 분석 진행 중... 완료되면 자동으로 표시됩니다.`;
+      // 백그라운드 큐가 해당 매치를 완료할 때까지 폴링
+      while (state.isGeneratePending || !state.prefetchedSamples?.has(matchId)) {
+        await new Promise((r) => setTimeout(r, 3000));
+        // 프리페치에 올라왔는지 체크
+        if (state.prefetchedSamples?.has(matchId)) break;
+        // manifest에 올라왔는지 체크
+        try { state.manifest = (await fetchJson("/api/samples")).samples; } catch {}
+        const newSampleId = findSampleIdForMatch(matchId);
+        if (newSampleId) {
+          await selectSample(newSampleId);
+          setView("DETAIL_VIEW");
+          return;
+        }
+        dom.fetchStatus.textContent = `${matchId} 분석 중... 잠시만 기다려 주세요.`;
+      }
+      // 프리페치 완료됨
+      const bundle = state.prefetchedSamples.get(matchId);
+      if (bundle) {
+        renderSample(bundle);
+        setView("DETAIL_VIEW");
+        return;
+      }
+    }
+
+    // 4. 직접 생성
+    dom.fetchStatus.textContent = `${matchId} AI 분석 진행 중... (2~5분 소요)`;
+    let result;
+    try {
+      result = await handleGenerateSample(matchId);
+    } catch (err) {
+      dom.fetchStatus.textContent = "분석 재시도 중...";
+      result = await handleGenerateSample(matchId);
+    }
+    await selectSample(result.sampleId);
     setView("DETAIL_VIEW");
   } catch (error) {
     dom.fetchStatus.textContent = `상세 분석 열기 실패: ${formatRetryMessage(error)}`;
@@ -1456,6 +1647,14 @@ async function init() {
     if (!button) return;
     selectSample(button.dataset.sampleButton);
   });
+
+  if (dom.reportStrip) {
+    dom.reportStrip.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-sample-button]");
+      if (!button) return;
+      selectSample(button.dataset.sampleButton);
+    });
+  }
 
   dom.candidateList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-generate-match]");
@@ -1498,6 +1697,14 @@ async function init() {
   });
 
   // 저장된 계정 확인 → 자동 로그인 또는 로그인 화면
+  // 저장된 API 키 복원
+  const savedApiKey = loadSavedApiKey();
+  if (savedApiKey) {
+    state.riotApiKey = savedApiKey;
+    const apiKeyInput = dom.loginForm.querySelector("[name=riotApiKey]");
+    if (apiKeyInput) apiKeyInput.value = savedApiKey;
+  }
+
   const saved = loadSavedAccount();
   if (saved) {
     dom.loginForm.querySelector("[name=gameName]").value = saved.gameName;

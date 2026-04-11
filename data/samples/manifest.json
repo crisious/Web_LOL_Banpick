@@ -1,6 +1,78 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8164577567",
+      "matchId": "KR_8164577567",
+      "label": "sample-kr-8164577567 · SUPPORT LOSS",
+      "champion": "Senna",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "초반 킬 기회를 만들었으나 중반 반복 데스로 오브젝트 주도권을 완전히 내주며 패배한 경기",
+      "normalizedPath": "/data/samples/sample-kr-8164577567/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8164577567/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8164577567/sample-kr-8164577567-notes.md"
+    },
+    {
+      "id": "sample-kr-8166489844",
+      "matchId": "KR_8166489844",
+      "label": "sample-kr-8166489844 · MID LOSS",
+      "champion": "Nasus",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "나서스 미드로 바론 2회 확보에 기여했으나, 초반 불안정과 오브젝트 후 생존 실패로 승리 전환에 실패한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8166489844/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8166489844/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8166489844/sample-kr-8166489844-notes.md"
+    },
+    {
+      "id": "sample-kr-8166519650",
+      "matchId": "KR_8166519650",
+      "label": "sample-kr-8166519650 · MID LOSS",
+      "champion": "Galio",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "초반 킬 압박에도 불구하고 중반 반복 데스와 타워 손실로 흐름을 내준 갈리오 패배 경기",
+      "normalizedPath": "/data/samples/sample-kr-8166519650/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8166519650/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8166519650/sample-kr-8166519650-notes.md"
+    },
+    {
+      "id": "sample-kr-8164563430",
+      "matchId": "KR_8164563430",
+      "label": "sample-kr-8164563430 · SUPPORT LOSS",
+      "champion": "Nautilus",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "초반 반복 데스로 라인 주도권을 잃으며 15분 만에 무너진 경기",
+      "normalizedPath": "/data/samples/sample-kr-8164563430/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8164563430/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8164563430/sample-kr-8164563430-notes.md"
+    },
+    {
+      "id": "sample-kr-8166546648",
+      "matchId": "KR_8166546648",
+      "label": "sample-kr-8166546648 · TOP WIN",
+      "champion": "Malphite",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "초반 라인전에서 2데스를 내줬지만, 중반 오브젝트 합류와 바론 확보로 팀 승리를 이끌어낸 말파이트 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8166546648/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8166546648/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8166546648/sample-kr-8166546648-notes.md"
+    },
+    {
+      "id": "sample-kr-8164613865",
+      "matchId": "KR_8164613865",
+      "label": "sample-kr-8164613865 · SUPPORT WIN",
+      "champion": "Rell",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "렐의 적극적인 이니시에이트와 오브젝트 합류로 초반부터 주도권을 잡아 23분 만에 완승한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8164613865/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8164613865/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8164613865/sample-kr-8164613865-notes.md"
+    },
+    {
       "id": "sample-kr-8166575303",
       "matchId": "KR_8166575303",
       "label": "sample-kr-8166575303 · JUNGLE WIN",

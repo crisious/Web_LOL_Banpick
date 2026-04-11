@@ -29,7 +29,8 @@ body {
     radial-gradient(circle at top right, rgba(240, 179, 91, 0.18), transparent 30%),
     linear-gradient(145deg, var(--bg), var(--bg-alt));
   color: var(--text);
-  font-family: "Avenir Next", "Spoqa Han Sans Neo", "Noto Sans KR", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif;
+  font-size: 16px;
 }
 
 body::before {
@@ -669,7 +670,7 @@ body::after {
   border-radius: 999px;
   border: 1px solid var(--line);
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -922,7 +923,7 @@ body::after {
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
@@ -1131,7 +1132,7 @@ body::after {
 .obj-table th {
   text-align: left;
   padding: 8px 10px;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -1157,7 +1158,7 @@ body::after {
 
 .obj-phase-divider td {
   padding: 6px 10px;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1239,7 +1240,7 @@ body::after {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
 }
 
 .login-form input[type="text"],
@@ -1312,6 +1313,47 @@ body::after {
   border-radius: 8px;
 }
 
+.api-key-details {
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.api-key-details summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.api-key-details[open] summary {
+  margin-bottom: 8px;
+}
+
+.api-key-hint {
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.api-key-details input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: monospace;
+}
+
+.api-key-details input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .login-status {
   color: var(--muted);
   font-size: 0.82rem;
@@ -1348,7 +1390,7 @@ body::after {
 
 .match-summary-card {
   display: grid;
-  grid-template-columns: 180px 50px 80px 70px 60px 56px 1fr;
+  grid-template-columns: 180px 50px 80px 70px 60px 56px 48px 1fr;
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
@@ -1368,11 +1410,13 @@ body::after {
 }
 
 .match-summary-card[data-result="WIN"] {
-  border-left: 3px solid var(--mint);
+  border-left: 4px solid var(--mint);
+  background: linear-gradient(90deg, rgba(89, 209, 178, 0.06), var(--panel));
 }
 
 .match-summary-card[data-result="LOSS"] {
-  border-left: 3px solid var(--rose);
+  border-left: 4px solid var(--rose);
+  background: linear-gradient(90deg, rgba(255, 134, 120, 0.06), var(--panel));
 }
 
 .match-summary-champion {
@@ -1387,7 +1431,7 @@ body::after {
 
 .match-summary-champion .meta-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
@@ -1395,9 +1439,61 @@ body::after {
 .match-summary-result[data-result="LOSS"] { color: var(--rose); font-weight: 700; }
 
 .match-summary-kda { font-weight: 600; }
+
+.analyzed-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  pointer-events: none;
+  transition: background 300ms, color 300ms;
+}
+
+.analyzed-badge.badge--done {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.analyzed-badge.badge--pending {
+  background: var(--amber-soft);
+  color: var(--accent);
+  animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+.analyzed-badge.badge--fail {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.match-summary-card { position: relative; }
+.kda-death { color: var(--rose); }
+
+.score-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-left: 8px;
+}
+.score-badge--mvp { background: var(--accent); color: #11161a; }
+.score-badge--good { background: var(--mint-soft); color: var(--mint); }
+.score-badge--avg { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
+
+/* Desktop: row wrappers act as transparent grid passthrough */
+.msc-row1, .msc-row2 { display: contents; }
 .match-summary-cs,
 .match-summary-duration,
 .match-summary-queue,
+.match-summary-patch,
 .match-summary-time { color: var(--muted); font-size: 0.8rem; }
 
 /* ─── Back to list button ──────────────────────────────────────────────────── */
@@ -1406,7 +1502,8 @@ body::after {
   background: none;
   border: 1px solid var(--line);
   color: var(--muted);
-  padding: 8px 16px;
+  padding: 12px 20px;
+  min-height: 44px;
   border-radius: 8px;
   cursor: pointer;
   margin-bottom: 16px;
@@ -1523,7 +1620,7 @@ body::after {
 
 .comparison-badge {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   padding: 2px 8px;
   border-radius: 999px;
   font-weight: 600;
@@ -1601,10 +1698,63 @@ body::after {
 }
 
 @media (max-width: 760px) {
+  body { font-size: 15px; }
+
   .app-shell {
     width: min(100vw - 16px, 100%);
     padding-top: 16px;
   }
+
+  /* 매치 카드 2행 모바일 레이아웃 */
+  .match-summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 72px;
+    padding: 14px 16px;
+    font-size: 0.88rem;
+  }
+  .msc-row1, .msc-row2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .msc-row2 {
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding-left: 48px;
+  }
+
+  /* 섹션 네비 수평 스크롤 */
+  .section-nav {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .section-link {
+    white-space: nowrap;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  /* 매치 리스트 헤더 고정 */
+  .match-list-identity {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding: 12px 0;
+  }
+
+  /* 오브젝트 테이블 수평 스크롤 */
+  .objective-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .obj-table { min-width: 520px; }
+  .obj-table th, .obj-table td { padding: 8px 6px; }
 
   .workspace-grid {
     display: flex;
@@ -1782,7 +1932,7 @@ body::after {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1840,7 +1990,7 @@ body::after {
 .champion-avatar--small {
   width: 36px;
   height: 36px;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
 }
 
 .champion-avatar--medium {

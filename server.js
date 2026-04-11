@@ -1549,6 +1549,26 @@ async function loadSampleBundle(sampleId) {
   const normalized = await readJson(path.join(root, entry.normalizedPath.replace(/^\//, "")));
   const analysis = await readJson(path.join(root, entry.analysisPath.replace(/^\//, "")));
 
+  // 누락된 필드 서버측 보강 (기존 샘플 호환)
+  if (!normalized.playtimeScore && normalized.playerStats && normalized.timelineEvents) {
+    normalized.playtimeScore = buildPlaytimeScore(normalized);
+  }
+  if (!normalized.objectiveTimeline) {
+    // raw-timeline.json이 있으면 objectiveTimeline 생성
+    const tlPath = path.join(root, "data", "samples", sampleId, "raw-timeline.json");
+    const matchPath = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    try {
+      const timeline = await readJson(tlPath);
+      const matchDetail = await readJson(matchPath);
+      const participant = matchDetail.info.participants.find((p) => p.puuid === normalized.playerContext?.puuid);
+      if (participant && timeline) {
+        const ptMap = new Map();
+        matchDetail.info.participants.forEach((p) => ptMap.set(p.participantId, p.teamId));
+        normalized.objectiveTimeline = buildObjectiveTimeline(timeline, participant.teamId, ptMap);
+      }
+    } catch {}
+  }
+
   let comparison = null;
   const compPath = path.join(root, "data", "samples", sampleId, "comparison-result.json");
   try { comparison = await readJson(compPath); } catch {}
@@ -1562,6 +1582,13 @@ async function loadSampleBundle(sampleId) {
     analysis,
     comparison,
   };
+}
+
+function resolveApiKey(userKey) {
+  if (typeof userKey === "string" && userKey.startsWith("RGAPI-") && userKey.length > 20) {
+    return userKey.trim();
+  }
+  return process.env.RIOT_API_KEY || null;
 }
 
 async function parseBody(req) {
@@ -1638,17 +1665,14 @@ async function handleRecentMatches(req, res) {
     return;
   }
 
-  const apiKey = process.env.RIOT_API_KEY;
-  if (!apiKey) {
-    sendJson(res, 500, {
-      ok: false,
-      error: "RIOT_API_KEY is not set on the server process.",
-    });
-    return;
-  }
-
   try {
     const body = await parseBody(req);
+    const apiKey = resolveApiKey(body.riotApiKey);
+    if (!apiKey) {
+      sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다. 로그인 화면에서 키를 입력하거나 서버 .env를 확인하세요." });
+      return;
+    }
+
     const gameName = String(body.gameName || "").trim();
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
@@ -1741,17 +1765,14 @@ async function handleGenerateSample(req, res) {
     return;
   }
 
-  const apiKey = process.env.RIOT_API_KEY;
-  if (!apiKey) {
-    sendJson(res, 500, {
-      ok: false,
-      error: "RIOT_API_KEY is not set on the server process.",
-    });
-    return;
-  }
-
   try {
     const body = await parseBody(req);
+    const apiKey = resolveApiKey(body.riotApiKey);
+    if (!apiKey) {
+      sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다. 로그인 화면에서 키를 입력하거나 서버 .env를 확인하세요." });
+      return;
+    }
+
     const gameName = String(body.gameName || "").trim();
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();

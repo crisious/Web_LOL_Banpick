@@ -1,0 +1,699 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-11T17:24:28.647Z",
+  "sampleId": "sample-kr-8164613865",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-04-11T17:24:28.646Z",
+      "language": "ko",
+      "matchId": "KR_8164613865",
+      "riotId": "매운맛 비스킷#KR1",
+      "champion": "Rell",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "analysisId": "ai_sample-kr-8164613865_1775928268646"
+    },
+    "matchSummary": {
+      "headline": "렐의 적극적인 이니시에이트와 오브젝트 합류로 초반부터 주도권을 잡아 23분 만에 완승한 경기."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 2킬을 직접 만들며 라인 우위를 확보했고, 드래곤 3개를 모두 챙기는 오브젝트 운영이 돋보였습니다. 중반 교전 후속 합류와 타워 압박 전환도 팀 승리에 크게 기여했습니다. 다만, 중반 핵심 구간에서 두 번의 데스가 발생했는데, 오브젝트를 챙긴 직후 포지셔닝이 느슨해지는 패턴이 보입니다. 교전 후 이탈 타이밍을 의식하면 더 안정적인 운영이 가능합니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "timestamp": "0:00~14:59",
+        "summary": "8분대 드래곤 파이트에 합류하며 첫 킬을 만들었고, 12분에 추가 킬까지 성공시키며 2/0/4로 라인전을 압도적으로 마무리했다. 오브젝트 템포를 초반부터 확보해 팀 전체 흐름을 이끌었다.",
+        "playerKDA": "2/0/4"
+      },
+      {
+        "phase": "MID",
+        "timestamp": "15:00~20:59",
+        "summary": "교전 합류와 타워 전환이 빠르게 이어지며 어시스트 8개를 기록했지만, 17:49과 20:51에 각각 데스를 내주며 운영 안정감이 흔들렸다. 드래곤 3개째를 확보하는 데 기여했으나, 오브젝트 후 생존에 취약한 모습을 보였다.",
+        "playerKDA": "0/2/8"
+      },
+      {
+        "phase": "LATE",
+        "timestamp": "21:00~23:04",
+        "summary": "팀이 쌓아 놓은 유리한 상황을 바탕으로 특별한 교전 없이 경기를 마무리했다. 추가 데스 없이 안정적으로 게임을 종료했다.",
+        "playerKDA": "0/0/0"
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "초반 킬 메이킹 능력",
+        "description": "8:58과 12:18에 직접 킬을 만들어 내며 라인 주도권을 확보했습니다. 서포터로서 초반에 2킬을 기록한 것은 렐의 이니시에이트를 적극적으로 활용한 결과입니다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_006"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "오브젝트 템포 장악",
+        "description": "드래곤 3개를 모두 확보하고 적에게 0개만 허용한 완벽한 오브젝트 운영이었습니다. 16:28 정글 오브젝트 셋업과 20:16 드래곤 파이트 합류가 특히 효과적이었습니다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_014",
+          "evt_024"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "교전 후 구조물 전환",
+        "description": "15:45~17:21 구간에서 교전 승리를 즉시 타워 압박으로 전환하며 팀의 5타워 확보에 기여했습니다. 킬 어드밴티지를 구조물 이득으로 변환하는 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_013",
+          "evt_015",
+          "evt_016",
+          "evt_017"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "오브젝트 확보 후 생존 관리 미흡",
+        "description": "17:49 데스는 교전 승리와 타워 확보 직후 발생했습니다. 오브젝트를 챙긴 뒤 긴장이 풀리며 포지셔닝이 느슨해지는 패턴이 보입니다. 오브젝트 후에도 즉시 안전 지역으로 이탈하는 습관이 필요합니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_016",
+          "evt_017"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "중반 핵심 구간 연속 데스",
+        "description": "17:49과 20:51에 연속으로 데스가 발생하며 중반 운영 안정감이 흔들렸습니다. 팀이 크게 앞서 있어 영향이 제한적이었지만, 접전 상황이었다면 역전의 빌미가 될 수 있는 패턴입니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_025"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "킬 관여율 개선 여지",
+        "description": "팀 총 33킬 중 킬 관여율이 42%로, 서포터 평균 대비 다소 낮습니다. 특히 중반 데스 이후 교전 합류가 어려워진 구간이 있었을 것으로 보이며, 데스를 줄이면 자연스럽게 관여율도 올라갈 수 있습니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_025"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "오브젝트(드래곤·타워) 확보 직후 3초 내로 안전 지역 이탈 경로를 미리 설정하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_2",
+        "text": "중반 교전 후 체력이 50% 이하면 무리하게 추가 교전에 참여하지 않고 리콜 판단하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_3",
+        "text": "팀이 앞서 있을 때 불필요한 어그로를 끌지 않도록 시야 확보 후 팀 뒤에서 이니시에이트 기회 대기하기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_4",
+        "text": "렐의 W(돌진) 사용 후 이탈이 느린 점을 고려해 진입 전 아군 후속 딜러 위치를 반드시 확인하기",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "8:58",
+        "phase": "EARLY",
+        "title": "첫 킬 메이킹",
+        "description": "드래곤 파이트 직후 교전에서 직접 킬을 만들어 내며 초반 주도권을 확보한 핵심 장면입니다.",
+        "coachNote": "렐의 이니시에이트 타이밍이 정확했습니다. 이런 타이밍 감각을 유지하세요."
+      },
+      {
+        "eventId": "evt_014",
+        "timestampLabel": "16:28",
+        "phase": "MID",
+        "title": "오브젝트 셋업 성공",
+        "description": "정글 오브젝트를 직접 셋업하며 팀의 구조물 압박 재료를 마련한 장면입니다.",
+        "coachNote": "오브젝트 타이밍에 맞춰 시야를 깔고 셋업하는 움직임이 좋았습니다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "17:49",
+        "phase": "MID",
+        "title": "교전 후 불필요한 데스",
+        "description": "타워 확보와 교전 승리 직후 발생한 데스로, 오브젝트 후 이탈 타이밍 관리가 아쉬운 장면입니다.",
+        "coachNote": "오브젝트를 챙겼으면 욕심내지 말고 빠지세요. 이미 이득을 봤으니 추가 리스크를 감수할 필요가 없습니다."
+      },
+      {
+        "eventId": "evt_024",
+        "timestampLabel": "20:16",
+        "phase": "MID",
+        "title": "3번째 드래곤 확보",
+        "description": "팀의 세 번째 드래곤 확보에 직접 합류하며 오브젝트 운영을 마무리한 장면입니다.",
+        "coachNote": "드래곤 타이밍에 빠짐없이 합류한 점이 좋습니다. 다만 이후 20:51 데스로 이어진 점은 주의하세요."
+      },
+      {
+        "eventId": "evt_025",
+        "timestampLabel": "20:51",
+        "phase": "MID",
+        "title": "드래곤 후 포지셔닝 실수",
+        "description": "드래곤 확보 직후 35초 만에 데스를 당한 장면으로, 오브젝트 후 생존 패턴의 반복입니다.",
+        "coachNote": "이 데스는 첫 번째 데스와 같은 패턴입니다. 오브젝트 후 '한 발 더'의 유혹을 참는 연습이 필요합니다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_004",
+        "usedIn": [
+          "str_1",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_005",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_006",
+        "usedIn": [
+          "str_1"
+        ]
+      },
+      {
+        "eventId": "evt_012",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_013",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_014",
+        "usedIn": [
+          "str_2",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_016",
+        "usedIn": [
+          "str_3",
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_017",
+        "usedIn": [
+          "str_3",
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_019",
+        "usedIn": [
+          "weak_1",
+          "weak_2",
+          "weak_3",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_024",
+        "usedIn": [
+          "str_2",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "usedIn": [
+          "weak_2",
+          "weak_3",
+          "keyMoments"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "matchId": "KR_8164613865",
+      "queueLabel": "RANKED_SOLO",
+      "champion": "Rell",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "durationLabel": "23:04",
+      "targetPlayer": {
+        "riotId": "매운맛 비스킷#KR1",
+        "participantId": 10
+      },
+      "redteamFocus": [
+        "겉으로 좋아 보이는 오브젝트 템포의 실제 기여도 점검",
+        "중반 승리 구간에서 반복된 생존 실패 패턴",
+        "상위 티어에서 처벌될 수 있는 낮은 킬 관여와 후속 운영 공백"
+      ]
+    },
+    "matchSummary": {
+      "oneLine": "팀은 빠르게 오브젝트와 구조물로 굴려 이겼지만, Rell 본인은 중반 핵심 구간에서 관여율과 생존 안정성이 동시에 흔들린 경기다.",
+      "resultContext": "23분 승리, 팀 드래곤 3:0, 포탑 5:1로 결과는 압도적이었으나 개인 킬 관여율은 42%에 그쳐 팀 전체 우세 대비 영향력이 과장될 여지가 있다."
+    },
+    "coachSummary": {
+      "overallFlow": "초반에는 8:58, 12:18 교전에서 직접 킬을 만들며 라인전 이후 흐름에 기여했다. 팀은 9:47, 14:32, 16:28, 20:16 오브젝트 흐름을 계속 챙겼고, 15~17분 구간에 교전 후속과 포탑 압박으로 승리 조건을 빠르게 구조물 쪽으로 전환했다. 그러나 레드팀 관점에서 보면 이 경기는 '잘 굴린 경기'라기보다 '팀이 이미 유리한 구도에서 Rell이 필요한 순간에는 참여했지만, 핵심 중반에는 죽지 않아야 할 타이밍에 두 번 죽은 경기'에 가깝다. 특히 17:21 교전 승리 직후 17:49 사망, 20:16 드래곤 타이밍 관여 후 20:51 사망은 오브젝트 이후 정리 단계에서 반복되는 취약점으로 보인다.",
+      "criticalRead": "69 시야 점수와 2/2/12 KDA는 표면적으로 좋아 보이지만, 33킬 팀에서 14킬 관여는 낮다. 즉 많은 이득이 본인의 선제 설계보다 팀의 다른 축에서 발생했을 가능성이 높다. 상위 티어에서는 Rell이 진입 후 살아나오지 못하거나, 오브젝트 이후 리콜·라인 재정비 타이밍을 놓치는 패턴이 바로 역오브젝트나 현상금 회수로 연결될 수 있다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반은 개인 킬 2개와 팀 오브젝트 흐름이 동시에 발생해 결과적으로 매우 좋았다. 다만 8:35에 먼저 흔들린 오브젝트/구조물 이벤트가 있었고, 8:43 및 14:32 드래곤 관련 이벤트는 데이터상 플레이어 직접 관여가 표시되지 않는다. 즉 초반 우위 전체를 Rell의 주도권으로 해석하기에는 근거가 부족하다.",
+        "redteamConcern": "초반 성과는 있었지만, 드래곤 흐름 일부가 본인 직접 관여 없이 진행됐다. 서포터가 오브젝트 전 시야와 합류의 중심이 되어야 하는 관점에서는 '팀이 잘 챙겨준 오브젝트'와 '내가 설계한 오브젝트'를 분리해서 봐야 한다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_004",
+          "evt_005",
+          "evt_006",
+          "evt_010"
+        ]
+      },
+      "MID": {
+        "summary": "중반에는 15:45부터 17:21까지 후속 합류, 오브젝트, 포탑, 교전 승리가 이어지며 게임을 크게 굴렸다. 하지만 바로 17:49에 사망했고, 20:16 드래곤 관여 후에도 20:51에 다시 사망했다. 이 구간은 승리의 핵심이면서 동시에 가장 큰 구조적 약점이 드러난 구간이다.",
+        "redteamConcern": "Rell의 중반 역할은 진입 자체보다 진입 후 생존, 시야 유지, 다음 오브젝트 연결까지 포함한다. 이 경기에서는 좋은 교전 뒤 정리 단계에서 죽는 패턴이 반복돼, 더 강한 상대라면 이긴 교전이 반반 교환이나 역전 빌미로 바뀔 수 있다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_013",
+          "evt_014",
+          "evt_015",
+          "evt_016",
+          "evt_017",
+          "evt_019",
+          "evt_024",
+          "evt_025"
+        ]
+      },
+      "LATE": {
+        "summary": "23:04에 종료되어 실질적인 후반 검증은 없었다. 후반 이벤트가 없기 때문에 장기전 운영, 바론 시야전, 5대5 정면 한타에서의 Rell 숙련도는 이 경기만으로는 평가할 수 없다.",
+        "redteamConcern": "빠른 승리는 약점을 숨긴다. 이 경기는 후반 운영을 잘해서 이긴 것이 아니라, 중반까지 만든 격차가 충분히 커서 후반 검증 전에 끝난 경기다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "title": "초반 교전에서 직접 킬을 만들 수 있는 결단력",
+        "description": "8:58, 12:18에 플레이어 관여 킬이 발생했다. Rell이 초반에 단순 보호형으로 머무르지 않고 교전 결과를 직접 만든 점은 분명한 장점이다.",
+        "redteamCaveat": "다만 두 번의 직접 킬이 이후 높은 전체 관여율로 이어지지는 않았다. 초반 성공이 경기 전체 주도권으로 확장됐는지는 별도로 봐야 한다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_006"
+        ]
+      },
+      {
+        "title": "중반 15~17분 승리 구간에 필요한 후속 합류는 수행",
+        "description": "15:45, 16:59, 17:21에 교전 후속 합류 및 스커미시 승리가 이어졌고, 17:07 포탑 압박에도 관여했다. 팀이 굴리는 구간에서 완전히 이탈하지 않고 필요한 지점에는 붙었다.",
+        "redteamCaveat": "후속 합류 중심이라는 것은 반대로 선제 설계가 부족했을 가능성도 있다. 상위 티어에서는 '늦게 잘 붙는 것'보다 '먼저 구도를 만드는 것'의 가치가 더 크다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_015",
+          "evt_016",
+          "evt_017"
+        ]
+      },
+      {
+        "title": "오브젝트 흐름 자체는 팀 승리 조건과 맞게 유지",
+        "description": "팀은 드래곤 3개를 챙겼고 적 드래곤을 0으로 묶었다. 16:28 오브젝트 준비에는 플레이어 직접 관여도 표시되어 있어, 최소한 중반 핵심 오브젝트 타이밍을 완전히 놓치지는 않았다.",
+        "redteamCaveat": "8:43, 14:32 드래곤 이벤트는 플레이어 직접 관여가 표시되지 않는다. 오브젝트 결과가 좋았다는 사실만으로 서포터의 오브젝트 설계가 좋았다고 결론내리면 위험하다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_010",
+          "evt_014",
+          "evt_024"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "팀 우세 대비 낮은 킬 관여율",
+        "description": "팀 총 33킬 중 플레이어는 2킬 12어시스트로 14킬 관여, 킬 관여율 42%에 그쳤다. Rell 서포터가 23분 압승 경기에서 이 정도 관여율이면, 팀의 주요 이득이 본인 설계 바깥에서 많이 발생했을 가능성이 높다.",
+        "whyItMattersAtHigherTier": "상위 티어에서는 서포터가 주요 교전 각, 시야 장악, 미드-정글 연결의 중심이 되지 못하면 팀이 앞서도 운영 속도가 느려진다. 특히 Rell은 챔피언 특성상 '있어야 할 곳에 먼저 있는 것'이 핵심이다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_010",
+          "evt_012",
+          "evt_015",
+          "evt_017",
+          "evt_024"
+        ]
+      },
+      {
+        "title": "이긴 교전 이후 생존 실패가 반복됨",
+        "description": "17:21 스커미시 승리 후 17:49에 사망했고, 20:16 드래곤 타이밍 관여 후 20:51에 다시 사망했다. 단발 실수가 아니라 '이득을 본 직후 정리 단계에서 죽는 패턴'으로 읽힌다.",
+        "whyItMattersAtHigherTier": "Rell은 진입 후 죽어도 되는 챔피언처럼 보이지만, 오브젝트 이후에는 살아서 시야를 다시 깔고 라인 전환을 도와야 한다. 상위 티어에서는 이런 사망이 바로 바론 시야 상실, 미드 웨이브 손실, 현상금 회수로 이어진다.",
+        "relatedEventIds": [
+          "evt_017",
+          "evt_019",
+          "evt_024",
+          "evt_025"
+        ]
+      },
+      {
+        "title": "오브젝트 성과가 개인 설계력으로 과대평가될 위험",
+        "description": "팀은 드래곤 3:0으로 크게 앞섰지만, 주요 드래곤 이벤트 중 일부는 플레이어 직접 관여가 표시되지 않는다. 69 시야 점수도 좋지만, 이 데이터만으로 그 시야가 실제 선제 교전이나 안전한 오브젝트 전환으로 이어졌다고 보기는 어렵다.",
+        "whyItMattersAtHigherTier": "강한 상대는 단순히 시야를 많이 지운 것보다 어느 타이밍에 어느 입구를 잠갔는지를 본다. 오브젝트를 먹은 뒤 사망까지 반복되면, 시야 점수는 높아도 운영 안정성은 낮을 수 있다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_010",
+          "evt_014",
+          "evt_024",
+          "evt_025"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "오브젝트 45초 전부터 본인이 먼저 움직였는지 확인하기",
+        "detail": "드래곤을 먹었는지가 아니라, 강가 입구 시야와 미드 합류 라인을 누가 먼저 잡았는지 복기한다."
+      },
+      {
+        "item": "교전 승리 후 10초 안에 다음 행동을 고정하기",
+        "detail": "추격, 시야 재장악, 리콜, 포탑 압박 중 하나를 바로 선택한다. 애매하게 남아 있다가 죽는 패턴을 줄이는 것이 우선이다."
+      },
+      {
+        "item": "Rell 진입 전 아군 딜러 거리와 후속 CC 가능 여부를 체크하기",
+        "detail": "좋은 각처럼 보여도 아군이 따라오지 못하면 통계상 어시스트가 붙어도 구조적으로는 나쁜 진입일 수 있다."
+      },
+      {
+        "item": "승리 경기에서도 킬 관여율 목표를 따로 잡기",
+        "detail": "팀이 크게 이긴 20~25분 경기라면 서포터 기준 최소한 주요 교전 대부분에 관여했는지 확인한다. 단순 KDA보다 빠진 교전 수를 본다."
+      },
+      {
+        "item": "오브젝트 이후 사망 장면만 따로 클립으로 묶어 보기",
+        "detail": "17:49, 20:51 사망은 같은 유형일 가능성이 있다. 와드 욕심, 과추격, 리콜 지연, 아군과 거리 벌어짐 중 무엇이 반복됐는지 확인한다."
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "8:35",
+        "phase": "EARLY",
+        "title": "초반 오브젝트/구조물 흐름이 먼저 흔들린 장면",
+        "analysis": "이후 팀이 드래곤과 교전으로 복구했지만, 8:35에 먼저 내준 흐름은 초반 설계가 완전히 깔끔하지 않았다는 신호다. 플레이어 직접 관여는 없지만, 서포터 입장에서는 이 타이밍 전후 시야와 합류 위치를 복기할 가치가 있다."
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "8:58",
+        "phase": "EARLY",
+        "title": "직접 킬로 초반 흐름을 당긴 장면",
+        "analysis": "플레이어가 직접 관여해 킬을 만들었다. 장점이 분명한 장면이지만, 이 성공이 이후 전맵 주도권으로 확장됐는지는 낮은 최종 킬 관여율 때문에 의문이 남는다."
+      },
+      {
+        "eventId": "evt_006",
+        "timestampLabel": "12:18",
+        "phase": "EARLY",
+        "title": "두 번째 직접 킬 관여",
+        "analysis": "초반에 2킬을 직접 만든 것은 Rell의 교전 선택이 통했던 근거다. 다만 서포터가 킬을 먹은 뒤 시야·로밍·오브젝트 설계로 전환했는지 확인해야 한다."
+      },
+      {
+        "eventId": "evt_014",
+        "timestampLabel": "16:28",
+        "phase": "MID",
+        "title": "중반 오브젝트 준비에 직접 관여한 장면",
+        "analysis": "이 장면은 오브젝트 템포에 플레이어가 직접 연결된 긍정적 근거다. 하지만 바로 이어지는 17분대 교전 후 사망까지 보면, 준비와 진입은 되지만 마무리 운영이 불안한 흐름으로 이어진다."
+      },
+      {
+        "eventId": "evt_017",
+        "timestampLabel": "17:21",
+        "phase": "MID",
+        "title": "스커미시 승리로 게임을 굳히는 듯한 장면",
+        "analysis": "겉으로는 좋은 승리 장면이다. 하지만 28초 뒤 17:49에 플레이어가 사망하기 때문에, 이 장면은 순수한 장점이라기보다 '이득 후 정리 실패'를 보기 위한 출발점이다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "17:49",
+        "phase": "MID",
+        "title": "이긴 흐름 직후 나온 첫 번째 핵심 사망",
+        "analysis": "중반 핵심 구도에서의 사망이다. 앞선 스커미시 승리 후 발생했기 때문에, 단순 데스보다 이득을 현금화하는 과정에서 생존 계획이 부족했는지를 봐야 한다."
+      },
+      {
+        "eventId": "evt_024",
+        "timestampLabel": "20:16",
+        "phase": "MID",
+        "title": "드래곤 타이밍 관여",
+        "analysis": "팀의 3:0 드래곤 흐름에 연결되는 중요한 장면이다. 그러나 이 장면 역시 20:51 사망과 붙어서 봐야 하며, 오브젝트 이후 퇴각·시야 재정비가 안정적이었는지는 의심된다."
+      },
+      {
+        "eventId": "evt_025",
+        "timestampLabel": "20:51",
+        "phase": "MID",
+        "title": "오브젝트 이후 반복된 두 번째 사망",
+        "analysis": "17:49와 같은 패턴으로 볼 가능성이 높은 사망이다. 승리 경기라 묻혔지만, 더 강한 상대라면 이 타이밍 사망은 바론 전 시야권 상실이나 다음 웨이브 손해로 이어질 수 있다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "8:35",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "초반 설계 불안",
+          "오브젝트 성과 과대평가 경계"
+        ]
+      },
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "8:43",
+        "phase": "EARLY",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "팀 오브젝트 흐름",
+          "플레이어 직접 설계 근거 부족"
+        ]
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "8:58",
+        "phase": "EARLY",
+        "eventType": "CHAMPION_KILL",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "초반 직접 교전 기여"
+        ]
+      },
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "9:47",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_WIN",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "팀 오브젝트 템포",
+          "개인 관여도 분리 평가"
+        ]
+      },
+      {
+        "eventId": "evt_006",
+        "timestampLabel": "12:18",
+        "phase": "EARLY",
+        "eventType": "CHAMPION_KILL",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "초반 직접 킬 창출"
+        ]
+      },
+      {
+        "eventId": "evt_010",
+        "timestampLabel": "14:32",
+        "phase": "EARLY",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "드래곤 흐름",
+          "플레이어 직접 관여 한계"
+        ]
+      },
+      {
+        "eventId": "evt_012",
+        "timestampLabel": "15:45",
+        "phase": "MID",
+        "eventType": "TEAMFIGHT_FOLLOWUP",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "중반 후속 합류"
+        ]
+      },
+      {
+        "eventId": "evt_013",
+        "timestampLabel": "15:58",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "구조물 전환",
+          "팀 주도 흐름"
+        ]
+      },
+      {
+        "eventId": "evt_014",
+        "timestampLabel": "16:28",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_WIN",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "중반 오브젝트 관여"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "16:59",
+        "phase": "MID",
+        "eventType": "TEAMFIGHT_FOLLOWUP",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "중반 교전 후속"
+        ]
+      },
+      {
+        "eventId": "evt_016",
+        "timestampLabel": "17:07",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "구조물 압박 관여"
+        ]
+      },
+      {
+        "eventId": "evt_017",
+        "timestampLabel": "17:21",
+        "phase": "MID",
+        "eventType": "SKIRMISH_WIN",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "중반 스커미시 승리",
+          "이득 후 사망 패턴의 직전 장면"
+        ]
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "17:49",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "중반 생존 실패",
+          "이득 후 정리 실패"
+        ]
+      },
+      {
+        "eventId": "evt_024",
+        "timestampLabel": "20:16",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "핵심 드래곤 관여",
+          "오브젝트 이후 사망 패턴의 직전 장면"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "timestampLabel": "20:51",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "오브젝트 이후 생존 실패",
+          "반복 패턴 근거"
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "초반 킬 메이킹 능력",
+        "claudeNote": "8:58과 12:18에 직접 킬을 만들어 내며 라인 주도권을 확보했습니다. 서포터로서 초반에 2킬을 기록한 것은 렐의 이니시에이트를 적극적으로 활용한 결과입니다.",
+        "codexNote": "8:58, 12:18에 플레이어 관여 킬이 발생했다. Rell이 초반에 단순 보호형으로 머무르지 않고 교전 결과를 직접 만든 점은 분명한 장점이다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 템포 장악",
+        "claudeNote": "드래곤 3개를 모두 확보하고 적에게 0개만 허용한 완벽한 오브젝트 운영이었습니다. 16:28 정글 오브젝트 셋업과 20:16 드래곤 파이트 합류가 특히 효과적이었습니다.",
+        "codexNote": "팀은 드래곤 3개를 챙겼고 적 드래곤을 0으로 묶었다. 16:28 오브젝트 준비에는 플레이어 직접 관여도 표시되어 있어, 최소한 중반 핵심 오브젝트 타이밍을 완전히 놓치지는 않았다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 확보 후 생존 관리 미흡",
+        "claudeNote": "17:49 데스는 교전 승리와 타워 확보 직후 발생했습니다. 오브젝트를 챙긴 뒤 긴장이 풀리며 포지셔닝이 느슨해지는 패턴이 보입니다. 오브젝트 후에도 즉시 안전 지역으로 이탈하는 습관이 필요합니다.",
+        "codexNote": "17:21 스커미시 승리 후 17:49에 사망했고, 20:16 드래곤 타이밍 관여 후 20:51에 다시 사망했다. 단발 실수가 아니라 '이득을 본 직후 정리 단계에서 죽는 패턴'으로 읽힌다."
+      },
+      {
+        "category": "weakness",
+        "topic": "킬 관여율 개선 여지",
+        "claudeNote": "팀 총 33킬 중 킬 관여율이 42%로, 서포터 평균 대비 다소 낮습니다. 특히 중반 데스 이후 교전 합류가 어려워진 구간이 있었을 것으로 보이며, 데스를 줄이면 자연스럽게 관여율도 올라갈 수 있습니다.",
+        "codexNote": "팀 총 33킬 중 플레이어는 2킬 12어시스트로 14킬 관여, 킬 관여율 42%에 그쳤다. Rell 서포터가 23분 압승 경기에서 이 정도 관여율이면, 팀의 주요 이득이 본인 설계 바깥에서 많이 발생했을 가능성이 높다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "교전 후 구조물 전환",
+        "note": "15:45~17:21 구간에서 교전 승리를 즉시 타워 압박으로 전환하며 팀의 5타워 확보에 기여했습니다. 킬 어드밴티지를 구조물 이득으로 변환하는 판단이 좋았습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 핵심 구간 연속 데스",
+        "note": "17:49과 20:51에 연속으로 데스가 발생하며 중반 운영 안정감이 흔들렸습니다. 팀이 크게 앞서 있어 영향이 제한적이었지만, 접전 상황이었다면 역전의 빌미가 될 수 있는 패턴입니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "중반 15~17분 승리 구간에 필요한 후속 합류는 수행",
+        "note": "15:45, 16:59, 17:21에 교전 후속 합류 및 스커미시 승리가 이어졌고, 17:07 포탑 압박에도 관여했다. 팀이 굴리는 구간에서 완전히 이탈하지 않고 필요한 지점에는 붙었다."
+      }
+    ],
+    "agreementRate": 67
+  }
+}
