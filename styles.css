@@ -486,6 +486,10 @@ body::after {
 
 .fetch-status {
   margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(120, 186, 255, 0.16);
+  background: rgba(12, 19, 32, 0.42);
 }
 
 .panel--reports {
@@ -1010,6 +1014,158 @@ body::after {
   animation: rise-in 520ms ease both;
 }
 
+/* ─── Playtime Score ──────────────────────────────────────────────────────── */
+
+.score-panel {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.score-overall {
+  text-align: center;
+}
+
+.score-overall-number {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.score-overall-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.score-overall-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.score-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.score-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.score-bar-header strong {
+  color: var(--text);
+}
+
+.score-bar-track {
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 600ms ease;
+}
+
+/* ─── Objective Timeline ──────────────────────────────────────────────────── */
+
+.obj-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.obj-summary-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.obj-summary-label strong {
+  color: var(--text);
+}
+
+.obj-summary-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  overflow: hidden;
+}
+
+.obj-summary-fill--ally {
+  background: var(--mint);
+  border-radius: 5px 0 0 5px;
+}
+
+.obj-summary-fill--enemy {
+  background: var(--rose);
+  border-radius: 0 5px 5px 0;
+}
+
+.obj-summary-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.obj-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.obj-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.obj-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+
+.obj-row--ally {
+  background: rgba(89, 209, 178, 0.06);
+}
+
+.obj-row--enemy {
+  background: rgba(255, 134, 120, 0.06);
+}
+
+.obj-team-cell[data-team="ALLY"] { color: var(--mint); font-weight: 600; }
+.obj-team-cell[data-team="ENEMY"] { color: var(--rose); font-weight: 600; }
+
+.obj-phase-divider td {
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  background: rgba(240, 179, 91, 0.08);
+  border-bottom: 1px solid var(--accent);
+}
+
 /* ─── View state machine ──────────────────────────────────────────────────── */
 
 [data-view="LOGGED_OUT"] .app-shell { display: none; }
@@ -1020,6 +1176,16 @@ body::after {
 [data-view="MATCH_LIST"] .workspace-grid { display: none; }
 
 [data-view="LOADING_DETAIL"] .login-overlay { display: none; }
+[data-view="LOADING_DETAIL"] .match-list-view { display: none; }
+[data-view="LOADING_DETAIL"] .back-to-list-btn { display: inline-block; }
+[data-view="LOADING_DETAIL"] .topbar,
+[data-view="LOADING_DETAIL"] .workspace-grid {
+  opacity: 0.72;
+}
+[data-view="LOADING_DETAIL"] .fetch-status {
+  border-color: rgba(120, 186, 255, 0.36);
+  background: rgba(120, 186, 255, 0.1);
+}
 
 [data-view="DETAIL_VIEW"] .login-overlay { display: none; }
 [data-view="DETAIL_VIEW"] .match-list-view { display: none; }
@@ -1127,6 +1293,16 @@ body::after {
 
 .login-submit:hover {
   opacity: 0.9;
+}
+
+.login-submit:disabled,
+.match-summary-card:disabled,
+.fetch-form button:disabled,
+.candidate-card--button:disabled,
+.back-to-list-btn:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .login-submit--small {
@@ -1402,6 +1578,15 @@ body::after {
 
   .login-card {
     padding: 32px 24px;
+  }
+
+  .score-panel {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .obj-table-wrap {
+    overflow-x: auto;
   }
 
   .hero-copy h1,

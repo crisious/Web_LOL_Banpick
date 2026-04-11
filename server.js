@@ -602,6 +602,13 @@ function buildNormalized(account, matchDetail, timeline, options) {
   };
 
   normalized.derivedSignals = buildDerivedSignals(normalized);
+  normalized.playtimeScore = buildPlaytimeScore(normalized);
+
+  // participantId → teamId 매핑 (오브젝트 타임라인용)
+  const participantTeamMap = new Map();
+  matchDetail.info.participants.forEach((p) => participantTeamMap.set(p.participantId, p.teamId));
+  normalized.objectiveTimeline = buildObjectiveTimeline(timeline, participant.teamId, participantTeamMap);
+
   return normalized;
 }
 
@@ -872,6 +879,127 @@ function buildPhaseSummaries(normalized) {
       focus,
     };
   });
+}
+
+// ─── Playtime Score ──────────────────────────────────────────────────────
+
+function clamp10(v) { return Math.min(10, Math.max(0, +v.toFixed(1))); }
+
+function calcCombatScore(stats, minutes) {
+  const kdaPart = Math.min(stats.kda, 6) / 6 * 6;
+  const kpPart = Math.min(stats.killParticipation, 0.6) / 0.6 * 2;
+  const dpmPart = Math.min((stats.damageToChampions / minutes) / 800, 1) * 2;
+  return clamp10(kdaPart + kpPart + dpmPart);
+}
+
+function calcIncomeScore(stats, position, minutes) {
+  const csThreshold = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 }[position] || 6;
+  const csPart = Math.min(stats.csPerMinute / csThreshold, 1.2) * 5;
+  const goldPart = Math.min((stats.goldEarned / minutes) / 450, 1.2) * 5;
+  return clamp10(csPart + goldPart);
+}
+
+function calcVisionScore(stats, minutes) {
+  const vsPerMin = stats.visionScore / minutes;
+  return clamp10(Math.min(vsPerMin / 1.5, 1.2) * 10);
+}
+
+function calcSurvivalScore(stats, minutes) {
+  const deathsPerMin = stats.deaths / minutes;
+  if (deathsPerMin <= 0.1) return 10;
+  if (deathsPerMin <= 0.2) return 8;
+  if (deathsPerMin <= 0.3) return 6;
+  if (deathsPerMin <= 0.4) return 4;
+  return clamp10(2 - (deathsPerMin - 0.4) * 5);
+}
+
+function calcObjectiveScore(events) {
+  const wins = events.filter((e) => ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(e.eventType)).length;
+  const fails = events.filter((e) => e.eventType === "OBJECTIVE_SETUP_FAIL").length;
+  const total = wins + fails;
+  if (total === 0) return 5;
+  const ratio = wins / total;
+  return clamp10(ratio * 8 + Math.min(wins, 5) * 0.4);
+}
+
+function calcStructureScore(team, events) {
+  const towerTakes = events.filter((e) => e.eventType === "TOWER_TAKE").length;
+  const towerDiff = (team.teamTowers || 0) - (team.enemyTowers || 0);
+  const towerPart = Math.min(towerTakes, 4) * 1.5;
+  const diffPart = Math.min(Math.max(towerDiff + 3, 0), 6) / 6 * 4;
+  return clamp10(towerPart + diffPart);
+}
+
+function buildPlaytimeScore(normalized) {
+  const stats = normalized.playerStats;
+  const info = normalized.matchInfo;
+  const team = normalized.teamContext;
+  const events = normalized.timelineEvents;
+  const minutes = info.durationSeconds / 60;
+
+  const combat = calcCombatScore(stats, minutes);
+  const income = calcIncomeScore(stats, info.position, minutes);
+  const vision = calcVisionScore(stats, minutes);
+  const survival = calcSurvivalScore(stats, minutes);
+  const objective = calcObjectiveScore(events);
+  const structure = calcStructureScore(team, events);
+
+  const overall = +(combat * 0.25 + income * 0.20 + vision * 0.10 + survival * 0.20 + objective * 0.15 + structure * 0.10).toFixed(1);
+
+  return {
+    overall,
+    categories: { combat, income, vision, survival, objective, structure },
+    label: overall >= 8 ? "MVP급" : overall >= 6 ? "양호" : overall >= 4 ? "보통" : "개선 필요",
+  };
+}
+
+// ─── Objective Timeline ──────────────────────────────────────────────────
+
+function buildStructureLabel(event) {
+  const tower = { OUTER_TURRET: "외곽 타워", INNER_TURRET: "내부 타워", BASE_TURRET: "억제기 타워", NEXUS_TURRET: "넥서스 타워" };
+  const lane = { TOP_LANE: "탑", MID_LANE: "미드", BOT_LANE: "봇" };
+  if (event.buildingType === "INHIBITOR_BUILDING") return `${lane[event.laneType] || ""} 억제기`;
+  return `${lane[event.laneType] || ""} ${tower[event.towerType] || "구조물"}`;
+}
+
+function buildObjectiveLabel(event) {
+  const labels = { DRAGON: "드래곤", BARON_NASHOR: "바론", RIFTHERALD: "전령", HORDE: "공허 유충" };
+  const sub = event.monsterSubType ? ` (${event.monsterSubType.replace(/_/g, " ").toLowerCase()})` : "";
+  return `${labels[event.monsterType] || event.monsterType}${sub}`;
+}
+
+function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
+  const events = [];
+  timeline.info.frames.forEach((frame) => {
+    frame.events.forEach((event) => {
+      if (event.type === "BUILDING_KILL") {
+        events.push({
+          time: event.timestamp,
+          timeLabel: timestampLabel(event.timestamp),
+          phase: phaseFor(event.timestamp),
+          type: "STRUCTURE",
+          subtype: event.towerType || event.buildingType,
+          lane: event.laneType || "",
+          team: event.teamId === targetTeamId ? "ENEMY" : "ALLY",
+          label: buildStructureLabel(event),
+        });
+      }
+      if (event.type === "ELITE_MONSTER_KILL") {
+        const killerTeam = participantTeamMap.get(event.killerId);
+        events.push({
+          time: event.timestamp,
+          timeLabel: timestampLabel(event.timestamp),
+          phase: phaseFor(event.timestamp),
+          type: "OBJECTIVE",
+          subtype: event.monsterType,
+          lane: "",
+          team: killerTeam === targetTeamId ? "ALLY" : "ENEMY",
+          label: buildObjectiveLabel(event),
+        });
+      }
+    });
+  });
+  return events.sort((a, b) => a.time - b.time);
 }
 
 function labelForMoment(event) {
@@ -1590,6 +1718,22 @@ async function upsertManifestEntry(entry) {
   return manifest;
 }
 
+function inferMatchIdFromSampleEntry(entry) {
+  if (!entry) return null;
+  if (entry.matchId) return entry.matchId;
+
+  const sources = [entry.id, entry.label, entry.normalizedPath, entry.analysisPath, entry.notesPath];
+  for (const source of sources) {
+    if (typeof source !== "string") continue;
+    const match = source.match(/([a-z0-9]+)[-_](\d{8,})/i);
+    if (match) {
+      return `${match[1].toUpperCase()}_${match[2]}`;
+    }
+  }
+
+  return null;
+}
+
 async function handleGenerateSample(req, res) {
   const ip = req.socket.remoteAddress || "unknown";
   if (!rateLimit(`generate:${ip}`, 60000)) {
@@ -1678,6 +1822,7 @@ async function handleGenerateSample(req, res) {
 
     const entry = {
       id: sampleId,
+      matchId,
       label: `${sampleId} · ${normalized.matchInfo.position} ${normalized.matchInfo.result}`,
       champion: normalized.matchInfo.champion,
       publicAlias,
@@ -1710,7 +1855,13 @@ async function handleGenerateSample(req, res) {
 async function handleApi(req, res, url) {
   if (req.method === "GET" && url.pathname === "/api/samples") {
     const manifest = await loadManifest();
-    sendJson(res, 200, manifest);
+    sendJson(res, 200, {
+      ...manifest,
+      samples: manifest.samples.map((sample) => ({
+        ...sample,
+        matchId: inferMatchIdFromSampleEntry(sample),
+      })),
+    });
     return true;
   }
 

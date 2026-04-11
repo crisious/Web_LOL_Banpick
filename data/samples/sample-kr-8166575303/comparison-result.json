@@ -1,0 +1,681 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-11T17:04:35.189Z",
+  "sampleId": "sample-kr-8166575303",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-04-11T17:04:35.189Z",
+      "language": "ko",
+      "matchId": "KR_8166575303",
+      "riotId": "매운맛 비스킷#KR1",
+      "champion": "DrMundo",
+      "position": "JUNGLE",
+      "result": "WIN",
+      "durationLabel": "20:05",
+      "analysisId": "ai_sample-kr-8166575303_1775927075189"
+    },
+    "matchSummary": {
+      "headline": "초반 3데스로 흔들렸지만 중반 합류와 구조물 압박으로 20분 만에 뒤집은 승리"
+    },
+    "coachSummary": {
+      "overallSummary": "초반 정글 교전에서 세 번 잡히며 템포를 크게 잃었지만, 중반부터 팀 교전 합류 타이밍이 정확해지면서 흐름을 되찾았습니다. 특히 16~17분 구간에서 연속 킬 관여와 오브젝트 확보로 구조물 압박을 이끌어낸 점이 승리의 핵심이었습니다. 다만 킬 관여율 21%와 챔피언 피해량 3,225는 정글러로서 팀에 충분한 영향력을 행사하지 못했음을 보여줍니다. 초반 동선 안정성을 높이면 더 일찍 게임을 장악할 수 있습니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "중반 교전 합류 타이밍",
+        "description": "16:33~16:40 구간에서 연속으로 교전에 합류하며 킬 관여를 만들었습니다. 문도의 탱킹 능력을 활용해 팀파이트에 적시에 투입한 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_009",
+          "evt_012",
+          "evt_013"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "오브젝트 연계 판단력",
+        "description": "17:24 정글 오브젝트 확보 후 곧바로 구조물 압박으로 전환하는 흐름을 만들었습니다. 오브젝트 → 타워 연계가 승리를 앞당긴 핵심 요인입니다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_016",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "중반 이후 생존력 관리",
+        "description": "초반 3데스 이후 중반에는 단 한 번도 죽지 않았습니다. 초반 실수를 인지하고 무리한 진입을 자제하며 안정적으로 플레이한 점이 돋보입니다.",
+        "relatedEventIds": [
+          "evt_009",
+          "evt_012",
+          "evt_013",
+          "evt_015"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "초반 정글 동선 불안정",
+        "description": "3:14 첫 데스가 이후 연쇄 사망(8:33, 13:50)으로 이어졌습니다. 문도는 초반 1v1이 약한 챔피언이므로, 상대 정글러와의 조우를 피하는 동선 설계가 필요합니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "드래곤 주도권 상실",
+        "description": "상대 팀에 드래곤 2개를 내주었습니다. 8:29, 10:21에 오브젝트 셋업 실패가 기록되어 있으며, 정글러로서 드래곤 타이밍 관리와 사전 시야 확보가 부족했습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_005",
+          "evt_004"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "낮은 킬 관여율과 챔피언 피해량",
+        "description": "킬 관여율 21%와 챔피언 피해량 3,225는 팀 킬 19개 대비 정글러의 존재감이 부족했음을 나타냅니다. 초반 사망으로 인한 템포 손실이 전체 영향력 감소로 이어진 것으로 보입니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "문도 초반(1~6레벨) 동선을 상대 정글러 위치 기반으로 반대편에서 파밍하는 루트로 계획하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_2",
+        "text": "첫 드래곤 스폰 1분 전부터 하단 시야를 깔고, 체력·스펠 상태를 확인한 뒤 싸울지 포기할지 미리 결정하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_3",
+        "text": "초반에 죽더라도 무리한 복수 갱킹을 시도하지 않고, 파밍으로 아이템 파워스파이크까지 버티기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_4",
+        "text": "중반 교전 합류 타이밍은 이번 경기처럼 유지하되, 합류 전 팀원 체력 상태를 확인하는 습관 만들기",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "3:14",
+        "phase": "EARLY",
+        "title": "첫 번째 사망 — 초반 템포 손실의 시작",
+        "description": "3분대 초반 사망으로 정글 루트가 꼬이면서 이후 연쇄 사망의 빌미를 제공했습니다. 문도의 초반 약점을 고려하면 이 시점의 교전 자체를 피했어야 합니다."
+      },
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "10:21",
+        "phase": "EARLY",
+        "title": "핵심 오브젝트 상실",
+        "description": "중요도 5의 오브젝트를 내준 장면입니다. 이미 2데스 상태에서 오브젝트 경쟁력이 부족했고, 사전 시야 부재로 컨테스트조차 어려웠을 가능성이 높습니다."
+      },
+      {
+        "eventId": "evt_009",
+        "timestampLabel": "15:55",
+        "phase": "MID",
+        "title": "반전의 킬 — 흐름 전환점",
+        "description": "중반 첫 킬을 직접 만들며 분위기를 반전시켰습니다. 이 킬을 기점으로 팀의 연속 구조물 압박이 시작되었고, 게임 종료까지 주도권을 되찾았습니다."
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "17:24",
+        "phase": "MID",
+        "title": "오브젝트 확보 → 구조물 전환",
+        "description": "정글 오브젝트를 챙긴 뒤 곧바로 타워 압박으로 전환한 핵심 장면입니다. 이 판단이 20분 조기 승리의 결정적 계기가 되었습니다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "19:47",
+        "phase": "MID",
+        "title": "최종 구조물 붕괴",
+        "description": "중요도 5의 구조물을 무너뜨리며 게임을 마무리짓는 흐름을 완성했습니다. 중반 연속 압박의 결실입니다."
+      }
+    ],
+    "evidenceIndex": {
+      "strengths": {
+        "str_1": [
+          "evt_009",
+          "evt_012",
+          "evt_013"
+        ],
+        "str_2": [
+          "evt_015",
+          "evt_016",
+          "evt_019"
+        ],
+        "str_3": [
+          "evt_009",
+          "evt_012",
+          "evt_013",
+          "evt_015"
+        ]
+      },
+      "weaknesses": {
+        "weak_1": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ],
+        "weak_2": [
+          "evt_002",
+          "evt_005",
+          "evt_004"
+        ],
+        "weak_3": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ]
+      },
+      "keyMoments": [
+        "evt_001",
+        "evt_005",
+        "evt_009",
+        "evt_015",
+        "evt_019"
+      ]
+    },
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "analysisMode": "coaching_redteam",
+      "matchId": "KR_8166575303",
+      "player": "매운맛 비스킷#KR1",
+      "participantId": 7,
+      "champion": "DrMundo",
+      "position": "JUNGLE",
+      "queueLabel": "RANKED_SOLO",
+      "gameVersion": "16.7.760.9485",
+      "durationLabel": "20:05",
+      "result": "WIN"
+    },
+    "matchSummary": {
+      "oneLine": "승리는 했지만, 문도 정글 본인의 초반 3데스와 반복된 오브젝트 실패를 팀의 16분 이후 구조물 러시가 덮어준 경기다.",
+      "overall": "초반에는 플레이어가 직접 관여한 사망과 오브젝트 세팅 실패가 겹치며 정글 주도권이 크게 흔들렸다. 특히 3:14, 8:33, 13:50 사망은 모두 EARLY 구간에 집중되어 있어 단순 사고가 아니라 초반 교전 진입 기준과 위험 계산의 반복 문제로 볼 수 있다. 그럼에도 15:55 이후 킬 관여와 16분대 연속 교전 후속 합류, 17:24 정글 오브젝트 확보를 통해 흐름을 일부 회복했다. 다만 팀 전체는 타워 6개를 가져가며 승리 조건을 구조물로 전환했지만, 플레이어의 킬 관여율은 21%, 챔피언 피해량은 3225로 낮아 승리 기여가 전면 주도보다는 후속 보조에 가까웠다. 드래곤은 0대2로 밀렸기 때문에, 상위 티어에서는 같은 초반 손실이 팀의 구조물 전환으로 쉽게 보상되지 않을 가능성이 높다."
+    },
+    "coachSummary": {
+      "redteamView": "이 경기는 결과만 보면 빠른 승리처럼 보이지만, 정글 관점에서는 위험 신호가 더 많다. 문도 정글은 안정적으로 성장하고 중반부터 앞라인 압박을 만드는 쪽이 기대값인데, 이 경기에서는 초반 사망 3회로 성장과 오브젝트 템포를 먼저 잃었다. 이후의 승리 흐름은 본인의 설계라기보다 팀의 구조물 압박과 상대의 수비 실패가 맞물린 결과에 가깝다. 다음 게임에서 같은 방식으로 초반을 내주면, 상대가 드래곤과 전령 또는 타워 교환을 더 정교하게 굴릴 때 회복 구간 자체가 사라질 수 있다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "가장 큰 문제 구간이다. 0킬 3데스 1어시스트로 끝났고, 주요 이벤트 6개 중 플레이어 직접 관여 사망과 오브젝트 실패가 반복됐다. 3:14 첫 사망 이후 8분대 오브젝트 세팅 실패와 사망이 붙어 나오며 정글러가 맵 리듬을 잡는 대신 상대 흐름에 끌려간 양상이다.",
+        "riskPattern": "초반 교전 참여 기준이 느슨하고, 오브젝트 주변에서 먼저 위치를 잃은 뒤 후속 손실로 이어지는 패턴이 보인다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_003",
+          "evt_004",
+          "evt_005",
+          "evt_007"
+        ]
+      },
+      "MID": {
+        "summary": "15:55 킬과 16:33, 16:40 후속 합류로 손실을 일부 회복했다. 17:24 정글 오브젝트 확보도 긍정적이다. 그러나 16:10에 여전히 오브젝트 실패가 있었고, 16분 이후 타워 획득 이벤트 다수는 플레이어 비관여로 기록되어 팀의 구조물 압박이 승리 흐름의 핵심이었다.",
+        "riskPattern": "중반 회복은 있었지만 선제 설계보다 이미 열린 교전에 늦지 않게 붙은 성격이 강하다.",
+        "relatedEventIds": [
+          "evt_009",
+          "evt_010",
+          "evt_011",
+          "evt_012",
+          "evt_013",
+          "evt_014",
+          "evt_015",
+          "evt_016",
+          "evt_019"
+        ]
+      },
+      "LATE": {
+        "summary": "20:05에 종료되어 실질적인 후반 검증은 없었다. 따라서 이 승리를 후반 운영 안정성의 증거로 보기는 어렵다.",
+        "riskPattern": "초반 손실을 후반 운영으로 복구하는 능력은 이 데이터만으로 확인되지 않는다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "title": "무너진 초반 이후에도 중반 교전 연결은 포기하지 않았다",
+        "description": "초반 3데스로 게임에서 사라질 수 있는 상황이었지만 15:55 직접 킬, 16:33과 16:40 후속 합류로 최소한 중반 교전에는 다시 연결됐다. 다만 이는 주도적인 설계라기보다 열린 싸움에 합류한 성격이 강하므로 과대평가하면 안 된다.",
+        "relatedEventIds": [
+          "evt_009",
+          "evt_012",
+          "evt_013"
+        ]
+      },
+      {
+        "title": "17분대 정글 오브젝트 확보로 구조물 압박 재료를 보탰다",
+        "description": "17:24 정글 오브젝트 확보는 이후 팀의 연속 타워 압박 흐름과 연결될 수 있는 긍정 요소다. 초반 오브젝트 실패가 많았던 경기에서 중반에 최소한 하나의 회복 지점을 만든 점은 인정할 수 있다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_014",
+          "evt_016",
+          "evt_019"
+        ]
+      },
+      {
+        "title": "팀이 구조물 승리 조건으로 전환할 때 방해가 되지는 않았다",
+        "description": "16:25, 17:17, 17:37, 19:47 타워 획득 흐름이 이어졌고, 플레이어는 이 구간에서 추가 사망 없이 경기를 마쳤다. 다만 대부분 비관여 이벤트라 본인이 구조물 승리 조건을 만든 것보다는 팀의 압박이 성공하는 동안 더 이상 손실을 늘리지 않은 쪽에 가깝다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_014",
+          "evt_016",
+          "evt_019"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "초반 안정성이 정글러 기준으로 치명적으로 낮았다",
+        "description": "EARLY 구간에만 3데스가 집중됐다. 문도 정글은 초반 교전력이 압도적인 챔피언이 아니기 때문에, 3:14 첫 사망 이후에도 8:33, 13:50에 반복 사망한 것은 챔피언 강점과 게임 플랜이 어긋난 신호다. 상위 티어에서는 이 정도 초반 손실이 드래곤, 카정, 시야 장악으로 더 크게 굴러간다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ]
+      },
+      {
+        "title": "오브젝트 세팅 실패가 반복됐고 승리 결과가 이를 가렸다",
+        "description": "8:29, 10:21, 16:10에 오브젝트 또는 구조물 관련 실패가 기록됐고 팀 드래곤도 0대2로 밀렸다. 20분 승리라 크게 드러나지 않았지만, 정글러가 오브젝트 타이밍마다 먼저 준비하지 못하면 더 긴 게임에서는 승리 조건이 상대에게 넘어간다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_005",
+          "evt_010"
+        ]
+      },
+      {
+        "title": "승리 기여가 팀 구조물 압박에 과도하게 의존했다",
+        "description": "팀은 19킬을 기록했지만 플레이어 킬 관여율은 21%에 그쳤고, 챔피언 피해량도 3225로 낮다. 중반 타워 획득 이벤트 다수가 플레이어 비관여로 기록되어 있어, 이 경기를 본인의 캐리 패턴으로 해석하면 위험하다. 상대가 구조물 방어를 더 잘하거나 팀 라인이 같은 속도로 이기지 못하면 동일한 승리 방식이 재현되기 어렵다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_014",
+          "evt_016",
+          "evt_019"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "첫 6분에는 교전 참여보다 생존 동선과 풀캠프 완주 여부를 우선 체크한다.",
+        "why": "3:14 첫 사망이 이후 8분대 오브젝트 실패와 추가 사망으로 이어졌다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_003"
+        ]
+      },
+      {
+        "item": "오브젝트 60초 전에는 라인 주도권, 시야, 체력 상태 중 2개 이상이 없으면 먼저 치지 않는다.",
+        "why": "오브젝트 실패가 8:29, 10:21, 16:10에 반복됐고 드래곤도 0대2로 밀렸다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_005",
+          "evt_010"
+        ]
+      },
+      {
+        "item": "문도 정글로 초반 교전에 들어갈 때는 '내가 먼저 맞아도 빠질 수 있는가'를 진입 기준으로 둔다.",
+        "why": "초반 사망 3회는 단발 실수보다 진입 각 판단이 반복적으로 느슨했을 가능성이 높다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_007"
+        ]
+      },
+      {
+        "item": "중반 합류 성공 후에는 즉시 구조물, 캠프, 시야 중 하나로 전환해 개인 관여도를 남긴다.",
+        "why": "15:55 이후 교전 관여는 있었지만, 주요 타워 획득은 대부분 비관여로 기록됐다.",
+        "relatedEventIds": [
+          "evt_009",
+          "evt_012",
+          "evt_013",
+          "evt_011",
+          "evt_014",
+          "evt_016"
+        ]
+      },
+      {
+        "item": "승리 복기에서 '이긴 이유'와 '내가 만든 이유'를 분리해 기록한다.",
+        "why": "이번 경기는 팀 타워 6개와 빠른 종료가 핵심이지만, 개인 지표는 1/3/3, 킬 관여율 21%로 낮았다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_014",
+          "evt_016",
+          "evt_019"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "3:14",
+        "phase": "EARLY",
+        "title": "첫 사망으로 초반 정글 템포가 깨진 장면",
+        "redteamRead": "문도 정글이 초반에 먼저 죽으면 이후 교전 선택권과 오브젝트 접근권이 동시에 줄어든다. 이 장면은 단순 1데스가 아니라 뒤의 8분대 손실을 여는 시작점으로 봐야 한다."
+      },
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "8:33",
+        "phase": "EARLY",
+        "title": "오브젝트 실패 직후 추가 사망",
+        "redteamRead": "8:29 실패와 8:33 사망이 붙어 나온 것은 위험한 오브젝트 주변에서 빠지는 판단이 늦었을 가능성을 시사한다. 상위 티어에서는 이런 연속 손실이 드래곤과 정글 캠프까지 연결된다."
+      },
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "10:21",
+        "phase": "EARLY",
+        "title": "중요도 5의 오브젝트 세팅 실패",
+        "redteamRead": "초반이 이미 흔들린 상태에서 또 오브젝트 세팅 실패가 나왔다. 이 시점의 문제는 피지컬보다 '싸워도 되는 조건인지'를 검증하지 않은 운영 판단에 가깝다."
+      },
+      {
+        "eventId": "evt_007",
+        "timestampLabel": "13:50",
+        "phase": "EARLY",
+        "title": "세 번째 초반 사망으로 회복 난도가 커진 장면",
+        "redteamRead": "3번째 사망은 경기 결과와 별개로 가장 위험한 신호다. 같은 패턴이 반복되면 이후 중반 합류 성공이 있어도 본인이 주도권을 잡는 게임이 아니라 팀이 벌어준 시간을 따라가는 게임이 된다."
+      },
+      {
+        "eventId": "evt_009",
+        "timestampLabel": "15:55",
+        "phase": "MID",
+        "title": "직접 킬로 흐름을 되찾은 장면",
+        "redteamRead": "긍정적인 회복 장면이지만, 앞선 손실을 완전히 상쇄하는 장면은 아니다. 이 킬 이후 오브젝트나 구조물 전환까지 본인이 연결했는지가 핵심인데, 바로 뒤 16:10에 오브젝트 실패가 기록됐다."
+      },
+      {
+        "eventId": "evt_010",
+        "timestampLabel": "16:10",
+        "phase": "MID",
+        "title": "킬 이후에도 남아 있던 오브젝트 관리 문제",
+        "redteamRead": "15:55 킬로 분위기를 가져온 직후에도 오브젝트 실패가 발생했다. 교전 승리와 운영 전환 사이의 연결이 약하면, 좋은 플레이가 실제 이득으로 고정되지 않는다."
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "17:24",
+        "phase": "MID",
+        "title": "정글 오브젝트 확보로 중반 흐름에 기여",
+        "redteamRead": "이 장면은 경기 내에서 플레이어가 만든 비교적 명확한 회복 지점이다. 다만 앞선 오브젝트 실패들이 있었기 때문에, 성공 장면 하나보다 실패 빈도를 줄이는 쪽이 더 중요하다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "19:47",
+        "phase": "MID",
+        "title": "팀의 구조물 압박으로 승리가 굳어진 장면",
+        "redteamRead": "중요도 5의 타워 획득이지만 플레이어 비관여다. 승리의 결정적 흐름은 팀 구조물 압박에서 나왔고, 이를 개인 정글 운영 성공으로 착각하면 다음 경기 피드백이 왜곡된다."
+      }
+    ],
+    "evidenceIndex": {
+      "playerStatEvidence": {
+        "scoreline": "1/3/3",
+        "kda": 1.33,
+        "killParticipation": 0.21,
+        "csPerMinute": 5.18,
+        "damageToChampions": 3225,
+        "visionScore": 19,
+        "earlyDeaths": 3,
+        "teamKills": 19,
+        "teamTowers": 6,
+        "enemyTowers": 1,
+        "teamDragons": 0,
+        "enemyDragons": 2
+      },
+      "eventEvidence": [
+        {
+          "eventId": "evt_001",
+          "timestampLabel": "3:14",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "초반 안정성 문제",
+            "첫 템포 손실"
+          ]
+        },
+        {
+          "eventId": "evt_002",
+          "timestampLabel": "8:29",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "오브젝트 준비 실패",
+            "초반 손실 연쇄"
+          ]
+        },
+        {
+          "eventId": "evt_003",
+          "timestampLabel": "8:33",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "오브젝트 주변 추가 손실",
+            "진입 및 이탈 판단 문제"
+          ]
+        },
+        {
+          "eventId": "evt_004",
+          "timestampLabel": "9:53",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 4,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 차원의 초반 흐름 흔들림"
+          ]
+        },
+        {
+          "eventId": "evt_005",
+          "timestampLabel": "10:21",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "반복된 오브젝트 실패",
+            "중요 타이밍 판단 오류"
+          ]
+        },
+        {
+          "eventId": "evt_007",
+          "timestampLabel": "13:50",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "초반 3데스 누적",
+            "상위 티어 노출 위험"
+          ]
+        },
+        {
+          "eventId": "evt_009",
+          "timestampLabel": "15:55",
+          "phase": "MID",
+          "eventType": "CHAMPION_KILL",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "중반 회복 시도",
+            "직접 킬 관여"
+          ]
+        },
+        {
+          "eventId": "evt_010",
+          "timestampLabel": "16:10",
+          "phase": "MID",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "교전 후 운영 전환 미흡",
+            "오브젝트 관리 문제 지속"
+          ]
+        },
+        {
+          "eventId": "evt_011",
+          "timestampLabel": "16:25",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 4,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "개인 비관여 승리 흐름"
+          ]
+        },
+        {
+          "eventId": "evt_012",
+          "timestampLabel": "16:33",
+          "phase": "MID",
+          "eventType": "SKIRMISH_WIN",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "후속 합류 성공",
+            "중반 교전 연결"
+          ]
+        },
+        {
+          "eventId": "evt_013",
+          "timestampLabel": "16:40",
+          "phase": "MID",
+          "eventType": "SKIRMISH_WIN",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "후속 합류 성공",
+            "중반 회복"
+          ]
+        },
+        {
+          "eventId": "evt_014",
+          "timestampLabel": "17:17",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 4,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 전환",
+            "승리 요인 분리"
+          ]
+        },
+        {
+          "eventId": "evt_015",
+          "timestampLabel": "17:24",
+          "phase": "MID",
+          "eventType": "OBJECTIVE_SETUP_WIN",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "중반 오브젝트 회복",
+            "구조물 압박 보조"
+          ]
+        },
+        {
+          "eventId": "evt_016",
+          "timestampLabel": "17:37",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 4,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "연속 타워 압박",
+            "팀 의존 승리 흐름"
+          ]
+        },
+        {
+          "eventId": "evt_019",
+          "timestampLabel": "19:47",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "승리 확정 구조물 압박",
+            "개인 주도성 과대평가 경계"
+          ]
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "중반 교전 합류 타이밍",
+        "claudeNote": "16:33~16:40 구간에서 연속으로 교전에 합류하며 킬 관여를 만들었습니다. 문도의 탱킹 능력을 활용해 팀파이트에 적시에 투입한 판단이 좋았습니다.",
+        "codexNote": "초반 3데스로 게임에서 사라질 수 있는 상황이었지만 15:55 직접 킬, 16:33과 16:40 후속 합류로 최소한 중반 교전에는 다시 연결됐다. 다만 이는 주도적인 설계라기보다 열린 싸움에 합류한 성격이 강하므로 과대평가하면 안 된다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 연계 판단력",
+        "claudeNote": "17:24 정글 오브젝트 확보 후 곧바로 구조물 압박으로 전환하는 흐름을 만들었습니다. 오브젝트 → 타워 연계가 승리를 앞당긴 핵심 요인입니다.",
+        "codexNote": "17:24 정글 오브젝트 확보는 이후 팀의 연속 타워 압박 흐름과 연결될 수 있는 긍정 요소다. 초반 오브젝트 실패가 많았던 경기에서 중반에 최소한 하나의 회복 지점을 만든 점은 인정할 수 있다."
+      },
+      {
+        "category": "strength",
+        "topic": "중반 이후 생존력 관리",
+        "claudeNote": "초반 3데스 이후 중반에는 단 한 번도 죽지 않았습니다. 초반 실수를 인지하고 무리한 진입을 자제하며 안정적으로 플레이한 점이 돋보입니다.",
+        "codexNote": "초반 3데스로 게임에서 사라질 수 있는 상황이었지만 15:55 직접 킬, 16:33과 16:40 후속 합류로 최소한 중반 교전에는 다시 연결됐다. 다만 이는 주도적인 설계라기보다 열린 싸움에 합류한 성격이 강하므로 과대평가하면 안 된다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 정글 동선 불안정",
+        "claudeNote": "3:14 첫 데스가 이후 연쇄 사망(8:33, 13:50)으로 이어졌습니다. 문도는 초반 1v1이 약한 챔피언이므로, 상대 정글러와의 조우를 피하는 동선 설계가 필요합니다.",
+        "codexNote": "EARLY 구간에만 3데스가 집중됐다. 문도 정글은 초반 교전력이 압도적인 챔피언이 아니기 때문에, 3:14 첫 사망 이후에도 8:33, 13:50에 반복 사망한 것은 챔피언 강점과 게임 플랜이 어긋난 신호다. 상위 티어에서는 이 정도 초반 손실이 드래곤, 카정, 시야 장악으로 더 크게 굴러간다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "weakness",
+        "topic": "드래곤 주도권 상실",
+        "note": "상대 팀에 드래곤 2개를 내주었습니다. 8:29, 10:21에 오브젝트 셋업 실패가 기록되어 있으며, 정글러로서 드래곤 타이밍 관리와 사전 시야 확보가 부족했습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "낮은 킬 관여율과 챔피언 피해량",
+        "note": "킬 관여율 21%와 챔피언 피해량 3,225는 팀 킬 19개 대비 정글러의 존재감이 부족했음을 나타냅니다. 초반 사망으로 인한 템포 손실이 전체 영향력 감소로 이어진 것으로 보입니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "팀이 구조물 승리 조건으로 전환할 때 방해가 되지는 않았다",
+        "note": "16:25, 17:17, 17:37, 19:47 타워 획득 흐름이 이어졌고, 플레이어는 이 구간에서 추가 사망 없이 경기를 마쳤다. 다만 대부분 비관여 이벤트라 본인이 구조물 승리 조건을 만든 것보다는 팀의 압박이 성공하는 동안 더 이상 손실을 늘리지 않은 쪽에 가깝다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 세팅 실패가 반복됐고 승리 결과가 이를 가렸다",
+        "note": "8:29, 10:21, 16:10에 오브젝트 또는 구조물 관련 실패가 기록됐고 팀 드래곤도 0대2로 밀렸다. 20분 승리라 크게 드러나지 않았지만, 정글러가 오브젝트 타이밍마다 먼저 준비하지 못하면 더 긴 게임에서는 승리 조건이 상대에게 넘어간다."
+      },
+      {
+        "category": "weakness",
+        "topic": "승리 기여가 팀 구조물 압박에 과도하게 의존했다",
+        "note": "팀은 19킬을 기록했지만 플레이어 킬 관여율은 21%에 그쳤고, 챔피언 피해량도 3225로 낮다. 중반 타워 획득 이벤트 다수가 플레이어 비관여로 기록되어 있어, 이 경기를 본인의 캐리 패턴으로 해석하면 위험하다. 상대가 구조물 방어를 더 잘하거나 팀 라인이 같은 속도로 이기지 못하면 동일한 승리 방식이 재현되기 어렵다."
+      }
+    ],
+    "agreementRate": 67
+  }
+}
