@@ -10,6 +10,10 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 - 저장 샘플 기준 플레이어 추세 요약
 - Riot ID 입력 후 최근 경기 후보 조회
 - 후보 경기 1건을 클릭해서 새 샘플 생성
+- 챔피언 배지 UI 렌더링
+  - 작은 카드: Data Dragon 최신 버전 기반 `square icon` 우선 사용
+  - 큰 스냅샷: `loading art` 기반 대표 이미지 사용
+  - 버전 조회 전/실패 시 `loading art` 또는 이니셜 배지로 fallback
 - 원본 응답, 정규화 JSON, 분석 결과 JSON을 `data/samples/` 아래에 저장
 - Riot API 키를 프런트엔드에 노출하지 않고 서버에서만 사용
 
@@ -19,6 +23,7 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 
 - 경기 헤드라인
 - Quick View 상단 요약 바
+- Champion / Role / Result 스냅샷
 - KDA, CS, 킬관여, 시야, 오브젝트 지표
 - 저장된 리포트 빠른 비교
 - 플레이어 추세 요약
@@ -40,7 +45,7 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 1. Riot ID -> `account-v1`
 2. PUUID -> 최근 Match ID 목록
 3. 각 Match 상세 조회
-4. UI에 샘플 후보 카드 표시
+4. UI에 챔피언/포지션/결과 중심의 샘플 후보 카드 표시
 
 후보 카드를 클릭하면 해당 경기의 상세 + Timeline을 다시 가져와 새 샘플을 생성합니다.
 
@@ -98,6 +103,8 @@ node server.js
 
 - `KR`, `JP1` 계정의 match/account 조회는 `asia.api.riotgames.com` 클러스터를 사용
 - 최근 경기 후보는 간단한 `sampleFitScore` 기준으로 정렬
+- 샘플 manifest 항목에는 `champion`, `publicAlias`, `collectedDate`, `theme`를 함께 저장
+- 챔피언 배지 이미지는 Riot Data Dragon을 사용하며, 런타임에 최신 버전을 확인해 정사각형 아이콘 경로를 구성
 - 생성된 샘플은 아래 파일을 함께 남김
 
 ```text
@@ -127,6 +134,13 @@ data/samples/sample-<match-id>/
   - `sample-002` / `Dr. Mundo JUNGLE WIN`
 - 라이브 생성 검증 샘플:
   - `sample-kr-8166637996` / `Dr. Mundo JUNGLE WIN`
+
+## UI 메모
+
+- 샘플 스위처 카드: 챔피언 배지 + 챔피언명 + 샘플 라벨 + Riot ID
+- 저장된 리포트 카드: 챔피언 배지 + 챔피언명 + 역할/결과 배지
+- 최근 경기 후보 카드: 챔피언 배지 + 챔피언명 + 역할/결과 태그 + fit 점수
+- Quick View Champion 영역: 큰 챔피언 대표 아트 + 챔피언명
 
 ## 최근 검증 메모
 

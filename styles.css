@@ -1149,3 +1149,142 @@ body::after {
     font-size: 0.92rem;
   }
 }
+
+.sample-chip__row,
+.report-card__title,
+.champion-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sample-chip__copy,
+.candidate-head__copy {
+  min-width: 0;
+}
+
+.sample-chip__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sample-chip__copy span,
+.sample-chip__copy strong,
+.report-card__title h4,
+.candidate-head__copy h4 {
+  overflow-wrap: anywhere;
+}
+
+.sample-chip__champion {
+  display: inline-flex;
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.candidate-head__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.candidate-head__tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.candidate-head__tag--result[data-result="WIN"] {
+  color: var(--accent-strong);
+  border-color: rgba(89, 209, 178, 0.24);
+  background: rgba(89, 209, 178, 0.12);
+}
+
+.candidate-head__tag--result[data-result="LOSS"] {
+  color: #ff9c8f;
+  border-color: rgba(255, 156, 143, 0.24);
+  background: rgba(255, 156, 143, 0.12);
+}
+
+.champion-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background:
+    var(--champion-art, linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))),
+    radial-gradient(circle at top left, rgba(240, 179, 91, 0.32), transparent 58%),
+    linear-gradient(180deg, rgba(89, 209, 178, 0.12), rgba(255, 255, 255, 0.04));
+  background-size: cover, auto, auto;
+  background-position: var(--champion-art-position, center top), center, center;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 10px rgba(5, 8, 16, 0.85);
+}
+
+.champion-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.34)),
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 52%);
+}
+
+.champion-avatar[data-monogram]::before {
+  content: attr(data-monogram);
+  position: relative;
+  z-index: 1;
+}
+
+.champion-avatar--small {
+  width: 36px;
+  height: 36px;
+  font-size: 0.72rem;
+}
+
+.champion-avatar--medium {
+  width: 42px;
+  height: 42px;
+  font-size: 0.82rem;
+}
+
+.champion-avatar--large {
+  width: 48px;
+  height: 48px;
+  font-size: 0.9rem;
+}
+
+.report-card__champion {
+  display: inline-flex;
+  margin-bottom: 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.champion-inline--snapshot strong {
+  margin: 0;
+}

@@ -10,6 +10,7 @@ const dom = {
   gameFlowSummary: document.querySelector("[data-game-flow-summary]"),
   resultPill: document.querySelector("[data-result-pill]"),
   snapshotChampion: document.querySelector("[data-snapshot-champion]"),
+  snapshotChampionIcon: document.querySelector("[data-snapshot-champion-icon]"),
   snapshotRole: document.querySelector("[data-snapshot-role]"),
   snapshotResult: document.querySelector("[data-snapshot-result]"),
   snapshotQueue: document.querySelector("[data-snapshot-queue]"),
@@ -78,6 +79,203 @@ function compactPatchLabel(version) {
     return `${parts[0]}.${parts[1]}`;
   }
   return text;
+}
+
+function championDisplayName(name) {
+  return String(name || "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+}
+
+const CHAMPION_ART_ALIASES = {
+  FiddleSticks: "Fiddlesticks",
+  Wukong: "MonkeyKing",
+};
+
+let championCdnVersion = "";
+let championCdnVersionPromise = null;
+let championAssetMap = null;
+let championAssetMapPromise = null;
+
+function normalizeChampionToken(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function registerChampionAssetKey(map, candidate, assetKey) {
+  const token = normalizeChampionToken(candidate);
+  if (!token) return;
+  map.set(token, assetKey);
+}
+
+function championAssetKey(name) {
+  const raw = String(name || "").trim();
+  if (!raw) return "";
+  const normalized = normalizeChampionToken(raw);
+  if (championAssetMap?.has(normalized)) {
+    return championAssetMap.get(normalized) || raw;
+  }
+  return CHAMPION_ART_ALIASES[raw] || raw;
+}
+
+function championArtUrl(name) {
+  const key = championAssetKey(name);
+  if (!key) return "";
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${key}_0.jpg`;
+}
+
+function championSquareUrl(name) {
+  const key = championAssetKey(name);
+  if (!key || !championCdnVersion) return "";
+  return `https://ddragon.leagueoflegends.com/cdn/${championCdnVersion}/img/champion/${key}.png`;
+}
+
+function championAvatarArtValue(name, size = "medium") {
+  const artUrl = championArtUrl(name);
+
+  if (size === "large") {
+    return artUrl ? `url('${artUrl}')` : "";
+  }
+
+  const squareUrl = championSquareUrl(name);
+  if (squareUrl) {
+    return `url('${squareUrl}')`;
+  }
+
+  return artUrl ? `url('${artUrl}')` : "";
+}
+
+function championAvatarPosition(name, size = "medium") {
+  if (size === "large") {
+    return "center top";
+  }
+  return championSquareUrl(name) ? "center center" : "center top";
+}
+
+function inferChampionAvatarSize(node) {
+  if (node?.classList.contains("champion-avatar--large")) return "large";
+  if (node?.classList.contains("champion-avatar--small")) return "small";
+  return "medium";
+}
+
+function applyChampionAvatarPresentation(node, name) {
+  if (!node) return;
+
+  const size = inferChampionAvatarSize(node);
+  const artValue = championAvatarArtValue(name, size);
+  if (artValue) {
+    node.style.setProperty("--champion-art", artValue);
+    node.style.setProperty("--champion-art-position", championAvatarPosition(name, size));
+  } else {
+    node.style.removeProperty("--champion-art");
+    node.style.removeProperty("--champion-art-position");
+  }
+}
+
+function refreshChampionAvatarElements() {
+  document.querySelectorAll(".champion-avatar[data-champion-name]").forEach((node) => {
+    applyChampionAvatarPresentation(node, node.dataset.championName);
+  });
+}
+
+function loadChampionAssetMap(version) {
+  if (!version || championAssetMap || championAssetMapPromise) return;
+
+  championAssetMapPromise = fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`)
+    .then((response) => (response.ok ? response.json() : null))
+    .then((payload) => {
+      if (!payload?.data) return;
+
+      const nextMap = new Map();
+      Object.values(payload.data).forEach((champion) => {
+        registerChampionAssetKey(nextMap, champion.id, champion.id);
+        registerChampionAssetKey(nextMap, champion.name, champion.id);
+        registerChampionAssetKey(nextMap, championDisplayName(champion.id), champion.id);
+      });
+
+      Object.entries(CHAMPION_ART_ALIASES).forEach(([alias, assetKey]) => {
+        registerChampionAssetKey(nextMap, alias, assetKey);
+      });
+
+      championAssetMap = nextMap;
+      refreshChampionAvatarElements();
+    })
+    .catch(() => {})
+    .finally(() => {
+      championAssetMapPromise = null;
+    });
+}
+
+function queueChampionVersionLoad() {
+  if (championCdnVersion) {
+    loadChampionAssetMap(championCdnVersion);
+    return;
+  }
+
+  if (championCdnVersionPromise) return;
+
+  championCdnVersionPromise = fetch("https://ddragon.leagueoflegends.com/api/versions.json")
+    .then((response) => (response.ok ? response.json() : []))
+    .then((versions) => {
+      if (Array.isArray(versions) && versions[0]) {
+        championCdnVersion = versions[0];
+        loadChampionAssetMap(championCdnVersion);
+        refreshChampionAvatarElements();
+      }
+    })
+    .catch(() => {})
+    .finally(() => {
+      championCdnVersionPromise = null;
+    });
+}
+
+function championMonogram(name) {
+  const display = championDisplayName(name);
+  const parts = display.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+  }
+  return (parts[0] || "??").slice(0, 2).toUpperCase();
+}
+
+function championAvatarMarkup(name, size = "medium") {
+  const display = championDisplayName(name) || "Unknown";
+  const monogram = championMonogram(name);
+  const artValue = championAvatarArtValue(name, size);
+  const artStyle = artValue
+    ? ` style="--champion-art:${artValue};--champion-art-position:${championAvatarPosition(name, size)}"`
+    : "";
+  queueChampionVersionLoad();
+  return `<span class="champion-avatar champion-avatar--${size}" aria-hidden="true" title="${display}" data-champion-name="${name || ""}" data-monogram="${monogram}"${artStyle}></span>`;
+}
+
+function candidateResultToken(match) {
+  if (typeof match?.result === "string" && match.result) {
+    return match.result;
+  }
+  if (typeof match?.win === "boolean") {
+    return match.win ? "WIN" : "LOSS";
+  }
+  return "";
+}
+
+function candidateIdentityMetaMarkup(match) {
+  const tokens = [];
+  const role = String(match?.role || "").trim();
+  const result = candidateResultToken(match);
+
+  if (role) {
+    tokens.push(`<span class="candidate-head__tag">${role}</span>`);
+  }
+
+  if (result) {
+    tokens.push(
+      `<span class="candidate-head__tag candidate-head__tag--result" data-result="${result}">${resultLabel(result)}</span>`,
+    );
+  }
+
+  return tokens.length ? `<div class="candidate-head__tags">${tokens.join("")}</div>` : "";
 }
 
 function parseReportMeta(sample) {
@@ -385,8 +583,14 @@ function renderSampleSwitcher() {
     .map(
       (sample) => `
         <button class="sample-chip" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
-          <span>${sample.label}</span>
-          <strong>${sample.publicAlias}</strong>
+          <div class="sample-chip__row">
+            ${championAvatarMarkup(sample.champion, "small")}
+            <div class="sample-chip__copy">
+              <em class="sample-chip__champion">${championDisplayName(sample.champion)}</em>
+              <span>${sample.label}</span>
+              <strong>${sample.publicAlias}</strong>
+            </div>
+          </div>
         </button>
       `,
     )
@@ -404,7 +608,13 @@ function renderSampleSwitcher() {
               <span class="meta-label">${sample.id}</span>
               <span class="report-card__state">${sample.id === state.currentSampleId ? "CURRENT" : "ARCHIVE"}</span>
             </div>
-            <h4>${sample.label}</h4>
+            <div class="report-card__title">
+              ${championAvatarMarkup(sample.champion, "medium")}
+              <div>
+                <span class="report-card__champion">${championDisplayName(sample.champion)}</span>
+                <h4>${sample.label}</h4>
+              </div>
+            </div>
             <div class="report-card__badges">
               <span class="report-badge">${meta.role}</span>
               <span class="report-badge report-badge--result" data-result="${meta.result}">${resultText}</span>
@@ -434,7 +644,16 @@ function renderHero(sample) {
   dom.resultPill.dataset.result = sample.analysis.matchSummary.result;
   dom.resultPill.textContent = `${resultLabel(sample.analysis.matchSummary.result)} · ${sample.analysis.coachSummary.winLossReason}`;
 
-  dom.snapshotChampion.textContent = sample.analysis.matchSummary.champion;
+  const championName = championDisplayName(sample.analysis.matchSummary.champion);
+  dom.snapshotChampion.textContent = championName;
+  if (dom.snapshotChampionIcon) {
+    dom.snapshotChampionIcon.textContent = "";
+    dom.snapshotChampionIcon.dataset.monogram = championMonogram(sample.analysis.matchSummary.champion);
+    dom.snapshotChampionIcon.dataset.championName = sample.analysis.matchSummary.champion || "";
+    dom.snapshotChampionIcon.title = championName;
+    applyChampionAvatarPresentation(dom.snapshotChampionIcon, sample.analysis.matchSummary.champion);
+    queueChampionVersionLoad();
+  }
   dom.snapshotRole.textContent = sample.analysis.matchSummary.role;
   dom.snapshotResult.textContent = resultLabel(sample.analysis.matchSummary.result);
   dom.snapshotQueue.textContent = compactQueueLabel(sample.analysis.matchSummary.queueType);
@@ -645,9 +864,13 @@ function renderCandidates(matches) {
       (match) => `
         <button class="candidate-card candidate-card--button" type="button" data-generate-match="${match.matchId}">
           <div class="candidate-head">
-            <div class="candidate-head__copy">
-              <span class="meta-label">${match.matchId}</span>
-              <h4>${match.champion}</h4>
+            <div class="champion-inline">
+              ${championAvatarMarkup(match.champion, "medium")}
+              <div class="candidate-head__copy">
+                <span class="meta-label">${match.matchId}</span>
+                <h4>${championDisplayName(match.champion)}</h4>
+                ${candidateIdentityMetaMarkup(match)}
+              </div>
             </div>
             <span class="candidate-fit">fit ${match.sampleFitScore}</span>
           </div>

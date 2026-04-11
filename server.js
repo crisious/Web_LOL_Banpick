@@ -1296,6 +1296,7 @@ async function handleGenerateSample(req, res) {
     const entry = {
       id: sampleId,
       label: `${sampleId} · ${analysis.matchSummary.role} ${analysis.matchSummary.result}`,
+      champion: analysis.matchSummary.champion,
       publicAlias,
       collectedDate: new Date().toISOString().slice(0, 10),
       theme: analysis.coachSummary.gameFlowSummary,
