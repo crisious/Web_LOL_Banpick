@@ -29,6 +29,8 @@ const dom = {
   trendSummary: document.querySelector("[data-trend-summary]"),
   trendStats: document.querySelector("[data-trend-stats]"),
   trendTags: document.querySelector("[data-trend-tags]"),
+  trendStrengths: document.querySelector("[data-trend-strengths]"),
+  trendWeaknesses: document.querySelector("[data-trend-weaknesses]"),
   recentForm: document.querySelector("[data-recent-form]"),
   fetchStatus: document.querySelector("[data-fetch-status]"),
   candidateList: document.querySelector("[data-candidate-list]"),
@@ -159,6 +161,18 @@ function buildCandidateCardSummary(match) {
   return [compactQueueLabel(match.queueLabel), `적합도 ${match.sampleFitScore}`].join(" · ");
 }
 
+function classifyTrendTag(tag) {
+  if (/(좋음|안정|장악|템포|합류|연결|꾸준|승리)/.test(tag)) {
+    return "positive";
+  }
+
+  if (/(불안|아쉬움|느림|생존|데스|리스크|손해|실패)/.test(tag)) {
+    return "negative";
+  }
+
+  return "neutral";
+}
+
 function buildTrendSnapshot() {
   const samples = state.manifest;
   const current = samples.find((sample) => sample.id === state.currentSampleId) || samples[0];
@@ -196,6 +210,16 @@ function buildTrendSnapshot() {
     .sort((left, right) => right[1] - left[1])
     .slice(0, 4)
     .map(([tag, count]) => `${tag} ${count}회`);
+  const positiveTags = [...tagCounts.entries()]
+    .filter(([tag]) => classifyTrendTag(tag) === "positive")
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 3)
+    .map(([tag, count]) => `${tag} ${count}회`);
+  const negativeTags = [...tagCounts.entries()]
+    .filter(([tag]) => classifyTrendTag(tag) === "negative")
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 3)
+    .map(([tag, count]) => `${tag} ${count}회`);
 
   const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${dominantRole} 비중 ${dominantRoleCount}회`;
   const summary =
@@ -213,6 +237,8 @@ function buildTrendSnapshot() {
       { label: "Current", value: current?.id || "-", note: "현재 보고 있는 샘플" },
     ],
     tags: recurringTags,
+    positiveTags,
+    negativeTags,
   };
 }
 
@@ -240,6 +266,20 @@ function renderTrendPanel() {
     trend.tags.length > 0
       ? trend.tags.map((tag) => `<span class="trend-tag">${tag}</span>`).join("")
       : `<span class="trend-tag">표본 적음</span>`;
+
+  if (dom.trendStrengths) {
+    dom.trendStrengths.innerHTML =
+      trend.positiveTags.length > 0
+        ? trend.positiveTags.map((tag) => `<div class="trend-list__item">${tag}</div>`).join("")
+        : `<div class="trend-list__item">반복 강점 표본 적음</div>`;
+  }
+
+  if (dom.trendWeaknesses) {
+    dom.trendWeaknesses.innerHTML =
+      trend.negativeTags.length > 0
+        ? trend.negativeTags.map((tag) => `<div class="trend-list__item">${tag}</div>`).join("")
+        : `<div class="trend-list__item">반복 약점 표본 적음</div>`;
+  }
 }
 
 function buildCompactHeadline(sample) {
