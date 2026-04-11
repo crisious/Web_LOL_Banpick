@@ -1,0 +1,669 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-11T11:29:15.873Z",
+  "sampleId": "sample-kr-8166601659",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-04-11T11:29:15.872Z",
+      "language": "ko",
+      "matchId": "KR_8166601659",
+      "riotId": "매운맛 비스킷#KR1",
+      "champion": "DrMundo",
+      "position": "JUNGLE",
+      "result": "WIN",
+      "analysisId": "ai_sample-kr-8166601659_1775906955872"
+    },
+    "matchSummary": {
+      "headline": "10데스에도 불구하고 문도의 탱킹과 팀 합류로 팀이 49킬을 뽑아내며 역전승을 거둔 경기"
+    },
+    "coachSummary": {
+      "overallSummary": "이번 경기는 초·중반에 반복적인 데스로 흐름을 내줬지만, 문도 특유의 탱킹력과 꾸준한 팀파이트 참여로 팀이 킬을 축적할 수 있는 공간을 만들어줬습니다. 다만 드래곤 4개를 모두 내준 점과 중반 5데스는 상대에게 불필요한 골드를 제공했고, 만약 상대가 드래곤 소울을 더 효과적으로 활용했다면 패배할 수도 있었던 경기입니다. 승리 안에서도 개선점을 찾아 다음 경기에서는 더 안정적인 정글링을 목표로 해봅시다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "꾸준한 팀파이트 참여와 탱킹",
+        "description": "10데스에도 포기하지 않고 13어시스트를 기록하며 팀파이트마다 전선을 유지했습니다. 문도의 체력 회복력을 활용해 상대의 스킬과 집중 화력을 흡수하면서 팀원들이 49킬을 뽑아낼 수 있는 공간을 만들어줬습니다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_025",
+          "evt_028",
+          "evt_032",
+          "evt_033"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "후반 바론 활용과 구조물 압박",
+        "description": "팀이 바론 1회를 확보한 뒤 타워 8개를 부수며 게임을 마무리했습니다. 드래곤을 모두 내줬음에도 바론을 통한 스플릿 압박과 구조물 파괴로 승리 조건을 만들어낸 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_035"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "열세 상황에서의 멘탈 유지",
+        "description": "초반부터 데스가 쌓이고 드래곤을 연속으로 내주는 불리한 상황에서도 팀파이트 참여를 포기하지 않았습니다. 중반 이후 어시스트 비율이 높아진 것은 팀 합류 타이밍을 잘 잡았다는 증거입니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_025",
+          "evt_028",
+          "evt_032"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "중반 반복 데스로 인한 골드 유출",
+        "description": "중반에만 5데스를 기록하며 상대에게 불필요한 현상금 골드를 제공했습니다. 17분~28분 사이 약 10분 동안 집중적으로 사망한 것은 교전 진입 타이밍이나 포지셔닝에 개선이 필요하다는 신호입니다. 탱커라도 무의미한 데스는 팀 전체의 맵 압력을 떨어뜨립니다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_025",
+          "evt_028",
+          "evt_032"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "드래곤 통제력 부재",
+        "description": "상대에게 드래곤 4개를 모두 내줬습니다. 정글러로서 오브젝트 타이머 관리와 사전 시야 장악이 부족했던 것으로 보입니다. 소울까지 내줄 경우 후반 팀파이트에서 치명적인 불이익을 받을 수 있으므로, 드래곤 스폰 1분 전부터 하단 시야와 포지션을 준비하는 습관이 필요합니다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_006",
+          "evt_011",
+          "evt_017",
+          "evt_020",
+          "evt_026",
+          "evt_027"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "낮은 정글 CS 효율",
+        "description": "분당 CS 3.75는 문도 정글 기준으로 낮은 수치입니다. 잦은 데스로 인한 부활 대기 시간과 비효율적 동선이 원인으로 보입니다. 갱킹 실패 후 바로 캠프를 소화하는 루틴을 갖추면 골드 격차를 줄일 수 있습니다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_025"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "label": "드래곤 스폰 60초 전에 하단 리버 시야 확보하기",
+        "priority": "high"
+      },
+      {
+        "id": "chk_2",
+        "label": "중반 교전 전 팀원 위치를 미니맵으로 확인한 뒤 진입하기",
+        "priority": "high"
+      },
+      {
+        "id": "chk_3",
+        "label": "데스 후 복귀 시 가장 가까운 캠프부터 소화하여 CS 손실 최소화하기",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_4",
+        "label": "문도 궁극기 쿨타임이 없을 때는 교전을 피하고 파밍에 집중하기",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_5",
+        "label": "바론·드래곤 교환 판단 시 팀 상태와 인원수를 먼저 체크하기",
+        "priority": "high"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "14:08",
+        "phase": "EARLY",
+        "title": "초반 오브젝트 연속 실점",
+        "description": "14분대에 연속으로 오브젝트를 내주며 초반 주도권을 상실했습니다. 이 시점에서 상대 정글러의 동선을 예측하고 카운터 오브젝트를 시도하는 판단이 필요했습니다."
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "17:40",
+        "phase": "MID",
+        "title": "중반 첫 데스 — 운영 불안의 시작",
+        "description": "중반 첫 사망으로 이후 연쇄 데스의 시발점이 되었습니다. 이 교전에서의 진입 각도나 타이밍을 복기해볼 필요가 있습니다."
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "25:35",
+        "phase": "MID",
+        "title": "드래곤 앞 포지셔닝 실패",
+        "description": "오브젝트 앞에서 직접 관여했음에도 내주게 된 장면입니다. 스마이트 타이밍이나 팀 합류 시점을 점검해야 합니다."
+      },
+      {
+        "eventId": "evt_033",
+        "timestampLabel": "30:04",
+        "phase": "LATE",
+        "title": "후반 결정적 교전에서의 사망",
+        "description": "후반 중요한 교전에서 생존하지 못하며 팀에 부담을 줬습니다. 그러나 이 희생 이후 팀이 바론을 확보하고 게임을 마무리한 점에서 의미 있는 탱킹이었을 가능성도 있습니다."
+      },
+      {
+        "eventId": "evt_029",
+        "timestampLabel": "28:04",
+        "phase": "MID",
+        "title": "연속 오브젝트 실점의 정점",
+        "description": "28분까지 다수의 오브젝트를 내주며 맵 통제권이 크게 기울었습니다. 이 시점에서 수비적 시야 운용으로 전환하는 판단이 필요했습니다."
+      }
+    ],
+    "evidenceIndex": {
+      "totalEventsAnalyzed": 15,
+      "playerInvolvedEvents": [
+        "evt_015",
+        "evt_019",
+        "evt_025",
+        "evt_026",
+        "evt_028",
+        "evt_032",
+        "evt_033",
+        "evt_035"
+      ],
+      "objectiveFailEvents": [
+        "evt_005",
+        "evt_006",
+        "evt_011",
+        "evt_017",
+        "evt_020",
+        "evt_026",
+        "evt_027",
+        "evt_029",
+        "evt_035"
+      ],
+      "highImportanceEvents": [
+        "evt_005",
+        "evt_006",
+        "evt_011",
+        "evt_015",
+        "evt_017",
+        "evt_019",
+        "evt_020",
+        "evt_025",
+        "evt_026",
+        "evt_027",
+        "evt_028",
+        "evt_029",
+        "evt_032",
+        "evt_033",
+        "evt_035"
+      ],
+      "derivedThemesUsed": [
+        "weak_early_stability",
+        "poor_post_objective_survivability",
+        "low_resource_conversion",
+        "late_structure_closeout"
+      ]
+    },
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "matchId": "KR_8166601659",
+      "targetPlayer": "매운맛 비스킷#KR1",
+      "participantId": 7,
+      "champion": "DrMundo",
+      "position": "JUNGLE",
+      "queue": "RANKED_SOLO",
+      "result": "WIN",
+      "duration": "34:58",
+      "reviewStance": "critical_structure_review"
+    },
+    "matchSummary": {
+      "oneLine": "승리는 했지만 정글 문도 입장에서 0용, 낮은 킬 관여율, 반복 데스가 겹쳐 팀의 교전력과 상대 실수에 크게 기대어 버틴 경기다.",
+      "criticalRead": "2/10/13, 킬 관여율 31%, CS 3.75/min, 팀 드래곤 0 대 상대 4라는 지표는 이 경기가 안정적인 정글 운영 승리가 아니라 불리한 오브젝트 흐름 속에서 후반 팀 교전과 바론 전환으로 뒤집은 경기였음을 보여준다."
+    },
+    "coachSummary": {
+      "overallFlow": "초중반부터 오브젝트 세팅 실패가 반복되며 정글 주도권을 잃었고, 17분 이후 플레이어 데스가 계속 누적되면서 운영 안정성이 크게 흔들렸다. 중반에는 17:40, 19:20, 23:37, 26:26, 28:32 데스가 연속적으로 기록되어, 문도의 탱킹이 공간 창출이 아니라 사망으로 끝나는 장면이 많았을 가능성이 높다. 후반에는 팀이 바론 1회와 타워 8개를 통해 승리 조건을 만들었지만, 30:04 데스와 31:20 오브젝트 실패가 남아 있어 마무리 과정도 깔끔했다고 보기 어렵다. 레드팀 관점에서는 이 승리를 '좋은 정글 캐리'로 해석하면 위험하며, 더 강한 상대에게는 드래곤 관리 실패와 사망 타이밍이 그대로 패배 조건이 될 구조다.",
+      "hiddenPattern": "반복 패턴은 '오브젝트를 내줌 → 이후 핵심 구도에서 사망 → 다음 오브젝트 준비도 늦어짐'에 가깝다. 단일 실수보다, 시야와 위치 선점이 늦은 상태에서 문도의 체급으로 억지 진입하거나 버티려는 판단이 누적된 경기로 읽힌다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "초반은 2킬을 기록했지만 3데스와 오브젝트 세팅 실패가 함께 발생해 실제 주도권 확보로 이어지지 않았다.",
+        "redteamRead": "표면적으로는 킬이 있어 괜찮아 보일 수 있으나, 14:08과 14:15에 연속으로 중요 오브젝트나 구조물을 내준 흐름은 초반 킬이 맵 통제로 변환되지 않았다는 신호다. 정글러가 초반에 얻은 자원을 오브젝트 타이밍, 시야, 라인 압박으로 연결하지 못하면 상위 티어에서는 바로 드래곤 스택과 정글 진입권을 잃는다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_006"
+        ]
+      },
+      {
+        "phase": "MID",
+        "summary": "중반은 가장 큰 붕괴 구간이다. 0킬 5데스 7어시스트로 교전에 관여했지만, 사망과 오브젝트 실패가 너무 잦았다.",
+        "redteamRead": "15:52부터 28:32까지 오브젝트 실패와 플레이어 데스가 반복됐다. 어시스트 7개는 팀 교전 참여를 보여주지만, 17:40, 19:20, 23:37, 26:26, 28:32 데스가 모두 중반 핵심 구도에서 발생했다는 점이 더 중요하다. 이는 '앞에서 맞아주는 탱커'가 아니라 '죽어서 다음 턴을 없애는 정글러'로 기능했을 가능성을 시사한다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_015",
+          "evt_017",
+          "evt_019",
+          "evt_020",
+          "evt_025",
+          "evt_026",
+          "evt_027",
+          "evt_028",
+          "evt_029",
+          "evt_032"
+        ]
+      },
+      {
+        "phase": "LATE",
+        "summary": "후반은 팀이 바론과 타워로 승리 마무리 조건을 만들었지만, 플레이어는 결정 구도에서 생존 리스크를 계속 노출했다.",
+        "redteamRead": "30:04 데스와 31:20 오브젝트 세팅 실패는 후반에도 판단 안정성이 회복되지 않았다는 근거다. 팀이 이긴 것은 맞지만, 드래곤 0 대 4 상황에서 후반 결정 구도 데스가 반복되면 보통은 장로, 바론, 억제기 교환에서 즉시 게임이 끝난다. 이번 승리는 팀 전체 교전력 또는 상대의 마무리 실패 덕을 본 부분이 크다.",
+        "relatedEventIds": [
+          "evt_033",
+          "evt_035"
+        ]
+      }
+    ],
+    "strengths": [
+      {
+        "title": "불리한 흐름에서도 교전 접점은 계속 만들었다",
+        "description": "최종 13어시스트와 25,315 챔피언 피해량은 완전히 소극적으로 무너진 경기는 아니었음을 보여준다. 문도 정글로 전투에 계속 몸을 넣었고, 팀이 바론 1회와 타워 8개까지 연결하는 동안 전선 참여 자체는 유지했다.",
+        "redteamCaveat": "다만 킬 관여율이 31%로 낮고 데스가 10회라서, 이 장점은 '효율적인 한타 기여'라기보다 '많이 싸웠고 일부는 팀이 수습했다'에 가깝다.",
+        "relatedEventIds": [
+          "evt_026",
+          "evt_033",
+          "evt_035"
+        ]
+      },
+      {
+        "title": "초반에 최소한의 킬 생산력은 있었다",
+        "description": "초반 지표는 2킬 1어시스트로, 완전히 무기력하게 시작한 경기는 아니다. 초반 교전에서 킬을 만들어낼 여지는 있었다.",
+        "redteamCaveat": "문제는 이 킬이 오브젝트 통제로 전환되지 않았다는 점이다. 14분대 연속 오브젝트 실패가 있어, 초반 득점이 실제 게임 주도권으로 굳어지지 않았다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_006"
+        ]
+      },
+      {
+        "title": "후반까지 게임에서 이탈하지 않고 탱커 역할을 시도했다",
+        "description": "10데스에도 불구하고 레벨 15, 체력 계열 아이템 중심 빌드, 후반 5어시스트는 끝까지 전면에서 역할을 수행하려 했다는 근거다.",
+        "redteamCaveat": "상위 티어 기준으로는 '끝까지 앞에 있었다'보다 '언제 앞에 서면 안 되는지'가 더 중요하다. 30:04 후반 결정 구도 데스는 탱커 역할 수행과 무리한 피격 허용의 경계가 무너진 장면으로 봐야 한다.",
+        "relatedEventIds": [
+          "evt_033",
+          "evt_035"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "오브젝트 운영이 승리한 정글러의 수준이 아니었다",
+        "description": "팀 드래곤 0, 상대 드래곤 4는 정글 포지션에서 가장 심각한 경고 신호다. 타워와 바론으로 이겼더라도, 드래곤 스택을 전부 내준 구조는 재현성이 낮다.",
+        "whyItMattersHigherTier": "상위 티어 상대는 2용 이후부터 시야를 더 깊게 고정하고, 3용 타이밍부터 사이드와 미드 라인을 강제로 묶는다. 이 경기처럼 오브젝트 세팅 실패가 반복되면 후반 바론 반전 기회 자체가 오지 않을 가능성이 높다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_006",
+          "evt_011",
+          "evt_017",
+          "evt_020",
+          "evt_026",
+          "evt_027",
+          "evt_029",
+          "evt_035"
+        ]
+      },
+      {
+        "title": "중반 데스가 단발 실수가 아니라 반복 패턴이다",
+        "description": "17:40, 19:20, 23:37, 26:26, 28:32에 플레이어 데스가 반복됐다. 중반 5데스는 단순히 한 번 물린 문제가 아니라, 싸움 전 위치 선정이나 철수 기준이 계속 늦었다는 의미다.",
+        "whyItMattersHigherTier": "정글러가 중반에 죽으면 캠프 손실보다 더 큰 문제가 생긴다. 다음 오브젝트 시야를 먼저 못 잡고, 강타 보유자가 사라져 상대가 드래곤과 바론을 확정적으로 설계할 수 있다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_025",
+          "evt_028",
+          "evt_032"
+        ]
+      },
+      {
+        "title": "탱킹과 희생을 혼동했을 가능성이 높다",
+        "description": "문도는 앞라인을 설 수 있지만, 이 경기의 10데스는 공간 창출보다 사망 비용이 더 컸을 가능성을 강하게 시사한다. 특히 낮은 킬 관여율 31%와 함께 보면, 죽은 장면들이 팀 전체 이득으로 충분히 환산되지 않았을 위험이 크다.",
+        "whyItMattersHigherTier": "상위 티어에서는 탱커가 먼저 죽는 순간 상대가 스킬을 다 썼다는 사실보다, 우리 팀이 강타와 앞라인을 잃었다는 사실이 더 크게 작동한다. 버티는 챔피언일수록 '죽어도 되는 각'보다 '살아서 다음 턴을 여는 각'을 우선해야 한다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_025",
+          "evt_028",
+          "evt_032",
+          "evt_033"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "첫 드래곤 이전 60초에는 바텀/미드 라인 상태와 강가 시야를 먼저 확인하고, 싸움이 불리하면 반대편 캠프나 전령 쪽 교환 계획을 즉시 정한다.",
+        "targetProblem": "드래곤 0 대 4와 반복 오브젝트 세팅 실패"
+      },
+      {
+        "item": "중반 교전 전에는 '내가 죽어도 우리 팀이 오브젝트를 먹는가'를 기준으로 진입 여부를 판단한다. 답이 아니면 문도라도 먼저 들어가지 않는다.",
+        "targetProblem": "중반 5데스와 낮은 자원 전환 효율"
+      },
+      {
+        "item": "오브젝트 90초 전 귀환, 60초 전 시야, 30초 전 라인 합류 위치를 고정 루틴으로 만든다.",
+        "targetProblem": "오브젝트가 열린 뒤에야 반응하는 늦은 세팅"
+      },
+      {
+        "item": "한타에서 첫 진입 후 체력이 절반 이하가 되면 계속 추격하지 말고, 궁극기와 이동 속도로 한 번 빠져 스킬 쿨타임을 다시 받는 패턴을 연습한다.",
+        "targetProblem": "탱킹이 사망으로 끝나는 반복 구조"
+      },
+      {
+        "item": "승리한 판도 데스 타임라인을 먼저 복기한다. 특히 17분 이후 죽은 위치와 직후 잃은 오브젝트를 함께 기록한다.",
+        "targetProblem": "승리 때문에 가려지는 판단 오류"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "14:08",
+        "phase": "EARLY",
+        "title": "초반 득점이 오브젝트 주도권으로 연결되지 않은 첫 신호",
+        "criticalAnalysis": "중요 오브젝트나 구조물을 내준 장면이다. 초반에 2킬이 있었음에도 이 타이밍에 맵 이득을 잃었다는 점은, 킬 이후 정글 동선과 시야 전환이 느렸을 가능성을 보여준다."
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "17:40",
+        "phase": "MID",
+        "title": "중반 반복 데스 패턴의 시작점",
+        "criticalAnalysis": "중반 핵심 구도에서 플레이어가 사망했다. 이 시점부터 28분대까지 데스가 반복되므로, 단순 실수보다 교전 진입 기준 자체를 의심해야 한다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "19:20",
+        "phase": "MID",
+        "title": "두 번째 중반 데스로 운영 안정성이 무너진 장면",
+        "criticalAnalysis": "17:40 이후 약 1분 40초 만에 다시 사망했다. 정글러가 이 간격으로 죽으면 캠프, 시야, 오브젝트 준비가 모두 늦어져 팀이 수동적으로 움직이게 된다."
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "25:35",
+        "phase": "MID",
+        "title": "플레이어가 관여한 오브젝트 세팅 실패",
+        "criticalAnalysis": "오브젝트 실패이며 플레이어가 직접 관여된 이벤트다. 드래곤 0 대 4라는 최종 결과를 고려하면, 이 장면은 단순한 팀 단위 실패가 아니라 정글러의 준비 위치와 판단을 반드시 점검해야 하는 근거다."
+      },
+      {
+        "eventId": "evt_028",
+        "timestampLabel": "26:26",
+        "phase": "MID",
+        "title": "오브젝트 실패 직후 이어진 사망 리스크",
+        "criticalAnalysis": "25:35 오브젝트 실패 후 1분 이내에 다시 플레이어 데스가 발생했다. 오브젝트를 못 먹은 뒤 철수 기준까지 늦어졌을 가능성이 있으며, 이런 흐름은 상위 티어에서 바로 바론이나 억제기 압박으로 연결된다."
+      },
+      {
+        "eventId": "evt_033",
+        "timestampLabel": "30:04",
+        "phase": "LATE",
+        "title": "후반 결정 구도에서 생존하지 못한 장면",
+        "criticalAnalysis": "후반 데스는 초중반 데스보다 비용이 훨씬 크다. 팀이 최종적으로 승리했기 때문에 묻힐 수 있지만, 이 타이밍에 정글러가 죽는 것은 장로, 바론, 억제기 구도에서 치명적이다."
+      },
+      {
+        "eventId": "evt_035",
+        "timestampLabel": "31:20",
+        "phase": "LATE",
+        "title": "승리 직전에도 남아 있던 오브젝트 세팅 문제",
+        "criticalAnalysis": "후반에 플레이어가 관여한 오브젝트 세팅 실패다. 이 경기는 이겼지만, 마지막까지 오브젝트 준비 문제가 해결되지 않았다는 점에서 승리의 재현성이 낮다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "14:08",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "early_summary",
+          "objective_control_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_006",
+        "timestampLabel": "14:15",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "early_summary",
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_011",
+        "timestampLabel": "15:52",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "mid_summary",
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "17:40",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "mid_summary",
+          "death_pattern_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_017",
+        "timestampLabel": "18:12",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "mid_summary",
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "19:20",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "mid_summary",
+          "death_pattern_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_020",
+        "timestampLabel": "20:01",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "timestampLabel": "23:37",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "death_pattern_weakness",
+          "tanking_efficiency_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "25:35",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "objective_control_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_027",
+        "timestampLabel": "26:11",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_028",
+        "timestampLabel": "26:26",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "death_pattern_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_029",
+        "timestampLabel": "28:04",
+        "phase": "MID",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "usedFor": [
+          "objective_control_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_032",
+        "timestampLabel": "28:32",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "death_pattern_weakness",
+          "tanking_efficiency_weakness"
+        ]
+      },
+      {
+        "eventId": "evt_033",
+        "timestampLabel": "30:04",
+        "phase": "LATE",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "late_summary",
+          "tanking_efficiency_weakness",
+          "key_moment"
+        ]
+      },
+      {
+        "eventId": "evt_035",
+        "timestampLabel": "31:20",
+        "phase": "LATE",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "usedFor": [
+          "late_summary",
+          "objective_control_weakness",
+          "key_moment"
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "weakness",
+        "topic": "중반 반복 데스로 인한 골드 유출",
+        "claudeNote": "중반에만 5데스를 기록하며 상대에게 불필요한 현상금 골드를 제공했습니다. 17분~28분 사이 약 10분 동안 집중적으로 사망한 것은 교전 진입 타이밍이나 포지셔닝에 개선이 필요하다는 신호입니다. 탱커라도 무의미한 데스는 팀 전체의 맵 압력을 떨어뜨립니다.",
+        "codexNote": "17:40, 19:20, 23:37, 26:26, 28:32에 플레이어 데스가 반복됐다. 중반 5데스는 단순히 한 번 물린 문제가 아니라, 싸움 전 위치 선정이나 철수 기준이 계속 늦었다는 의미다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "꾸준한 팀파이트 참여와 탱킹",
+        "note": "10데스에도 포기하지 않고 13어시스트를 기록하며 팀파이트마다 전선을 유지했습니다. 문도의 체력 회복력을 활용해 상대의 스킬과 집중 화력을 흡수하면서 팀원들이 49킬을 뽑아낼 수 있는 공간을 만들어줬습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "후반 바론 활용과 구조물 압박",
+        "note": "팀이 바론 1회를 확보한 뒤 타워 8개를 부수며 게임을 마무리했습니다. 드래곤을 모두 내줬음에도 바론을 통한 스플릿 압박과 구조물 파괴로 승리 조건을 만들어낸 판단이 좋았습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "열세 상황에서의 멘탈 유지",
+        "note": "초반부터 데스가 쌓이고 드래곤을 연속으로 내주는 불리한 상황에서도 팀파이트 참여를 포기하지 않았습니다. 중반 이후 어시스트 비율이 높아진 것은 팀 합류 타이밍을 잘 잡았다는 증거입니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "드래곤 통제력 부재",
+        "note": "상대에게 드래곤 4개를 모두 내줬습니다. 정글러로서 오브젝트 타이머 관리와 사전 시야 장악이 부족했던 것으로 보입니다. 소울까지 내줄 경우 후반 팀파이트에서 치명적인 불이익을 받을 수 있으므로, 드래곤 스폰 1분 전부터 하단 시야와 포지션을 준비하는 습관이 필요합니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "낮은 정글 CS 효율",
+        "note": "분당 CS 3.75는 문도 정글 기준으로 낮은 수치입니다. 잦은 데스로 인한 부활 대기 시간과 비효율적 동선이 원인으로 보입니다. 갱킹 실패 후 바로 캠프를 소화하는 루틴을 갖추면 골드 격차를 줄일 수 있습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "불리한 흐름에서도 교전 접점은 계속 만들었다",
+        "note": "최종 13어시스트와 25,315 챔피언 피해량은 완전히 소극적으로 무너진 경기는 아니었음을 보여준다. 문도 정글로 전투에 계속 몸을 넣었고, 팀이 바론 1회와 타워 8개까지 연결하는 동안 전선 참여 자체는 유지했다."
+      },
+      {
+        "category": "strength",
+        "topic": "초반에 최소한의 킬 생산력은 있었다",
+        "note": "초반 지표는 2킬 1어시스트로, 완전히 무기력하게 시작한 경기는 아니다. 초반 교전에서 킬을 만들어낼 여지는 있었다."
+      },
+      {
+        "category": "strength",
+        "topic": "후반까지 게임에서 이탈하지 않고 탱커 역할을 시도했다",
+        "note": "10데스에도 불구하고 레벨 15, 체력 계열 아이템 중심 빌드, 후반 5어시스트는 끝까지 전면에서 역할을 수행하려 했다는 근거다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 운영이 승리한 정글러의 수준이 아니었다",
+        "note": "팀 드래곤 0, 상대 드래곤 4는 정글 포지션에서 가장 심각한 경고 신호다. 타워와 바론으로 이겼더라도, 드래곤 스택을 전부 내준 구조는 재현성이 낮다."
+      },
+      {
+        "category": "weakness",
+        "topic": "탱킹과 희생을 혼동했을 가능성이 높다",
+        "note": "문도는 앞라인을 설 수 있지만, 이 경기의 10데스는 공간 창출보다 사망 비용이 더 컸을 가능성을 강하게 시사한다. 특히 낮은 킬 관여율 31%와 함께 보면, 죽은 장면들이 팀 전체 이득으로 충분히 환산되지 않았을 위험이 크다."
+      }
+    ],
+    "agreementRate": 17
+  }
+}

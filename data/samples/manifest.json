@@ -1,6 +1,17 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8166601659",
+      "label": "sample-kr-8166601659 · JUNGLE WIN",
+      "champion": "DrMundo",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "10데스에도 불구하고 문도의 탱킹과 팀 합류로 팀이 49킬을 뽑아내며 역전승을 거둔 경기",
+      "normalizedPath": "/data/samples/sample-kr-8166601659/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8166601659/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8166601659/sample-kr-8166601659-notes.md"
+    },
+    {
       "id": "sample-kr-8166637996",
       "label": "sample-kr-8166637996 · JUNGLE WIN",
       "champion": "DrMundo",

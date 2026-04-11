@@ -145,9 +145,70 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 - 현재 실제 작업 대상은 리플레이 분석 앱 쪽 파일들.
 - 예전 밴픽 와이어프레임 파일(`admin.html`, `admin.js`, `admin.css`, `draft-state.js`)은 워크스페이스에 남아 있지만 현재 주 작업 흐름은 아님.
 
+---
+
+## AI 에이전트 분석 파이프라인 (진행 중)
+
+### 아키텍처 결정
+
+기존 `buildAnalysis()`의 규칙 기반 템플릿 분석을 두 AI CLI 에이전트로 교체.
+
+```
+normalized-match.json
+  ↓ buildLlmPayload()
+payload
+  ├→ callClaudeAgent()   [claude --print --output-format json]  → 코칭 분석
+  └→ callCodexAgent()    [codex exec - --json --ephemeral]      → 레드팀 비판 분석
+       ↓ Promise.allSettled (병렬 실행)
+  buildComparison()
+       ↓
+  analysis-result.json     ← 기존 스키마 유지 (primary = Claude)
+  comparison-result.json   ← 신규 (레드팀 비교 결과)
+```
+
+### 에이전트 역할 구분
+
+| 에이전트 | CLI | 역할 | sourceType |
+|---|---|---|---|
+| Claude | `claude --print` | 코칭 분석 (균형, 개선점 중심) | `claude_ai` |
+| Codex | `codex exec -` | 레드팀 비판 (놓친 패턴, 구조적 약점) | `codex_redteam` |
+
+### 핵심 구현 사항
+
+- `runCli(args, stdin, timeoutMs)` — 공통 subprocess 헬퍼, `settled` 플래그로 이중 reject 방지
+- `buildLlmPayload(normalized)` — importance ≥ 3 이벤트 최대 15개로 필터, rawRef/laneHint 제거
+- `buildComparison(claude, codex, sampleId)` — 장점/단점 키워드 교집합으로 agreements/claudeOnly/codexOnly 분류
+- `buildRuleBasedAnalysis()` — 기존 규칙 분석 함수로 분리, 양쪽 CLI 실패 시 fallback
+- `buildAnalysis()` — async 전환, `__comparison` 임시 필드로 비교 결과 전달
+
+### Codex CLI JSONL 포맷 (실측)
+
+```jsonl
+{"type":"thread.started","thread_id":"..."}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"type":"agent_message","text":"...응답 텍스트..."}}
+{"type":"turn.completed","usage":{...}}
+```
+
+파싱 키: `evt.type === "item.completed" && evt.item?.type === "agent_message"` → `evt.item.text`
+
+### Codex 모델 참고
+
+- `-m o4-mini` — ChatGPT 계정에서 미지원 (실측 확인)
+- 모델 미지정 시 계정 기본 모델 사용 (권장)
+
+### 새로 추가되는 파일
+
+- `data/samples/{id}/comparison-result.json` — 레드팀 비교 결과 저장
+
+### API 키 불필요
+
+- 두 CLI 모두 자체 세션 인증 사용 (ANTHROPIC_API_KEY, OPENAI_API_KEY 불필요)
+- `.env.example` 변경 없음
+
 ## 다음 추천 작업
 
 1. 새 Riot 개발 키 발급 후 `.env` 반영
-2. `/api/recent-matches`와 `/api/generate-sample` 실데이터 검증
-3. 후보/저장 리포트/헤드라인 요약 규칙 고도화
-4. 필요하면 다중 경기 누적 분석 뷰 추가
+2. `/api/generate-sample` 실행해 AI 에이전트 분석 결과 검증
+3. `comparison-result.json` UI 뷰 추가 (레드팀 비교 패널)
+4. 다중 경기 누적 분석 뷰 추가

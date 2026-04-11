@@ -1,0 +1,205 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "generatedAt": "2026-04-11T11:29:15.872Z",
+    "language": "ko",
+    "matchId": "KR_8166601659",
+    "riotId": "매운맛 비스킷#KR1",
+    "champion": "DrMundo",
+    "position": "JUNGLE",
+    "result": "WIN",
+    "analysisId": "ai_sample-kr-8166601659_1775906955872"
+  },
+  "matchSummary": {
+    "headline": "10데스에도 불구하고 문도의 탱킹과 팀 합류로 팀이 49킬을 뽑아내며 역전승을 거둔 경기"
+  },
+  "coachSummary": {
+    "overallSummary": "이번 경기는 초·중반에 반복적인 데스로 흐름을 내줬지만, 문도 특유의 탱킹력과 꾸준한 팀파이트 참여로 팀이 킬을 축적할 수 있는 공간을 만들어줬습니다. 다만 드래곤 4개를 모두 내준 점과 중반 5데스는 상대에게 불필요한 골드를 제공했고, 만약 상대가 드래곤 소울을 더 효과적으로 활용했다면 패배할 수도 있었던 경기입니다. 승리 안에서도 개선점을 찾아 다음 경기에서는 더 안정적인 정글링을 목표로 해봅시다."
+  },
+  "phaseSummaries": [],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "꾸준한 팀파이트 참여와 탱킹",
+      "description": "10데스에도 포기하지 않고 13어시스트를 기록하며 팀파이트마다 전선을 유지했습니다. 문도의 체력 회복력을 활용해 상대의 스킬과 집중 화력을 흡수하면서 팀원들이 49킬을 뽑아낼 수 있는 공간을 만들어줬습니다.",
+      "relatedEventIds": [
+        "evt_015",
+        "evt_019",
+        "evt_025",
+        "evt_028",
+        "evt_032",
+        "evt_033"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "후반 바론 활용과 구조물 압박",
+      "description": "팀이 바론 1회를 확보한 뒤 타워 8개를 부수며 게임을 마무리했습니다. 드래곤을 모두 내줬음에도 바론을 통한 스플릿 압박과 구조물 파괴로 승리 조건을 만들어낸 판단이 좋았습니다.",
+      "relatedEventIds": [
+        "evt_035"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "열세 상황에서의 멘탈 유지",
+      "description": "초반부터 데스가 쌓이고 드래곤을 연속으로 내주는 불리한 상황에서도 팀파이트 참여를 포기하지 않았습니다. 중반 이후 어시스트 비율이 높아진 것은 팀 합류 타이밍을 잘 잡았다는 증거입니다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_025",
+        "evt_028",
+        "evt_032"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "weak_1",
+      "title": "중반 반복 데스로 인한 골드 유출",
+      "description": "중반에만 5데스를 기록하며 상대에게 불필요한 현상금 골드를 제공했습니다. 17분~28분 사이 약 10분 동안 집중적으로 사망한 것은 교전 진입 타이밍이나 포지셔닝에 개선이 필요하다는 신호입니다. 탱커라도 무의미한 데스는 팀 전체의 맵 압력을 떨어뜨립니다.",
+      "relatedEventIds": [
+        "evt_015",
+        "evt_019",
+        "evt_025",
+        "evt_028",
+        "evt_032"
+      ]
+    },
+    {
+      "id": "weak_2",
+      "title": "드래곤 통제력 부재",
+      "description": "상대에게 드래곤 4개를 모두 내줬습니다. 정글러로서 오브젝트 타이머 관리와 사전 시야 장악이 부족했던 것으로 보입니다. 소울까지 내줄 경우 후반 팀파이트에서 치명적인 불이익을 받을 수 있으므로, 드래곤 스폰 1분 전부터 하단 시야와 포지션을 준비하는 습관이 필요합니다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_006",
+        "evt_011",
+        "evt_017",
+        "evt_020",
+        "evt_026",
+        "evt_027"
+      ]
+    },
+    {
+      "id": "weak_3",
+      "title": "낮은 정글 CS 효율",
+      "description": "분당 CS 3.75는 문도 정글 기준으로 낮은 수치입니다. 잦은 데스로 인한 부활 대기 시간과 비효율적 동선이 원인으로 보입니다. 갱킹 실패 후 바로 캠프를 소화하는 루틴을 갖추면 골드 격차를 줄일 수 있습니다.",
+      "relatedEventIds": [
+        "evt_015",
+        "evt_019",
+        "evt_025"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_1",
+      "label": "드래곤 스폰 60초 전에 하단 리버 시야 확보하기",
+      "priority": "high"
+    },
+    {
+      "id": "chk_2",
+      "label": "중반 교전 전 팀원 위치를 미니맵으로 확인한 뒤 진입하기",
+      "priority": "high"
+    },
+    {
+      "id": "chk_3",
+      "label": "데스 후 복귀 시 가장 가까운 캠프부터 소화하여 CS 손실 최소화하기",
+      "priority": "medium"
+    },
+    {
+      "id": "chk_4",
+      "label": "문도 궁극기 쿨타임이 없을 때는 교전을 피하고 파밍에 집중하기",
+      "priority": "medium"
+    },
+    {
+      "id": "chk_5",
+      "label": "바론·드래곤 교환 판단 시 팀 상태와 인원수를 먼저 체크하기",
+      "priority": "high"
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_005",
+      "timestampLabel": "14:08",
+      "phase": "EARLY",
+      "title": "초반 오브젝트 연속 실점",
+      "description": "14분대에 연속으로 오브젝트를 내주며 초반 주도권을 상실했습니다. 이 시점에서 상대 정글러의 동선을 예측하고 카운터 오브젝트를 시도하는 판단이 필요했습니다."
+    },
+    {
+      "eventId": "evt_015",
+      "timestampLabel": "17:40",
+      "phase": "MID",
+      "title": "중반 첫 데스 — 운영 불안의 시작",
+      "description": "중반 첫 사망으로 이후 연쇄 데스의 시발점이 되었습니다. 이 교전에서의 진입 각도나 타이밍을 복기해볼 필요가 있습니다."
+    },
+    {
+      "eventId": "evt_026",
+      "timestampLabel": "25:35",
+      "phase": "MID",
+      "title": "드래곤 앞 포지셔닝 실패",
+      "description": "오브젝트 앞에서 직접 관여했음에도 내주게 된 장면입니다. 스마이트 타이밍이나 팀 합류 시점을 점검해야 합니다."
+    },
+    {
+      "eventId": "evt_033",
+      "timestampLabel": "30:04",
+      "phase": "LATE",
+      "title": "후반 결정적 교전에서의 사망",
+      "description": "후반 중요한 교전에서 생존하지 못하며 팀에 부담을 줬습니다. 그러나 이 희생 이후 팀이 바론을 확보하고 게임을 마무리한 점에서 의미 있는 탱킹이었을 가능성도 있습니다."
+    },
+    {
+      "eventId": "evt_029",
+      "timestampLabel": "28:04",
+      "phase": "MID",
+      "title": "연속 오브젝트 실점의 정점",
+      "description": "28분까지 다수의 오브젝트를 내주며 맵 통제권이 크게 기울었습니다. 이 시점에서 수비적 시야 운용으로 전환하는 판단이 필요했습니다."
+    }
+  ],
+  "evidenceIndex": {
+    "totalEventsAnalyzed": 15,
+    "playerInvolvedEvents": [
+      "evt_015",
+      "evt_019",
+      "evt_025",
+      "evt_026",
+      "evt_028",
+      "evt_032",
+      "evt_033",
+      "evt_035"
+    ],
+    "objectiveFailEvents": [
+      "evt_005",
+      "evt_006",
+      "evt_011",
+      "evt_017",
+      "evt_020",
+      "evt_026",
+      "evt_027",
+      "evt_029",
+      "evt_035"
+    ],
+    "highImportanceEvents": [
+      "evt_005",
+      "evt_006",
+      "evt_011",
+      "evt_015",
+      "evt_017",
+      "evt_019",
+      "evt_020",
+      "evt_025",
+      "evt_026",
+      "evt_027",
+      "evt_028",
+      "evt_029",
+      "evt_032",
+      "evt_033",
+      "evt_035"
+    ],
+    "derivedThemesUsed": [
+      "weak_early_stability",
+      "poor_post_objective_survivability",
+      "low_resource_conversion",
+      "late_structure_closeout"
+    ]
+  },
+  "schemaVersion": "1.0"
+}

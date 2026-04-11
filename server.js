@@ -4,6 +4,7 @@ const fs = require("fs");
 const fsp = require("fs/promises");
 const path = require("path");
 const { URL } = require("url");
+const { spawn } = require("child_process");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -994,7 +995,9 @@ function buildHeadline(normalized, strengths, weaknesses) {
   return "핵심 오브젝트 합류와 생존 관리가 승패를 가른 경기";
 }
 
-function buildAnalysis(normalized, sampleId) {
+// ─── Rule-based fallback ────────────────────────────────────────────────────
+
+function buildRuleBasedAnalysis(normalized, sampleId) {
   const strengths = buildStrengths(normalized);
   const weaknesses = buildWeaknesses(normalized);
   const coachSummary = buildCoachSummary(normalized);
@@ -1028,6 +1031,330 @@ function buildAnalysis(normalized, sampleId) {
     keyMoments,
     evidenceIndex,
   };
+}
+
+// ─── LLM payload builder ─────────────────────────────────────────────────────
+
+function buildLlmPayload(normalized) {
+  const filteredEvents = normalized.timelineEvents
+    .filter((e) => e.importance >= 3)
+    .sort((a, b) => b.importance - a.importance)
+    .slice(0, 15)
+    .sort((a, b) => a.timestampMs - b.timestampMs)
+    .map(({ eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved }) => ({
+      eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved,
+    }));
+
+  const { early, mid, late } = normalized.phaseContext;
+  return {
+    taskMeta: { language: "ko", analysisMode: "coaching", strengthCount: 3, weaknessCount: 3, checklistCountMin: 3, checklistCountMax: 5 },
+    matchContext: {
+      playerContext: { riotId: normalized.playerContext.riotId, participantId: normalized.playerContext.participantId },
+      matchInfo: normalized.matchInfo,
+      playerStats: normalized.playerStats,
+      teamContext: normalized.teamContext,
+    },
+    phaseContext: {
+      early: { kills: early.kills, deaths: early.deaths, assists: early.assists, notableEventCount: early.notableEventCount },
+      mid:   { kills: mid.kills,   deaths: mid.deaths,   assists: mid.assists,   notableEventCount: mid.notableEventCount   },
+      late:  { kills: late.kills,  deaths: late.deaths,  assists: late.assists,  notableEventCount: late.notableEventCount  },
+    },
+    timelineEvents: filteredEvents,
+    derivedSignals: normalized.derivedSignals,
+    outputContract: {
+      schemaVersion: "1.0",
+      requiredTopLevelFields: ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex"],
+      requiredArrayCounts: { strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: 4 },
+      rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
+    },
+  };
+}
+
+// ─── CLI subprocess helper ────────────────────────────────────────────────────
+
+// subprocess에서 CLI를 찾을 수 있도록 PATH 보강 (node 프로세스는 shell PATH 미상속 가능)
+const AUGMENTED_PATH = [
+  process.env.PATH,
+  "/opt/homebrew/bin",
+  "/usr/local/bin",
+  `${process.env.HOME}/.local/bin`,
+].filter(Boolean).join(":");
+
+function runCli(args, stdinText, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const settle = (fn, val) => { if (!settled) { settled = true; fn(val); } };
+
+    const env = { ...process.env, PATH: AUGMENTED_PATH };
+    const proc = spawn(args[0], args.slice(1), { stdio: ["pipe", "pipe", "pipe"], env });
+    let stdout = "";
+    let stderr = "";
+
+    proc.stdout.on("data", (c) => { stdout += c; });
+    proc.stderr.on("data", (c) => { stderr += c; });
+    proc.stdin.on("error", () => {}); // EPIPE 억제
+
+    const timer = setTimeout(() => {
+      proc.kill();
+      settle(reject, new Error(`timeout: ${args[0]}`));
+    }, timeoutMs);
+
+    proc.on("close", (code) => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        settle(reject, new Error(`${args[0]} exited ${code}: ${stderr.slice(0, 300)}`));
+        return;
+      }
+      settle(resolve, stdout);
+    });
+
+    proc.on("error", (err) => {
+      clearTimeout(timer);
+      const msg = err.code === "ENOENT" ? `${args[0]} CLI not found in PATH` : err.message;
+      settle(reject, new Error(msg));
+    });
+
+    proc.stdin.write(stdinText, "utf8");
+    proc.stdin.end();
+  });
+}
+
+// ─── Claude: 코칭 분석 에이전트 ──────────────────────────────────────────────
+
+const CLAUDE_COACHING_PROMPT = `당신은 League of Legends 경기 복기 코치다.
+입력 경기 데이터를 바탕으로 플레이어가 잘한 점과 개선점을 균형 있게 분석한다.
+모든 인사이트는 이벤트와 지표에 근거해야 한다. 플레이어를 비난하지 말고 코칭형 문장을 사용한다.
+출력은 반드시 JSON만. 코드블록 마커 없음.
+
+주어진 경기 데이터를 분석해 생성하라: 경기 한줄 요약, 전체 흐름 요약, 구간별 요약(EARLY/MID/LATE),
+장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상, 근거 이벤트 인덱스.
+모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "claude_ai".
+
+분석할 경기 데이터:`;
+
+async function callClaudeAgent(payload, timeoutMs = 300000) {
+  const stdinText = `${CLAUDE_COACHING_PROMPT}\n\n${JSON.stringify(payload, null, 2)}`;
+  const raw = await runCli(["claude", "--print", "--output-format", "json"], stdinText, timeoutMs);
+
+  // --output-format json → { result: "...", ... }
+  let text;
+  try {
+    const wrapper = JSON.parse(raw);
+    text = (wrapper.result ?? raw).trim();
+  } catch {
+    text = raw.trim();
+  }
+
+  if (text.startsWith("```")) text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  return JSON.parse(text);
+}
+
+// ─── Codex: 레드팀 비판 에이전트 ─────────────────────────────────────────────
+
+const CODEX_REDTEAM_PROMPT = `당신은 League of Legends 경기 분석 레드팀 에이전트다.
+일반 코칭 분석이 놓치기 쉬운 구조적 문제와 숨겨진 패턴을 찾아내는 것이 목적이다.
+아래 관점으로 집중 검토하라:
+- 표면적으로 좋아 보이지만 실제로 비효율적인 플레이
+- 통계에 드러나지 않는 반복 패턴과 판단 오류
+- 상위 티어에서 더 크게 노출될 구조적 약점
+- 승리 요인으로 여겨지는 플레이 중 운이나 상대 실수에 의존한 부분
+
+같은 JSON 출력 스키마를 사용하되, 더 비판적이고 구체적인 시각으로 작성하라.
+출력은 JSON만. 코드블록 마커 없음.
+
+주어진 경기 데이터를 분석해 생성하라: 경기 한줄 요약, 전체 흐름 요약, 구간별 요약(EARLY/MID/LATE),
+장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상, 근거 이벤트 인덱스.
+모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "codex_redteam".
+
+분석할 경기 데이터:`;
+
+async function callCodexAgent(payload, timeoutMs = 300000) {
+  const stdinText = `${CODEX_REDTEAM_PROMPT}\n\n${JSON.stringify(payload, null, 2)}`;
+
+  // codex exec - : stdin으로 프롬프트 전달
+  // --json       : JSONL 이벤트 스트림 출력
+  // --ephemeral  : 세션 저장 없음
+  // -s read-only : 파일시스템 조작 차단
+  // --color never: ANSI 코드 제거
+  const raw = await runCli(
+    ["codex", "exec", "-", "--json", "--ephemeral", "-s", "read-only", "--color", "never"],
+    stdinText,
+    timeoutMs,
+  );
+
+  // JSONL 파싱: item.type === "agent_message" 에서 text 추출 (실측 포맷 기준)
+  let text = "";
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      const evt = JSON.parse(trimmed);
+      if (evt.type === "item.completed" && evt.item?.type === "agent_message") {
+        text = evt.item.text ?? "";
+      }
+    } catch { /* 파싱 불가 줄 무시 */ }
+  }
+
+  // JSONL에서 추출 실패 시 raw 전체 시도
+  if (!text) text = raw;
+  text = text.trim();
+  if (text.startsWith("```")) text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  return JSON.parse(text);
+}
+
+// ─── Output schema validator ──────────────────────────────────────────────────
+
+function validateAnalysisOutput(json) {
+  if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
+  if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
+  if (!json?.coachSummary?.overallSummary) throw new Error("missing coachSummary.overallSummary");
+  if (!Array.isArray(json?.strengths) || json.strengths.length < 1) throw new Error("strengths empty");
+  if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
+  if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
+  if (!Array.isArray(json?.keyMoments) || json.keyMoments.length < 2) throw new Error("keyMoments < 2");
+}
+
+// ─── Red-team comparison builder ─────────────────────────────────────────────
+
+function buildComparison(claudeResult, codexResult, sampleId) {
+  function keywords(text) {
+    return (text ?? "").replace(/[^가-힣a-z0-9\s]/gi, " ").toLowerCase().split(/\s+/).filter((w) => w.length >= 2);
+  }
+  function overlaps(titleA, titleB) {
+    const ka = new Set(keywords(titleA));
+    return keywords(titleB).some((w) => ka.has(w));
+  }
+
+  const agreements = [];
+  const claudeOnly = [];
+  const codexOnly = [];
+
+  const claudeStrengths = claudeResult?.strengths ?? [];
+  const codexStrengths  = codexResult?.strengths  ?? [];
+  const claudeWeaknesses = claudeResult?.weaknesses ?? [];
+  const codexWeaknesses  = codexResult?.weaknesses  ?? [];
+
+  for (const cs of claudeStrengths) {
+    const match = codexStrengths.find((ds) => overlaps(cs.title, ds.title));
+    if (match) agreements.push({ category: "strength", topic: cs.title, claudeNote: cs.description, codexNote: match.description });
+    else claudeOnly.push({ category: "strength", topic: cs.title, note: cs.description });
+  }
+  for (const ds of codexStrengths) {
+    if (!claudeStrengths.find((cs) => overlaps(ds.title, cs.title))) {
+      codexOnly.push({ category: "strength", topic: ds.title, note: ds.description });
+    }
+  }
+  for (const cw of claudeWeaknesses) {
+    const match = codexWeaknesses.find((dw) => overlaps(cw.title, dw.title));
+    if (match) agreements.push({ category: "weakness", topic: cw.title, claudeNote: cw.description, codexNote: match.description });
+    else claudeOnly.push({ category: "weakness", topic: cw.title, note: cw.description });
+  }
+  for (const dw of codexWeaknesses) {
+    if (!claudeWeaknesses.find((cw) => overlaps(dw.title, cw.title))) {
+      codexOnly.push({ category: "weakness", topic: dw.title, note: dw.description });
+    }
+  }
+
+  const total = claudeStrengths.length + claudeWeaknesses.length;
+  return {
+    schemaVersion: "1.0",
+    generatedAt: new Date().toISOString(),
+    sampleId,
+    primaryAgent: claudeResult ? "claude" : "codex",
+    redTeamAgent: "codex",
+    claudeAnalysis: claudeResult ?? null,
+    codexAnalysis: codexResult ?? null,
+    comparison: {
+      agreements,
+      claudeOnly,
+      codexOnly,
+      agreementRate: total > 0 ? Math.round((agreements.length / total) * 100) : 0,
+    },
+  };
+}
+
+// ─── Main analysis orchestrator ───────────────────────────────────────────────
+
+async function buildAnalysis(normalized, sampleId) {
+  const payload = buildLlmPayload(normalized);
+
+  const [claudeSettled, codexSettled] = await Promise.allSettled([
+    callClaudeAgent(payload),
+    callCodexAgent(payload),
+  ]);
+
+  const claudeOk = claudeSettled.status === "fulfilled";
+  const codexOk  = codexSettled.status === "fulfilled";
+
+  if (!claudeOk) console.error(`[AI] Claude failed for ${sampleId}:`, claudeSettled.reason?.message);
+  if (!codexOk)  console.error(`[AI] Codex failed for ${sampleId}:`,  codexSettled.reason?.message);
+
+  const claudeResult = claudeOk ? claudeSettled.value : null;
+  const codexResult  = codexOk  ? codexSettled.value  : null;
+
+  let primary = claudeResult ?? codexResult;
+
+  if (!primary) {
+    console.error(`[AI] Both agents failed for ${sampleId}, using rule-based fallback`);
+    return buildRuleBasedAnalysis(normalized, sampleId);
+  }
+
+  // 모델이 생략하기 쉬운 필드 서버측 보완 (AI 콘텐츠는 최대한 유지)
+  if (!primary.schemaVersion) primary.schemaVersion = "1.0";
+  if (!primary.analysisMeta) primary.analysisMeta = {};
+  if (!primary.analysisMeta.language) primary.analysisMeta.language = "ko";
+
+  // matchSummary: AI가 string으로 반환하는 경우 → 객체로 정규화
+  if (typeof primary.matchSummary === "string") {
+    primary.matchSummary = { headline: primary.matchSummary };
+  }
+  if (!primary.matchSummary) primary.matchSummary = {};
+  if (!primary.matchSummary.headline) {
+    const fb = buildRuleBasedAnalysis(normalized, sampleId);
+    primary.matchSummary.headline = fb.matchSummary.headline;
+  }
+  // coachSummary: AI가 string으로 반환하는 경우 → 객체로 정규화
+  if (typeof primary.coachSummary === "string") {
+    primary.coachSummary = { overallSummary: primary.coachSummary };
+  }
+  if (!primary.coachSummary) primary.coachSummary = {};
+  if (!primary.coachSummary.overallSummary) {
+    const fb = buildCoachSummary(normalized);
+    primary.coachSummary.overallSummary = fb.overallSummary;
+  }
+  // phaseSummaries: AI가 배열 대신 객체로 반환하는 경우 → 배열로 정규화
+  if (primary.phaseSummaries && !Array.isArray(primary.phaseSummaries)) {
+    const ps = primary.phaseSummaries;
+    primary.phaseSummaries = ["early", "mid", "late"]
+      .filter((k) => ps[k])
+      .map((k) => {
+        const v = ps[k];
+        return typeof v === "string" ? { phase: k.toUpperCase(), summary: v } : { phase: k.toUpperCase(), ...v };
+      });
+  }
+  if (!Array.isArray(primary.keyMoments) || primary.keyMoments.length < 2) {
+    primary.keyMoments = buildKeyMoments(normalized);
+  }
+  if (!Array.isArray(primary.actionChecklist) || primary.actionChecklist.length < 1) {
+    primary.actionChecklist = buildActionChecklist(normalized, primary.weaknesses ?? []);
+  }
+
+  try {
+    validateAnalysisOutput(primary);
+  } catch (err) {
+    console.error(`[AI] Schema validation failed for ${sampleId}:`, err.message, "— using rule-based fallback");
+    return buildRuleBasedAnalysis(normalized, sampleId);
+  }
+
+  // analysisMeta 서버측 강제 정규화
+  primary.analysisMeta.analysisId  = `ai_${sampleId}_${Date.now()}`;
+  primary.analysisMeta.generatedAt = new Date().toISOString();
+
+  // 비교 결과를 임시 필드로 전달 (handleGenerateSample에서 분리 저장)
+  primary.__comparison = buildComparison(claudeResult, codexResult, sampleId);
+
+  console.log(`[AI] Analysis complete for ${sampleId} — primary: ${primary.analysisMeta.sourceType}`);
+  return primary;
 }
 
 function requestJson(urlString, headers = {}) {
@@ -1278,7 +1605,11 @@ async function handleGenerateSample(req, res) {
       cluster,
       publicAlias,
     });
-    const analysis = buildAnalysis(normalized, sampleId);
+    const analysis = await buildAnalysis(normalized, sampleId);
+
+    // __comparison은 임시 전달 필드 — 저장 전 분리
+    const comparison = analysis.__comparison ?? null;
+    delete analysis.__comparison;
 
     await Promise.all([
       writeJson(path.join(sampleDir, "raw-account.json"), account),
@@ -1286,6 +1617,9 @@ async function handleGenerateSample(req, res) {
       writeJson(path.join(sampleDir, "raw-timeline.json"), timeline),
       writeJson(path.join(sampleDir, "normalized-match.json"), normalized),
       writeJson(path.join(sampleDir, "analysis-result.json"), analysis),
+      comparison
+        ? writeJson(path.join(sampleDir, "comparison-result.json"), comparison)
+        : Promise.resolve(),
       fsp.writeFile(
         path.join(sampleDir, `${sampleId}-notes.md`),
         `# ${sampleId} notes\n\n- Match ID: \`${matchId}\`\n- Riot ID source: \`${gameName}#${tagLine}\`\n- Public alias: \`${publicAlias}\`\n- Theme: ${analysis.matchSummary.headline}\n`,
@@ -1295,11 +1629,11 @@ async function handleGenerateSample(req, res) {
 
     const entry = {
       id: sampleId,
-      label: `${sampleId} · ${analysis.matchSummary.role} ${analysis.matchSummary.result}`,
-      champion: analysis.matchSummary.champion,
+      label: `${sampleId} · ${normalized.matchInfo.position} ${normalized.matchInfo.result}`,
+      champion: normalized.matchInfo.champion,
       publicAlias,
       collectedDate: new Date().toISOString().slice(0, 10),
-      theme: analysis.coachSummary.gameFlowSummary,
+      theme: analysis.matchSummary?.headline || analysis.coachSummary?.gameFlowSummary || "",
       normalizedPath: `/data/samples/${sampleId}/normalized-match.json`,
       analysisPath: `/data/samples/${sampleId}/analysis-result.json`,
       notesPath: `/data/samples/${sampleId}/${sampleId}-notes.md`,
