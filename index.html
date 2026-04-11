@@ -60,6 +60,7 @@
               <a class="section-link" href="#reports">저장 리포트</a>
               <a class="section-link" href="#phases">구간 분석</a>
               <a class="section-link" href="#insights">강점과 약점</a>
+              <a class="section-link" href="#comparison">AI 비교</a>
               <a class="section-link" href="#execution">실행 루틴</a>
               <a class="section-link" href="#evidence">근거 로그</a>
             </div>
@@ -88,11 +89,11 @@
             <form class="fetch-form" data-recent-form aria-labelledby="recent-match-title">
               <label>
                 <span>gameName</span>
-                <input name="gameName" type="text" value="매운맛 비스킷" required />
+                <input name="gameName" type="text" value="매운맛 비스킷" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" />
               </label>
               <label>
                 <span>tagLine</span>
-                <input name="tagLine" type="text" value="KR1" required />
+                <input name="tagLine" type="text" value="KR1" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" />
               </label>
               <label>
                 <span>platform</span>
@@ -232,6 +233,18 @@
             </div>
             <div class="insight-stack" data-weaknesses></div>
             </article>
+          </section>
+
+          <section class="section-block" id="comparison" aria-labelledby="comparison-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">AI Comparison</p>
+                <h2 id="comparison-title">AI 비교 분석</h2>
+              </div>
+            </div>
+            <p class="muted" data-comparison-status></p>
+            <div class="comparison-overview" data-comparison-overview></div>
+            <div class="comparison-grid" data-comparison-grid></div>
           </section>
 
           <section class="execution-grid" id="execution" aria-labelledby="execution-title">

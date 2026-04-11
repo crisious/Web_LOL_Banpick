@@ -11,6 +11,16 @@ loadEnvFile(path.join(root, ".env"));
 const port = Number(process.env.PORT || 8123);
 const manifestPath = path.join(root, "data", "samples", "manifest.json");
 
+// ─── Simple in-memory rate limiter ───────────────────────────────────────────
+const rateBuckets = new Map();
+function rateLimit(key, windowMs) {
+  const now = Date.now();
+  const last = rateBuckets.get(key) || 0;
+  if (now - last < windowMs) return false;
+  rateBuckets.set(key, now);
+  return true;
+}
+
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
@@ -291,7 +301,7 @@ function shouldKeepEvent(rawEvent, targetParticipantId, targetTeamId) {
   }
 
   if (rawEvent.type === "BUILDING_KILL") {
-    return rawEvent.teamId === targetTeamId || rawEvent.teamId !== targetTeamId;
+    return playerInvolved || rawEvent.teamId !== targetTeamId;
   }
 
   return false;
@@ -1411,6 +1421,10 @@ async function loadSampleBundle(sampleId) {
   const normalized = await readJson(path.join(root, entry.normalizedPath.replace(/^\//, "")));
   const analysis = await readJson(path.join(root, entry.analysisPath.replace(/^\//, "")));
 
+  let comparison = null;
+  const compPath = path.join(root, "data", "samples", sampleId, "comparison-result.json");
+  try { comparison = await readJson(compPath); } catch {}
+
   return {
     sampleId: entry.id,
     publicAlias: entry.publicAlias,
@@ -1418,6 +1432,7 @@ async function loadSampleBundle(sampleId) {
     theme: entry.theme,
     normalized,
     analysis,
+    comparison,
   };
 }
 
@@ -1428,6 +1443,14 @@ async function parseBody(req) {
   }
   const raw = Buffer.concat(chunks).toString("utf8");
   return raw ? JSON.parse(raw) : {};
+}
+
+function validateRiotId(gameName, tagLine) {
+  if (!gameName || gameName.length < 3 || gameName.length > 16) return "gameName은 3~16자여야 합니다.";
+  if (!tagLine || tagLine.length < 2 || tagLine.length > 5) return "tagLine은 2~5자여야 합니다.";
+  if (!/^[a-zA-Z0-9가-힣\s_.]+$/.test(gameName)) return "gameName에 허용되지 않는 문자가 있습니다.";
+  if (!/^[a-zA-Z0-9]+$/.test(tagLine)) return "tagLine은 영문/숫자만 허용됩니다.";
+  return null;
 }
 
 function sampleFitScore(match) {
@@ -1471,6 +1494,12 @@ function summarizeMatch(match, puuid) {
 }
 
 async function handleRecentMatches(req, res) {
+  const ip = req.socket.remoteAddress || "unknown";
+  if (!rateLimit(`recent:${ip}`, 10000)) {
+    sendJson(res, 429, { ok: false, error: "요청이 너무 빠릅니다. 10초 후 다시 시도하세요." });
+    return;
+  }
+
   const apiKey = process.env.RIOT_API_KEY;
   if (!apiKey) {
     sendJson(res, 500, {
@@ -1488,10 +1517,12 @@ async function handleRecentMatches(req, res) {
     const matchCount = Math.min(Math.max(Number(body.matchCount || 5), 1), 10);
 
     if (!gameName || !tagLine) {
-      sendJson(res, 400, {
-        ok: false,
-        error: "gameName and tagLine are required.",
-      });
+      sendJson(res, 400, { ok: false, error: "gameName and tagLine are required." });
+      return;
+    }
+    const riotIdError = validateRiotId(gameName, tagLine);
+    if (riotIdError) {
+      sendJson(res, 400, { ok: false, error: riotIdError });
       return;
     }
 
@@ -1550,6 +1581,12 @@ async function upsertManifestEntry(entry) {
 }
 
 async function handleGenerateSample(req, res) {
+  const ip = req.socket.remoteAddress || "unknown";
+  if (!rateLimit(`generate:${ip}`, 60000)) {
+    sendJson(res, 429, { ok: false, error: "샘플 생성은 1분에 1회만 가능합니다." });
+    return;
+  }
+
   const apiKey = process.env.RIOT_API_KEY;
   if (!apiKey) {
     sendJson(res, 500, {
@@ -1567,10 +1604,12 @@ async function handleGenerateSample(req, res) {
     const matchId = String(body.matchId || "").trim();
 
     if (!gameName || !tagLine || !matchId) {
-      sendJson(res, 400, {
-        ok: false,
-        error: "gameName, tagLine, and matchId are required.",
-      });
+      sendJson(res, 400, { ok: false, error: "gameName, tagLine, and matchId are required." });
+      return;
+    }
+    const riotIdError = validateRiotId(gameName, tagLine);
+    if (riotIdError) {
+      sendJson(res, 400, { ok: false, error: riotIdError });
       return;
     }
 
