@@ -1010,6 +1010,147 @@ body::after {
   animation: rise-in 520ms ease both;
 }
 
+/* ─── AI Comparison Section ───────────────────────────────────────────────── */
+
+.comparison-rate-bar {
+  margin-bottom: 24px;
+}
+
+.comparison-rate-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.comparison-rate-label strong {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.comparison-rate-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.comparison-rate-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--mint));
+  transition: width 600ms ease;
+}
+
+.comparison-rate-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.comparison-column-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--line);
+}
+
+.comparison-column-title--agree { color: var(--accent); border-color: var(--accent); }
+.comparison-column-title--claude { color: var(--mint); border-color: var(--mint); }
+.comparison-column-title--codex { color: var(--rose); border-color: var(--rose); }
+
+.comparison-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.comparison-card[data-source="agree"] {
+  background: linear-gradient(135deg, rgba(240, 179, 91, 0.08), rgba(89, 209, 178, 0.06));
+  border-color: rgba(240, 179, 91, 0.3);
+}
+
+.comparison-card[data-source="claude"] {
+  background: linear-gradient(135deg, rgba(89, 209, 178, 0.08), rgba(89, 209, 178, 0.03));
+  border-color: rgba(89, 209, 178, 0.25);
+}
+
+.comparison-card[data-source="codex"] {
+  background: linear-gradient(135deg, rgba(255, 134, 120, 0.08), rgba(255, 134, 120, 0.03));
+  border-color: rgba(255, 134, 120, 0.25);
+}
+
+.comparison-card h4 {
+  font-size: 0.92rem;
+  margin: 6px 0 8px;
+  color: var(--text);
+}
+
+.comparison-card p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 4px 0;
+}
+
+.comparison-notes p strong {
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.comparison-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-badge--strength {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.comparison-badge--weakness {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+/* ─── Retry Button ────────────────────────────────────────────────────────── */
+
+.retry-btn {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.retry-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 @media (max-width: 1180px) {
   .topbar,
   .workspace-grid,
@@ -1020,6 +1161,7 @@ body::after {
   .execution-grid,
   .phase-grid,
   .stat-ribbon,
+  .comparison-grid,
   .fetch-form {
     grid-template-columns: 1fr;
   }
@@ -1039,6 +1181,21 @@ body::after {
   .app-shell {
     width: min(100vw - 16px, 100%);
     padding-top: 16px;
+  }
+
+  .workspace-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  #main-content {
+    order: 1;
+  }
+
+  .sidebar-stack {
+    order: 2;
+    gap: 16px;
   }
 
   body::after {

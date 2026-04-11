@@ -35,6 +35,9 @@ const dom = {
   recentForm: document.querySelector("[data-recent-form]"),
   fetchStatus: document.querySelector("[data-fetch-status]"),
   candidateList: document.querySelector("[data-candidate-list]"),
+  comparisonStatus: document.querySelector("[data-comparison-status]"),
+  comparisonOverview: document.querySelector("[data-comparison-overview]"),
+  comparisonGrid: document.querySelector("[data-comparison-grid]"),
 };
 
 const state = {
@@ -201,7 +204,7 @@ function loadChampionAssetMap(version) {
       championAssetMap = nextMap;
       refreshChampionAvatarElements();
     })
-    .catch(() => {})
+    .catch((err) => console.warn("[CDN] Champion asset map load failed:", err.message))
     .finally(() => {
       championAssetMapPromise = null;
     });
@@ -224,7 +227,7 @@ function queueChampionVersionLoad() {
         refreshChampionAvatarElements();
       }
     })
-    .catch(() => {})
+    .catch((err) => console.warn("[CDN] Champion version fetch failed:", err.message))
     .finally(() => {
       championCdnVersionPromise = null;
     });
@@ -575,7 +578,18 @@ async function loadSampleBundle(sampleId) {
 }
 
 function evidenceMap(sample) {
-  return new Map(sample.analysis.evidenceIndex.map((entry) => [entry.eventId, entry]));
+  return new Map(
+    (sample.normalized.timelineEvents || []).map((entry) => [
+      entry.eventId,
+      {
+        eventId: entry.eventId,
+        timestamp: entry.timestampLabel || entry.timestamp || "-",
+        eventType: entry.eventType || "-",
+        summary: entry.summary || "",
+        statNote: entry.laneHint ? `위치 ${entry.laneHint}` : entry.phase ? `${entry.phase} 구간` : "",
+      },
+    ]),
+  );
 }
 
 function renderSampleSwitcher() {
@@ -722,7 +736,17 @@ function renderStats(sample) {
 }
 
 function renderPhases(sample) {
-  dom.phaseGrid.innerHTML = sample.analysis.phaseSummaries
+  const phaseCards =
+    sample.analysis.phaseSummaries && sample.analysis.phaseSummaries.length > 0
+      ? sample.analysis.phaseSummaries
+      : Object.entries(sample.normalized.phaseContext || {}).map(([phase, info]) => ({
+          phase: phase.toUpperCase(),
+          rating: info.deaths >= 4 ? "BAD" : info.kills + info.assists >= info.deaths ? "GOOD" : "OK",
+          summary: `${info.kills}킬 ${info.deaths}데스 ${info.assists}어시스트`,
+          focus: `주요 이벤트 ${info.notableEventCount}건`,
+        }));
+
+  dom.phaseGrid.innerHTML = phaseCards
     .map(
       (phase) => `
         <article class="phase-card" data-rating="${phase.rating}">
@@ -748,10 +772,9 @@ function renderInsightCards(host, items, kind, sample) {
         .filter(Boolean)
         .slice(0, 2);
 
-      const footer =
-        kind === "strength"
-          ? `<p class="insight-footer">${item.impact}</p>`
-          : `<p class="insight-footer">${item.improvementHint}</p>`;
+      const footerText = kind === "strength" ? item.impact : item.improvementHint;
+      const footer = footerText ? `<p class="insight-footer">${footerText}</p>` : "";
+      const evidenceText = item.evidence || linkedEvidence[0]?.summary || "";
 
       return `
         <article class="insight-card" data-kind="${kind}">
@@ -760,7 +783,7 @@ function renderInsightCards(host, items, kind, sample) {
             <span>${kind === "strength" ? "잘한 점" : "개선 포인트"}</span>
           </div>
           <p class="insight-body">${item.description}</p>
-          <p class="insight-evidence">${item.evidence}</p>
+          <p class="insight-evidence">${evidenceText}</p>
           ${footer}
           <div class="chip-row">
             ${linkedEvidence
@@ -778,14 +801,22 @@ function renderInsightCards(host, items, kind, sample) {
 }
 
 function renderChecklist(sample) {
+  const priorityToken = (priority) => {
+    if (typeof priority === "number") return `P${priority}`;
+    if (priority === "high") return "HIGH";
+    if (priority === "medium") return "MED";
+    if (priority === "low") return "LOW";
+    return "TIP";
+  };
+
   dom.checklist.innerHTML = sample.analysis.actionChecklist
     .map(
       (item) => `
         <li class="checklist-item">
-          <div class="checklist-priority">P${item.priority}</div>
+          <div class="checklist-priority">${priorityToken(item.priority)}</div>
           <div>
-            <strong>${item.action}</strong>
-            <p>${item.reason}</p>
+            <strong>${item.action || item.label}</strong>
+            ${item.reason ? `<p>${item.reason}</p>` : ""}
           </div>
         </li>
       `,
@@ -799,13 +830,13 @@ function renderKeyMoments(sample) {
       (moment) => `
         <article class="moment-card">
           <div class="moment-stamp">
-            <span>${moment.timestamp}</span>
+            <span>${moment.timestamp || moment.timestampLabel}</span>
             <strong>${moment.phase}</strong>
           </div>
           <div class="moment-copy">
-            <h4>${moment.label}</h4>
-            <p>${moment.reason}</p>
-            <span>${moment.impact}</span>
+            <h4>${moment.label || moment.title}</h4>
+            <p>${moment.reason || moment.description}</p>
+            <span>${moment.impact || ""}</span>
           </div>
         </article>
       `,
@@ -814,7 +845,14 @@ function renderKeyMoments(sample) {
 }
 
 function renderEvidence(sample) {
-  dom.evidence.innerHTML = sample.analysis.evidenceIndex
+  const timelineMap = evidenceMap(sample);
+  const evidenceEntries = Array.isArray(sample.analysis.evidenceIndex)
+    ? sample.analysis.evidenceIndex
+    : (sample.analysis.evidenceIndex?.highImportanceEvents || sample.analysis.evidenceIndex?.playerInvolvedEvents || [])
+        .map((eventId) => timelineMap.get(eventId))
+        .filter(Boolean);
+
+  dom.evidence.innerHTML = evidenceEntries
     .map(
       (entry) => `
         <article class="evidence-item">
@@ -832,6 +870,83 @@ function renderEvidence(sample) {
     .join("");
 }
 
+function renderComparison(sample) {
+  const comp = sample.comparison?.comparison;
+  if (!comp) {
+    dom.comparisonStatus.textContent = "이 샘플에는 AI 비교 분석 데이터가 없습니다.";
+    dom.comparisonOverview.innerHTML = "";
+    dom.comparisonGrid.innerHTML = "";
+    return;
+  }
+  dom.comparisonStatus.textContent = "";
+
+  const rate = comp.agreementRate ?? 0;
+  dom.comparisonOverview.innerHTML = `
+    <div class="comparison-rate-bar">
+      <div class="comparison-rate-label">
+        <span>동의율</span>
+        <strong>${rate}%</strong>
+      </div>
+      <div class="comparison-rate-track">
+        <div class="comparison-rate-fill" style="width: ${rate}%"></div>
+      </div>
+      <div class="comparison-rate-meta">
+        <span>동의 ${comp.agreements.length}건</span>
+        <span>Claude ${comp.claudeOnly.length}건</span>
+        <span>Codex ${comp.codexOnly.length}건</span>
+      </div>
+    </div>
+  `;
+
+  function categoryBadge(cat) {
+    return cat === "strength"
+      ? '<span class="comparison-badge comparison-badge--strength">강점</span>'
+      : '<span class="comparison-badge comparison-badge--weakness">약점</span>';
+  }
+
+  const agreementCards = comp.agreements.map((a) => `
+    <article class="comparison-card" data-source="agree">
+      ${categoryBadge(a.category)}
+      <h4>${a.topic}</h4>
+      <div class="comparison-notes">
+        <p><strong>Claude:</strong> ${a.claudeNote}</p>
+        <p><strong>Codex:</strong> ${a.codexNote}</p>
+      </div>
+    </article>
+  `).join("");
+
+  const claudeCards = comp.claudeOnly.map((c) => `
+    <article class="comparison-card" data-source="claude">
+      ${categoryBadge(c.category)}
+      <h4>${c.topic}</h4>
+      <p>${c.note}</p>
+    </article>
+  `).join("");
+
+  const codexCards = comp.codexOnly.map((c) => `
+    <article class="comparison-card" data-source="codex">
+      ${categoryBadge(c.category)}
+      <h4>${c.topic}</h4>
+      <p>${c.note}</p>
+    </article>
+  `).join("");
+
+  dom.comparisonGrid.innerHTML = `
+    <div class="comparison-column">
+      <h3 class="comparison-column-title comparison-column-title--agree">양쪽 동의</h3>
+      ${agreementCards || '<p class="muted">동의 항목 없음</p>'}
+    </div>
+    <div class="comparison-column">
+      <h3 class="comparison-column-title comparison-column-title--claude">Claude만</h3>
+      ${claudeCards || '<p class="muted">없음</p>'}
+    </div>
+    <div class="comparison-column">
+      <h3 class="comparison-column-title comparison-column-title--codex">Codex만</h3>
+      ${codexCards || '<p class="muted">없음</p>'}
+    </div>
+  `;
+}
+
 function renderSample(sample) {
   state.currentSample = sample;
   renderHero(sample);
@@ -842,6 +957,7 @@ function renderSample(sample) {
   renderChecklist(sample);
   renderKeyMoments(sample);
   renderEvidence(sample);
+  renderComparison(sample);
   renderSampleSwitcher();
 }
 
@@ -850,11 +966,12 @@ async function selectSample(sampleId) {
   dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
 
   try {
+    state.manifest = (await fetchJson("/api/samples")).samples;
     const sample = await loadSampleBundle(sampleId);
     renderSample(sample);
     dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${sample.analysis.matchSummary.champion} ${sample.analysis.matchSummary.role} ${resultLabel(sample.analysis.matchSummary.result)}`;
   } catch (error) {
-    dom.fetchStatus.textContent = `샘플 로드 실패: ${error.message}`;
+    dom.fetchStatus.innerHTML = `샘플 로드 실패: ${error.message} <button class="retry-btn" data-retry-sample="${sampleId}">다시 시도</button>`;
   }
 }
 
@@ -893,9 +1010,21 @@ function renderCandidates(matches) {
 async function handleRecentMatchesSubmit(event) {
   event.preventDefault();
   const formData = new FormData(dom.recentForm);
+  const gameName = (formData.get("gameName") || "").trim();
+  const tagLine = (formData.get("tagLine") || "").trim();
+
+  if (gameName.length < 3 || gameName.length > 16) {
+    dom.fetchStatus.textContent = "gameName은 3~16자여야 합니다.";
+    return;
+  }
+  if (tagLine.length < 2 || tagLine.length > 5 || !/^[a-zA-Z0-9]+$/.test(tagLine)) {
+    dom.fetchStatus.textContent = "tagLine은 2~5자 영문/숫자만 허용됩니다.";
+    return;
+  }
+
   const payload = {
-    gameName: formData.get("gameName"),
-    tagLine: formData.get("tagLine"),
+    gameName,
+    tagLine,
     platformRegion: formData.get("platformRegion"),
     matchCount: 5,
   };
@@ -915,7 +1044,7 @@ async function handleRecentMatchesSubmit(event) {
     renderCandidates(result.matches || []);
     dom.fetchStatus.textContent = `${result.riotId} 최근 경기 ${result.matches.length}건을 불러왔습니다. fit 점수가 높은 순서대로 정렬했습니다.`;
   } catch (error) {
-    dom.fetchStatus.textContent = `최근 경기 조회 실패: ${error.message}. server.js를 통해 실행 중인지 확인해 주세요.`;
+    dom.fetchStatus.innerHTML = `최근 경기 조회 실패: ${error.message} <button class="retry-btn" data-retry-recent>다시 시도</button>`;
   }
 }
 
@@ -976,6 +1105,18 @@ async function init() {
   });
 
   dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
+
+  document.addEventListener("click", (event) => {
+    const retrySample = event.target.closest("[data-retry-sample]");
+    if (retrySample) {
+      selectSample(retrySample.dataset.retrySample);
+      return;
+    }
+    const retryRecent = event.target.closest("[data-retry-recent]");
+    if (retryRecent) {
+      dom.recentForm.dispatchEvent(new Event("submit", { cancelable: true }));
+    }
+  });
 }
 
 init();
