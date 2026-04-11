@@ -125,6 +125,7 @@ data/samples/sample-<match-id>/
 - `normalized-match-schema.md`: 분석 입력 스키마
 - `normalization-mapping-rules.md`: Match/Timeline -> 정규화 규칙
 - `sample-data-ops-runbook.md`: 샘플 생성 운영 절차
+- `research-materials-lol-replay.md`: 관련 연구 자료, 우선순위, 실행 체크리스트
 
 ## 현재 샘플 상태
 
