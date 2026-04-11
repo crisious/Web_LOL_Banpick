@@ -6,7 +6,7 @@
 
 - Match ID: `KR_8166674448`
 - Riot ID source: `매운맛 비스킷#KR1`
-- Public alias: `PlayerAlias#KR1`
+- Public alias: `매운맛 비스킷#KR1`
 
 ## Selected profile
 
