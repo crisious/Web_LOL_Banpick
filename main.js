@@ -1,409 +1,718 @@
-const draftStore = window.LolDraftState;
-let store = draftStore.loadStore();
-
 const dom = {
-  broadcastTitle: document.querySelector("[data-broadcast-title]"),
-  broadcastSubtitle: document.querySelector("[data-broadcast-subtitle]"),
-  bluePanel: document.querySelector('[data-team-panel="blue"]'),
-  redPanel: document.querySelector('[data-team-panel="red"]'),
-  phaseTrack: document.querySelector("[data-phase-track]"),
-  bluePickStack: document.querySelector('[data-pick-stack="blue"]'),
-  redPickStack: document.querySelector('[data-pick-stack="red"]'),
-  blueBanStrip: document.querySelector('[data-ban-strip="blue"]'),
-  redBanStrip: document.querySelector('[data-ban-strip="red"]'),
-  blueFearless: document.querySelector('[data-fearless-column="blue"]'),
-  redFearless: document.querySelector('[data-fearless-column="red"]'),
-  timerValue: document.querySelector("[data-timer-value]"),
-  phaseTitle: document.querySelector("[data-phase-title]"),
-  phaseCounter: document.querySelector("[data-phase-counter]"),
-  patchVersion: document.querySelector("[data-patch-version]"),
-  liveState: document.querySelector("[data-live-state]"),
-  activeTeam: document.querySelector("[data-active-team]"),
-  activeCopy: document.querySelector("[data-active-copy]"),
-  activeRole: document.querySelector("[data-active-role]"),
-  activeKind: document.querySelector("[data-active-kind]"),
-  seriesFormat: document.querySelector("[data-series-format]"),
-  seriesGame: document.querySelector("[data-series-game]"),
-  priorityChoice: document.querySelector("[data-priority-choice]"),
-  counterChoice: document.querySelector("[data-counter-choice]"),
+  sampleId: document.querySelector("[data-sample-id]"),
+  heroPlayer: document.querySelector("[data-hero-player]"),
+  heroMatch: document.querySelector("[data-hero-match]"),
+  heroDate: document.querySelector("[data-hero-date]"),
+  themeCopy: document.querySelector("[data-theme-copy]"),
+  heroPills: document.querySelector("[data-hero-pills]"),
+  headline: document.querySelector("[data-headline]"),
+  overallSummary: document.querySelector("[data-overall-summary]"),
+  gameFlowSummary: document.querySelector("[data-game-flow-summary]"),
+  resultPill: document.querySelector("[data-result-pill]"),
+  snapshotChampion: document.querySelector("[data-snapshot-champion]"),
+  snapshotRole: document.querySelector("[data-snapshot-role]"),
+  snapshotResult: document.querySelector("[data-snapshot-result]"),
+  snapshotQueue: document.querySelector("[data-snapshot-queue]"),
+  snapshotDuration: document.querySelector("[data-snapshot-duration]"),
+  snapshotPatch: document.querySelector("[data-snapshot-patch]"),
+  snapshotConfidence: document.querySelector("[data-snapshot-confidence]"),
+  statRibbon: document.querySelector("[data-stat-ribbon]"),
+  phaseGrid: document.querySelector("[data-phase-grid]"),
+  strengths: document.querySelector("[data-strengths]"),
+  weaknesses: document.querySelector("[data-weaknesses]"),
+  checklist: document.querySelector("[data-checklist]"),
+  keyMoments: document.querySelector("[data-key-moments]"),
+  evidence: document.querySelector("[data-evidence]"),
+  sampleSwitcher: document.querySelector("[data-sample-switcher]"),
+  reportStrip: document.querySelector("[data-report-strip]"),
+  trendHeadline: document.querySelector("[data-trend-headline]"),
+  trendSummary: document.querySelector("[data-trend-summary]"),
+  trendStats: document.querySelector("[data-trend-stats]"),
+  trendTags: document.querySelector("[data-trend-tags]"),
+  recentForm: document.querySelector("[data-recent-form]"),
+  fetchStatus: document.querySelector("[data-fetch-status]"),
+  candidateList: document.querySelector("[data-candidate-list]"),
 };
 
-function currentStep() {
-  return draftStore.getCurrentStep(store);
+const state = {
+  manifest: [],
+  currentSample: null,
+  currentSampleId: null,
+};
+
+function formatPercent(value) {
+  return `${Math.round(value * 100)}%`;
 }
 
-function assignments() {
-  return draftStore.resolveAssignments(store);
+function formatNumber(value) {
+  return new Intl.NumberFormat("ko-KR").format(value);
 }
 
-function teamRecord(teamKey) {
-  return store.teams[teamKey];
+function ratingLabel(rating) {
+  if (rating === "GOOD") return "좋음";
+  if (rating === "BAD") return "아쉬움";
+  return "보통";
 }
 
-function teamBySide(side) {
-  return teamRecord(assignments().sideToTeam[side]);
+function resultLabel(result) {
+  return result === "WIN" ? "승리" : "패배";
 }
 
-function teamByPickOrder(order) {
-  return teamRecord(assignments().pickOrderToTeam[order]);
+function compactQueueLabel(queueLabel) {
+  const map = {
+    RANKED_SOLO: "솔랭",
+    RANKED_FLEX: "자랭",
+    NORMAL_BLIND: "일반",
+    ARAM: "칼바람",
+  };
+
+  return map[queueLabel] || queueLabel;
 }
 
-function formatSeconds(milliseconds) {
-  return draftStore.formatTimer(milliseconds);
+function compactPatchLabel(version) {
+  const text = String(version || "");
+  const parts = text.split(".");
+  if (parts.length >= 2) {
+    return `${parts[0]}.${parts[1]}`;
+  }
+  return text;
 }
 
-function sideLabel(side) {
-  return side === "blue" ? "Blue Side" : "Red Side";
+function parseReportMeta(sample) {
+  const detail = String(sample.label || "").split("·")[1]?.trim() || "";
+  const [role = "UNKNOWN", result = "UNKNOWN"] = detail.split(/\s+/);
+  return { role, result };
 }
 
-function pickOrderLabel(order) {
-  return order === "first" ? "First Pick" : "Second Pick";
+function classifyTheme(theme) {
+  if (/(weak|poor|low|messy|issue|issues|risk|slow|death|late_structure_closeout)/.test(theme)) {
+    return "negative";
+  }
+
+  if (/(reliable|strong|good|tempo|control|stable|followup|frontline|roaming|objective)/.test(theme)) {
+    return "positive";
+  }
+
+  return "neutral";
 }
 
-function selectionSummary() {
-  const resolved = assignments();
-  const priorityTeam = teamRecord(resolved.priorityTeam);
-  const otherTeam = teamRecord(resolved.otherTeam);
-  const priorityChoice =
-    store.selection.priorityChoiceType === "pickOrder"
-      ? pickOrderLabel(store.selection.priorityChoiceValue)
-      : sideLabel(store.selection.priorityChoiceValue);
-  const counterChoice =
-    store.selection.priorityChoiceType === "pickOrder"
-      ? sideLabel(store.selection.counterChoiceValue)
-      : pickOrderLabel(store.selection.counterChoiceValue);
+function themeLabel(theme) {
+  const labels = {
+    weak_early_lane_stability: "초반 라인 불안",
+    reliable_objective_followup: "오브젝트 합류 안정적",
+    poor_post_baron_survivability: "바론 이후 생존 아쉬움",
+    low_mid_lane_farm: "파밍 속도 아쉬움",
+    strong_objective_tempo: "오브젝트 템포 좋음",
+    strong_objective_control: "오브젝트 장악 좋음",
+    positioning_risk: "포지셔닝 아쉬움",
+    messy_deaths: "불필요한 데스 잦음",
+    late_structure_closeout: "후반 마무리 아쉬움",
+  };
+
+  return labels[theme] || "";
+}
+
+function compactInsightLabel(text) {
+  return String(text || "")
+    .replace(/주요 /g, "")
+    .replace(/이번 판에서 /g, "")
+    .replace(/다음 판에서 /g, "")
+    .replace(/초반 라인 안정감이 낮았음/g, "초반 라인 불안")
+    .replace(/중앙 라인 성장 속도가 너무 느렸음/g, "성장 속도 느림")
+    .replace(/바론 이후 생존과 전환이 아쉬웠음/g, "바론 이후 생존/전환 아쉬움")
+    .replace(/주요 오브젝트 교전에 꾸준히 합류했음/g, "오브젝트 합류 안정적")
+    .replace(/중후반 교전에서 후속 킬 관여를 만들어 냈음/g, "중후반 킬 관여 좋음")
+    .replace(/시야 투자량이 높은 편이었음/g, "시야 투자 좋음")
+    .replace(/이었음|였음|했음|았음|었음/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildManifestCardSummary(sample) {
+  const text = String(sample.theme || "");
+  const parts = [];
+
+  if (/초반/.test(text) && /(불안|손해|데스|흔들)/.test(text)) {
+    parts.push("초반 불안");
+  }
+  if (/(오브젝트|드래곤|바론)/.test(text) && /(꾸준|합류|템포|장악|확보)/.test(text)) {
+    parts.push("오브젝트 템포 좋음");
+  }
+  if (/바론/.test(text) && /(전환|생존|압박)/.test(text)) {
+    parts.push("바론 이후 전환 아쉬움");
+  }
+  if (/구조물/.test(text) && /(압박|연결|마무리)/.test(text)) {
+    parts.push("구조물 압박 연결");
+  }
+  if (/(데스|죽|생존)/.test(text) && /(아쉬|불안|흔들)/.test(text)) {
+    parts.push("생존 관리 아쉬움");
+  }
+
+  if (parts.length > 0) {
+    return parts.slice(0, 2).join(" · ");
+  }
+
+  return compactInsightLabel(text).slice(0, 42) || sample.label;
+}
+
+function buildCandidateCardSummary(match) {
+  return [compactQueueLabel(match.queueLabel), `적합도 ${match.sampleFitScore}`].join(" · ");
+}
+
+function buildTrendSnapshot() {
+  const samples = state.manifest;
+  const current = samples.find((sample) => sample.id === state.currentSampleId) || samples[0];
+  const playerAlias = current?.publicAlias || "PlayerAlias#KR1";
+  const roleCounts = new Map();
+  let wins = 0;
+  let losses = 0;
+  const tagCounts = new Map();
+
+  for (const sample of samples) {
+    const meta = parseReportMeta(sample);
+    roleCounts.set(meta.role, (roleCounts.get(meta.role) || 0) + 1);
+
+    if (meta.result === "WIN") {
+      wins += 1;
+    } else if (meta.result === "LOSS") {
+      losses += 1;
+    }
+
+    const tags = buildManifestCardSummary(sample)
+      .split("·")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+    for (const tag of tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    }
+  }
+
+  const dominantRoleEntry =
+    [...roleCounts.entries()].sort((left, right) => right[1] - left[1])[0] || ["UNKNOWN", 0];
+  const dominantRole = dominantRoleEntry[0];
+  const dominantRoleCount = dominantRoleEntry[1];
+  const recurringTags = [...tagCounts.entries()]
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 4)
+    .map(([tag, count]) => `${tag} ${count}회`);
+
+  const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${dominantRole} 비중 ${dominantRoleCount}회`;
+  const summary =
+    recurringTags.length > 0
+      ? `반복 신호는 ${recurringTags.slice(0, 2).join(", ")} 쪽입니다. 현재 선택한 샘플 ${current?.id || "-"}를 기준으로 세부 복기를 이어갈 수 있습니다.`
+      : `아직 저장된 리포트가 적어서 누적 추세는 제한적입니다. 샘플을 더 쌓으면 반복 패턴이 더 선명해집니다.`;
 
   return {
-    priorityChoice: `${priorityTeam.name} chose ${priorityChoice}`,
-    counterChoice: `${otherTeam.name} chose ${counterChoice}`,
+    headline,
+    summary,
+    stats: [
+      { label: "Reports", value: `${samples.length}개`, note: "저장된 리포트 수" },
+      { label: "Record", value: `${wins}승 ${losses}패`, note: "저장 샘플 기준" },
+      { label: "Main Role", value: dominantRole, note: `가장 많이 나온 포지션 ${dominantRoleCount}회` },
+      { label: "Current", value: current?.id || "-", note: "현재 보고 있는 샘플" },
+    ],
+    tags: recurringTags,
   };
 }
 
-function slotState(turn) {
-  const currentTurn = currentStep().turn;
-  if (turn < currentTurn) {
-    return "locked";
+function renderTrendPanel() {
+  if (!dom.trendHeadline || state.manifest.length === 0) {
+    return;
   }
-  if (turn === currentTurn) {
-    return "active";
-  }
-  return "pending";
-}
 
-function renderMeta() {
-  const summary = selectionSummary();
-  dom.broadcastTitle.textContent = store.broadcast.title;
-  dom.broadcastSubtitle.textContent = store.broadcast.subtitle;
-  document.querySelector('[data-score-name="blue"]').textContent = teamBySide("blue").name;
-  document.querySelector('[data-score-name="red"]').textContent = teamBySide("red").name;
-  document.querySelector('[data-score="blue"]').textContent = teamBySide("blue").score;
-  document.querySelector('[data-score="red"]').textContent = teamBySide("red").score;
-  dom.seriesFormat.textContent = store.series.format;
-  dom.seriesGame.textContent = store.series.gameLabel;
-  dom.priorityChoice.textContent = summary.priorityChoice;
-  dom.counterChoice.textContent = summary.counterChoice;
-  dom.patchVersion.textContent = store.series.patch;
-}
-
-function renderTeamPanel(side) {
-  const panel = side === "blue" ? dom.bluePanel : dom.redPanel;
-  const resolved = assignments();
-  const teamKey = resolved.sideToTeam[side];
-  const team = teamRecord(teamKey);
-  panel.querySelector(`[data-team-name="${side}"]`).textContent = team.name;
-  panel.querySelector(`[data-coach="${side}"]`).textContent = team.coach;
-  panel.querySelector(`[data-seed="${side}"]`).textContent = team.seed;
-  panel.querySelector(`[data-pick-order="${side}"]`).textContent = pickOrderLabel(
-    resolved.teamToPickOrder[teamKey],
-  );
-
-  const rosterHost = panel.querySelector(`[data-roster="${side}"]`);
-  rosterHost.innerHTML = team.roster
+  const trend = buildTrendSnapshot();
+  dom.trendHeadline.textContent = trend.headline;
+  dom.trendSummary.textContent = trend.summary;
+  dom.trendStats.innerHTML = trend.stats
     .map(
-      (entry) => `
-        <article class="roster-item">
-          <div>
-            <span class="roster-role">${entry.role}</span>
-            <p class="roster-name">${entry.player}</p>
-          </div>
-          <span>${sideLabel(side)}</span>
+      (item) => `
+        <article class="trend-stat">
+          <span class="meta-label">${item.label}</span>
+          <strong>${item.value}</strong>
+          <span class="trend-stat__note">${item.note}</span>
+        </article>
+      `,
+    )
+    .join("");
+
+  dom.trendTags.innerHTML =
+    trend.tags.length > 0
+      ? trend.tags.map((tag) => `<span class="trend-tag">${tag}</span>`).join("")
+      : `<span class="trend-tag">표본 적음</span>`;
+}
+
+function buildCompactHeadline(sample) {
+  const match = sample.analysis.matchSummary;
+  const base = `${match.champion} ${match.role} ${resultLabel(match.result)}`;
+  const candidateThemes = sample.normalized.derivedSignals?.candidateThemes || [];
+
+  let positive = "";
+  let negative = "";
+
+  for (const theme of candidateThemes) {
+    const label = themeLabel(theme);
+    if (!label) {
+      continue;
+    }
+
+    const kind = classifyTheme(theme);
+    if (kind === "positive" && !positive) {
+      positive = label;
+    }
+    if (kind === "negative" && !negative) {
+      negative = label;
+    }
+  }
+
+  if (!positive) {
+    positive = compactInsightLabel(sample.analysis.strengths?.[0]?.title);
+  }
+
+  if (!negative) {
+    negative = compactInsightLabel(sample.analysis.weaknesses?.[0]?.title);
+  }
+
+  if (match.result === "WIN" && positive && negative) {
+    return `${base} · ${positive} / ${negative}`;
+  }
+
+  if (match.result === "LOSS" && negative && positive) {
+    return `${base} · ${negative} / ${positive}`;
+  }
+
+  if (positive) {
+    return `${base} · ${positive}`;
+  }
+
+  if (negative) {
+    return `${base} · ${negative}`;
+  }
+
+  return match.headline;
+}
+
+async function fetchJson(path, options) {
+  const response = await fetch(path, options);
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload.error || `${path} 요청 실패`);
+  }
+  return payload;
+}
+
+async function loadManifest() {
+  try {
+    const apiManifest = await fetchJson("/api/samples");
+    return apiManifest.samples || [];
+  } catch (error) {
+    const fileManifest = await fetchJson("/data/samples/manifest.json");
+    return fileManifest.samples || [];
+  }
+}
+
+async function loadSampleBundle(sampleId) {
+  try {
+    return await fetchJson(`/api/samples/${sampleId}`);
+  } catch (error) {
+    const entry = state.manifest.find((sample) => sample.id === sampleId);
+    if (!entry) {
+      throw error;
+    }
+
+    const [normalized, analysis] = await Promise.all([
+      fetchJson(entry.normalizedPath),
+      fetchJson(entry.analysisPath),
+    ]);
+
+    return {
+      sampleId: entry.id,
+      publicAlias: entry.publicAlias,
+      collectedDate: entry.collectedDate,
+      theme: entry.theme,
+      normalized,
+      analysis,
+    };
+  }
+}
+
+function evidenceMap(sample) {
+  return new Map(sample.analysis.evidenceIndex.map((entry) => [entry.eventId, entry]));
+}
+
+function renderSampleSwitcher() {
+  dom.sampleSwitcher.innerHTML = state.manifest
+    .map(
+      (sample) => `
+        <button class="sample-chip" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
+          <span>${sample.label}</span>
+          <strong>${sample.publicAlias}</strong>
+        </button>
+      `,
+    )
+    .join("");
+
+  if (dom.reportStrip) {
+    dom.reportStrip.innerHTML = state.manifest
+      .map((sample) => {
+        const meta = parseReportMeta(sample);
+        const resultText = meta.result === "WIN" ? "승리" : meta.result === "LOSS" ? "패배" : meta.result;
+
+        return `
+          <button class="report-card" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
+            <div class="report-card__top">
+              <span class="meta-label">${sample.id}</span>
+              <span class="report-card__state">${sample.id === state.currentSampleId ? "CURRENT" : "ARCHIVE"}</span>
+            </div>
+            <h4>${sample.label}</h4>
+            <div class="report-card__badges">
+              <span class="report-badge">${meta.role}</span>
+              <span class="report-badge report-badge--result" data-result="${meta.result}">${resultText}</span>
+            </div>
+            <p>${buildManifestCardSummary(sample)}</p>
+            <strong>${sample.publicAlias}</strong>
+          </button>
+        `;
+      })
+      .join("");
+  }
+
+  renderTrendPanel();
+}
+
+function renderHero(sample) {
+  dom.sampleId.textContent = sample.sampleId;
+  dom.heroPlayer.textContent = sample.publicAlias;
+  dom.heroMatch.textContent = sample.analysis.matchSummary.matchId;
+  dom.heroDate.textContent = sample.collectedDate;
+  dom.themeCopy.textContent = sample.theme;
+
+  dom.headline.textContent = buildCompactHeadline(sample);
+  dom.headline.title = sample.analysis.matchSummary.headline;
+  dom.overallSummary.textContent = sample.analysis.coachSummary.overallSummary;
+  dom.gameFlowSummary.textContent = sample.analysis.coachSummary.gameFlowSummary;
+  dom.resultPill.dataset.result = sample.analysis.matchSummary.result;
+  dom.resultPill.textContent = `${resultLabel(sample.analysis.matchSummary.result)} · ${sample.analysis.coachSummary.winLossReason}`;
+
+  dom.snapshotChampion.textContent = sample.analysis.matchSummary.champion;
+  dom.snapshotRole.textContent = sample.analysis.matchSummary.role;
+  dom.snapshotResult.textContent = resultLabel(sample.analysis.matchSummary.result);
+  dom.snapshotQueue.textContent = compactQueueLabel(sample.analysis.matchSummary.queueType);
+  dom.snapshotDuration.textContent = sample.normalized.matchInfo.durationLabel;
+  dom.snapshotPatch.textContent = compactPatchLabel(sample.analysis.matchSummary.gameVersion);
+  dom.snapshotConfidence.textContent = formatPercent(sample.analysis.analysisMeta.confidence);
+
+  if (dom.heroPills) {
+    dom.heroPills.innerHTML = [
+      sample.analysis.matchSummary.champion,
+      sample.analysis.matchSummary.role,
+      resultLabel(sample.analysis.matchSummary.result),
+      compactQueueLabel(sample.analysis.matchSummary.queueType),
+      compactPatchLabel(sample.analysis.matchSummary.gameVersion),
+    ]
+      .map((label) => `<span class="hero-pill">${label}</span>`)
+      .join("");
+  }
+}
+
+function renderStats(sample) {
+  const stats = [
+    {
+      label: "KDA",
+      value: `${sample.normalized.playerStats.kills}/${sample.normalized.playerStats.deaths}/${sample.normalized.playerStats.assists}`,
+      note: `배수 ${sample.normalized.playerStats.kda.toFixed(2)}`,
+    },
+    {
+      label: "CS",
+      value: formatNumber(sample.normalized.playerStats.cs),
+      note: `분당 ${sample.normalized.playerStats.csPerMinute.toFixed(2)}`,
+    },
+    {
+      label: "Gold",
+      value: formatNumber(sample.normalized.playerStats.goldEarned),
+      note: "누적 획득 골드",
+    },
+    {
+      label: "Damage",
+      value: formatNumber(sample.normalized.playerStats.damageToChampions),
+      note: "챔피언 대상 피해",
+    },
+    {
+      label: "Vision",
+      value: formatNumber(sample.normalized.playerStats.visionScore),
+      note: "시야 점수",
+    },
+    {
+      label: "KP",
+      value: formatPercent(sample.normalized.playerStats.killParticipation),
+      note: `팀 킬 ${sample.normalized.teamContext.teamTotalKills}`,
+    },
+  ];
+
+  dom.statRibbon.innerHTML = stats
+    .map(
+      (stat) => `
+        <article class="stat-card">
+          <span class="meta-label">${stat.label}</span>
+          <strong>${stat.value}</strong>
+          <span class="stat-note">${stat.note}</span>
         </article>
       `,
     )
     .join("");
 }
 
-function renderPhaseTrack() {
-  const resolved = assignments();
-  dom.phaseTrack.innerHTML = store.sequence
-    .map((step, index) => {
-      const actingTeamKey = resolved.pickOrderToTeam[step.order];
-      const actingSide = resolved.teamToSide[actingTeamKey];
-      const stateLabel = index < store.live.turnIndex ? "done" : index === store.live.turnIndex ? "active" : "pending";
-      return `
-        <button class="phase-chip" type="button" data-state="${stateLabel}" data-team="${actingSide}" data-turn-index="${index}">
-          <div class="phase-chip__meta">
-            <span>#${String(step.turn).padStart(2, "0")}</span>
-            <span class="phase-chip__team">${actingSide}</span>
+function renderPhases(sample) {
+  dom.phaseGrid.innerHTML = sample.analysis.phaseSummaries
+    .map(
+      (phase) => `
+        <article class="phase-card" data-rating="${phase.rating}">
+          <div class="phase-card__top">
+            <span class="phase-tag">${phase.phase}</span>
+            <span class="phase-rating">${ratingLabel(phase.rating)}</span>
           </div>
-          <strong class="phase-chip__title">${step.label}</strong>
-          <span class="phase-chip__copy">${pickOrderLabel(step.order)} · ${step.type} slot ${step.slot + 1}</span>
-        </button>
+          <p class="phase-summary">${phase.summary}</p>
+          <p class="phase-focus">${phase.focus}</p>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderInsightCards(host, items, kind, sample) {
+  const evidence = evidenceMap(sample);
+
+  host.innerHTML = items
+    .map((item) => {
+      const linkedEvidence = (item.relatedEventIds || [])
+        .map((id) => evidence.get(id))
+        .filter(Boolean)
+        .slice(0, 2);
+
+      const footer =
+        kind === "strength"
+          ? `<p class="insight-footer">${item.impact}</p>`
+          : `<p class="insight-footer">${item.improvementHint}</p>`;
+
+      return `
+        <article class="insight-card" data-kind="${kind}">
+          <div class="insight-card__header">
+            <h4>${item.title}</h4>
+            <span>${kind === "strength" ? "잘한 점" : "개선 포인트"}</span>
+          </div>
+          <p class="insight-body">${item.description}</p>
+          <p class="insight-evidence">${item.evidence}</p>
+          ${footer}
+          <div class="chip-row">
+            ${linkedEvidence
+              .map(
+                (entry) => `
+                  <span class="event-chip">${entry.timestamp} · ${entry.eventType}</span>
+                `,
+              )
+              .join("")}
+          </div>
+        </article>
       `;
     })
     .join("");
 }
 
-function renderPickStack(side) {
-  const resolved = assignments();
-  const team = teamRecord(resolved.sideToTeam[side]);
-  const host = side === "blue" ? dom.bluePickStack : dom.redPickStack;
-  host.innerHTML = team.picks
-    .map((pick) => {
-      const visualState = slotState(pick.turn);
-      const champion = visualState === "pending" ? "Hidden" : pick.champion;
-      const caption =
-        visualState === "pending"
-          ? "Awaiting reveal"
-          : visualState === "active"
-            ? "On the clock"
-            : "Locked in";
-      return `
-        <article class="pick-card" data-team="${side}" data-state="${visualState}">
-          <div class="pick-card__left">
-            <span class="pick-role">${pick.role.slice(0, 3).toUpperCase()}</span>
-            <div class="pick-copy">
-              <strong class="pick-name">${champion}</strong>
-              <span class="pick-player">${pick.player}</span>
+function renderChecklist(sample) {
+  dom.checklist.innerHTML = sample.analysis.actionChecklist
+    .map(
+      (item) => `
+        <li class="checklist-item">
+          <div class="checklist-priority">P${item.priority}</div>
+          <div>
+            <strong>${item.action}</strong>
+            <p>${item.reason}</p>
+          </div>
+        </li>
+      `,
+    )
+    .join("");
+}
+
+function renderKeyMoments(sample) {
+  dom.keyMoments.innerHTML = sample.analysis.keyMoments
+    .map(
+      (moment) => `
+        <article class="moment-card">
+          <div class="moment-stamp">
+            <span>${moment.timestamp}</span>
+            <strong>${moment.phase}</strong>
+          </div>
+          <div class="moment-copy">
+            <h4>${moment.label}</h4>
+            <p>${moment.reason}</p>
+            <span>${moment.impact}</span>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderEvidence(sample) {
+  dom.evidence.innerHTML = sample.analysis.evidenceIndex
+    .map(
+      (entry) => `
+        <article class="evidence-item">
+          <div class="evidence-stamp">
+            <span>${entry.timestamp}</span>
+            <strong>${entry.eventType}</strong>
+          </div>
+          <div class="evidence-copy">
+            <p>${entry.summary}</p>
+            <span>${entry.statNote}</span>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderSample(sample) {
+  state.currentSample = sample;
+  renderHero(sample);
+  renderStats(sample);
+  renderPhases(sample);
+  renderInsightCards(dom.strengths, sample.analysis.strengths, "strength", sample);
+  renderInsightCards(dom.weaknesses, sample.analysis.weaknesses, "weakness", sample);
+  renderChecklist(sample);
+  renderKeyMoments(sample);
+  renderEvidence(sample);
+  renderSampleSwitcher();
+}
+
+async function selectSample(sampleId) {
+  state.currentSampleId = sampleId;
+  dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
+
+  try {
+    const sample = await loadSampleBundle(sampleId);
+    renderSample(sample);
+    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${sample.analysis.matchSummary.champion} ${sample.analysis.matchSummary.role} ${resultLabel(sample.analysis.matchSummary.result)}`;
+  } catch (error) {
+    dom.fetchStatus.textContent = `샘플 로드 실패: ${error.message}`;
+  }
+}
+
+function renderCandidates(matches) {
+  dom.candidateList.innerHTML = matches
+    .map(
+      (match) => `
+        <button class="candidate-card candidate-card--button" type="button" data-generate-match="${match.matchId}">
+          <div class="candidate-head">
+            <div class="candidate-head__copy">
+              <span class="meta-label">${match.matchId}</span>
+              <h4>${match.champion}</h4>
             </div>
+            <span class="candidate-fit">fit ${match.sampleFitScore}</span>
           </div>
-          <span class="pick-card__state">${caption}</span>
-        </article>
-      `;
-    })
+          <div class="candidate-meta candidate-meta--primary">
+            <span>${match.role}</span>
+            <span class="candidate-result" data-result="${match.result}">${resultLabel(match.result)}</span>
+            <span>${match.durationLabel}</span>
+            <span>${match.kills}/${match.deaths}/${match.assists}</span>
+          </div>
+          <div class="candidate-meta candidate-meta--secondary">
+            <span>${buildCandidateCardSummary(match)}</span>
+          </div>
+          <p>${match.champion} ${match.role} 기준으로 바로 샘플 생성 가능한 경기입니다.</p>
+        </button>
+      `,
+    )
     .join("");
 }
 
-function renderBanStrip(side) {
-  const resolved = assignments();
-  const team = teamRecord(resolved.sideToTeam[side]);
-  const host = side === "blue" ? dom.blueBanStrip : dom.redBanStrip;
-  host.innerHTML = team.bans
-    .map((ban) => {
-      const visualState = slotState(ban.turn);
-      return `
-        <article class="ban-slot" data-team="${side}" data-state="${visualState}">
-          <span class="ban-slot__team">${side}</span>
-          <strong class="ban-slot__name">${visualState === "pending" ? "Open ban" : ban.champion}</strong>
-          <span class="ban-slot__state">${visualState}</span>
-        </article>
-      `;
-    })
-    .join("");
-}
-
-function renderFearless(side) {
-  const resolved = assignments();
-  const host = side === "blue" ? dom.blueFearless : dom.redFearless;
-  const team = teamRecord(resolved.sideToTeam[side]);
-  host.dataset.team = side;
-  host.innerHTML = `
-    <div class="fearless-column__header">
-      <strong class="fearless-column__team">${team.name}</strong>
-      <span class="eyebrow">${team.fearless.length} locked champions</span>
-    </div>
-    <div class="fearless-grid">
-      ${team.fearless
-        .map(
-          (item) => `
-            <article class="fearless-item">
-              <div class="fearless-item__copy">
-                <span class="fearless-item__label">${item.game} ${item.role}</span>
-                <strong>${item.champion}</strong>
-              </div>
-              <span class="fearless-item__turn">${item.game.replace("G", "")}</span>
-            </article>
-          `,
-        )
-        .join("")}
-    </div>
-  `;
-}
-
-function renderCurrentStep() {
-  const resolved = assignments();
-  const step = currentStep();
-  const teamKey = resolved.pickOrderToTeam[step.order];
-  const side = resolved.teamToSide[teamKey];
-  const team = teamRecord(teamKey);
-  const slotData = step.type === "pick" ? team.picks[step.slot] : team.bans[step.slot];
-
-  dom.phaseTitle.textContent = `${team.name} ${step.label}`;
-  dom.phaseCounter.textContent = `${step.turn} / ${store.sequence.length}`;
-  dom.liveState.innerHTML = store.live.running ? '<span class="live-chip">live</span>' : "paused";
-  dom.timerValue.textContent = formatSeconds(store.live.remainingMs);
-  dom.activeTeam.textContent = team.name;
-  dom.activeCopy.textContent = step.prompt;
-  dom.activeRole.textContent = step.type === "pick" && slotData.role ? `${slotData.role} lane` : sideLabel(side);
-  dom.activeKind.textContent = `${pickOrderLabel(step.order)} · ${step.type} slot ${step.slot + 1}`;
-}
-
-function render() {
-  renderMeta();
-  renderTeamPanel("blue");
-  renderTeamPanel("red");
-  renderPhaseTrack();
-  renderPickStack("blue");
-  renderPickStack("red");
-  renderBanStrip("blue");
-  renderBanStrip("red");
-  renderFearless("blue");
-  renderFearless("red");
-  renderCurrentStep();
-}
-
-function persistStore() {
-  store = draftStore.saveStore(store);
-}
-
-function jumpToTurn(nextIndex, persist) {
-  store = draftStore.jumpToTurn(store, nextIndex);
-  render();
-  if (persist) {
-    persistStore();
-  }
-}
-
-let lastTick = performance.now();
-function animate(now) {
-  const delta = Math.min(250, now - lastTick);
-  lastTick = now;
-
-  if (store.live.running) {
-    const previousTurnIndex = store.live.turnIndex;
-    const previousVisibleSeconds = Math.ceil(store.live.remainingMs / 1000);
-    const previousRunning = store.live.running;
-    store = draftStore.stepLive(store, delta);
-
-    const nextVisibleSeconds = Math.ceil(store.live.remainingMs / 1000);
-    const turnChanged = previousTurnIndex !== store.live.turnIndex;
-    const secondsChanged = previousVisibleSeconds !== nextVisibleSeconds;
-    const runningChanged = previousRunning !== store.live.running;
-
-    if (turnChanged) {
-      renderPhaseTrack();
-      renderPickStack("blue");
-      renderPickStack("red");
-      renderBanStrip("blue");
-      renderBanStrip("red");
-      renderCurrentStep();
-    } else if (secondsChanged || runningChanged) {
-      renderCurrentStep();
-    }
-  }
-
-  window.requestAnimationFrame(animate);
-}
-
-function toggleFullscreen() {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-    return;
-  }
-  document.documentElement.requestFullscreen().catch(() => {});
-}
-
-function resetCurrentTimer() {
-  store.live.remainingMs = currentStep().duration * 1000;
-  renderCurrentStep();
-  persistStore();
-}
-
-function handleKeydown(event) {
-  if (event.key === "ArrowRight") {
-    jumpToTurn(store.live.turnIndex + 1, true);
-  } else if (event.key === "ArrowLeft") {
-    jumpToTurn(store.live.turnIndex - 1, true);
-  } else if (event.key.toLowerCase() === "r") {
-    resetCurrentTimer();
-  } else if (event.key === " ") {
-    event.preventDefault();
-    store.live.running = !store.live.running;
-    renderCurrentStep();
-    persistStore();
-  } else if (event.key.toLowerCase() === "f") {
-    toggleFullscreen();
-  }
-}
-
-function renderGameToText() {
-  const resolved = assignments();
-  const step = currentStep();
-  const actingTeamKey = resolved.pickOrderToTeam[step.order];
+async function handleRecentMatchesSubmit(event) {
+  event.preventDefault();
+  const formData = new FormData(dom.recentForm);
   const payload = {
-    view: "broadcast-wireframe",
-    note: "origin at top-left, x grows right, y grows down",
-    title: store.broadcast.title,
-    live: store.live.running,
-    turn: step.turn,
-    phase: `${teamRecord(actingTeamKey).name} ${step.label}`,
-    timer_seconds: Math.ceil(store.live.remainingMs / 1000),
-    active_team: teamRecord(actingTeamKey).name,
-    active_type: step.type,
-    blue_side_team: teamBySide("blue").name,
-    red_side_team: teamBySide("red").name,
-    first_pick_team: teamByPickOrder("first").name,
-    second_pick_team: teamByPickOrder("second").name,
-    selection_priority_team: teamRecord(resolved.priorityTeam).name,
-    selection_priority_pick_order: store.selection.priorityChoiceValue,
-    selection_counter_team: teamRecord(resolved.otherTeam).name,
-    selection_counter_side: store.selection.counterChoiceValue,
-    blue_locked_picks: teamBySide("blue").picks
-      .filter((pick) => pick.turn < step.turn)
-      .map((pick) => pick.champion),
-    red_locked_picks: teamBySide("red").picks
-      .filter((pick) => pick.turn < step.turn)
-      .map((pick) => pick.champion),
-    blue_locked_bans: teamBySide("blue").bans
-      .filter((ban) => ban.turn < step.turn)
-      .map((ban) => ban.champion),
-    red_locked_bans: teamBySide("red").bans
-      .filter((ban) => ban.turn < step.turn)
-      .map((ban) => ban.champion),
+    gameName: formData.get("gameName"),
+    tagLine: formData.get("tagLine"),
+    platformRegion: formData.get("platformRegion"),
+    matchCount: 5,
   };
-  return JSON.stringify(payload);
+
+  dom.fetchStatus.textContent = `${payload.gameName}#${payload.tagLine} 최근 경기 후보를 불러오는 중입니다.`;
+  dom.candidateList.innerHTML = "";
+
+  try {
+    const result = await fetchJson("/api/recent-matches", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    renderCandidates(result.matches || []);
+    dom.fetchStatus.textContent = `${result.riotId} 최근 경기 ${result.matches.length}건을 불러왔습니다. fit 점수가 높은 순서대로 정렬했습니다.`;
+  } catch (error) {
+    dom.fetchStatus.textContent = `최근 경기 조회 실패: ${error.message}. server.js를 통해 실행 중인지 확인해 주세요.`;
+  }
 }
 
-window.render_game_to_text = renderGameToText;
-window.advanceTime = (milliseconds) => {
-  const wasRunning = store.live.running;
-  const steppedStore = draftStore.clone(store);
-  steppedStore.live.running = true;
-  store = draftStore.stepLive(steppedStore, milliseconds);
-  store.live.running = wasRunning;
-  render();
-};
-window.resetWireframe = () => {
-  store = draftStore.resetStore();
-  lastTick = performance.now();
-  render();
-};
+async function handleGenerateSample(matchId) {
+  const formData = new FormData(dom.recentForm);
+  const payload = {
+    gameName: formData.get("gameName"),
+    tagLine: formData.get("tagLine"),
+    platformRegion: formData.get("platformRegion"),
+    matchId,
+  };
 
-document.addEventListener("keydown", handleKeydown);
-dom.phaseTrack.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-turn-index]");
-  if (!button) {
+  dom.fetchStatus.textContent = `${matchId} 기준으로 새 샘플을 생성하는 중입니다.`;
+
+  try {
+    const result = await fetchJson("/api/generate-sample", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    state.manifest = await loadManifest();
+    await selectSample(result.sampleId);
+    dom.fetchStatus.textContent = `${result.sampleId} 생성 완료 · ${result.analysis.matchSummary.champion} ${result.analysis.matchSummary.role} ${result.analysis.matchSummary.result}`;
+  } catch (error) {
+    dom.fetchStatus.textContent = `샘플 생성 실패: ${error.message}`;
+  }
+}
+
+async function init() {
+  try {
+    state.manifest = await loadManifest();
+    renderSampleSwitcher();
+    const defaultSampleId = state.manifest[0]?.id || "sample-001";
+    await selectSample(defaultSampleId);
+  } catch (error) {
+    document.body.innerHTML = `
+      <main class="fallback-shell">
+        <h1>샘플 데이터를 불러오지 못했습니다.</h1>
+        <p>${error.message}</p>
+      </main>
+    `;
     return;
   }
 
-  jumpToTurn(Number(button.dataset.turnIndex), true);
-});
+  dom.sampleSwitcher.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-sample-button]");
+    if (!button) return;
+    selectSample(button.dataset.sampleButton);
+  });
 
-draftStore.subscribe((nextStore) => {
-  store = nextStore;
-  lastTick = performance.now();
-  render();
-});
+  dom.candidateList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-generate-match]");
+    if (!button) return;
+    handleGenerateSample(button.dataset.generateMatch);
+  });
 
-render();
-window.requestAnimationFrame(animate);
+  dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
+}
+
+init();
