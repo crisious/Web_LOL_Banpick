@@ -38,13 +38,55 @@ const dom = {
   comparisonStatus: document.querySelector("[data-comparison-status]"),
   comparisonOverview: document.querySelector("[data-comparison-overview]"),
   comparisonGrid: document.querySelector("[data-comparison-grid]"),
+  loginOverlay: document.querySelector("[data-login-overlay]"),
+  loginForm: document.querySelector("[data-login-form]"),
+  loginStatus: document.querySelector("[data-login-status]"),
+  matchListView: document.querySelector("[data-match-list-view]"),
+  matchListGrid: document.querySelector("[data-match-list-grid]"),
+  matchListHeader: document.querySelector("[data-match-list-header]"),
+  backToListBtn: document.querySelector("[data-back-to-list]"),
 };
 
 const state = {
   manifest: [],
   currentSample: null,
   currentSampleId: null,
+  view: "LOGGED_OUT",
+  account: null,
+  recentMatches: [],
 };
+
+// ─── localStorage persistence ─────────────────────────────────────────────
+
+function saveAccount(account) {
+  localStorage.setItem("lol-coach-account", JSON.stringify(account));
+}
+
+function loadSavedAccount() {
+  try { return JSON.parse(localStorage.getItem("lol-coach-account")); } catch { return null; }
+}
+
+// ─── View state machine ──────────────────────────────────────────────────
+
+function setView(viewName) {
+  state.view = viewName;
+  document.body.dataset.view = viewName;
+}
+
+// ─── Time helpers ────────────────────────────────────────────────────────
+
+function timeAgo(epochMs) {
+  const diff = Date.now() - epochMs;
+  const sec = Math.floor(diff / 1000);
+  if (sec < 60) return "방금 전";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  if (day < 30) return `${day}일 전`;
+  return `${Math.floor(day / 30)}개월 전`;
+}
 
 function formatPercent(value) {
   return `${Math.round(value * 100)}%`;
@@ -1076,21 +1118,111 @@ async function handleGenerateSample(matchId) {
   }
 }
 
-async function init() {
-  try {
-    state.manifest = await loadManifest();
-    renderSampleSwitcher();
-    const defaultSampleId = state.manifest[0]?.id || "sample-001";
-    await selectSample(defaultSampleId);
-  } catch (error) {
-    document.body.innerHTML = `
-      <main class="fallback-shell">
-        <h1>샘플 데이터를 불러오지 못했습니다.</h1>
-        <p>${error.message}</p>
-      </main>
-    `;
+// ─── Login handler ────────────────────────────────────────────────────────
+
+async function handleLogin(event) {
+  if (event) event.preventDefault();
+  const form = new FormData(dom.loginForm);
+  const account = {
+    gameName: (form.get("gameName") || "").trim(),
+    tagLine: (form.get("tagLine") || "").trim(),
+    platformRegion: form.get("platformRegion") || "KR",
+  };
+  const remember = form.get("remember");
+
+  if (account.gameName.length < 3 || account.tagLine.length < 2) {
+    dom.loginStatus.textContent = "gameName(3자 이상)과 tagLine(2자 이상)을 입력하세요.";
     return;
   }
+
+  setView("LOADING_MATCHES");
+  dom.loginStatus.textContent = `${account.gameName}#${account.tagLine} 조회 중...`;
+
+  try {
+    const result = await fetchJson("/api/recent-matches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...account, matchCount: 10 }),
+    });
+
+    state.account = { ...account, riotId: result.riotId, puuid: result.puuid };
+    state.recentMatches = result.matches || [];
+    if (remember) saveAccount(account);
+
+    renderMatchList();
+    setView("MATCH_LIST");
+  } catch (error) {
+    dom.loginStatus.textContent = `조회 실패: ${error.message}`;
+    setView("LOGGED_OUT");
+  }
+}
+
+// ─── 10-game match list ───────────────────────────────────────────────────
+
+function renderMatchList() {
+  const matches = state.recentMatches;
+
+  dom.matchListHeader.innerHTML = `
+    <div class="match-list-identity">
+      <h2>${state.account.riotId || `${state.account.gameName}#${state.account.tagLine}`}</h2>
+      <p class="muted">최근 ${matches.length}게임 요약 · 클릭하면 상세 AI 분석</p>
+      <button class="login-submit login-submit--small" data-logout-btn>다른 계정</button>
+    </div>
+  `;
+
+  dom.matchListGrid.innerHTML = matches.map((m) => `
+    <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
+      <div class="match-summary-champion">
+        ${championAvatarMarkup(m.champion, "small")}
+        <div>
+          <strong>${championDisplayName(m.champion)}</strong>
+          <span class="meta-label">${m.role}</span>
+        </div>
+      </div>
+      <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
+      <span class="match-summary-kda">${m.kills}/${m.deaths}/${m.assists}</span>
+      <span class="match-summary-cs">${m.csPerMin} CS/m</span>
+      <span class="match-summary-duration">${m.durationLabel}</span>
+      <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
+      <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
+    </button>
+  `).join("");
+}
+
+// ─── Detail analysis from match list ──────────────────────────────────────
+
+async function startDetailAnalysis(matchId) {
+  setView("LOADING_DETAIL");
+  dom.fetchStatus.textContent = `${matchId} AI 분석 진행 중... (2~5분 소요)`;
+
+  // 사이드바 폼에 현재 계정 정보 프리필
+  dom.recentForm.querySelector("[name=gameName]").value = state.account.gameName;
+  dom.recentForm.querySelector("[name=tagLine]").value = state.account.tagLine;
+  dom.recentForm.querySelector("[name=platformRegion]").value = state.account.platformRegion;
+
+  await handleGenerateSample(matchId);
+
+  // generate 완료 후 manifest 새로고침 + 해당 샘플 로드
+  try {
+    state.manifest = (await fetchJson("/api/samples")).samples;
+    const sampleId = state.manifest.find((s) => s.id.includes(matchId.replace(/^KR_/, "")))?.id;
+    if (sampleId) await selectSample(sampleId);
+  } catch {}
+
+  setView("DETAIL_VIEW");
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+
+async function init() {
+  // manifest 로드 (실패해도 계속 진행)
+  try {
+    state.manifest = await loadManifest();
+  } catch {}
+
+  // 이벤트 리스너 등록
+  dom.loginForm.addEventListener("submit", handleLogin);
+  dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
 
   dom.sampleSwitcher.addEventListener("click", (event) => {
     const button = event.target.closest("[data-sample-button]");
@@ -1104,7 +1236,22 @@ async function init() {
     handleGenerateSample(button.dataset.generateMatch);
   });
 
-  dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
+  dom.matchListGrid.addEventListener("click", (event) => {
+    const card = event.target.closest("[data-match-detail]");
+    if (!card) return;
+    startDetailAnalysis(card.dataset.matchDetail);
+  });
+
+  dom.backToListBtn.addEventListener("click", () => setView("MATCH_LIST"));
+
+  dom.matchListHeader.addEventListener("click", (event) => {
+    if (event.target.closest("[data-logout-btn]")) {
+      localStorage.removeItem("lol-coach-account");
+      state.account = null;
+      state.recentMatches = [];
+      setView("LOGGED_OUT");
+    }
+  });
 
   document.addEventListener("click", (event) => {
     const retrySample = event.target.closest("[data-retry-sample]");
@@ -1117,6 +1264,17 @@ async function init() {
       dom.recentForm.dispatchEvent(new Event("submit", { cancelable: true }));
     }
   });
+
+  // 저장된 계정 확인 → 자동 로그인 또는 로그인 화면
+  const saved = loadSavedAccount();
+  if (saved) {
+    dom.loginForm.querySelector("[name=gameName]").value = saved.gameName;
+    dom.loginForm.querySelector("[name=tagLine]").value = saved.tagLine;
+    if (saved.platformRegion) dom.loginForm.querySelector("[name=platformRegion]").value = saved.platformRegion;
+    handleLogin();
+  } else {
+    setView("LOGGED_OUT");
+  }
 }
 
 init();

@@ -6,9 +6,48 @@
     <title>LoL Replay Coach Report</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
+  <body data-view="LOGGED_OUT">
     <a class="skip-link" href="#main-content">본문 분석 영역으로 건너뛰기</a>
+
+    <section class="login-overlay" data-login-overlay>
+      <div class="login-card">
+        <h1 class="login-title">LoL Replay Coach</h1>
+        <p class="login-subtitle">Riot ID를 입력하면 최근 10게임 요약을 바로 확인합니다.</p>
+        <form class="login-form" data-login-form>
+          <label>
+            <span>gameName</span>
+            <input name="gameName" type="text" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" placeholder="매운맛 비스킷" />
+          </label>
+          <label>
+            <span>tagLine</span>
+            <input name="tagLine" type="text" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" placeholder="KR1" />
+          </label>
+          <label>
+            <span>지역</span>
+            <select name="platformRegion">
+              <option value="KR" selected>한국 (KR)</option>
+              <option value="JP1">일본 (JP)</option>
+              <option value="NA1">북미 (NA)</option>
+              <option value="EUW1">유럽서부 (EUW)</option>
+            </select>
+          </label>
+          <label class="login-remember">
+            <input type="checkbox" name="remember" checked />
+            <span>이 계정 기억하기</span>
+          </label>
+          <button type="submit" class="login-submit">최근 10게임 분석 시작</button>
+        </form>
+        <p class="login-status" data-login-status></p>
+      </div>
+    </section>
+
     <div class="app-shell">
+
+      <section class="match-list-view" data-match-list-view>
+        <div class="match-list-header" data-match-list-header></div>
+        <div class="match-list-grid" data-match-list-grid></div>
+      </section>
+
       <header class="topbar">
         <div>
           <p class="eyebrow">Replay Coach Dashboard</p>
@@ -108,6 +147,7 @@
         </aside>
 
         <main class="dashboard" id="main-content">
+          <button class="back-to-list-btn" data-back-to-list>← 10게임 목록으로</button>
           <section class="summary-grid" id="overview" aria-labelledby="overview-title">
             <h2 class="sr-only" id="overview-title">경기 개요</h2>
           <article class="panel panel--headline">

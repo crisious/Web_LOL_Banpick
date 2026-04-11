@@ -1472,12 +1472,15 @@ function summarizeMatch(match, puuid) {
   }
 
   const role = normalizeRole(participant.teamPosition || participant.individualPosition);
+  const dur = match.info.gameDuration || 1;
+  const cs = (participant.totalMinionsKilled || 0) + (participant.neutralMinionsKilled || 0);
+
   const summary = {
     matchId: match.metadata.matchId,
     queueId: match.info.queueId,
     queueLabel: queueLabel(match.info.queueId),
-    durationSeconds: match.info.gameDuration,
-    durationLabel: durationLabel(match.info.gameDuration),
+    durationSeconds: dur,
+    durationLabel: durationLabel(dur),
     gameVersion: match.info.gameVersion,
     champion: participant.championName,
     role,
@@ -1485,6 +1488,13 @@ function summarizeMatch(match, puuid) {
     kills: participant.kills,
     deaths: participant.deaths,
     assists: participant.assists,
+    csPerMin: +(cs / (dur / 60)).toFixed(1),
+    visionScore: participant.visionScore || 0,
+    goldEarned: participant.goldEarned || 0,
+    damageToChampions: participant.totalDamageDealtToChampions || 0,
+    timestamp: match.info.gameCreation,
+    items: [participant.item0, participant.item1, participant.item2, participant.item3, participant.item4, participant.item5, participant.item6],
+    summonerSpells: [participant.summoner1Id, participant.summoner2Id],
   };
 
   return {
@@ -1514,7 +1524,7 @@ async function handleRecentMatches(req, res) {
     const gameName = String(body.gameName || "").trim();
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
-    const matchCount = Math.min(Math.max(Number(body.matchCount || 5), 1), 10);
+    const matchCount = Math.min(Math.max(Number(body.matchCount || 10), 1), 20);
 
     if (!gameName || !tagLine) {
       sendJson(res, 400, { ok: false, error: "gameName and tagLine are required." });
@@ -1552,7 +1562,7 @@ async function handleRecentMatches(req, res) {
     const matches = details
       .map((detail) => summarizeMatch(detail, account.puuid))
       .filter(Boolean)
-      .sort((a, b) => b.sampleFitScore - a.sampleFitScore);
+      .sort((a, b) => b.timestamp - a.timestamp);
 
     sendJson(res, 200, {
       ok: true,
