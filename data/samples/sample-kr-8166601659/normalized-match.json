@@ -2,7 +2,7 @@
   "schemaVersion": "1.0",
   "sourceMeta": {
     "sourceType": "riot_match_v5",
-    "fetchedAt": "2026-04-11T11:27:32.726Z",
+    "fetchedAt": "2026-04-11T13:59:15.771Z",
     "platformRegion": "KR",
     "regionalCluster": "ASIA",
     "rawMatchId": "KR_8166601659"
@@ -71,7 +71,7 @@
       "kills": 2,
       "deaths": 3,
       "assists": 1,
-      "notableEventCount": 8
+      "notableEventCount": 7
     },
     "mid": {
       "startMs": 900001,
@@ -79,7 +79,7 @@
       "kills": 0,
       "deaths": 5,
       "assists": 7,
-      "notableEventCount": 23
+      "notableEventCount": 19
     },
     "late": {
       "startMs": 1800001,
@@ -87,7 +87,7 @@
       "kills": 0,
       "deaths": 2,
       "assists": 5,
-      "notableEventCount": 16
+      "notableEventCount": 14
     }
   },
   "timelineEvents": [
@@ -153,21 +153,6 @@
     },
     {
       "eventId": "evt_005",
-      "timestampMs": 848209,
-      "timestampLabel": "14:08",
-      "phase": "EARLY",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "BOT_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 15,
-        "eventIndex": 5
-      }
-    },
-    {
-      "eventId": "evt_006",
       "timestampMs": 855533,
       "timestampLabel": "14:15",
       "phase": "EARLY",
@@ -182,7 +167,7 @@
       }
     },
     {
-      "eventId": "evt_007",
+      "eventId": "evt_006",
       "timestampMs": 885002,
       "timestampLabel": "14:45",
       "phase": "EARLY",
@@ -197,7 +182,7 @@
       }
     },
     {
-      "eventId": "evt_008",
+      "eventId": "evt_007",
       "timestampMs": 888515,
       "timestampLabel": "14:48",
       "phase": "EARLY",
@@ -212,7 +197,7 @@
       }
     },
     {
-      "eventId": "evt_009",
+      "eventId": "evt_008",
       "timestampMs": 894527,
       "timestampLabel": "14:54",
       "phase": "EARLY",
@@ -227,7 +212,7 @@
       }
     },
     {
-      "eventId": "evt_010",
+      "eventId": "evt_009",
       "timestampMs": 948880,
       "timestampLabel": "15:48",
       "phase": "MID",
@@ -242,22 +227,7 @@
       }
     },
     {
-      "eventId": "evt_011",
-      "timestampMs": 952723,
-      "timestampLabel": "15:52",
-      "phase": "MID",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "TOP_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 16,
-        "eventIndex": 50
-      }
-    },
-    {
-      "eventId": "evt_012",
+      "eventId": "evt_010",
       "timestampMs": 1019963,
       "timestampLabel": "16:59",
       "phase": "MID",
@@ -272,7 +242,7 @@
       }
     },
     {
-      "eventId": "evt_013",
+      "eventId": "evt_011",
       "timestampMs": 1033725,
       "timestampLabel": "17:13",
       "phase": "MID",
@@ -287,7 +257,7 @@
       }
     },
     {
-      "eventId": "evt_014",
+      "eventId": "evt_012",
       "timestampMs": 1054970,
       "timestampLabel": "17:34",
       "phase": "MID",
@@ -302,7 +272,7 @@
       }
     },
     {
-      "eventId": "evt_015",
+      "eventId": "evt_013",
       "timestampMs": 1060883,
       "timestampLabel": "17:40",
       "phase": "MID",
@@ -317,7 +287,7 @@
       }
     },
     {
-      "eventId": "evt_016",
+      "eventId": "evt_014",
       "timestampMs": 1083987,
       "timestampLabel": "18:03",
       "phase": "MID",
@@ -332,22 +302,7 @@
       }
     },
     {
-      "eventId": "evt_017",
-      "timestampMs": 1092204,
-      "timestampLabel": "18:12",
-      "phase": "MID",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "MID_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 19,
-        "eventIndex": 11
-      }
-    },
-    {
-      "eventId": "evt_018",
+      "eventId": "evt_015",
       "timestampMs": 1156979,
       "timestampLabel": "19:16",
       "phase": "MID",
@@ -362,7 +317,7 @@
       }
     },
     {
-      "eventId": "evt_019",
+      "eventId": "evt_016",
       "timestampMs": 1160408,
       "timestampLabel": "19:20",
       "phase": "MID",
@@ -377,7 +332,7 @@
       }
     },
     {
-      "eventId": "evt_020",
+      "eventId": "evt_017",
       "timestampMs": 1201317,
       "timestampLabel": "20:01",
       "phase": "MID",
@@ -392,7 +347,7 @@
       }
     },
     {
-      "eventId": "evt_021",
+      "eventId": "evt_018",
       "timestampMs": 1207199,
       "timestampLabel": "20:07",
       "phase": "MID",
@@ -407,7 +362,7 @@
       }
     },
     {
-      "eventId": "evt_022",
+      "eventId": "evt_019",
       "timestampMs": 1267158,
       "timestampLabel": "21:07",
       "phase": "MID",
@@ -422,7 +377,7 @@
       }
     },
     {
-      "eventId": "evt_023",
+      "eventId": "evt_020",
       "timestampMs": 1283116,
       "timestampLabel": "21:23",
       "phase": "MID",
@@ -437,7 +392,7 @@
       }
     },
     {
-      "eventId": "evt_024",
+      "eventId": "evt_021",
       "timestampMs": 1368037,
       "timestampLabel": "22:48",
       "phase": "MID",
@@ -452,7 +407,7 @@
       }
     },
     {
-      "eventId": "evt_025",
+      "eventId": "evt_022",
       "timestampMs": 1417955,
       "timestampLabel": "23:37",
       "phase": "MID",
@@ -467,7 +422,7 @@
       }
     },
     {
-      "eventId": "evt_026",
+      "eventId": "evt_023",
       "timestampMs": 1535407,
       "timestampLabel": "25:35",
       "phase": "MID",
@@ -482,22 +437,7 @@
       }
     },
     {
-      "eventId": "evt_027",
-      "timestampMs": 1571637,
-      "timestampLabel": "26:11",
-      "phase": "MID",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "MID_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 27,
-        "eventIndex": 10
-      }
-    },
-    {
-      "eventId": "evt_028",
+      "eventId": "evt_024",
       "timestampMs": 1586006,
       "timestampLabel": "26:26",
       "phase": "MID",
@@ -512,22 +452,7 @@
       }
     },
     {
-      "eventId": "evt_029",
-      "timestampMs": 1684554,
-      "timestampLabel": "28:04",
-      "phase": "MID",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "BOT_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 29,
-        "eventIndex": 3
-      }
-    },
-    {
-      "eventId": "evt_030",
+      "eventId": "evt_025",
       "timestampMs": 1707043,
       "timestampLabel": "28:27",
       "phase": "MID",
@@ -542,7 +467,7 @@
       }
     },
     {
-      "eventId": "evt_031",
+      "eventId": "evt_026",
       "timestampMs": 1707677,
       "timestampLabel": "28:27",
       "phase": "MID",
@@ -557,7 +482,7 @@
       }
     },
     {
-      "eventId": "evt_032",
+      "eventId": "evt_027",
       "timestampMs": 1712746,
       "timestampLabel": "28:32",
       "phase": "MID",
@@ -572,7 +497,7 @@
       }
     },
     {
-      "eventId": "evt_033",
+      "eventId": "evt_028",
       "timestampMs": 1804742,
       "timestampLabel": "30:04",
       "phase": "LATE",
@@ -587,7 +512,7 @@
       }
     },
     {
-      "eventId": "evt_034",
+      "eventId": "evt_029",
       "timestampMs": 1813405,
       "timestampLabel": "30:13",
       "phase": "LATE",
@@ -602,7 +527,7 @@
       }
     },
     {
-      "eventId": "evt_035",
+      "eventId": "evt_030",
       "timestampMs": 1880813,
       "timestampLabel": "31:20",
       "phase": "LATE",
@@ -617,7 +542,7 @@
       }
     },
     {
-      "eventId": "evt_036",
+      "eventId": "evt_031",
       "timestampMs": 1883367,
       "timestampLabel": "31:23",
       "phase": "LATE",
@@ -632,22 +557,7 @@
       }
     },
     {
-      "eventId": "evt_037",
-      "timestampMs": 1919691,
-      "timestampLabel": "31:59",
-      "phase": "LATE",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "BOT_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 32,
-        "eventIndex": 39
-      }
-    },
-    {
-      "eventId": "evt_038",
+      "eventId": "evt_032",
       "timestampMs": 1922810,
       "timestampLabel": "32:02",
       "phase": "LATE",
@@ -662,22 +572,7 @@
       }
     },
     {
-      "eventId": "evt_039",
-      "timestampMs": 1931763,
-      "timestampLabel": "32:11",
-      "phase": "LATE",
-      "eventType": "OBJECTIVE_SETUP_FAIL",
-      "importance": 5,
-      "isPlayerInvolved": false,
-      "laneHint": "BOT_LANE",
-      "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
-      "rawRef": {
-        "frameIndex": 33,
-        "eventIndex": 4
-      }
-    },
-    {
-      "eventId": "evt_040",
+      "eventId": "evt_033",
       "timestampMs": 1987907,
       "timestampLabel": "33:07",
       "phase": "LATE",
@@ -692,7 +587,7 @@
       }
     },
     {
-      "eventId": "evt_041",
+      "eventId": "evt_034",
       "timestampMs": 1995340,
       "timestampLabel": "33:15",
       "phase": "LATE",
@@ -707,7 +602,7 @@
       }
     },
     {
-      "eventId": "evt_042",
+      "eventId": "evt_035",
       "timestampMs": 2030526,
       "timestampLabel": "33:50",
       "phase": "LATE",
@@ -722,7 +617,7 @@
       }
     },
     {
-      "eventId": "evt_043",
+      "eventId": "evt_036",
       "timestampMs": 2044548,
       "timestampLabel": "34:04",
       "phase": "LATE",
@@ -737,7 +632,7 @@
       }
     },
     {
-      "eventId": "evt_044",
+      "eventId": "evt_037",
       "timestampMs": 2048023,
       "timestampLabel": "34:08",
       "phase": "LATE",
@@ -752,7 +647,7 @@
       }
     },
     {
-      "eventId": "evt_045",
+      "eventId": "evt_038",
       "timestampMs": 2053642,
       "timestampLabel": "34:13",
       "phase": "LATE",
@@ -767,7 +662,7 @@
       }
     },
     {
-      "eventId": "evt_046",
+      "eventId": "evt_039",
       "timestampMs": 2068154,
       "timestampLabel": "34:28",
       "phase": "LATE",
@@ -782,7 +677,7 @@
       }
     },
     {
-      "eventId": "evt_047",
+      "eventId": "evt_040",
       "timestampMs": 2077064,
       "timestampLabel": "34:37",
       "phase": "LATE",
@@ -797,7 +692,7 @@
       }
     },
     {
-      "eventId": "evt_048",
+      "eventId": "evt_041",
       "timestampMs": 2087148,
       "timestampLabel": "34:47",
       "phase": "LATE",
