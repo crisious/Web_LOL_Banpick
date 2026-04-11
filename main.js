@@ -224,8 +224,8 @@ function buildTrendSnapshot() {
   const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${dominantRole} 비중 ${dominantRoleCount}회`;
   const summary =
     recurringTags.length > 0
-      ? `반복 신호는 ${recurringTags.slice(0, 2).join(", ")} 쪽입니다. 현재 선택한 샘플 ${current?.id || "-"}를 기준으로 세부 복기를 이어갈 수 있습니다.`
-      : `아직 저장된 리포트가 적어서 누적 추세는 제한적입니다. 샘플을 더 쌓으면 반복 패턴이 더 선명해집니다.`;
+      ? `반복 신호: ${recurringTags.slice(0, 2).join(" / ")}. 현재 샘플 ${current?.id || "-"} 기준으로 복기 중입니다.`
+      : `표본이 적어 누적 추세는 아직 제한적입니다. 샘플이 더 쌓이면 패턴이 선명해집니다.`;
 
   return {
     headline,
