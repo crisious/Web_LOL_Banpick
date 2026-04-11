@@ -1,0 +1,265 @@
+{
+  "schemaVersion": "1.0",
+  "sourceMeta": {
+    "sourceType": "riot_match_v5",
+    "fetchedAt": "2026-04-11T00:00:00+09:00",
+    "platformRegion": "KR",
+    "regionalCluster": "ASIA",
+    "rawMatchId": "KR_8166674448"
+  },
+  "playerContext": {
+    "puuid": "Ud5AKpmTkcofwWbXETvSoiiPIt0nCAt45abDQTKIabEf6dUZjQ9WU2rM1XsE7TWF2rhjJiz03bVp1w",
+    "riotId": "매운맛 비스킷#KR1",
+    "isAnonymous": true,
+    "participantId": 2
+  },
+  "matchInfo": {
+    "matchId": "KR_8166674448",
+    "queueId": 420,
+    "queueLabel": "RANKED_SOLO",
+    "mapId": 11,
+    "mapLabel": "SUMMONERS_RIFT",
+    "gameVersion": "16.7.760.9485",
+    "gameCreation": "2026-04-09T18:18:00+09:00",
+    "durationSeconds": 2168,
+    "durationLabel": "36:08",
+    "result": "WIN",
+    "champion": "DrMundo",
+    "position": "JUNGLE",
+    "teamId": 100
+  },
+  "playerStats": {
+    "kills": 2,
+    "deaths": 6,
+    "assists": 11,
+    "kda": 2.17,
+    "cs": 174,
+    "csPerMinute": 4.82,
+    "goldEarned": 11427,
+    "damageToChampions": 18187,
+    "visionScore": 45,
+    "killParticipation": 0.35,
+    "champLevel": 16,
+    "summonerSpells": [4, 11],
+    "items": [3083, 3742, 3084, 1028, 0, 3009, 3364]
+  },
+  "teamContext": {
+    "teamTotalKills": 37,
+    "teamGoldEstimate": 0,
+    "teamDragons": 3,
+    "teamBarons": 0,
+    "teamTowers": 8,
+    "enemyDragons": 2,
+    "enemyBarons": 1,
+    "enemyTowers": 6
+  },
+  "phaseContext": {
+    "early": {
+      "startMs": 0,
+      "endMs": 900000,
+      "kills": 0,
+      "deaths": 2,
+      "assists": 2,
+      "notableEventCount": 6
+    },
+    "mid": {
+      "startMs": 900001,
+      "endMs": 1800000,
+      "kills": 1,
+      "deaths": 2,
+      "assists": 6,
+      "notableEventCount": 8
+    },
+    "late": {
+      "startMs": 1800001,
+      "endMs": 2168000,
+      "kills": 1,
+      "deaths": 2,
+      "assists": 3,
+      "notableEventCount": 7
+    }
+  },
+  "timelineEvents": [
+    {
+      "eventId": "evt_001",
+      "timestampMs": 410453,
+      "timestampLabel": "06:50",
+      "phase": "EARLY",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "초반 지구 드래곤을 직접 챙기며 정글 템포를 먼저 잡았다.",
+      "rawRef": { "frameIndex": 7, "eventIndex": 29 }
+    },
+    {
+      "eventId": "evt_002",
+      "timestampMs": 464477,
+      "timestampLabel": "07:44",
+      "phase": "EARLY",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 3,
+      "isPlayerInvolved": true,
+      "laneHint": "BOT_RIVER",
+      "summary": "초반 강가 교전에서 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": { "frameIndex": 8, "eventIndex": 19 }
+    },
+    {
+      "eventId": "evt_003",
+      "timestampMs": 468708,
+      "timestampLabel": "07:48",
+      "phase": "EARLY",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "BOT_RIVER",
+      "summary": "직후 반격에서 데스를 내주며 초반 이득을 완전히 굳히지는 못했다.",
+      "rawRef": { "frameIndex": 8, "eventIndex": 23 }
+    },
+    {
+      "eventId": "evt_004",
+      "timestampMs": 745534,
+      "timestampLabel": "12:25",
+      "phase": "EARLY",
+      "eventType": "OBJECTIVE_SETUP_FAIL",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "두 번째 드래곤 구도에서는 끝까지 contest했지만 상대에게 헥스테크 드래곤을 내줬다.",
+      "rawRef": { "frameIndex": 13, "eventIndex": 27 }
+    },
+    {
+      "eventId": "evt_005",
+      "timestampMs": 858685,
+      "timestampLabel": "14:18",
+      "phase": "EARLY",
+      "eventType": "OBJECTIVE_SETUP_WIN",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "TOP_RIVER",
+      "summary": "공허 유충을 연속으로 챙기며 라인 압박 재료를 마련했다.",
+      "rawRef": { "frameIndex": 15, "eventIndex": 8 }
+    },
+    {
+      "eventId": "evt_006",
+      "timestampMs": 1106241,
+      "timestampLabel": "18:26",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "중반 물 드래곤 교전에서 끝까지 남아 팀의 드래곤 스택을 유지했다.",
+      "rawRef": { "frameIndex": 19, "eventIndex": 19 }
+    },
+    {
+      "eventId": "evt_007",
+      "timestampMs": 1227055,
+      "timestampLabel": "20:27",
+      "phase": "MID",
+      "eventType": "TEAMFIGHT_FOLLOWUP",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "MID_LANE",
+      "summary": "미드 교전에서 후속 진입 타이밍을 맞추며 연속 킬 관여를 만들었다.",
+      "rawRef": { "frameIndex": 21, "eventIndex": 21 }
+    },
+    {
+      "eventId": "evt_008",
+      "timestampMs": 1368229,
+      "timestampLabel": "22:48",
+      "phase": "MID",
+      "eventType": "CHAMPION_KILL",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "BOT_JUNGLE",
+      "summary": "상대 핵심 딜러를 직접 마무리하며 한타 흐름을 굳혔다.",
+      "rawRef": { "frameIndex": 23, "eventIndex": 33 }
+    },
+    {
+      "eventId": "evt_009",
+      "timestampMs": 1500284,
+      "timestampLabel": "25:00",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "세 번째 드래곤을 직접 확보하며 후반 오브젝트 우위를 만들었다.",
+      "rawRef": { "frameIndex": 25, "eventIndex": 40 }
+    },
+    {
+      "eventId": "evt_010",
+      "timestampMs": 1569475,
+      "timestampLabel": "26:09",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "MID_RIVER",
+      "summary": "중반 깊은 교전에서 먼저 끊기며 상대의 바론 압박 타이밍을 열어줬다.",
+      "rawRef": { "frameIndex": 27, "eventIndex": 2 }
+    },
+    {
+      "eventId": "evt_011",
+      "timestampMs": 1734042,
+      "timestampLabel": "28:54",
+      "phase": "MID",
+      "eventType": "BARON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "BARON_RIVER",
+      "summary": "바론 교전에는 참여했지만 결과적으로 상대에게 바론을 내줬다.",
+      "rawRef": { "frameIndex": 29, "eventIndex": 31 }
+    },
+    {
+      "eventId": "evt_012",
+      "timestampMs": 1862782,
+      "timestampLabel": "31:02",
+      "phase": "LATE",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "후반 결정적 드래곤 타이밍을 직접 챙기며 바론 손해를 부분적으로 상쇄했다.",
+      "rawRef": { "frameIndex": 32, "eventIndex": 2 }
+    },
+    {
+      "eventId": "evt_013",
+      "timestampMs": 1902005,
+      "timestampLabel": "31:42",
+      "phase": "LATE",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "TOP_RIVER",
+      "summary": "후반에도 한 차례 더 데스를 내주며 경기 마무리가 깔끔하지는 않았다.",
+      "rawRef": { "frameIndex": 32, "eventIndex": 26 }
+    },
+    {
+      "eventId": "evt_014",
+      "timestampMs": 2145937,
+      "timestampLabel": "35:45",
+      "phase": "LATE",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "MID_BASE",
+      "summary": "마지막 미드 돌파에서 억제기와 넥서스 타워 압박에 직접 관여하며 승리를 굳혔다.",
+      "rawRef": { "frameIndex": 36, "eventIndex": 21 }
+    }
+  ],
+  "derivedSignals": {
+    "hasEarlyLeadMoments": true,
+    "hasMidGameThrowRisk": true,
+    "hasObjectiveControlIssues": false,
+    "hasStrongRoamingPattern": false,
+    "hasPositioningRisk": true,
+    "candidateThemes": [
+      "strong_jungle_objective_tempo",
+      "messy_but_effective_teamfight_followup",
+      "too_many_midgame_deaths_for_a_winning_jungler",
+      "late_game_structure_closeout"
+    ]
+  }
+}

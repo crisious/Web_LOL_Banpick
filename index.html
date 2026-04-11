@@ -1,175 +1,276 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LoL Draft Broadcast Wireframe</title>
+    <title>LoL Replay Coach Report</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="broadcast-shell">
+    <a class="skip-link" href="#main-content">본문 분석 영역으로 건너뛰기</a>
+    <div class="app-shell">
       <header class="topbar">
-        <section class="topcard topcard--event">
-          <p class="eyebrow">Global Stage</p>
-          <h1 data-broadcast-title>Fearless Draft Wireframe</h1>
-          <p class="subline" data-broadcast-subtitle>
-            Broadcast layout study for a live League of Legends draft show.
-          </p>
-        </section>
-
-        <section class="topcard topcard--score">
-          <div class="scoreline">
-            <span class="score-team score-team--blue" data-score-name="blue"></span>
-            <span class="score-value" data-score="blue"></span>
-            <span class="score-separator">:</span>
-            <span class="score-value" data-score="red"></span>
-            <span class="score-team score-team--red" data-score-name="red"></span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-pill" data-series-format></span>
-            <span class="meta-pill" data-series-game></span>
-            <span class="meta-pill" data-priority-choice></span>
-            <span class="meta-pill" data-counter-choice></span>
-          </div>
-        </section>
-
-        <section class="topcard topcard--status">
-          <div class="status-grid">
-            <div>
-              <span class="status-label">Patch</span>
-              <strong data-patch-version></strong>
-            </div>
-            <div>
-              <span class="status-label">Phase</span>
-              <strong data-phase-counter></strong>
-            </div>
-            <div>
-              <span class="status-label">State</span>
-              <strong data-live-state></strong>
-            </div>
-          </div>
-        </section>
+        <div>
+          <p class="eyebrow">Replay Coach Dashboard</p>
+          <h1 class="topbar-title">전적 사이트 문법으로 다시 짠 LoL 복기 리포트</h1>
+        </div>
+        <p class="topbar-copy">왼쪽에서 플레이어와 샘플을 고르고, 오른쪽에서 경기 요약부터 개선 루틴까지 한 번에 탐색합니다.</p>
       </header>
 
-      <main class="main-stage">
-        <section class="team-panel team-panel--blue" data-team-panel="blue">
-          <div class="team-header">
-            <div>
-              <p class="eyebrow">Blue Side</p>
-              <h2 data-team-name="blue"></h2>
+      <div class="workspace-grid">
+        <aside class="sidebar-stack" aria-label="플레이어 허브">
+          <section class="hero-panel" aria-labelledby="player-hub-title">
+            <div class="hero-copy">
+              <p class="eyebrow">Player Hub</p>
+              <h2 id="player-hub-title">검색과 식별 정보를 먼저 고정하는 전적 사이트형 사이드 레일</h2>
+              <p class="hero-lede" data-theme-copy></p>
             </div>
-            <span class="side-tag">B</span>
-          </div>
-          <div class="detail-grid">
-            <div>
-              <span class="detail-label">Coach</span>
-              <strong data-coach="blue"></strong>
-            </div>
-            <div>
-              <span class="detail-label">Seed</span>
-              <strong data-seed="blue"></strong>
-            </div>
-            <div>
-              <span class="detail-label">Pick Order</span>
-              <strong data-pick-order="blue"></strong>
-            </div>
-          </div>
-          <div class="roster-list" data-roster="blue"></div>
-        </section>
 
-        <section class="draft-core">
-          <section class="phase-banner">
-            <div>
-              <p class="eyebrow">Current Call</p>
-              <h2 data-phase-title></h2>
+            <div class="hero-meta">
+              <article class="meta-card">
+                <span class="meta-label">Sample</span>
+                <strong data-sample-id></strong>
+              </article>
+              <article class="meta-card">
+                <span class="meta-label">Player</span>
+                <strong data-hero-player></strong>
+              </article>
+              <article class="meta-card">
+                <span class="meta-label">Match</span>
+                <strong data-hero-match></strong>
+              </article>
+              <article class="meta-card">
+                <span class="meta-label">Collected</span>
+                <strong data-hero-date></strong>
+              </article>
             </div>
-            <div class="timer-card">
-              <span class="timer-label">Draft Clock</span>
-              <strong data-timer-value></strong>
-            </div>
+            <div class="hero-pills" data-hero-pills></div>
           </section>
 
-          <section class="phase-track" data-phase-track></section>
-
-          <section class="pick-stage">
-            <div class="pick-stack" data-pick-stack="blue"></div>
-
-            <div class="center-signal">
-              <div class="signal-ring"></div>
-              <div class="signal-copy">
-                <p class="eyebrow">Observer Prompt</p>
-                <h3 data-active-team></h3>
-                <p data-active-copy></p>
-              </div>
-              <div class="signal-footer">
-                <span data-active-role></span>
-                <span data-active-kind></span>
+          <nav class="panel panel--nav" aria-label="분석 섹션 바로가기">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Overview Tabs</p>
+                <h3>리포트 빠른 이동</h3>
               </div>
             </div>
+            <div class="section-nav">
+              <a class="section-link" href="#overview">개요</a>
+              <a class="section-link" href="#trends">플레이어 추세</a>
+              <a class="section-link" href="#reports">저장 리포트</a>
+              <a class="section-link" href="#phases">구간 분석</a>
+              <a class="section-link" href="#insights">강점과 약점</a>
+              <a class="section-link" href="#execution">실행 루틴</a>
+              <a class="section-link" href="#evidence">근거 로그</a>
+            </div>
+          </nav>
 
-            <div class="pick-stack" data-pick-stack="red"></div>
+          <article class="panel panel--samples" aria-labelledby="sample-library-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Sample Library</p>
+                <h3 id="sample-library-title">저장된 분석 샘플 전환</h3>
+              </div>
+              <p class="section-copy">프로필 카드처럼 샘플을 바꿔 보면서 역할, 승패, 분석 문체를 비교할 수 있습니다.</p>
+            </div>
+            <div class="sample-switcher" data-sample-switcher></div>
+          </article>
+
+          <article class="panel panel--fetcher" aria-labelledby="recent-match-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Riot API Intake</p>
+                <h3 id="recent-match-title">최근 경기 후보 불러오기</h3>
+              </div>
+              <p class="section-copy">전적 사이트의 검색 바처럼 Riot ID를 넣고 최근 경기 후보를 조회합니다.</p>
+            </div>
+
+            <form class="fetch-form" data-recent-form aria-labelledby="recent-match-title">
+              <label>
+                <span>gameName</span>
+                <input name="gameName" type="text" value="매운맛 비스킷" required />
+              </label>
+              <label>
+                <span>tagLine</span>
+                <input name="tagLine" type="text" value="KR1" required />
+              </label>
+              <label>
+                <span>platform</span>
+                <input name="platformRegion" type="text" value="KR" required />
+              </label>
+              <button type="submit">최근 경기 불러오기</button>
+            </form>
+
+            <div class="fetch-status" data-fetch-status aria-live="polite">sample-001 실데이터는 이미 저장되어 있습니다. 필요하면 최근 경기 후보를 다시 불러와 다른 샘플도 고를 수 있습니다.</div>
+            <div class="candidate-list" data-candidate-list aria-live="polite"></div>
+          </article>
+        </aside>
+
+        <main class="dashboard" id="main-content">
+          <section class="summary-grid" id="overview" aria-labelledby="overview-title">
+            <h2 class="sr-only" id="overview-title">경기 개요</h2>
+          <article class="panel panel--headline">
+            <p class="eyebrow">Headline</p>
+            <h2 data-headline></h2>
+            <p class="summary-copy" data-overall-summary></p>
+            <p class="summary-detail" data-game-flow-summary></p>
+            <div class="winloss-pill" data-result-pill></div>
+          </article>
+
+          <article class="panel panel--snapshot" aria-labelledby="snapshot-title">
+            <div class="section-heading section-heading--compact">
+              <div>
+                <p class="eyebrow">Quick View</p>
+                <h3 id="snapshot-title">상단 요약 바</h3>
+              </div>
+              <p class="section-copy">전적 사이트처럼 경기 핵심 정보를 먼저 압축해서 보여줍니다.</p>
+            </div>
+            <div class="snapshot-grid">
+              <div class="snapshot-item">
+                <span class="meta-label">Champion</span>
+                <div class="champion-inline champion-inline--snapshot">
+                  <span class="champion-avatar champion-avatar--large" data-snapshot-champion-icon aria-hidden="true"></span>
+                  <strong data-snapshot-champion></strong>
+                </div>
+              </div>
+              <div class="snapshot-item">
+                <span class="meta-label">Role</span>
+                <strong data-snapshot-role></strong>
+              </div>
+              <div class="snapshot-item">
+                <span class="meta-label">Result</span>
+                <strong data-snapshot-result></strong>
+              </div>
+              <div class="snapshot-item">
+                <span class="meta-label">Queue</span>
+                <strong data-snapshot-queue></strong>
+              </div>
+              <div class="snapshot-item">
+                <span class="meta-label">Duration</span>
+                <strong data-snapshot-duration></strong>
+              </div>
+              <div class="snapshot-item">
+                <span class="meta-label">Patch</span>
+                <strong data-snapshot-patch></strong>
+              </div>
+            </div>
+            <p class="snapshot-footnote">분석 신뢰도 <strong data-snapshot-confidence></strong></p>
+          </article>
           </section>
 
-          <section class="ban-stage">
-            <div class="ban-strip" data-ban-strip="blue"></div>
-            <div class="ban-strip" data-ban-strip="red"></div>
+          <section class="stat-ribbon" data-stat-ribbon aria-label="핵심 지표"></section>
+
+          <section class="panel panel--trends" id="trends" aria-labelledby="trends-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Player Trend</p>
+                <h3 id="trends-title">저장 샘플 기준 누적 추세</h3>
+              </div>
+              <p class="section-copy">지금까지 저장된 리포트만 묶어서 자주 보이는 역할, 승패 흐름, 반복 테마를 먼저 훑어봅니다.</p>
+            </div>
+            <div class="trend-grid">
+              <article class="trend-callout">
+                <span class="meta-label">Trend Summary</span>
+                <h4 data-trend-headline></h4>
+                <p data-trend-summary></p>
+              </article>
+              <div class="trend-stats" data-trend-stats></div>
+              <div class="trend-tags" data-trend-tags></div>
+              <div class="trend-panels">
+                <article class="trend-panel trend-panel--positive">
+                  <span class="meta-label">Repeated Strengths</span>
+                  <div class="trend-list" data-trend-strengths></div>
+                </article>
+                <article class="trend-panel trend-panel--negative">
+                  <span class="meta-label">Repeated Weaknesses</span>
+                  <div class="trend-list" data-trend-weaknesses></div>
+                </article>
+              </div>
+            </div>
           </section>
-        </section>
 
-        <section class="team-panel team-panel--red" data-team-panel="red">
-          <div class="team-header">
-            <div>
-              <p class="eyebrow">Red Side</p>
-              <h2 data-team-name="red"></h2>
+          <section class="panel panel--reports" id="reports" aria-labelledby="reports-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Saved Reports</p>
+                <h3 id="reports-title">저장된 경기 리포트 빠른 비교</h3>
+              </div>
+              <p class="section-copy">전적 사이트의 최근 경기 리스트처럼 저장된 샘플을 한 줄에서 넘겨보며 역할과 경기 테마를 비교합니다.</p>
             </div>
-            <span class="side-tag">R</span>
+            <div class="report-strip" data-report-strip></div>
+          </section>
+
+          <section class="panel panel--phases" id="phases" aria-labelledby="phases-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Phase Review</p>
+              <h3 id="phases-title">초반부터 후반까지 흐름 요약</h3>
+            </div>
+            <p class="section-copy">구간별 평점과 다음 게임에서 집중할 포인트를 한 번에 확인합니다.</p>
           </div>
-          <div class="detail-grid">
-            <div>
-              <span class="detail-label">Coach</span>
-              <strong data-coach="red"></strong>
+          <div class="phase-grid" data-phase-grid></div>
+          </section>
+
+          <section class="insight-grid" id="insights" aria-labelledby="insights-title">
+            <h2 class="sr-only" id="insights-title">강점과 약점</h2>
+            <article class="panel panel--strengths" aria-labelledby="strengths-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Strengths</p>
+                <h3 id="strengths-title">이번 판에서 잘한 점</h3>
+              </div>
             </div>
-            <div>
-              <span class="detail-label">Seed</span>
-              <strong data-seed="red"></strong>
+            <div class="insight-stack" data-strengths></div>
+          </article>
+
+            <article class="panel panel--weaknesses" aria-labelledby="weaknesses-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Weaknesses</p>
+                <h3 id="weaknesses-title">다음 판에서 바꿔야 할 점</h3>
+              </div>
             </div>
-            <div>
-              <span class="detail-label">Pick Order</span>
-              <strong data-pick-order="red"></strong>
+            <div class="insight-stack" data-weaknesses></div>
+            </article>
+          </section>
+
+          <section class="execution-grid" id="execution" aria-labelledby="execution-title">
+            <h2 class="sr-only" id="execution-title">실행 루틴과 핵심 장면</h2>
+            <article class="panel panel--checklist" aria-labelledby="checklist-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Next Game Checklist</p>
+                <h3 id="checklist-title">바로 적용할 행동 루틴</h3>
+              </div>
             </div>
+            <ol class="checklist-list" data-checklist></ol>
+          </article>
+
+            <article class="panel panel--moments" aria-labelledby="moments-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Key Moments</p>
+                <h3 id="moments-title">경기 흐름을 바꾼 장면</h3>
+              </div>
+            </div>
+            <div class="moment-list" data-key-moments></div>
+            </article>
+          </section>
+
+          <section class="panel panel--evidence" id="evidence" aria-labelledby="evidence-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Evidence Ledger</p>
+              <h3 id="evidence-title">인사이트 근거 이벤트</h3>
+            </div>
+            <p class="section-copy">각 분석 문장이 어디서 나왔는지 확인할 수 있도록 핵심 이벤트를 정리했습니다.</p>
           </div>
-          <div class="roster-list" data-roster="red"></div>
-        </section>
-      </main>
-
-      <section class="fearless-board">
-        <div class="board-header">
-          <div>
-            <p class="eyebrow">Series Lockout</p>
-            <h2>Fearless Draft Memory</h2>
-          </div>
-          <p class="subline">
-            Champions already used earlier in the series stay visible here as a quick
-            production check.
-          </p>
-        </div>
-
-        <div class="fearless-columns">
-          <section class="fearless-column" data-fearless-column="blue"></section>
-          <section class="fearless-column" data-fearless-column="red"></section>
-        </div>
-      </section>
-
-      <footer class="control-dock">
-        <div class="dock-pill">Keys: Left/Right move turns, Space pause, R reset timer, F fullscreen</div>
-        <div class="dock-pill">
-          Status output: call `window.render_game_to_text()` or open
-          <a class="dock-link" href="./admin.html">admin panel</a>
-        </div>
-      </footer>
+          <div class="evidence-list" data-evidence></div>
+          </section>
+        </main>
+      </div>
     </div>
 
-    <script src="./draft-state.js"></script>
     <script src="./main.js"></script>
   </body>
 </html>
