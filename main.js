@@ -50,6 +50,10 @@ const dom = {
   objectiveTable: document.querySelector("[data-objective-table]"),
   kdaChart: document.querySelector("[data-kda-chart]"),
   kdaEvents: document.querySelector("[data-kda-events]"),
+  laningStats: document.querySelector("[data-laning-stats]"),
+  wardSummary: document.querySelector("[data-ward-summary]"),
+  wardEvents: document.querySelector("[data-ward-events]"),
+  buildTimeline: document.querySelector("[data-build-timeline]"),
 };
 
 const state = {
@@ -1022,6 +1026,105 @@ function renderPlaytimeScore(sample) {
   `;
 }
 
+function renderLaningStats(sample) {
+  const cs = sample.normalized?.challengeStats;
+  if (!cs || !dom.laningStats) {
+    if (dom.laningStats) dom.laningStats.innerHTML = "";
+    return;
+  }
+
+  const items = [
+    { label: "분당 데미지", value: Math.round(cs.damagePerMinute), unit: "DPM" },
+    { label: "분당 골드", value: Math.round(cs.goldPerMinute), unit: "GPM" },
+    { label: "팀 데미지 비중", value: `${(cs.teamDamagePercentage * 100).toFixed(1)}%`, unit: "" },
+    { label: "솔로킬", value: cs.soloKills, unit: "" },
+    { label: "10분 CS", value: cs.laneMinionsFirst10Minutes, unit: "" },
+    { label: "CS 최대 우위", value: cs.maxCsAdvantageOnLaneOpponent?.toFixed(1) || 0, unit: "" },
+    { label: "레벨 최대 우위", value: cs.maxLevelLeadLaneOpponent || 0, unit: "" },
+    { label: "터렛 플레이트", value: cs.turretPlatesTaken, unit: "" },
+    { label: "컨트롤 와드", value: cs.controlWardsPlaced, unit: "" },
+    { label: "스킬샷 회피", value: cs.skillshotsDodged, unit: "" },
+  ];
+
+  dom.laningStats.innerHTML = `
+    <h3 class="laning-stats-title">라인전 & 고급 지표</h3>
+    <div class="laning-stats-grid">
+      ${items.map((i) => `
+        <div class="laning-stat-item">
+          <span class="laning-stat-value">${i.value}${i.unit ? ` <small>${i.unit}</small>` : ""}</span>
+          <span class="laning-stat-label">${i.label}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderWardTimeline(sample) {
+  const ward = sample.normalized?.wardTimeline;
+  if (!ward) {
+    dom.wardSummary.innerHTML = "";
+    dom.wardEvents.innerHTML = '<p class="muted">와드 데이터가 없습니다.</p>';
+    return;
+  }
+
+  const s = ward.summary;
+  dom.wardSummary.innerHTML = `
+    <div class="ward-summary-grid">
+      <div class="ward-stat"><strong>${s.totalPlaced}</strong><span>설치</span></div>
+      <div class="ward-stat"><strong>${s.totalKilled}</strong><span>제거</span></div>
+      <div class="ward-stat"><strong>${s.controlWardsPlaced}</strong><span>컨트롤</span></div>
+      <div class="ward-stat"><strong>${s.wardsPerMinute}</strong><span>분당</span></div>
+    </div>
+    <div class="ward-phase-bar">
+      <span>초반 ${s.byPhase.EARLY}</span>
+      <span>중반 ${s.byPhase.MID}</span>
+      <span>후반 ${s.byPhase.LATE}</span>
+    </div>
+  `;
+
+  const wardLabel = { YELLOW_TRINKET: "노랑 와드", CONTROL_WARD: "컨트롤 와드", SIGHT_WARD: "시야 와드", BLUE_TRINKET: "파랑 와드" };
+  dom.wardEvents.innerHTML = ward.events.length > 0
+    ? ward.events.slice(0, 30).map((e) => `
+      <span class="ward-event-chip ward-event-chip--${e.action === "PLACED" ? "placed" : "killed"}">
+        ${e.timeLabel} ${e.action === "PLACED" ? "설치" : "제거"} ${wardLabel[e.wardType] || e.wardType}
+      </span>
+    `).join("")
+    : '<p class="muted">와드 이벤트 없음</p>';
+}
+
+function itemCdnVersion(sample) {
+  const raw = String(sample.normalized?.matchInfo?.gameVersion || "").trim();
+  const parts = raw.split(".");
+  if (parts.length >= 2) {
+    return `${parts[0]}.${parts[1]}.1`;
+  }
+  return championCdnVersion || "";
+}
+
+function renderBuildTimeline(sample) {
+  const items = sample.normalized?.itemTimeline;
+  if (!items || items.length === 0) {
+    dom.buildTimeline.innerHTML = '<p class="muted">빌드 데이터가 없습니다.</p>';
+    return;
+  }
+
+  // 핵심 아이템만 필터 (itemId >= 3000 이상 = 완성 아이템, 부츠 등)
+  const majorItems = items.filter((i) => i.itemId >= 3000 || i.itemId === 2031 || i.itemId === 2033);
+  const displayItems = majorItems.length > 0 ? majorItems : items.slice(0, 15);
+
+  dom.buildTimeline.innerHTML = `
+    <div class="build-scroll">
+      ${displayItems.map((i) => `
+        <div class="build-item">
+          <img class="build-item-icon" src="https://ddragon.leagueoflegends.com/cdn/${itemCdnVersion(sample)}/img/item/${i.itemId}.png"
+               alt="item ${i.itemId}" onerror="this.style.display='none'" width="32" height="32" />
+          <span class="build-item-time">${i.timeLabel}</span>
+        </div>
+      `).join('<span class="build-arrow">→</span>')}
+    </div>
+  `;
+}
+
 function renderObjectiveTimeline(sample) {
   const timeline = sample.normalized?.objectiveTimeline;
   if (!timeline || timeline.length === 0) {
@@ -1243,8 +1346,11 @@ function renderSample(sample) {
   renderEvidence(sample);
   renderComparison(sample);
   renderPlaytimeScore(sample);
+  renderLaningStats(sample);
   renderObjectiveTimeline(sample);
   renderKdaTimeline(sample);
+  renderWardTimeline(sample);
+  renderBuildTimeline(sample);
   renderSampleSwitcher();
 }
 
@@ -1482,7 +1588,16 @@ async function handleLogin(event) {
       body: JSON.stringify(payload),
     });
 
-    state.account = { ...account, riotId: result.riotId, puuid: result.puuid };
+    state.account = {
+      ...account,
+      riotId: result.riotId,
+      puuid: result.puuid,
+      summonerLevel: result.summonerLevel,
+      profileIconId: result.profileIconId,
+      ranked: result.ranked,
+      rankedStatus: result.rankedStatus,
+      rankedError: result.rankedError,
+    };
     state.recentMatches = result.matches || [];
     if (remember) saveAccount(account);
 
@@ -1506,6 +1621,16 @@ function renderMatchList() {
   dom.matchListHeader.innerHTML = `
     <div class="match-list-identity">
       <h2>${state.account.riotId || `${state.account.gameName}#${state.account.tagLine}`}</h2>
+      ${state.account.ranked ? `
+        <span class="rank-badge rank-badge--${(state.account.ranked.tier || "").toLowerCase()}">
+          ${state.account.ranked.tier} ${state.account.ranked.rank} · ${state.account.ranked.lp} LP · 승률 ${state.account.ranked.winRate}%
+        </span>
+      ` : state.account.rankedStatus === "error" ? `
+        <span class="rank-badge rank-badge--unavailable" title="${state.account.rankedError || "랭크 정보를 불러오지 못했습니다."}">
+          랭크 조회 실패
+        </span>
+      ` : ""}
+      ${state.account.summonerLevel ? `<span class="level-badge">Lv. ${state.account.summonerLevel}</span>` : ""}
       <p class="muted">최근 ${matches.length}게임 요약 · 클릭하면 상세 AI 분석</p>
       <button class="login-submit login-submit--small" data-logout-btn>다른 계정</button>
     </div>

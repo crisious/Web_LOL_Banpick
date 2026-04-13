@@ -1167,6 +1167,142 @@ body::after {
   border-bottom: 1px solid var(--accent);
 }
 
+/* ─── Laning Stats ────────────────────────────────────────────────────────── */
+
+.laning-stats-title {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 24px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.laning-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.laning-stat-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.laning-stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.laning-stat-value small {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.laning-stat-label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ─── Ward Timeline ───────────────────────────────────────────────────────── */
+
+.ward-summary-grid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.ward-stat {
+  text-align: center;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.ward-stat strong {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.ward-stat span {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.ward-phase-bar {
+  display: flex;
+  gap: 16px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.ward-event-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  margin: 2px 3px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+}
+
+.ward-event-chip--placed {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.ward-event-chip--killed {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+/* ─── Build Timeline ──────────────────────────────────────────────────────── */
+
+.build-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0;
+}
+
+.build-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.build-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+.build-item-time {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.build-arrow {
+  color: var(--muted);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
 /* ─── KDA Timeline ────────────────────────────────────────────────────────── */
 
 .kda-chart-scroll {
@@ -1539,6 +1675,38 @@ body::after {
 }
 
 .match-summary-card { position: relative; }
+
+.rank-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.rank-badge--iron { color: #8b7355; }
+.rank-badge--bronze { color: #cd7f32; }
+.rank-badge--silver { color: #c0c0c0; }
+.rank-badge--gold { color: var(--accent); border-color: rgba(240, 179, 91, 0.3); }
+.rank-badge--platinum { color: #2cc5b8; }
+.rank-badge--emerald { color: #50c878; }
+.rank-badge--diamond { color: #b9f2ff; }
+.rank-badge--master { color: #9d4dbb; }
+.rank-badge--grandmaster { color: #ef4444; }
+.rank-badge--challenger { color: #f0b35b; background: rgba(240, 179, 91, 0.15); }
+.rank-badge--unavailable { color: var(--rose); border-color: rgba(255, 134, 120, 0.28); background: rgba(255, 134, 120, 0.08); }
+
+.level-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+}
 .kda-death { color: var(--rose); }
 
 .score-badge {
@@ -1824,6 +1992,10 @@ body::after {
   .kda-evt {
     grid-template-columns: 45px 50px 80px 1fr;
     font-size: 0.78rem;
+  }
+
+  .laning-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .workspace-grid {

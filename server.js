@@ -567,6 +567,25 @@ function buildNormalized(account, matchDetail, timeline, options) {
         participant.item6 || 0,
       ],
     },
+    challengeStats: (() => {
+      const c = participant.challenges || {};
+      return {
+        damagePerMinute: c.damagePerMinute || 0,
+        goldPerMinute: c.goldPerMinute || 0,
+        visionScorePerMinute: c.visionScorePerMinute || 0,
+        killParticipation: c.killParticipation || 0,
+        teamDamagePercentage: c.teamDamagePercentage || 0,
+        soloKills: c.soloKills || 0,
+        laneMinionsFirst10Minutes: c.laneMinionsFirst10Minutes || 0,
+        maxCsAdvantageOnLaneOpponent: c.maxCsAdvantageOnLaneOpponent || 0,
+        maxLevelLeadLaneOpponent: c.maxLevelLeadLaneOpponent || 0,
+        turretPlatesTaken: c.turretPlatesTaken || 0,
+        earlyLaningPhaseGoldExpAdvantage: c.earlyLaningPhaseGoldExpAdvantage || 0,
+        controlWardsPlaced: c.controlWardsPlaced || 0,
+        skillshotsDodged: c.skillshotsDodged || 0,
+        outnumberedKills: c.outnumberedKills || 0,
+      };
+    })(),
     teamContext: {
       teamTotalKills,
       teamGoldEstimate: 0,
@@ -609,6 +628,8 @@ function buildNormalized(account, matchDetail, timeline, options) {
   matchDetail.info.participants.forEach((p) => participantTeamMap.set(p.participantId, p.teamId));
   normalized.objectiveTimeline = buildObjectiveTimeline(timeline, participant.teamId, participantTeamMap);
   normalized.kdaTimeline = buildKdaTimeline(normalized);
+  normalized.wardTimeline = buildWardTimeline(timeline, participant.participantId);
+  normalized.itemTimeline = buildItemTimeline(timeline, participant.participantId);
 
   return normalized;
 }
@@ -886,23 +907,28 @@ function buildPhaseSummaries(normalized) {
 
 function clamp10(v) { return Math.min(10, Math.max(0, +v.toFixed(1))); }
 
-function calcCombatScore(stats, minutes) {
-  const kdaPart = Math.min(stats.kda, 6) / 6 * 6;
-  const kpPart = Math.min(stats.killParticipation, 0.6) / 0.6 * 2;
-  const dpmPart = Math.min((stats.damageToChampions / minutes) / 800, 1) * 2;
-  return clamp10(kdaPart + kpPart + dpmPart);
+function calcCombatScore(stats, challenges, minutes) {
+  const dpm = challenges.damagePerMinute || (stats.damageToChampions / minutes);
+  const kdaPart = Math.min(stats.kda, 6) / 6 * 5;
+  const kpPart = Math.min(challenges.killParticipation || stats.killParticipation, 0.6) / 0.6 * 2;
+  const dpmPart = Math.min(dpm / 800, 1) * 2;
+  const soloPart = Math.min((challenges.soloKills || 0), 3) * 0.33;
+  return clamp10(kdaPart + kpPart + dpmPart + soloPart);
 }
 
-function calcIncomeScore(stats, position, minutes) {
+function calcIncomeScore(stats, challenges, position, minutes) {
   const csThreshold = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 }[position] || 6;
-  const csPart = Math.min(stats.csPerMinute / csThreshold, 1.2) * 5;
-  const goldPart = Math.min((stats.goldEarned / minutes) / 450, 1.2) * 5;
-  return clamp10(csPart + goldPart);
+  const gpm = challenges.goldPerMinute || (stats.goldEarned / minutes);
+  const csPart = Math.min(stats.csPerMinute / csThreshold, 1.2) * 4;
+  const goldPart = Math.min(gpm / 450, 1.2) * 4;
+  const platePart = Math.min((challenges.turretPlatesTaken || 0), 5) * 0.4;
+  return clamp10(csPart + goldPart + platePart);
 }
 
-function calcVisionScore(stats, minutes) {
-  const vsPerMin = stats.visionScore / minutes;
-  return clamp10(Math.min(vsPerMin / 1.5, 1.2) * 10);
+function calcVisionScore(stats, challenges, minutes) {
+  const vsPerMin = challenges.visionScorePerMinute || (stats.visionScore / minutes);
+  const cwPart = Math.min((challenges.controlWardsPlaced || 0), 8) * 0.25;
+  return clamp10(Math.min(vsPerMin / 1.5, 1.2) * 8 + cwPart);
 }
 
 function calcSurvivalScore(stats, minutes) {
@@ -933,14 +959,15 @@ function calcStructureScore(team, events) {
 
 function buildPlaytimeScore(normalized) {
   const stats = normalized.playerStats;
+  const challenges = normalized.challengeStats || {};
   const info = normalized.matchInfo;
   const team = normalized.teamContext;
   const events = normalized.timelineEvents;
   const minutes = info.durationSeconds / 60;
 
-  const combat = calcCombatScore(stats, minutes);
-  const income = calcIncomeScore(stats, info.position, minutes);
-  const vision = calcVisionScore(stats, minutes);
+  const combat = calcCombatScore(stats, challenges, minutes);
+  const income = calcIncomeScore(stats, challenges, info.position, minutes);
+  const vision = calcVisionScore(stats, challenges, minutes);
   const survival = calcSurvivalScore(stats, minutes);
   const objective = calcObjectiveScore(events);
   const structure = calcStructureScore(team, events);
@@ -996,6 +1023,73 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
           lane: "",
           team: killerTeam === targetTeamId ? "ALLY" : "ENEMY",
           label: buildObjectiveLabel(event),
+        });
+      }
+    });
+  });
+  return events.sort((a, b) => a.time - b.time);
+}
+
+// ─── Ward Timeline ────────────────────────────────────────────────────────
+
+function buildWardTimeline(timeline, targetParticipantId) {
+  const events = [];
+  timeline.info.frames.forEach((frame) => {
+    frame.events.forEach((event) => {
+      if (event.type === "WARD_PLACED" && event.creatorId === targetParticipantId) {
+        events.push({
+          time: event.timestamp,
+          timeLabel: timestampLabel(event.timestamp),
+          phase: phaseFor(event.timestamp),
+          action: "PLACED",
+          wardType: event.wardType || "UNKNOWN",
+        });
+      }
+      if (event.type === "WARD_KILL" && event.killerId === targetParticipantId) {
+        events.push({
+          time: event.timestamp,
+          timeLabel: timestampLabel(event.timestamp),
+          phase: phaseFor(event.timestamp),
+          action: "KILLED",
+          wardType: event.wardType || "UNKNOWN",
+        });
+      }
+    });
+  });
+
+  const placed = events.filter((e) => e.action === "PLACED");
+  const killed = events.filter((e) => e.action === "KILLED");
+  const controlWards = placed.filter((e) => e.wardType === "CONTROL_WARD").length;
+  const minutes = (timeline.info.frames.length - 1) || 1;
+
+  return {
+    events: events.sort((a, b) => a.time - b.time),
+    summary: {
+      totalPlaced: placed.length,
+      totalKilled: killed.length,
+      controlWardsPlaced: controlWards,
+      wardsPerMinute: +(placed.length / minutes).toFixed(2),
+      byPhase: {
+        EARLY: placed.filter((e) => e.phase === "EARLY").length,
+        MID: placed.filter((e) => e.phase === "MID").length,
+        LATE: placed.filter((e) => e.phase === "LATE").length,
+      },
+    },
+  };
+}
+
+// ─── Item Build Timeline ──────────────────────────────────────────────────
+
+function buildItemTimeline(timeline, targetParticipantId) {
+  const events = [];
+  timeline.info.frames.forEach((frame) => {
+    frame.events.forEach((event) => {
+      if (event.type === "ITEM_PURCHASED" && event.participantId === targetParticipantId) {
+        events.push({
+          time: event.timestamp,
+          timeLabel: timestampLabel(event.timestamp),
+          phase: phaseFor(event.timestamp),
+          itemId: event.itemId,
         });
       }
     });
@@ -1616,6 +1710,41 @@ async function loadSampleBundle(sampleId) {
   if (!normalized.kdaTimeline && normalized.timelineEvents) {
     normalized.kdaTimeline = buildKdaTimeline(normalized);
   }
+  if (!normalized.wardTimeline || !normalized.itemTimeline) {
+    const tlPath2 = path.join(root, "data", "samples", sampleId, "raw-timeline.json");
+    const matchPath2 = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    try {
+      const tl2 = await readJson(tlPath2);
+      const md2 = await readJson(matchPath2);
+      const pt2 = md2.info.participants.find((p) => p.puuid === normalized.playerContext?.puuid);
+      if (pt2 && tl2) {
+        if (!normalized.wardTimeline) normalized.wardTimeline = buildWardTimeline(tl2, pt2.participantId);
+        if (!normalized.itemTimeline) normalized.itemTimeline = buildItemTimeline(tl2, pt2.participantId);
+      }
+    } catch {}
+  }
+  if (!normalized.challengeStats) {
+    const matchPath3 = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    try {
+      const md3 = await readJson(matchPath3);
+      const pt3 = md3.info.participants.find((p) => p.puuid === normalized.playerContext?.puuid);
+      if (pt3?.challenges) {
+        const c = pt3.challenges;
+        normalized.challengeStats = {
+          damagePerMinute: c.damagePerMinute || 0, goldPerMinute: c.goldPerMinute || 0,
+          visionScorePerMinute: c.visionScorePerMinute || 0, killParticipation: c.killParticipation || 0,
+          teamDamagePercentage: c.teamDamagePercentage || 0, soloKills: c.soloKills || 0,
+          laneMinionsFirst10Minutes: c.laneMinionsFirst10Minutes || 0,
+          maxCsAdvantageOnLaneOpponent: c.maxCsAdvantageOnLaneOpponent || 0,
+          maxLevelLeadLaneOpponent: c.maxLevelLeadLaneOpponent || 0,
+          turretPlatesTaken: c.turretPlatesTaken || 0,
+          earlyLaningPhaseGoldExpAdvantage: c.earlyLaningPhaseGoldExpAdvantage || 0,
+          controlWardsPlaced: c.controlWardsPlaced || 0, skillshotsDodged: c.skillshotsDodged || 0,
+          outnumberedKills: c.outnumberedKills || 0,
+        };
+      }
+    } catch {}
+  }
 
   let comparison = null;
   const compPath = path.join(root, "data", "samples", sampleId, "comparison-result.json");
@@ -1748,10 +1877,48 @@ async function handleRecentMatches(req, res) {
       headers,
     );
 
-    const matchIds = await requestJson(
-      `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(account.puuid)}/ids?start=0&count=${matchCount}`,
-      headers,
-    );
+    // summoner + league + matchIds 병렬 호출
+    const platformHost = `${platformRegion.toLowerCase()}.api.riotgames.com`;
+    const [matchIds, summonerData, leagueData] = await Promise.all([
+      requestJson(
+        `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(account.puuid)}/ids?start=0&count=${matchCount}`,
+        headers,
+      ),
+      requestJson(
+        `https://${platformHost}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(account.puuid)}`,
+        headers,
+      ).catch(() => null),
+      null, // league-v4는 summonerId가 필요해서 아래에서 후속 호출
+    ]);
+
+    // league-v4: summonerId로 랭크 정보 조회
+    let ranked = null;
+    let rankedStatus = "unranked";
+    let rankedError = null;
+    if (summonerData?.id) {
+      try {
+        const entries = await requestJson(
+          `https://${platformHost}/lol/league/v4/entries/by-summoner/${encodeURIComponent(summonerData.id)}`,
+          headers,
+        );
+        const solo = entries.find((e) => e.queueType === "RANKED_SOLO_5x5");
+        if (solo) {
+          ranked = {
+            tier: solo.tier,
+            rank: solo.rank,
+            lp: solo.leaguePoints,
+            wins: solo.wins,
+            losses: solo.losses,
+            winRate: Math.round((solo.wins / Math.max(1, solo.wins + solo.losses)) * 100),
+          };
+          rankedStatus = "ok";
+        }
+      } catch (error) {
+        rankedStatus = "error";
+        rankedError = error?.message || "ranked lookup failed";
+      }
+    }
+
 
     const details = await Promise.all(
       matchIds.map((matchId) =>
@@ -1771,6 +1938,11 @@ async function handleRecentMatches(req, res) {
       puuid: account.puuid,
       platformRegion,
       matchCount,
+      summonerLevel: summonerData?.summonerLevel || null,
+      profileIconId: summonerData?.profileIconId || null,
+      ranked,
+      rankedStatus,
+      rankedError,
       matches,
     });
   } catch (error) {

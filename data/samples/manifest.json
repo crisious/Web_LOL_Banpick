@@ -1,6 +1,18 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8171663142",
+      "matchId": "KR_8171663142",
+      "label": "sample-kr-8171663142 · JUNGLE WIN",
+      "champion": "DrMundo",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-13",
+      "theme": "초반 3데스로 흔들렸지만 중반 이후 안정적인 합류와 구조물 압박으로 역전승을 이끌어낸 문도 정글 경기",
+      "normalizedPath": "/data/samples/sample-kr-8171663142/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8171663142/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8171663142/sample-kr-8171663142-notes.md"
+    },
+    {
       "id": "sample-kr-8048821726",
       "matchId": "KR_8048821726",
       "label": "sample-kr-8048821726 · SUPPORT WIN",
