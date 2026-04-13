@@ -1,0 +1,771 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-11T18:47:18.817Z",
+  "sampleId": "sample-kr-8065601119",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "analyzedAt": "2026-04-12",
+      "language": "ko",
+      "champion": "Braum",
+      "position": "SUPPORT",
+      "matchId": "KR_8065601119",
+      "result": "LOSS",
+      "durationLabel": "20:48",
+      "analysisId": "ai_sample-kr-8065601119_1775933238817",
+      "generatedAt": "2026-04-11T18:47:18.817Z"
+    },
+    "matchSummary": {
+      "headline": "초반 반복 데스로 주도권을 잃고, 오브젝트를 하나도 확보하지 못한 채 20분 만에 무너진 패배."
+    },
+    "coachSummary": {
+      "overallSummary": "브라움으로 시야 장악(51점)과 중반 합류 타이밍은 좋았으나, 초반 3데스가 바텀 레인 주도권을 완전히 넘겨주었습니다. 팀 전체가 드래곤 0개·타워 열세라는 수치가 보여주듯, 초반 불리를 만회할 오브젝트 세팅 기회를 만들지 못했습니다. 중반 교전 합류율이 올라간 점은 긍정적이므로, 다음 게임에서는 초반 생존에 집중하면 중반 이후 기여도를 더 높일 수 있습니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "1분 교전 데스로 시작해 리드를 잠깐 만들었지만(2:04 킬), 12분·14분 연속 데스로 레인 주도권을 완전히 상실했다. 팀 오브젝트도 7분·8분·13분 연달아 내주며 초반 격차가 벌어졌다.",
+        "kills": 1,
+        "deaths": 3,
+        "assists": 2
+      },
+      {
+        "phase": "MID",
+        "summary": "17~20분 구간에서 교전 후속 합류를 4회 성공시키며 킬 관여를 끌어올렸다. 그러나 19:45 핵심 교전 데스와 오브젝트 추가 실점으로 반격 모멘텀을 살리지 못했다.",
+        "kills": 0,
+        "deaths": 1,
+        "assists": 4
+      },
+      {
+        "phase": "LATE",
+        "summary": "경기가 20:48에 종료되어 후반 구간 진입 전 게임이 마무리되었다.",
+        "kills": 0,
+        "deaths": 0,
+        "assists": 0
+      }
+    ],
+    "strengths": [
+      {
+        "title": "높은 시야 점수",
+        "description": "20분 48초 경기에서 시야 점수 51을 기록했습니다. 분당 약 2.45점으로, 서포터로서 시야 확보 의무를 충실히 수행한 수치입니다.",
+        "relatedEventIds": []
+      },
+      {
+        "title": "중반 교전 합류 타이밍",
+        "description": "17:29~20:32 구간에서 4회 연속 교전 후속 합류에 성공하며, 중반 킬 관여 4어시스트를 올렸습니다. 불리한 상황에서도 팀 교전 기여를 놓지 않았습니다.",
+        "relatedEventIds": [
+          "evt_013",
+          "evt_014",
+          "evt_016",
+          "evt_018"
+        ]
+      },
+      {
+        "title": "초반 역공 킬 창출",
+        "description": "2:04에 직접 킬을 만들어 1분 데스 이후 흔들린 흐름을 즉시 되돌리려 시도했습니다. 수비적 챔피언임에도 공격 기회를 놓치지 않은 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "초반 반복 데스로 레인 주도권 상실",
+        "description": "1:02, 12:52, 14:10에 세 번 사망하며 바텀 레인 템포를 완전히 넘겨주었습니다. 특히 12~14분 2분 간격 연속 데스는 상대 바텀에게 큰 골드 격차를 허용했습니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_006",
+          "evt_010"
+        ]
+      },
+      {
+        "title": "오브젝트 세팅 실패에 대한 대응 부재",
+        "description": "팀이 드래곤 0개, 타워 2개에 그친 반면 상대는 드래곤 3개·타워 4개를 확보했습니다. 7:24, 13:16, 18:37 등 주요 오브젝트 실점 타이밍에 시야 선점이나 포지셔닝으로 경합 여건을 만들지 못했습니다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005",
+          "evt_007",
+          "evt_012",
+          "evt_015"
+        ]
+      },
+      {
+        "title": "중반 핵심 구도에서 데스",
+        "description": "19:45 교전에서 사망하며 반격 모멘텀이 끊겼습니다. 중요도 5로 평가된 이 데스 직후 팀이 최종적으로 무너졌기 때문에, 해당 교전에서의 진입 타이밍과 포지셔닝 재검토가 필요합니다.",
+        "relatedEventIds": [
+          "evt_017"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_01",
+        "text": "초반(1~5분) 교전 시 브라움 E(불굴의 의지)를 방어적으로 먼저 사용해 생존 우선 플레이하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_02",
+        "text": "드래곤 스폰 60초 전부터 하천 시야를 2개 이상 확보하고, 팀원에게 핑으로 오브젝트 세팅 알리기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_03",
+        "text": "레인에서 2데스 이상 발생 시 무리한 교전 대신 타워 밑 수비 운영으로 전환하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_04",
+        "text": "중반 교전 진입 전 아군 캐리 위치를 확인하고, 캐리와 같은 축선에서 교전 시작하기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_05",
+        "text": "데스 후 리스폰 시간 동안 미니맵을 읽고, 복귀 후 즉시 시야 갱신 루트 설정하기",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "1:02",
+        "title": "초반 선제 데스",
+        "description": "1분 교전에서 먼저 사망하며 레인 주도권을 넘겨주었습니다. 브라움의 패시브 스택을 쌓기 전에 교전이 끝난 점을 고려하면, 진입 타이밍이 너무 빨랐을 가능성이 있습니다.",
+        "phase": "EARLY",
+        "importance": 4
+      },
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "2:04",
+        "title": "역공 킬로 흐름 회복 시도",
+        "description": "직전 데스 1분 만에 킬을 만들어 골드 격차를 줄였습니다. 불리한 상황에서도 브라움 Q(겨울의 물결) 적중 후 패시브 연계를 성공시킨 좋은 판단이었습니다.",
+        "phase": "EARLY",
+        "importance": 4
+      },
+      {
+        "eventId": "evt_007",
+        "timestampLabel": "13:16",
+        "title": "핵심 오브젝트 실점",
+        "description": "중요도 5의 오브젝트를 상대에게 내주었습니다. 직전 12:52 데스로 인해 수적 열세 상태에서 오브젝트 경합이 불가능했던 연쇄 효과입니다.",
+        "phase": "EARLY",
+        "importance": 5
+      },
+      {
+        "eventId": "evt_017",
+        "timestampLabel": "19:45",
+        "title": "중반 결정적 데스",
+        "description": "19:28 교전 승리 직후 17초 만에 사망하며 얻은 이득을 지키지 못했습니다. 교전 승리 후 리셋 타이밍을 놓치고 추가 교전에 말려든 것으로 보입니다.",
+        "phase": "MID",
+        "importance": 5
+      },
+      {
+        "eventId": "evt_018",
+        "timestampLabel": "20:32",
+        "title": "마지막 합류 시도",
+        "description": "게임 종료 직전까지 교전 합류를 시도한 점은 포기하지 않는 태도를 보여줍니다. 다만 이미 격차가 벌어진 상태에서의 교전이라 결과를 뒤집기엔 부족했습니다.",
+        "phase": "MID",
+        "importance": 4
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "usedIn": [
+          "weaknesses[0]",
+          "keyMoments[0]"
+        ]
+      },
+      {
+        "eventId": "evt_002",
+        "usedIn": [
+          "strengths[2]",
+          "keyMoments[1]"
+        ]
+      },
+      {
+        "eventId": "evt_003",
+        "usedIn": [
+          "strengths[2]"
+        ]
+      },
+      {
+        "eventId": "evt_004",
+        "usedIn": [
+          "weaknesses[1]"
+        ]
+      },
+      {
+        "eventId": "evt_005",
+        "usedIn": [
+          "weaknesses[1]"
+        ]
+      },
+      {
+        "eventId": "evt_006",
+        "usedIn": [
+          "weaknesses[0]"
+        ]
+      },
+      {
+        "eventId": "evt_007",
+        "usedIn": [
+          "weaknesses[1]",
+          "keyMoments[2]"
+        ]
+      },
+      {
+        "eventId": "evt_010",
+        "usedIn": [
+          "weaknesses[0]"
+        ]
+      },
+      {
+        "eventId": "evt_012",
+        "usedIn": [
+          "weaknesses[1]"
+        ]
+      },
+      {
+        "eventId": "evt_013",
+        "usedIn": [
+          "strengths[1]"
+        ]
+      },
+      {
+        "eventId": "evt_014",
+        "usedIn": [
+          "strengths[1]"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "usedIn": [
+          "weaknesses[1]"
+        ]
+      },
+      {
+        "eventId": "evt_016",
+        "usedIn": [
+          "strengths[1]"
+        ]
+      },
+      {
+        "eventId": "evt_017",
+        "usedIn": [
+          "weaknesses[2]",
+          "keyMoments[3]"
+        ]
+      },
+      {
+        "eventId": "evt_018",
+        "usedIn": [
+          "strengths[1]",
+          "keyMoments[4]"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "matchId": "KR_8065601119",
+      "riotId": "핑거샷#KR1",
+      "participantId": 10,
+      "champion": "Braum",
+      "position": "SUPPORT",
+      "queueLabel": "RANKED_SOLO",
+      "result": "LOSS",
+      "durationLabel": "20:48",
+      "analysisFocus": [
+        "겉으로 좋아 보이는 비효율",
+        "반복 판단 오류",
+        "상위 티어에서 노출될 구조적 약점",
+        "상대 실수 의존 승리 요인 분리"
+      ]
+    },
+    "matchSummary": "초반 킬 관여와 높은 시야 점수는 있었지만, 브라움의 핵심 가치인 안정적인 선점과 오브젝트 전환이 무너지며 20분대에 패배한 경기다.",
+    "coachSummary": {
+      "overallFlow": "1:02 데스로 시작한 뒤 2:04 킬과 4:37 후속 합류로 흐름을 복구하는 듯했지만, 7:24, 8:34, 13:16 오브젝트 실패가 누적되며 팀의 운영 기반이 약해졌다. 12:52와 14:10 데스는 초반 복구 흐름을 다시 끊었고, 중반에는 17:29, 18:24, 19:28, 20:32에 킬 관여가 이어졌지만 18:37 오브젝트 실패와 19:45 핵심 데스 때문에 교전 성과가 승리 조건으로 전환되지 못했다.",
+      "redteamRead": "이 경기는 단순히 '시야 점수 51, 어시스트 6개라 서포터 역할을 했다'로 보면 위험하다. 실제 문제는 시야와 합류가 선제 설계가 아니라 이미 열린 싸움의 후속 처리에 가까웠다는 점이다. 상위 티어에서는 이런 패턴이 더 크게 벌어져, 상대가 오브젝트 타이밍에 먼저 자리를 잡고 브라움이 뒤늦게 몸으로 막으려다 데스를 내는 구조가 반복될 가능성이 높다.",
+      "criticalPattern": "좋은 장면은 있었지만 대부분 단독으로 게임 상태를 바꾸는 장면이 아니라 손실을 줄이는 장면에 가까웠다. 반대로 나쁜 장면은 오브젝트 실패와 개인 데스가 연결되어 팀 전체 템포를 잃게 만드는 장면이었다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반에는 1킬 2어시스트로 관여 자체는 있었지만, 3데스와 세 번의 오브젝트 실패가 더 크게 작용했다. 특히 1:02 선데스 이후 2:04 킬로 만회한 흐름은 좋아 보이나, 이후 7:24와 8:34에 운영 손실이 나고 12:52, 14:10 데스로 다시 끊기면서 안정적인 라인전 또는 강가 주도권으로 이어지지 못했다.",
+        "riskRead": "브라움은 초반에 한 번 밀리면 시야를 박으러 가는 동선 자체가 위험해지는 챔피언이다. 이 경기의 초반 패턴은 '싸움은 따라가지만, 다음 오브젝트 자리를 먼저 잡지 못하는' 형태로 보인다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_003",
+          "evt_004",
+          "evt_005",
+          "evt_006",
+          "evt_007",
+          "evt_010"
+        ]
+      },
+      "MID": {
+        "summary": "중반에는 4어시스트가 추가되며 교전 후속 합류는 살아 있었지만, 16:25와 18:37 오브젝트 실패가 계속 나왔고 19:45 데스가 핵심 구도를 무너뜨렸다. 19:28 교전 승리 직후 19:45에 죽은 흐름은 특히 위험하다. 이 패턴은 이득을 얻은 뒤 정리하거나 빠지는 기준이 불명확했을 가능성을 보여준다.",
+        "riskRead": "중반 성과가 '오브젝트 확보'가 아니라 '킬 관여 기록'으로만 남았다. 팀 드래곤 0, 상대 드래곤 3이라는 결과를 보면 중반의 교전 관여가 실제 승리 조건으로 연결되지 않았다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_013",
+          "evt_014",
+          "evt_015",
+          "evt_016",
+          "evt_017",
+          "evt_018"
+        ]
+      },
+      "LATE": {
+        "summary": "20:48에 종료되어 실질적인 후반 운영 구간은 없었다. 후반이 없었다는 점 자체가 문제다. 서포터 브라움이 중후반 한타에서 방패와 패시브로 가치를 낼 시간을 만들지 못했고, 그 전에 오브젝트와 포지션 손실이 누적되어 게임이 닫혔다.",
+        "riskRead": "후반 밸류를 논하기 전에 초중반 안정성과 오브젝트 전환 기준을 먼저 고쳐야 한다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "title": "교전 후속 합류 감각은 있었다",
+        "detail": "4:37, 17:29, 18:24, 20:32에 반복적으로 킬 관여를 만들었다. 완전히 끊긴 게임에서도 싸움이 열린 뒤 합류해 손실을 줄이는 능력은 확인된다. 다만 레드팀 관점에서는 이것이 선제 설계라기보다 후속 수습에 가까워 보이며, 상위 티어에서는 이 장점만으로는 오브젝트 손실을 막기 어렵다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_013",
+          "evt_014",
+          "evt_018"
+        ]
+      },
+      {
+        "title": "초반 불리함을 한 번은 복구했다",
+        "detail": "1:02에 먼저 죽은 뒤 2:04에 직접 킬을 만들며 초반 흐름을 되돌릴 기회는 만들었다. 초반 한 번의 실수를 그대로 무너뜨리지 않고 반격 장면을 만든 점은 긍정적이다. 그러나 이후 오브젝트 실패와 추가 데스로 연결됐기 때문에, 복구 이후의 다음 판단이 약했다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_004",
+          "evt_005",
+          "evt_006"
+        ]
+      },
+      {
+        "title": "시야 활동량 자체는 낮지 않았다",
+        "detail": "비전 스코어 51은 20:48 경기 시간 기준으로 활동량이 있었다는 신호다. 렌즈를 들고 시야 게임에 참여한 점도 확인된다. 하지만 팀 드래곤 0, 상대 드래곤 3, 오브젝트 실패 이벤트 반복을 보면 시야가 실제 선점과 싸움 회피 판단으로 전환되지 못했다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005",
+          "evt_007",
+          "evt_012",
+          "evt_015"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "오브젝트 전 60초 설계가 거의 작동하지 않았다",
+        "detail": "7:24, 8:34, 13:16, 16:25, 18:37에 오브젝트 또는 구조물 손실 흐름이 반복됐다. 단일 실수가 아니라 경기 전체에 걸친 구조적 문제다. 브라움은 먼저 자리를 잡았을 때 강한 챔피언인데, 이 경기에서는 이미 불리한 구도에 들어가거나 늦게 반응한 흔적이 더 크다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005",
+          "evt_007",
+          "evt_012",
+          "evt_015"
+        ]
+      },
+      {
+        "title": "데스 타이밍이 팀 템포를 직접 끊었다",
+        "detail": "1:02, 12:52, 14:10, 19:45 데스는 모두 흐름상 비용이 컸다. 특히 19:28 교전 승리 이후 19:45에 죽은 장면은 이득을 확정하지 못하고 다시 내주는 형태다. 브라움의 데스는 단순 개인 KDA 문제가 아니라, 다음 시야와 오브젝트 접근권을 잃게 만든다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_006",
+          "evt_010",
+          "evt_016",
+          "evt_017"
+        ]
+      },
+      {
+        "title": "킬 관여가 승리 조건으로 전환되지 않았다",
+        "detail": "1킬 6어시스트, 킬 관여율 41%는 표면적으로 무난해 보이지만 팀 전체 17킬 대비 영향력이 결정적이지 않았고, 팀 드래곤 0개와 포탑 2개에 그쳤다. 교전 참여는 있었지만 그 뒤 라인 정리, 시야 재장악, 드래곤 또는 포탑 전환으로 이어진 근거가 부족하다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_013",
+          "evt_014",
+          "evt_015",
+          "evt_016",
+          "evt_018"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "오브젝트 60초 전에는 새 시야를 박는 것이 아니라 이미 잡은 시야를 지키는 상태를 목표로 한다.",
+        "why": "이 경기의 반복 손실은 오브젝트가 뜬 뒤 반응하는 구도에서 발생한 것으로 보인다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005",
+          "evt_007",
+          "evt_012",
+          "evt_015"
+        ]
+      },
+      {
+        "item": "킬 관여 직후 5초 안에 '더 싸움', '오브젝트 전환', '즉시 이탈' 중 하나를 핑으로 확정한다.",
+        "why": "19:28 교전 승리 후 19:45 데스처럼 이득 이후 정리 기준이 흔들리면 이긴 싸움도 손해로 바뀐다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_017"
+        ]
+      },
+      {
+        "item": "브라움으로 먼저 맞는 진입과 아군 딜러 보호 진입을 구분한다.",
+        "why": "4데스 중 여러 번이 흐름을 끊는 타이밍에 발생했다. 브라움은 앞에 서야 하지만, 먼저 죽으면 방패와 패시브 가치가 사라진다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_006",
+          "evt_010",
+          "evt_017"
+        ]
+      },
+      {
+        "item": "시야 점수보다 '시야로 막은 손실'을 복기한다.",
+        "why": "비전 스코어 51에도 팀 드래곤 0, 상대 드래곤 3이었다. 다음 게임에서는 와드 개수보다 드래곤 전 강가 진입 차단 여부를 기준으로 본다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_007",
+          "evt_012",
+          "evt_015"
+        ]
+      },
+      {
+        "item": "초반 데스 후 복구 킬이 나오면 바로 라인과 강가 상태를 재설정한다.",
+        "why": "1:02 데스 후 2:04 킬로 복구했지만 이후 오브젝트 손실이 이어졌다. 복구 장면을 실제 주도권 회복으로 연결해야 한다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_004",
+          "evt_005"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "timestampLabel": "1:02",
+        "phase": "EARLY",
+        "title": "초반 선데스로 라인과 강가 안정성이 흔들림",
+        "summary": "경기 초반에 먼저 끊기며 브라움이 가장 필요한 초반 안정성을 잃었다.",
+        "redteamInterpretation": "단순 초반 사고가 아니라 이후 시야 진입과 오브젝트 준비를 어렵게 만드는 시작점이다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "timestampLabel": "2:04",
+        "phase": "EARLY",
+        "title": "복구 킬은 만들었지만 구조적 회복으로 이어지지 않음",
+        "summary": "직접 킬을 만들며 즉각적인 반격에는 성공했다.",
+        "redteamInterpretation": "좋은 장면이지만, 이후 오브젝트 실패가 이어졌기 때문에 이 킬은 게임 주도권 회복보다는 일시적 만회에 가까웠다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_004",
+          "evt_005"
+        ]
+      },
+      {
+        "timestampLabel": "7:24-8:34",
+        "phase": "EARLY",
+        "title": "초반 오브젝트 손실이 연속으로 발생",
+        "summary": "중요 오브젝트나 구조물을 상대에게 내주는 이벤트가 짧은 간격으로 반복됐다.",
+        "redteamInterpretation": "시야 또는 라인 주도권이 킬 관여와 별개로 작동하지 않았다는 신호다. 이 구간이 경기의 실제 방향을 상대 쪽으로 기울였을 가능성이 높다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005"
+        ]
+      },
+      {
+        "timestampLabel": "12:52-14:10",
+        "phase": "EARLY",
+        "title": "연속 데스로 초반 복구 여지가 사라짐",
+        "summary": "12:52와 14:10에 플레이어 데스가 이어졌고, 사이에 13:16 오브젝트 실패도 발생했다.",
+        "redteamInterpretation": "브라움이 버텨야 할 구간에서 먼저 사라지면 팀은 시야를 다시 잡을 몸이 없어진다. 이 구간은 개인 데스와 팀 운영 손실이 결합된 장면이다.",
+        "relatedEventIds": [
+          "evt_006",
+          "evt_007",
+          "evt_010"
+        ]
+      },
+      {
+        "timestampLabel": "17:29-18:37",
+        "phase": "MID",
+        "title": "중반 킬 관여가 오브젝트 전환으로 연결되지 않음",
+        "summary": "17:29와 18:24에 후속 합류로 킬 관여를 만들었지만 18:37에 다시 오브젝트 실패가 발생했다.",
+        "redteamInterpretation": "이 장면은 이 경기의 핵심 비효율이다. 싸움은 따라갔지만, 싸움 이후 가장 중요한 보상인 오브젝트를 가져오지 못했다.",
+        "relatedEventIds": [
+          "evt_013",
+          "evt_014",
+          "evt_015"
+        ]
+      },
+      {
+        "timestampLabel": "19:28-19:45",
+        "phase": "MID",
+        "title": "교전 승리 직후 핵심 데스로 이득이 닫히지 않음",
+        "summary": "19:28에 교전 승리 흐름이 있었지만 19:45에 중반 핵심 구도에서 데스를 내줬다.",
+        "redteamInterpretation": "상대 실수나 난전으로 얻은 이득을 안정적으로 확정하지 못한 장면이다. 상위 티어에서는 이런 후퇴 기준 부족이 바로 역전 각으로 처벌된다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_017"
+        ]
+      }
+    ],
+    "evidenceIndex": {
+      "eventIdsUsed": [
+        "evt_001",
+        "evt_002",
+        "evt_003",
+        "evt_004",
+        "evt_005",
+        "evt_006",
+        "evt_007",
+        "evt_010",
+        "evt_012",
+        "evt_013",
+        "evt_014",
+        "evt_015",
+        "evt_016",
+        "evt_017",
+        "evt_018"
+      ],
+      "events": [
+        {
+          "eventId": "evt_001",
+          "timestampLabel": "1:02",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "usedFor": [
+            "초반 안정성 문제",
+            "데스 타이밍 리스크"
+          ]
+        },
+        {
+          "eventId": "evt_002",
+          "timestampLabel": "2:04",
+          "phase": "EARLY",
+          "eventType": "CHAMPION_KILL",
+          "importance": 4,
+          "usedFor": [
+            "초반 복구 능력",
+            "일시적 반격"
+          ]
+        },
+        {
+          "eventId": "evt_003",
+          "timestampLabel": "4:37",
+          "phase": "EARLY",
+          "eventType": "TEAMFIGHT_FOLLOWUP",
+          "importance": 3,
+          "usedFor": [
+            "후속 합류 장점"
+          ]
+        },
+        {
+          "eventId": "evt_004",
+          "timestampLabel": "7:24",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "오브젝트 설계 실패",
+            "시야 전환 실패"
+          ]
+        },
+        {
+          "eventId": "evt_005",
+          "timestampLabel": "8:34",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 4,
+          "usedFor": [
+            "오브젝트 손실 반복"
+          ]
+        },
+        {
+          "eventId": "evt_006",
+          "timestampLabel": "12:52",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "usedFor": [
+            "초반 복구 실패",
+            "포지셔닝 리스크"
+          ]
+        },
+        {
+          "eventId": "evt_007",
+          "timestampLabel": "13:16",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "개인 데스와 팀 손실 연결"
+          ]
+        },
+        {
+          "eventId": "evt_010",
+          "timestampLabel": "14:10",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "usedFor": [
+            "연속 데스 리스크"
+          ]
+        },
+        {
+          "eventId": "evt_012",
+          "timestampLabel": "16:25",
+          "phase": "MID",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 4,
+          "usedFor": [
+            "중반 오브젝트 통제 문제"
+          ]
+        },
+        {
+          "eventId": "evt_013",
+          "timestampLabel": "17:29",
+          "phase": "MID",
+          "eventType": "TEAMFIGHT_FOLLOWUP",
+          "importance": 4,
+          "usedFor": [
+            "후속 합류",
+            "킬 관여"
+          ]
+        },
+        {
+          "eventId": "evt_014",
+          "timestampLabel": "18:24",
+          "phase": "MID",
+          "eventType": "TEAMFIGHT_FOLLOWUP",
+          "importance": 4,
+          "usedFor": [
+            "후속 합류",
+            "킬 관여"
+          ]
+        },
+        {
+          "eventId": "evt_015",
+          "timestampLabel": "18:37",
+          "phase": "MID",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "킬 관여 후 전환 실패",
+            "중반 핵심 손실"
+          ]
+        },
+        {
+          "eventId": "evt_016",
+          "timestampLabel": "19:28",
+          "phase": "MID",
+          "eventType": "SKIRMISH_WIN",
+          "importance": 4,
+          "usedFor": [
+            "교전 성과",
+            "이득 후 판단 기준"
+          ]
+        },
+        {
+          "eventId": "evt_017",
+          "timestampLabel": "19:45",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "이득 직후 손실",
+            "중반 핵심 데스"
+          ]
+        },
+        {
+          "eventId": "evt_018",
+          "timestampLabel": "20:32",
+          "phase": "MID",
+          "eventType": "TEAMFIGHT_FOLLOWUP",
+          "importance": 4,
+          "usedFor": [
+            "마지막 후속 합류",
+            "킬 관여가 승리 조건으로 전환되지 못함"
+          ]
+        }
+      ],
+      "statEvidence": {
+        "kda": 1.75,
+        "killsDeathsAssists": "1/4/6",
+        "visionScore": 51,
+        "killParticipation": 0.41,
+        "teamDragons": 0,
+        "enemyDragons": 3,
+        "teamTowers": 2,
+        "enemyTowers": 4,
+        "phaseDeaths": {
+          "early": 3,
+          "mid": 1,
+          "late": 0
+        },
+        "derivedSignalsUsed": [
+          "hasMidGameThrowRisk",
+          "hasObjectiveControlIssues",
+          "hasPositioningRisk",
+          "weak_early_stability",
+          "poor_post_objective_survivability"
+        ]
+      }
+    }
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "높은 시야 점수",
+        "claudeNote": "20분 48초 경기에서 시야 점수 51을 기록했습니다. 분당 약 2.45점으로, 서포터로서 시야 확보 의무를 충실히 수행한 수치입니다."
+      },
+      {
+        "category": "strength",
+        "topic": "중반 교전 합류 타이밍",
+        "claudeNote": "17:29~20:32 구간에서 4회 연속 교전 후속 합류에 성공하며, 중반 킬 관여 4어시스트를 올렸습니다. 불리한 상황에서도 팀 교전 기여를 놓지 않았습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "초반 역공 킬 창출",
+        "claudeNote": "2:04에 직접 킬을 만들어 1분 데스 이후 흔들린 흐름을 즉시 되돌리려 시도했습니다. 수비적 챔피언임에도 공격 기회를 놓치지 않은 판단이 좋았습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 세팅 실패에 대한 대응 부재",
+        "claudeNote": "팀이 드래곤 0개, 타워 2개에 그친 반면 상대는 드래곤 3개·타워 4개를 확보했습니다. 7:24, 13:16, 18:37 등 주요 오브젝트 실점 타이밍에 시야 선점이나 포지셔닝으로 경합 여건을 만들지 못했습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 핵심 구도에서 데스",
+        "claudeNote": "19:45 교전에서 사망하며 반격 모멘텀이 끊겼습니다. 중요도 5로 평가된 이 데스 직후 팀이 최종적으로 무너졌기 때문에, 해당 교전에서의 진입 타이밍과 포지셔닝 재검토가 필요합니다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "weakness",
+        "topic": "초반 반복 데스로 레인 주도권 상실",
+        "note": "1:02, 12:52, 14:10에 세 번 사망하며 바텀 레인 템포를 완전히 넘겨주었습니다. 특히 12~14분 2분 간격 연속 데스는 상대 바텀에게 큰 골드 격차를 허용했습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "weakness",
+        "topic": "킬 관여가 승리 조건으로 전환되지 않았다"
+      }
+    ],
+    "agreementRate": 83
+  }
+}

@@ -48,6 +48,8 @@ const dom = {
   scorePanel: document.querySelector("[data-score-panel]"),
   objectiveSummary: document.querySelector("[data-objective-summary]"),
   objectiveTable: document.querySelector("[data-objective-table]"),
+  kdaChart: document.querySelector("[data-kda-chart]"),
+  kdaEvents: document.querySelector("[data-kda-events]"),
 };
 
 const state = {
@@ -908,8 +910,8 @@ function renderChecklist(sample) {
         <li class="checklist-item">
           <div class="checklist-priority">${priorityToken(item.priority)}</div>
           <div>
-            <strong>${item.action || item.label}</strong>
-            ${item.reason ? `<p>${item.reason}</p>` : ""}
+            <strong>${item.action || item.text || item.label || ""}</strong>
+            ${item.reason || item.description ? `<p>${item.reason || item.description}</p>` : ""}
           </div>
         </li>
       `,
@@ -939,23 +941,36 @@ function renderKeyMoments(sample) {
 
 function renderEvidence(sample) {
   const timelineMap = evidenceMap(sample);
-  const evidenceEntries = Array.isArray(sample.analysis.evidenceIndex)
-    ? sample.analysis.evidenceIndex
-    : (sample.analysis.evidenceIndex?.highImportanceEvents || sample.analysis.evidenceIndex?.playerInvolvedEvents || [])
-        .map((eventId) => timelineMap.get(eventId))
-        .filter(Boolean);
+  const idx = sample.analysis?.evidenceIndex;
+
+  let evidenceEntries;
+  if (Array.isArray(idx)) {
+    // rule-based: 이미 완전한 객체 배열
+    evidenceEntries = idx;
+  } else {
+    // AI: { eventIds: [...] } 또는 { highImportanceEvents: [...] } 등 다양한 형식
+    const ids = idx?.eventIds || idx?.highImportanceEvents || idx?.playerInvolvedEvents || [];
+    evidenceEntries = (Array.isArray(ids) ? ids : [])
+      .map((eventId) => timelineMap.get(eventId))
+      .filter(Boolean);
+  }
+
+  if (evidenceEntries.length === 0) {
+    dom.evidence.innerHTML = '<p class="muted">근거 이벤트 데이터가 없습니다.</p>';
+    return;
+  }
 
   dom.evidence.innerHTML = evidenceEntries
     .map(
       (entry) => `
         <article class="evidence-item">
           <div class="evidence-stamp">
-            <span>${entry.timestamp}</span>
-            <strong>${entry.eventType}</strong>
+            <span>${entry.timestamp || entry.timestampLabel || "—"}</span>
+            <strong>${entry.eventType || "—"}</strong>
           </div>
           <div class="evidence-copy">
-            <p>${entry.summary}</p>
-            <span>${entry.statNote}</span>
+            <p>${entry.summary || ""}</p>
+            <span>${entry.statNote || entry.laneHint || ""}</span>
           </div>
         </article>
       `,
@@ -1065,6 +1080,56 @@ function renderObjectiveTimeline(sample) {
       <tbody>${rows}</tbody>
     </table>
   `;
+}
+
+function renderKdaTimeline(sample) {
+  const points = sample.normalized?.kdaTimeline;
+  if (!points || points.length <= 1) {
+    dom.kdaChart.innerHTML = "";
+    dom.kdaEvents.innerHTML = '<p class="muted">KDA 타임라인 데이터가 없습니다.</p>';
+    return;
+  }
+
+  // KDA 수치 바 차트 (SVG)
+  const maxKda = Math.max(...points.map((p) => p.kda), 1);
+  const barWidth = Math.max(28, Math.floor(600 / points.length));
+  const svgW = barWidth * points.length + 20;
+  const svgH = 120;
+
+  const bars = points.map((p, i) => {
+    const h = Math.round((p.kda / maxKda) * (svgH - 30));
+    const x = i * barWidth + 10;
+    const color = p.eventType === "PLAYER_DEATH" ? "var(--rose)" : p.eventType === "CHAMPION_KILL" ? "var(--mint)" : "var(--accent)";
+    return `<rect x="${x}" y="${svgH - h - 20}" width="${barWidth - 4}" height="${h}" rx="3" fill="${color}" opacity="0.7"/>
+      <text x="${x + (barWidth - 4) / 2}" y="${svgH - h - 24}" text-anchor="middle" fill="var(--text)" font-size="10">${p.kda}</text>
+      <text x="${x + (barWidth - 4) / 2}" y="${svgH - 6}" text-anchor="middle" fill="var(--muted)" font-size="9">${p.timeLabel}</text>`;
+  }).join("");
+
+  dom.kdaChart.innerHTML = `
+    <div class="kda-chart-scroll">
+      <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}">${bars}</svg>
+    </div>
+  `;
+
+  // KDA 변화 이벤트 리스트
+  const eventTypeLabel = {
+    PLAYER_DEATH: "데스",
+    CHAMPION_KILL: "킬",
+    TEAMFIGHT_FOLLOWUP: "어시스트",
+    SKIRMISH_WIN: "어시스트",
+  };
+
+  dom.kdaEvents.innerHTML = points.slice(1).map((p) => {
+    const typeClass = p.eventType === "PLAYER_DEATH" ? "kda-evt--death" : "kda-evt--kill";
+    return `
+      <div class="kda-evt ${typeClass}">
+        <span class="kda-evt-time">${p.timeLabel}</span>
+        <span class="kda-evt-type">${eventTypeLabel[p.eventType] || p.eventType}</span>
+        <span class="kda-evt-kda">${p.kills}/${p.deaths}/${p.assists} (${p.kda})</span>
+        <span class="kda-evt-desc">${p.event}</span>
+      </div>
+    `;
+  }).join("");
 }
 
 function renderComparison(sample) {
@@ -1179,6 +1244,7 @@ function renderSample(sample) {
   renderComparison(sample);
   renderPlaytimeScore(sample);
   renderObjectiveTimeline(sample);
+  renderKdaTimeline(sample);
   renderSampleSwitcher();
 }
 
@@ -1487,9 +1553,8 @@ function updateCardBadge(matchId, text, cssClass) {
 
 async function prefetchAndAnalyzeAll() {
   state.prefetchedSamples = new Map();
-  const unanalyzed = [];
 
-  // Phase 1: 기존 샘플 프리페치
+  // 저장된 샘플만 프리페치
   for (const match of state.recentMatches) {
     const sampleId = findSampleIdForMatch(match.matchId);
     if (sampleId) {
@@ -1498,58 +1563,6 @@ async function prefetchAndAnalyzeAll() {
         state.prefetchedSamples.set(match.matchId, bundle);
         updateCardBadge(match.matchId, "분석 완료", "badge--done");
       } catch {}
-    } else {
-      unanalyzed.push(match.matchId);
-    }
-  }
-
-  // Phase 2: 미분석 매치 순차 백그라운드 생성 (rate limit 60초 간격)
-  if (unanalyzed.length === 0 || !state.account) return;
-
-  for (const matchId of unanalyzed) {
-    // 뷰가 바뀌었으면 중단
-    if (state.view !== "MATCH_LIST") return;
-    // 다른 generate가 진행 중이면 대기
-    while (state.isGeneratePending) {
-      await new Promise((r) => setTimeout(r, 2000));
-    }
-
-    updateCardBadge(matchId, "분석 중...", "badge--pending");
-
-    try {
-      state.isGeneratePending = true;
-      const result = await fetchJson("/api/generate-sample", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          gameName: state.account.gameName,
-          tagLine: state.account.tagLine,
-          platformRegion: state.account.platformRegion,
-          matchId,
-          publicAlias: `${state.account.gameName}#${state.account.tagLine}`,
-          ...(getUserApiKey() ? { riotApiKey: getUserApiKey() } : {}),
-        }),
-      });
-      state.isGeneratePending = false;
-
-      // manifest 새로고침
-      try { state.manifest = (await fetchJson("/api/samples")).samples; } catch {}
-
-      // 프리페치 캐시에 추가
-      const sampleId = result.sampleId;
-      if (sampleId) {
-        try {
-          const bundle = await loadSampleBundle(sampleId);
-          state.prefetchedSamples.set(matchId, bundle);
-        } catch {}
-      }
-
-      updateCardBadge(matchId, "분석 완료", "badge--done");
-    } catch (err) {
-      state.isGeneratePending = false;
-      updateCardBadge(matchId, "분석 실패", "badge--fail");
-      // rate limit 대기 (서버 60초 제한)
-      await new Promise((r) => setTimeout(r, 65000));
     }
   }
 }
@@ -1568,7 +1581,10 @@ async function startDetailAnalysis(matchId) {
     // 1. 프리페치 캐시 확인 (즉시 렌더)
     const prefetched = state.prefetchedSamples?.get(matchId);
     if (prefetched) {
+      const match = sampleMatchSummary(prefetched);
+      state.currentSampleId = prefetched.sampleId || findSampleIdForMatch(matchId) || state.currentSampleId;
       renderSample(prefetched);
+      dom.fetchStatus.textContent = `${state.currentSampleId || matchId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
       setView("DETAIL_VIEW");
       return;
     }
@@ -1583,42 +1599,9 @@ async function startDetailAnalysis(matchId) {
       return;
     }
 
-    // 3. 백그라운드 생성이 진행 중인 경우 → 완료 대기
-    if (state.isGeneratePending) {
-      dom.fetchStatus.textContent = `${matchId} 백그라운드 분석 진행 중... 완료되면 자동으로 표시됩니다.`;
-      // 백그라운드 큐가 해당 매치를 완료할 때까지 폴링
-      while (state.isGeneratePending || !state.prefetchedSamples?.has(matchId)) {
-        await new Promise((r) => setTimeout(r, 3000));
-        // 프리페치에 올라왔는지 체크
-        if (state.prefetchedSamples?.has(matchId)) break;
-        // manifest에 올라왔는지 체크
-        try { state.manifest = (await fetchJson("/api/samples")).samples; } catch {}
-        const newSampleId = findSampleIdForMatch(matchId);
-        if (newSampleId) {
-          await selectSample(newSampleId);
-          setView("DETAIL_VIEW");
-          return;
-        }
-        dom.fetchStatus.textContent = `${matchId} 분석 중... 잠시만 기다려 주세요.`;
-      }
-      // 프리페치 완료됨
-      const bundle = state.prefetchedSamples.get(matchId);
-      if (bundle) {
-        renderSample(bundle);
-        setView("DETAIL_VIEW");
-        return;
-      }
-    }
-
-    // 4. 직접 생성
+    // 3. 직접 생성
     dom.fetchStatus.textContent = `${matchId} AI 분석 진행 중... (2~5분 소요)`;
-    let result;
-    try {
-      result = await handleGenerateSample(matchId);
-    } catch (err) {
-      dom.fetchStatus.textContent = "분석 재시도 중...";
-      result = await handleGenerateSample(matchId);
-    }
+    const result = await handleGenerateSample(matchId);
     await selectSample(result.sampleId);
     setView("DETAIL_VIEW");
   } catch (error) {

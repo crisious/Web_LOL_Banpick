@@ -608,6 +608,7 @@ function buildNormalized(account, matchDetail, timeline, options) {
   const participantTeamMap = new Map();
   matchDetail.info.participants.forEach((p) => participantTeamMap.set(p.participantId, p.teamId));
   normalized.objectiveTimeline = buildObjectiveTimeline(timeline, participant.teamId, participantTeamMap);
+  normalized.kdaTimeline = buildKdaTimeline(normalized);
 
   return normalized;
 }
@@ -1000,6 +1001,50 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
     });
   });
   return events.sort((a, b) => a.time - b.time);
+}
+
+// ─── KDA Timeline ─────────────────────────────────────────────────────────
+
+function buildKdaTimeline(normalized) {
+  const events = normalized.timelineEvents || [];
+  let kills = 0;
+  let deaths = 0;
+  let assists = 0;
+
+  const points = [{ time: 0, timeLabel: "0:00", phase: "EARLY", kills, deaths, assists, kda: 0, event: "게임 시작" }];
+
+  for (const evt of events) {
+    if (!evt.isPlayerInvolved) continue;
+
+    let changed = false;
+    if (evt.eventType === "PLAYER_DEATH") {
+      deaths++;
+      changed = true;
+    } else if (evt.eventType === "CHAMPION_KILL") {
+      kills++;
+      changed = true;
+    } else if (evt.eventType === "TEAMFIGHT_FOLLOWUP" || evt.eventType === "SKIRMISH_WIN") {
+      assists++;
+      changed = true;
+    }
+
+    if (changed) {
+      const kda = +((kills + assists) / Math.max(1, deaths)).toFixed(2);
+      points.push({
+        time: evt.timestampMs,
+        timeLabel: evt.timestampLabel,
+        phase: evt.phase,
+        kills,
+        deaths,
+        assists,
+        kda,
+        event: evt.summary || evt.eventType,
+        eventType: evt.eventType,
+      });
+    }
+  }
+
+  return points;
 }
 
 function labelForMoment(event) {
@@ -1567,6 +1612,9 @@ async function loadSampleBundle(sampleId) {
         normalized.objectiveTimeline = buildObjectiveTimeline(timeline, participant.teamId, ptMap);
       }
     } catch {}
+  }
+  if (!normalized.kdaTimeline && normalized.timelineEvents) {
+    normalized.kdaTimeline = buildKdaTimeline(normalized);
   }
 
   let comparison = null;

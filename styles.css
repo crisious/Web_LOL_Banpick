@@ -1167,6 +1167,71 @@ body::after {
   border-bottom: 1px solid var(--accent);
 }
 
+/* ─── KDA Timeline ────────────────────────────────────────────────────────── */
+
+.kda-chart-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
+  padding-bottom: 4px;
+}
+
+.kda-chart-scroll svg {
+  display: block;
+}
+
+.kda-timeline-events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kda-evt {
+  display: grid;
+  grid-template-columns: 50px 60px 100px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  border-left: 3px solid var(--line);
+}
+
+.kda-evt--death {
+  background: rgba(255, 134, 120, 0.06);
+  border-left-color: var(--rose);
+}
+
+.kda-evt--kill {
+  background: rgba(89, 209, 178, 0.06);
+  border-left-color: var(--mint);
+}
+
+.kda-evt-time {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.kda-evt-type {
+  font-weight: 700;
+}
+
+.kda-evt--death .kda-evt-type { color: var(--rose); }
+.kda-evt--kill .kda-evt-type { color: var(--mint); }
+
+.kda-evt-kda {
+  font-family: monospace;
+  color: var(--text);
+}
+
+.kda-evt-desc {
+  color: var(--muted);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ─── View state machine ──────────────────────────────────────────────────── */
 
 [data-view="LOGGED_OUT"] .app-shell { display: none; }
@@ -1755,6 +1820,11 @@ body::after {
   .objective-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .obj-table { min-width: 520px; }
   .obj-table th, .obj-table td { padding: 8px 6px; }
+
+  .kda-evt {
+    grid-template-columns: 45px 50px 80px 1fr;
+    font-size: 0.78rem;
+  }
 
   .workspace-grid {
     display: flex;

@@ -1,6 +1,42 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8048821726",
+      "matchId": "KR_8048821726",
+      "label": "sample-kr-8048821726 · SUPPORT WIN",
+      "champion": "Lulu",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-13",
+      "theme": "초반 적극적인 교전 합류로 팀 킬을 주도했지만, 두 번의 데스가 아쉬운 15분 룰루 서포터 승리",
+      "normalizedPath": "/data/samples/sample-kr-8048821726/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8048821726/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8048821726/sample-kr-8048821726-notes.md"
+    },
+    {
+      "id": "sample-kr-8065601119",
+      "matchId": "KR_8065601119",
+      "label": "sample-kr-8065601119 · SUPPORT LOSS",
+      "champion": "Braum",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "초반 반복 데스로 주도권을 잃고, 오브젝트를 하나도 확보하지 못한 채 20분 만에 무너진 패배.",
+      "normalizedPath": "/data/samples/sample-kr-8065601119/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8065601119/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8065601119/sample-kr-8065601119-notes.md"
+    },
+    {
+      "id": "sample-kr-8097520888",
+      "matchId": "KR_8097520888",
+      "label": "sample-kr-8097520888 · SUPPORT LOSS",
+      "champion": "Braum",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-11",
+      "theme": "5분 37초 만에 종료된 초단기 패배 경기로, 브라움이 킬 관여 100%를 기록했으나 초반 교전 사망 이후 팀 전체의 템포가 무너졌다.",
+      "normalizedPath": "/data/samples/sample-kr-8097520888/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8097520888/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8097520888/sample-kr-8097520888-notes.md"
+    },
+    {
       "id": "sample-kr-8164577567",
       "matchId": "KR_8164577567",
       "label": "sample-kr-8164577567 · SUPPORT LOSS",

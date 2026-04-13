@@ -8,8 +8,11 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 - 저장된 샘플 경기 목록 조회
 - 샘플별 분석 대시보드 렌더링
 - 저장 샘플 기준 플레이어 추세 요약
-- Riot ID 입력 후 최근 경기 후보 조회
-- 후보 경기 1건을 클릭해서 새 샘플 생성
+- Riot ID 입력 후 최근 10경기 조회
+- 저장된 경기면 즉시 상세 분석 열기
+- 저장되지 않은 경기만 클릭 시 새 샘플 생성
+- 로그인/최근 경기 조회 중복 제출 방지
+- `recent-matches` 실패 시 기존 상세 화면 유지
 - 챔피언 배지 UI 렌더링
   - 작은 카드: Data Dragon 최신 버전 기반 `square icon` 우선 사용
   - 큰 스냅샷: `loading art` 기반 대표 이미지 사용
@@ -32,7 +35,7 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 - 다음 경기 체크리스트
 - 핵심 장면과 근거 이벤트
 
-### 2. 최근 경기 불러오기
+### 2. 로그인 후 최근 경기 불러오기
 
 입력값:
 
@@ -47,7 +50,16 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 3. 각 Match 상세 조회
 4. UI에 챔피언/포지션/결과 중심의 샘플 후보 카드 표시
 
-후보 카드를 클릭하면 해당 경기의 상세 + Timeline을 다시 가져와 새 샘플을 생성합니다.
+로그인 직후에는 최근 10경기 카드가 렌더링됩니다.
+
+- `이미 저장된 경기`: `generate-sample` 없이 바로 상세 화면 진입
+- `저장되지 않은 경기`: 클릭 시 해당 경기의 상세 + Timeline을 다시 가져와 새 샘플 생성 후 상세 화면 진입
+
+### 3. 상세 화면에서 최근 경기 다시 불러오기
+
+- 상세 화면 상태에서도 `최근 경기 불러오기`를 다시 실행할 수 있습니다.
+- 이때 `429`나 조회 실패가 나더라도 현재 열려 있는 상세 화면은 유지됩니다.
+- 오류는 상태 문구에만 표시되고, 이전 샘플 데이터는 사라지지 않습니다.
 
 ## 주요 파일
 
@@ -65,6 +77,7 @@ MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline
 ├── decision-replay-processing.md
 ├── plan-riot-api-sample-data.md
 ├── normalized-match-schema.md
+├── sample-data-cleanup-plan.md
 └── sample-data-ops-runbook.md
 ```
 
@@ -99,6 +112,12 @@ node server.js
 - `tagLine`: `KR1`
 - `platformRegion`: `KR`
 
+보조 QA 계정 예시:
+
+- `gameName`: `핑거샷`
+- `tagLine`: `KR1`
+- `platformRegion`: `KR`
+
 ## API 동작 메모
 
 - `KR`, `JP1` 계정의 match/account 조회는 `asia.api.riotgames.com` 클러스터를 사용
@@ -124,17 +143,31 @@ data/samples/sample-<match-id>/
 - `riot-api-call-spec.md`: 호출 순서와 요청 스펙
 - `normalized-match-schema.md`: 분석 입력 스키마
 - `normalization-mapping-rules.md`: Match/Timeline -> 정규화 규칙
+- `sample-data-cleanup-plan.md`: 보존 샘플 / QA 생성 샘플 정리 기준
 - `sample-data-ops-runbook.md`: 샘플 생성 운영 절차
 - `research-materials-lol-replay.md`: 관련 연구 자료, 우선순위, 실행 체크리스트
 
 ## 현재 샘플 상태
 
-- 현재 저장된 샘플 수: `3`
+- 현재 저장된 샘플 수: `15`
 - 기본 샘플:
   - `sample-001` / `Nasus MID LOSS`
   - `sample-002` / `Dr. Mundo JUNGLE WIN`
-- 라이브 생성 검증 샘플:
-  - `sample-kr-8166637996` / `Dr. Mundo JUNGLE WIN`
+- 메인 계정 기준 샘플:
+  - `sample-kr-8164563430`
+  - `sample-kr-8164577567`
+  - `sample-kr-8164613865`
+  - `sample-kr-8166489844`
+  - `sample-kr-8166519650`
+  - `sample-kr-8166546648`
+  - `sample-kr-8166575303`
+  - `sample-kr-8166601659`
+  - `sample-kr-8166637996`
+  - `sample-kr-8166674448`
+- 보조 계정 보존 샘플:
+  - `sample-kr-8048821726`
+  - `sample-kr-8065601119`
+  - `sample-kr-8097520888`
 
 ## UI 메모
 
@@ -151,6 +184,11 @@ data/samples/sample-<match-id>/
 - `KR_8166637996` 기준 `/api/generate-sample` 실데이터 샘플 생성 확인
 - 생성 결과가 `data/samples/manifest.json` 및 새 샘플 폴더에 정상 반영되는 것 확인
 - Headless Chrome으로 데스크톱/모바일 화면 캡처 후 레이아웃 밀도 조정 완료
+- `2026-04-13` 기준 저장된 경기 즉시 상세 진입 확인
+- `2026-04-13` 기준 미저장 경기 `generate-sample 1회 -> sample load -> DETAIL_VIEW` 흐름 확인
+- `2026-04-13` 기준 로그인 더블클릭 시 중복 요청 방지 확인
+- `2026-04-13` 기준 상세 화면에서 `recent-matches`가 `429`로 실패해도 기존 상세 유지 확인
+- `2026-04-13` 기준 QA 생성 샘플 정리 후 라이브러리 반영 확인
 
 ## 보안 주의
 

@@ -1,0 +1,304 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "matchId": "KR_8048821726",
+    "analysisTimestamp": "2026-04-13T00:00:00Z",
+    "language": "ko",
+    "analysisMode": "coaching",
+    "analysisId": "ai_sample-kr-8048821726_1776043883625",
+    "generatedAt": "2026-04-13T01:31:23.625Z"
+  },
+  "matchSummary": {
+    "headline": "초반 적극적인 교전 합류로 팀 킬을 주도했지만, 두 번의 데스가 아쉬운 15분 룰루 서포터 승리"
+  },
+  "coachSummary": {
+    "overallSummary": "15분이라는 짧은 경기에서 룰루로 2/2/7(KDA 4.5)을 기록하며 승리했습니다. 초반부터 교전에 꾸준히 합류해 킬 관여율 43%를 만들었고, 시야 점수 20으로 짧은 경기 대비 준수한 시야 기여를 보여줬습니다. 다만 6분대와 9분대에 킬을 따낸 직후 곧바로 역으로 잡히는 패턴이 반복되었는데, 교전 이후 퇴각 타이밍을 개선하면 같은 기여도에서 데스를 줄여 더 큰 이득을 챙길 수 있습니다. 오브젝트 관리 면에서 드래곤은 1개 확보했으나 14분대에 연속으로 구조물을 내준 장면이 있어 오브젝트 우선순위 판단도 다음 과제입니다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "phaseLabel": "EARLY",
+      "timeRange": "0:00 ~ 14:59",
+      "summary": "교전 참여도가 매우 높았던 구간입니다. 5분 50초부터 교전에 적극 합류해 2킬 7어시스트를 모두 이 구간에서 만들어냈습니다. 그러나 6:27과 9:30에 킬을 딴 직후 역킬을 허용하며 교환 손익이 줄었습니다. 12분대 연속 소규모 교전 승리로 팀 주도권을 확보했지만, 14분대에 오브젝트를 연달아 내주며 마무리가 아쉬웠습니다.",
+      "keyStats": {
+        "kills": 2,
+        "deaths": 2,
+        "assists": 7
+      }
+    },
+    {
+      "phase": "MID",
+      "phaseLabel": "MID",
+      "timeRange": "15:00 ~",
+      "summary": "15분 06초 타워를 확보하며 경기가 마무리되었습니다. 추가 교전 없이 구조물 압박으로 승리를 확정지은 깔끔한 마무리였습니다.",
+      "keyStats": {
+        "kills": 0,
+        "deaths": 0,
+        "assists": 0
+      }
+    },
+    {
+      "phase": "LATE",
+      "phaseLabel": "LATE",
+      "timeRange": "해당 없음",
+      "summary": "경기가 15분 14초에 종료되어 후반 구간은 발생하지 않았습니다.",
+      "keyStats": {
+        "kills": 0,
+        "deaths": 0,
+        "assists": 0
+      }
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_01",
+      "title": "꾸준한 교전 합류와 킬 관여",
+      "description": "초반부터 소규모 교전과 팀파이트에 빠짐없이 합류해 7어시스트를 기록했습니다. 룰루의 실드·폴리모프를 활용한 후속 합류 타이밍이 좋아 팀 킬 21개 중 9개(43%)에 관여했습니다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_004",
+        "evt_008",
+        "evt_009",
+        "evt_010",
+        "evt_011",
+        "evt_012"
+      ]
+    },
+    {
+      "id": "str_02",
+      "title": "교전에서 직접 킬 창출 능력",
+      "description": "6:20과 9:26에 직접 킬을 따내며 서포터임에도 공격적인 기여를 보여줬습니다. 상대의 약한 순간을 포착해 마무리 데미지를 넣는 판단이 좋았습니다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_005"
+      ]
+    },
+    {
+      "id": "str_03",
+      "title": "짧은 경기 대비 준수한 시야 점수",
+      "description": "15분 경기에서 시야 점수 20을 기록했습니다. 분당 약 1.3의 시야 점수로, 교전이 잦은 상황에서도 와드 관리를 병행한 점이 인상적입니다. 오라클 렌즈(3364) 전환도 적절했습니다.",
+      "relatedEventIds": [
+        "evt_007",
+        "evt_004"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "weak_01",
+      "title": "킬 직후 역킬 허용 패턴 반복",
+      "description": "6:20에 킬을 딴 뒤 7초 만에(6:27) 사망하고, 9:26 킬 후 4초 만에(9:30) 다시 사망했습니다. 킬을 따낸 뒤 흥분하여 퇴각하지 않고 추가 교전에 노출되는 패턴이 두 번 반복되었습니다. 교전 이득을 확보한 후에는 빠르게 빠지는 연습이 필요합니다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_003",
+        "evt_005",
+        "evt_006"
+      ]
+    },
+    {
+      "id": "weak_02",
+      "title": "오브젝트 주변 세팅 미흡",
+      "description": "14:31과 14:53에 연속으로 상대에게 구조물 또는 오브젝트를 내줬습니다. 팀 킬에서 앞서고 있었음에도 오브젝트 전환이 늦어 불필요한 손해가 발생했습니다. 교전 승리 후 오브젝트로 이어지는 흐름을 만드는 의식이 필요합니다.",
+      "relatedEventIds": [
+        "evt_013",
+        "evt_014"
+      ]
+    },
+    {
+      "id": "weak_03",
+      "title": "드래곤 파이트 직접 관여 부족",
+      "description": "10:32 드래곤 파이트에서 직접 관여(isPlayerInvolved)가 기록되지 않았습니다. 서포터로서 오브젝트 싸움에 선제적으로 포지션을 잡고 시야를 깔아주는 역할이 더 필요합니다. 팀이 1드래곤을 확보했지만 서포터의 셋업이 동반되었다면 더 안정적이었을 것입니다.",
+      "relatedEventIds": [
+        "evt_007"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_01",
+      "text": "킬을 따낸 직후 3초 안에 퇴각 경로를 확보하고, 추가 딜 욕심을 버리기",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_02",
+      "text": "드래곤·바론 스폰 60초 전부터 해당 지역에 컨트롤 와드 + 오라클 렌즈로 시야 선점하기",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_03",
+      "text": "교전 승리 후 5초 이내에 팀원에게 핑으로 오브젝트(타워/드래곤) 전환 유도하기",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_04",
+      "text": "룰루 궁극기(거대화)를 공격적 킬 확보보다 아군 생존용으로 우선 사용하기",
+      "priority": "MEDIUM"
+    }
+  ],
+  "keyMoments": [
+    {
+      "momentId": "km_01",
+      "timestampLabel": "6:20 ~ 6:27",
+      "title": "첫 킬 후 즉시 역킬 허용",
+      "description": "교전에서 킬을 만들었지만 7초 만에 역으로 사망하며 골드 이득이 상쇄되었습니다. 킬 후 퇴각 판단이 핵심 개선 포인트입니다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_003"
+      ],
+      "importance": 4
+    },
+    {
+      "momentId": "km_02",
+      "timestampLabel": "9:26 ~ 9:30",
+      "title": "두 번째 킬-데스 교환 반복",
+      "description": "같은 패턴이 반복되었습니다. 킬을 따낸 직후 4초 만에 사망하며 데스가 누적되었습니다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_006"
+      ],
+      "importance": 4
+    },
+    {
+      "momentId": "km_03",
+      "timestampLabel": "12:43 ~ 12:47",
+      "title": "연속 소규모 교전 승리로 주도권 확보",
+      "description": "4초 간격으로 연속 교전에 합류해 팀이 다중 킬을 확보했습니다. 이 시점부터 팀의 골드 격차가 벌어지며 승리 흐름이 만들어졌습니다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_010"
+      ],
+      "importance": 3
+    },
+    {
+      "momentId": "km_04",
+      "timestampLabel": "14:14 ~ 14:20",
+      "title": "팀파이트 합류로 경기 마무리 기반 조성",
+      "description": "팀파이트에 연속 합류하며 상대 전력을 소모시켰고, 이후 타워 확보로 이어지는 마무리 흐름을 만들었습니다.",
+      "relatedEventIds": [
+        "evt_011",
+        "evt_012",
+        "evt_015"
+      ],
+      "importance": 3
+    },
+    {
+      "momentId": "km_05",
+      "timestampLabel": "14:31 ~ 14:53",
+      "title": "오브젝트 연속 허용",
+      "description": "킬 우위 상황에서 구조물을 연달아 내줬습니다. 교전 승리를 오브젝트로 전환하지 못한 아쉬운 장면입니다.",
+      "relatedEventIds": [
+        "evt_013",
+        "evt_014"
+      ],
+      "importance": 4
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "usedIn": [
+        "str_01"
+      ]
+    },
+    {
+      "eventId": "evt_002",
+      "usedIn": [
+        "str_02",
+        "weak_01",
+        "km_01"
+      ]
+    },
+    {
+      "eventId": "evt_003",
+      "usedIn": [
+        "weak_01",
+        "km_01"
+      ]
+    },
+    {
+      "eventId": "evt_004",
+      "usedIn": [
+        "str_01",
+        "str_03"
+      ]
+    },
+    {
+      "eventId": "evt_005",
+      "usedIn": [
+        "str_02",
+        "weak_01",
+        "km_02"
+      ]
+    },
+    {
+      "eventId": "evt_006",
+      "usedIn": [
+        "weak_01",
+        "km_02"
+      ]
+    },
+    {
+      "eventId": "evt_007",
+      "usedIn": [
+        "str_03",
+        "weak_03"
+      ]
+    },
+    {
+      "eventId": "evt_008",
+      "usedIn": [
+        "str_01"
+      ]
+    },
+    {
+      "eventId": "evt_009",
+      "usedIn": [
+        "str_01",
+        "km_03"
+      ]
+    },
+    {
+      "eventId": "evt_010",
+      "usedIn": [
+        "str_01",
+        "km_03"
+      ]
+    },
+    {
+      "eventId": "evt_011",
+      "usedIn": [
+        "str_01",
+        "km_04"
+      ]
+    },
+    {
+      "eventId": "evt_012",
+      "usedIn": [
+        "str_01",
+        "km_04"
+      ]
+    },
+    {
+      "eventId": "evt_013",
+      "usedIn": [
+        "weak_02",
+        "km_05"
+      ]
+    },
+    {
+      "eventId": "evt_014",
+      "usedIn": [
+        "weak_02",
+        "km_05"
+      ]
+    },
+    {
+      "eventId": "evt_015",
+      "usedIn": [
+        "km_04"
+      ]
+    }
+  ],
+  "schemaVersion": "1.0"
+}
