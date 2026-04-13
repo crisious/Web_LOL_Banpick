@@ -1,6 +1,30 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8171847804",
+      "matchId": "KR_8171847804",
+      "label": "sample-kr-8171847804 · SUPPORT WIN",
+      "champion": "Morgana",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-13",
+      "theme": "오브젝트 중심 운영으로 압도적 승리를 이끌었지만, 중반 반복 데스가 아쉬운 모르가나 서포터 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8171847804/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8171847804/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8171847804/sample-kr-8171847804-notes.md"
+    },
+    {
+      "id": "sample-kr-8171875912",
+      "matchId": "KR_8171875912",
+      "label": "sample-kr-8171875912 · SUPPORT WIN",
+      "champion": "Pantheon",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-13",
+      "theme": "초반 라인전에서 다수의 데스를 내줬지만, 중반 오브젝트 합류와 구조물 압박으로 팀 승리에 기여한 판테온 서포터 경기",
+      "normalizedPath": "/data/samples/sample-kr-8171875912/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8171875912/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8171875912/sample-kr-8171875912-notes.md"
+    },
+    {
       "id": "sample-kr-8171663142",
       "matchId": "KR_8171663142",
       "label": "sample-kr-8171663142 · JUNGLE WIN",
