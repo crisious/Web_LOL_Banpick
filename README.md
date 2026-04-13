@@ -1,97 +1,101 @@
-# LoL Replay Analysis MVP
+# LoL Replay Coach
 
-리그 오브 레전드 경기 데이터를 불러와서 한 경기 요약, 장점/약점, 핵심 장면, 실행 체크리스트를 보여주는 웹 프로토타입입니다.  
-MVP 기준으로는 `.rofl` 원본 직접 처리 대신 Riot Match-V5 + Timeline API를 사용해 분석 입력을 구성합니다.
+리그 오브 레전드 경기 데이터를 Riot API로 수집하고, AI 에이전트(Claude + Codex)가 코칭 관점에서 분석하는 웹 애플리케이션입니다.
 
-## 현재 범위
+## 주요 기능
 
-- 저장된 샘플 경기 목록 조회
-- 샘플별 분석 대시보드 렌더링
-- 저장 샘플 기준 플레이어 추세 요약
-- Riot ID 입력 후 최근 10경기 조회
-- 저장된 경기면 즉시 상세 분석 열기
-- 저장되지 않은 경기만 클릭 시 새 샘플 생성
-- 로그인/최근 경기 조회 중복 제출 방지
-- `recent-matches` 실패 시 기존 상세 화면 유지
-- 챔피언 배지 UI 렌더링
-  - 작은 카드: Data Dragon 최신 버전 기반 `square icon` 우선 사용
-  - 큰 스냅샷: `loading art` 기반 대표 이미지 사용
-  - 버전 조회 전/실패 시 `loading art` 또는 이니셜 배지로 fallback
-- 원본 응답, 정규화 JSON, 분석 결과 JSON을 `data/samples/` 아래에 저장
-- Riot API 키를 프런트엔드에 노출하지 않고 서버에서만 사용
+### Riot ID 로그인 + 10게임 요약
+- Riot ID(gameName + tagLine + region) 입력으로 시작
+- 최근 10게임 요약을 즉시 표시 (챔피언, 역할, 승패, KDA, CS/분, 시간, 큐타입)
+- localStorage로 계정 기억 — 새로고침 시 자동 로그인
+- 랭크 정보(티어, LP, 승률) 함께 표시
+
+### AI 듀얼 에이전트 분석
+- **Claude** (코칭 분석): 장점/약점을 균형 있게 분석, 개선점 중심
+- **Codex** (레드팀 비판): 놓치기 쉬운 구조적 문제, 숨겨진 패턴 발견
+- 두 에이전트 병렬 실행 후 비교 결과 생성 (동의/불일치 분류)
+- 양쪽 실패 시 규칙 기반 분석으로 자동 fallback
+
+### 상세 분석 대시보드
+- 경기 헤드라인 + Quick View 스냅샷
+- 핵심 지표 (KDA, CS, 골드, 데미지, 시야, 킬관여)
+- 플레이타임 스코어 (전투/생존/수입/시야/오브젝트 종합)
+- 라인전 지표 (솔로킬, 10분 CS, CS 우위, 터렛 플레이트)
+- 초반/중반/후반 페이즈 요약
+- 플레이 강점 / 약점
+- AI 비교 분석 (동의율 바 + 3열 그리드)
+- 다음 경기 체크리스트 + 핵심 장면
+- 근거 이벤트 로그
+- KDA 변화 타임라인
+- 시야 & 와드 분석
+- 빌드 오더 타임라인
+- 타워 / 오브젝트 타임라인
+
+### 데이터 파이프라인
+- Riot API: account-v1 → match-v5 (detail + timeline) → summoner-v4 → league-v4
+- 정규화: challenges 객체(70+ 필드), 와드/아이템/오브젝트 타임라인 추출
+- 분석: AI 에이전트 → 스키마 검증 → 서버측 필드 정규화 → 저장
 
 ## 화면 흐름
 
-### 1. 샘플 분석 대시보드
+```
+[로그인] → Riot ID 입력 → [10게임 요약] → 게임 클릭 → [AI 분석 진행] → [상세 대시보드]
+                                ↑                                              │
+                                └──────────── ← 10게임 목록으로 ───────────────┘
+```
 
-- 경기 헤드라인
-- Quick View 상단 요약 바
-- Champion / Role / Result 스냅샷
-- KDA, CS, 킬관여, 시야, 오브젝트 지표
-- 저장된 리포트 빠른 비교
-- 플레이어 추세 요약
-- 초반/중반/후반 페이즈 요약
-- 플레이 강점 / 약점
-- 다음 경기 체크리스트
-- 핵심 장면과 근거 이벤트
+- **이미 저장된 경기**: generate-sample 없이 바로 상세 화면 진입
+- **미저장 경기**: 클릭 시 Riot API + AI 분석 후 상세 화면 진입 (2~5분)
+- 상세 화면에서 최근 경기 재조회 가능 (실패 시 기존 상세 유지)
 
-### 2. 로그인 후 최근 경기 불러오기
+## 기술 스택
 
-입력값:
-
-- `gameName`
-- `tagLine`
-- `platformRegion`
-
-버튼을 누르면 서버가 아래 순서로 데이터를 가져옵니다.
-
-1. Riot ID -> `account-v1`
-2. PUUID -> 최근 Match ID 목록
-3. 각 Match 상세 조회
-4. UI에 챔피언/포지션/결과 중심의 샘플 후보 카드 표시
-
-로그인 직후에는 최근 10경기 카드가 렌더링됩니다.
-
-- `이미 저장된 경기`: `generate-sample` 없이 바로 상세 화면 진입
-- `저장되지 않은 경기`: 클릭 시 해당 경기의 상세 + Timeline을 다시 가져와 새 샘플 생성 후 상세 화면 진입
-
-### 3. 상세 화면에서 최근 경기 다시 불러오기
-
-- 상세 화면 상태에서도 `최근 경기 불러오기`를 다시 실행할 수 있습니다.
-- 이때 `429`나 조회 실패가 나더라도 현재 열려 있는 상세 화면은 유지됩니다.
-- 오류는 상태 문구에만 표시되고, 이전 샘플 데이터는 사라지지 않습니다.
+- **백엔드**: Node.js (vanilla HTTP server, no Express)
+- **프론트엔드**: Vanilla JS + CSS (no frameworks)
+- **AI**: Claude CLI (`claude --print`) + Codex CLI (`codex exec -`)
+- **데이터**: Riot Match-V5 + Timeline API
+- **폰트**: Pretendard Variable
 
 ## 주요 파일
 
 ```text
 .
-├── index.html
-├── main.js
-├── styles.css
-├── server.js
+├── index.html          # 대시보드 UI (로그인 + 10게임 + 상세)
+├── main.js             # 프론트엔드 상태 머신 + 렌더링
+├── styles.css          # 다크 테마 + 반응형
+├── server.js           # API 서버 + Riot API + AI 에이전트 오케스트레이터
+├── .env                # RIOT_API_KEY, PORT (gitignore)
+├── .env.example
 ├── data/
 │   └── samples/
 │       ├── manifest.json
-│       ├── sample-001/
-│       └── sample-002/
-├── decision-replay-processing.md
-├── plan-riot-api-sample-data.md
-├── normalized-match-schema.md
-├── sample-data-cleanup-plan.md
-└── sample-data-ops-runbook.md
+│       └── sample-kr-XXXXXXXXXX/
+│           ├── raw-account.json
+│           ├── raw-match.json
+│           ├── raw-timeline.json
+│           ├── normalized-match.json
+│           ├── analysis-result.json
+│           ├── comparison-result.json    # AI 비교 결과 (있는 경우)
+│           └── sample-*-notes.md
+└── progress.md         # 프로젝트 진행 상황 기록
 ```
 
 ## 로컬 실행
 
-### 1. 환경 변수 파일 준비
+### 사전 요구
+
+- Node.js v18+
+- (AI 분석 사용 시) `claude` CLI, `codex` CLI 설치 및 로그인
+
+### 1. 환경 변수
 
 ```bash
 cp .env.example .env
 ```
 
-`.env`에 Riot 개발 키를 넣습니다.
+`.env`에 Riot 개발 키 입력:
 
-```bash
+```
 RIOT_API_KEY=RGAPI-your-development-key
 PORT=8123
 ```
@@ -102,107 +106,57 @@ PORT=8123
 node server.js
 ```
 
-브라우저에서 아래 주소를 엽니다.
+브라우저에서 [http://127.0.0.1:8123](http://127.0.0.1:8123) 접속
 
-- [http://127.0.0.1:8123](http://127.0.0.1:8123)
+### 3. 테스트 계정
 
-## 테스트용 입력 예시
+| gameName | tagLine | region |
+|---|---|---|
+| 매운맛 비스킷 | KR1 | KR |
+| 핑거샷 | KR1 | KR |
 
-- `gameName`: `매운맛 비스킷`
-- `tagLine`: `KR1`
-- `platformRegion`: `KR`
+## API 엔드포인트
 
-보조 QA 계정 예시:
+| Method | Path | 설명 |
+|---|---|---|
+| GET | `/api/samples` | 저장된 샘플 목록 |
+| GET | `/api/samples/:id` | 샘플 번들 (normalized + analysis + comparison) |
+| POST | `/api/recent-matches` | Riot ID 기준 최근 10게임 요약 |
+| POST | `/api/generate-sample` | 선택한 경기 AI 분석 + 샘플 생성 |
 
-- `gameName`: `핑거샷`
-- `tagLine`: `KR1`
-- `platformRegion`: `KR`
+## AI 에이전트 아키텍처
 
-## API 동작 메모
-
-- `KR`, `JP1` 계정의 match/account 조회는 `asia.api.riotgames.com` 클러스터를 사용
-- 최근 경기 후보는 간단한 `sampleFitScore` 기준으로 정렬
-- 샘플 manifest 항목에는 `champion`, `publicAlias`, `collectedDate`, `theme`를 함께 저장
-- 챔피언 배지 이미지는 Riot Data Dragon을 사용하며, 런타임에 최신 버전을 확인해 정사각형 아이콘 경로를 구성
-- 생성된 샘플은 아래 파일을 함께 남김
-
-```text
-data/samples/sample-<match-id>/
-├── raw-account.json
-├── raw-match.json
-├── raw-timeline.json
-├── normalized-match.json
-├── analysis-result.json
-└── sample-<id>-notes.md
+```
+normalized-match.json
+  ↓ buildLlmPayload()
+payload
+  ├→ callClaudeAgent()   [claude --print]      → 코칭 분석
+  └→ callCodexAgent()    [codex exec -]        → 레드팀 비판
+       ↓ Promise.allSettled (병렬)
+  buildComparison()
+       ↓
+  analysis-result.json    (primary = Claude)
+  comparison-result.json  (동의/불일치 비교)
 ```
 
-## 문서 맵
+- API 키 불필요 — 두 CLI 모두 자체 세션 인증 사용
+- Fallback 체인: Claude → Codex → 규칙 기반 분석
 
-- `decision-replay-processing.md`: `.rofl` 직접 처리 vs Riot API 의사결정
-- `plan-riot-api-sample-data.md`: 샘플 경기 수집 전략
-- `riot-api-call-spec.md`: 호출 순서와 요청 스펙
-- `normalized-match-schema.md`: 분석 입력 스키마
-- `normalization-mapping-rules.md`: Match/Timeline -> 정규화 규칙
-- `sample-data-cleanup-plan.md`: 보존 샘플 / QA 생성 샘플 정리 기준
-- `sample-data-ops-runbook.md`: 샘플 생성 운영 절차
-- `research-materials-lol-replay.md`: 관련 연구 자료, 우선순위, 실행 체크리스트
+## 보안
 
-## 현재 샘플 상태
-
-- 현재 저장된 샘플 수: `15`
-- 기본 샘플:
-  - `sample-001` / `Nasus MID LOSS`
-  - `sample-002` / `Dr. Mundo JUNGLE WIN`
-- 메인 계정 기준 샘플:
-  - `sample-kr-8164563430`
-  - `sample-kr-8164577567`
-  - `sample-kr-8164613865`
-  - `sample-kr-8166489844`
-  - `sample-kr-8166519650`
-  - `sample-kr-8166546648`
-  - `sample-kr-8166575303`
-  - `sample-kr-8166601659`
-  - `sample-kr-8166637996`
-  - `sample-kr-8166674448`
-- 보조 계정 보존 샘플:
-  - `sample-kr-8048821726`
-  - `sample-kr-8065601119`
-  - `sample-kr-8097520888`
-
-## UI 메모
-
-- 샘플 스위처 카드: 챔피언 배지 + 챔피언명 + 샘플 라벨 + Riot ID
-- 저장된 리포트 카드: 챔피언 배지 + 챔피언명 + 역할/결과 배지
-- 최근 경기 후보 카드: 챔피언 배지 + 챔피언명 + 역할/결과 태그 + fit 점수
-- Quick View Champion 영역: 큰 챔피언 대표 아트 + 챔피언명
-
-## 최근 검증 메모
-
-- `2026-04-11` 기준 Homebrew로 Node 설치 후 `node server.js` 실행 확인
-- `/api/samples` 및 `/api/samples/sample-001` 정상 응답 확인
-- `매운맛 비스킷#KR1` 기준 `/api/recent-matches` 실데이터 조회 확인
-- `KR_8166637996` 기준 `/api/generate-sample` 실데이터 샘플 생성 확인
-- 생성 결과가 `data/samples/manifest.json` 및 새 샘플 폴더에 정상 반영되는 것 확인
-- Headless Chrome으로 데스크톱/모바일 화면 캡처 후 레이아웃 밀도 조정 완료
-- `2026-04-13` 기준 저장된 경기 즉시 상세 진입 확인
-- `2026-04-13` 기준 미저장 경기 `generate-sample 1회 -> sample load -> DETAIL_VIEW` 흐름 확인
-- `2026-04-13` 기준 로그인 더블클릭 시 중복 요청 방지 확인
-- `2026-04-13` 기준 상세 화면에서 `recent-matches`가 `429`로 실패해도 기존 상세 유지 확인
-- `2026-04-13` 기준 QA 생성 샘플 정리 후 라이브러리 반영 확인
-
-## 보안 주의
-
-- `RIOT_API_KEY`는 브라우저 코드에 넣지 않습니다.
-- 현재 키가 외부에 노출된 적이 있다면 Riot Developer Portal에서 새 키로 재발급하는 편이 안전합니다.
-- 개발 키는 만료형이므로 장기 운영 전에는 재발급과 배포 전략을 따로 잡아야 합니다.
+- `RIOT_API_KEY`는 서버에서만 사용, 브라우저에 노출하지 않음
+- 프론트엔드 Riot API Key 입력 시 서버 키 대신 사용 (선택)
+- 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
+- Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
 
 ## 현재 한계
 
-- 분석 결과는 규칙 기반 요약이라 코치 품질의 해설은 아닙니다.
-- `.rofl` 리플레이 원본 직접 업로드/파싱은 아직 미지원입니다.
-- Riot 개발 키 만료, rate limit, 패치 변경에 따라 결과가 흔들릴 수 있습니다.
+- Riot 개발 키는 24시간 만료 — 재발급 필요
+- `.rofl` 리플레이 원본 직접 업로드/파싱 미지원
+- AI 분석은 게임당 2~5분 소요
+- Riot RSO OAuth는 프로덕션 승인 필요 (현재 Riot ID 입력 방식)
 
 ## 안내
 
-이 프로젝트는 팬메이드 분석 프로토타입입니다.  
+이 프로젝트는 팬메이드 분석 프로토타입입니다.
 Riot Games의 공식 제품이 아니며 Riot의 승인이나 보증을 받지 않았습니다.
