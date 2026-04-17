@@ -16,6 +16,8 @@ const dom = {
   snapshotQueue: document.querySelector("[data-snapshot-queue]"),
   snapshotDuration: document.querySelector("[data-snapshot-duration]"),
   snapshotPatch: document.querySelector("[data-snapshot-patch]"),
+  snapshotMastery: document.querySelector("[data-snapshot-mastery]"),
+  snapshotMasteryText: document.querySelector("[data-snapshot-mastery-text]"),
   snapshotConfidence: document.querySelector("[data-snapshot-confidence]"),
   statRibbon: document.querySelector("[data-stat-ribbon]"),
   phaseGrid: document.querySelector("[data-phase-grid]"),
@@ -54,6 +56,16 @@ const dom = {
   wardSummary: document.querySelector("[data-ward-summary]"),
   wardEvents: document.querySelector("[data-ward-events]"),
   buildTimeline: document.querySelector("[data-build-timeline]"),
+  tabBar: document.querySelector("[data-tab-bar]"),
+  sectionNav: document.querySelector("[data-section-nav]"),
+  dualTimeline: document.querySelector("[data-dual-timeline]"),
+  dualDetail: document.querySelector("[data-dual-detail]"),
+  detailProgress: document.querySelector("[data-detail-progress]"),
+  detailProgressTitle: document.querySelector("[data-detail-progress-title]"),
+  detailProgressPercent: document.querySelector("[data-detail-progress-percent]"),
+  detailProgressBar: document.querySelector("[data-detail-progress-bar]"),
+  detailProgressSteps: document.querySelector("[data-detail-progress-steps]"),
+  detailProgressMessage: document.querySelector("[data-detail-progress-message]"),
 };
 
 const state = {
@@ -65,7 +77,33 @@ const state = {
   recentMatches: [],
   prefetchedSamples: new Map(),
   riotApiKey: "",
+  detailProgress: {
+    status: "idle",
+    stepId: "",
+    message: "",
+    progress: 0,
+    soft: false,
+    skippedSteps: [],
+  },
+  detailProgressTimer: null,
 };
+
+const HTML_ESCAPE = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+  "`": "&#96;",
+};
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"'`]/g, (char) => HTML_ESCAPE[char]);
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
+}
 
 // ─── localStorage persistence ─────────────────────────────────────────────
 
@@ -95,6 +133,176 @@ function getUserApiKey() {
 function setView(viewName) {
   state.view = viewName;
   document.body.dataset.view = viewName;
+}
+
+const DETAIL_PROGRESS_STEPS = [
+  { id: "prepare", label: "분석 준비" },
+  { id: "lookup", label: "저장된 분석 확인" },
+  { id: "riot", label: "Riot 데이터 확인" },
+  { id: "ai", label: "AI 분석 생성 중" },
+  { id: "compose", label: "리포트 구성" },
+  { id: "complete", label: "완료" },
+];
+
+function detailProgressBaseValue(stepId) {
+  const values = {
+    prepare: 8,
+    lookup: 24,
+    riot: 42,
+    ai: 64,
+    compose: 88,
+    complete: 100,
+  };
+  return values[stepId] ?? 0;
+}
+
+function stopDetailProgressTimer() {
+  if (state.detailProgressTimer) {
+    clearInterval(state.detailProgressTimer);
+    state.detailProgressTimer = null;
+  }
+}
+
+function renderDetailProgress() {
+  if (!dom.detailProgress) return;
+
+  const progressState = state.detailProgress;
+  const isIdle = progressState.status === "idle";
+  dom.detailProgress.hidden = isIdle;
+  dom.detailProgress.dataset.status = progressState.status;
+  dom.detailProgress.classList.toggle("detail-progress--soft", Boolean(progressState.soft));
+  dom.detailProgress.setAttribute("aria-busy", progressState.status === "running" ? "true" : "false");
+
+  if (isIdle) {
+    if (dom.detailProgressSteps) dom.detailProgressSteps.innerHTML = "";
+    if (dom.detailProgressMessage) dom.detailProgressMessage.textContent = "";
+    return;
+  }
+
+  const progress = Math.max(0, Math.min(100, Math.round(progressState.progress || 0)));
+  const activeIndex = DETAIL_PROGRESS_STEPS.findIndex((step) => step.id === progressState.stepId);
+  const skipped = new Set(progressState.skippedSteps || []);
+  const titleByStatus = {
+    running: "상세 분석 진행 중",
+    complete: "상세 분석 완료",
+    error: "상세 분석 실패",
+  };
+
+  if (dom.detailProgressTitle) {
+    dom.detailProgressTitle.textContent = titleByStatus[progressState.status] || "상세 분석 진행 중";
+  }
+  if (dom.detailProgressPercent) {
+    dom.detailProgressPercent.textContent = `${progress}%`;
+  }
+  if (dom.detailProgressBar) {
+    dom.detailProgressBar.style.width = `${progress}%`;
+  }
+  if (dom.detailProgressMessage) {
+    dom.detailProgressMessage.textContent = progressState.message || "";
+  }
+  if (dom.detailProgressSteps) {
+    dom.detailProgressSteps.innerHTML = DETAIL_PROGRESS_STEPS.map((step, index) => {
+      let stepState = "waiting";
+      if (skipped.has(step.id)) {
+        stepState = "skipped";
+      } else if (progressState.status === "complete") {
+        stepState = "done";
+      } else if (index < activeIndex) {
+        stepState = "done";
+      } else if (index === activeIndex) {
+        stepState = progressState.status === "error" ? "error" : "running";
+      }
+
+      return `
+        <li class="detail-progress__step" data-step-state="${stepState}">
+          <span class="detail-progress__dot" aria-hidden="true"></span>
+          <strong>${escapeHtml(step.label)}</strong>
+        </li>
+      `;
+    }).join("");
+  }
+}
+
+function updateDetailProgress(stepId, options = {}) {
+  const progress = options.progress ?? detailProgressBaseValue(stepId);
+  state.detailProgress = {
+    status: options.status || "running",
+    stepId,
+    message: options.message || "",
+    progress,
+    soft: Boolean(options.soft),
+    skippedSteps: options.skippedSteps || state.detailProgress.skippedSteps || [],
+  };
+  renderDetailProgress();
+}
+
+function setDetailProgress(stepId, options = {}) {
+  stopDetailProgressTimer();
+  updateDetailProgress(stepId, options);
+}
+
+function startSoftDetailProgress(stepId, message, options = {}) {
+  stopDetailProgressTimer();
+  const start = Math.max(state.detailProgress.progress || 0, options.progress ?? detailProgressBaseValue(stepId));
+  updateDetailProgress(stepId, {
+    ...options,
+    message,
+    progress: start,
+    soft: true,
+  });
+
+  state.detailProgressTimer = setInterval(() => {
+    const current = state.detailProgress.progress || start;
+    const next = Math.min(88, current + (current < 74 ? 4 : 2));
+    updateDetailProgress(stepId, {
+      ...options,
+      message,
+      progress: next,
+      soft: true,
+    });
+  }, 1800);
+}
+
+function resetDetailProgress() {
+  stopDetailProgressTimer();
+  state.detailProgress = {
+    status: "idle",
+    stepId: "",
+    message: "",
+    progress: 0,
+    soft: false,
+    skippedSteps: [],
+  };
+  renderDetailProgress();
+}
+
+function completeDetailProgress(message = "리포트를 열었습니다.") {
+  stopDetailProgressTimer();
+  updateDetailProgress("complete", {
+    status: "complete",
+    message,
+    progress: 100,
+  });
+  setTimeout(() => {
+    if (state.detailProgress.status === "complete") {
+      resetDetailProgress();
+    }
+  }, 900);
+}
+
+function failDetailProgress(message = "상세 분석을 열지 못했습니다.") {
+  stopDetailProgressTimer();
+  updateDetailProgress(state.detailProgress.stepId || "prepare", {
+    status: "error",
+    message,
+    progress: state.detailProgress.progress || 100,
+    skippedSteps: state.detailProgress.skippedSteps || [],
+  });
+  setTimeout(() => {
+    if (state.detailProgress.status === "error") {
+      resetDetailProgress();
+    }
+  }, 1400);
 }
 
 // ─── Time helpers ────────────────────────────────────────────────────────
@@ -165,6 +373,7 @@ let championCdnVersion = "";
 let championCdnVersionPromise = null;
 let championAssetMap = null;
 let championAssetMapPromise = null;
+let championIdToName = new Map(); // numeric championId → champion asset key
 
 function normalizeChampionToken(name) {
   return String(name || "")
@@ -257,10 +466,12 @@ function loadChampionAssetMap(version) {
       if (!payload?.data) return;
 
       const nextMap = new Map();
+      const nextIdMap = new Map();
       Object.values(payload.data).forEach((champion) => {
         registerChampionAssetKey(nextMap, champion.id, champion.id);
         registerChampionAssetKey(nextMap, champion.name, champion.id);
         registerChampionAssetKey(nextMap, championDisplayName(champion.id), champion.id);
+        if (champion.key) nextIdMap.set(Number(champion.key), champion.id);
       });
 
       Object.entries(CHAMPION_ART_ALIASES).forEach(([alias, assetKey]) => {
@@ -268,7 +479,9 @@ function loadChampionAssetMap(version) {
       });
 
       championAssetMap = nextMap;
+      championIdToName = nextIdMap;
       refreshChampionAvatarElements();
+      refreshMasteryDisplay();
     })
     .catch((err) => console.warn("[CDN] Champion asset map load failed:", err.message))
     .finally(() => {
@@ -297,6 +510,35 @@ function queueChampionVersionLoad() {
     .finally(() => {
       championCdnVersionPromise = null;
     });
+}
+
+function profileIconUrl(iconId) {
+  if (!iconId || !championCdnVersion) return "";
+  return `https://ddragon.leagueoflegends.com/cdn/${championCdnVersion}/img/profileicon/${iconId}.png`;
+}
+
+function championNameFromId(numericId) {
+  return championIdToName.get(Number(numericId)) || "";
+}
+
+function findMasteryForChampion(championName) {
+  const mastery = state.account?.championMastery;
+  if (!Array.isArray(mastery) || mastery.length === 0) return null;
+  const assetKey = championAssetKey(championName);
+  return mastery.find((m) => championNameFromId(m.championId) === assetKey) || null;
+}
+
+function formatMasteryPoints(pts) {
+  if (!pts) return "0";
+  if (pts >= 1000000) return `${(pts / 1000000).toFixed(1)}M`;
+  if (pts >= 1000) return `${(pts / 1000).toFixed(1)}K`;
+  return String(pts);
+}
+
+function refreshMasteryDisplay() {
+  if (state.view === "MATCH_LIST" && state.recentMatches.length > 0) {
+    renderMatchList();
+  }
 }
 
 function championMonogram(name) {
@@ -767,6 +1009,37 @@ function renderHero(sample) {
   dom.snapshotConfidence.textContent =
     typeof sample.analysis?.analysisMeta?.confidence === "number" ? formatPercent(sample.analysis.analysisMeta.confidence) : "—";
 
+  // 마스터리 정보 표시
+  if (dom.snapshotMastery && dom.snapshotMasteryText) {
+    const mastery = findMasteryForChampion(match.champion);
+    if (mastery) {
+      dom.snapshotMastery.hidden = false;
+      dom.snapshotMasteryText.textContent = `Lv.${mastery.championLevel} · ${formatMasteryPoints(mastery.championPoints)}`;
+    } else {
+      dom.snapshotMastery.hidden = true;
+    }
+  }
+
+  // 챔피언 배너 이미지
+  const overviewTab = document.getElementById("tab-overview");
+  if (overviewTab) {
+    let banner = overviewTab.querySelector(".champion-hero-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.className = "champion-hero-banner";
+      overviewTab.prepend(banner);
+    }
+    const artUrl = championArtUrl(match.champion);
+    banner.style.backgroundImage = artUrl ? `url('${artUrl}')` : "";
+    banner.dataset.result = match.result || "";
+    banner.innerHTML = `
+      <div class="champion-hero-banner__overlay">
+        <span class="champion-hero-banner__name">${championName}</span>
+        <span class="champion-hero-banner__result" data-result="${match.result || ""}">${resultText}</span>
+      </div>
+    `;
+  }
+
   if (dom.heroPills) {
     dom.heroPills.innerHTML = [
       match.champion,
@@ -1059,6 +1332,348 @@ function renderLaningStats(sample) {
   `;
 }
 
+// ─── Dual-track timeline ──────────────────────────────────────────────
+
+const ALLY_EVENT_TYPES = new Set([
+  "CHAMPION_KILL", "SKIRMISH_WIN", "TEAMFIGHT_FOLLOWUP",
+  "ROAM_SUCCESS", "OBJECTIVE_SETUP_WIN", "TOWER_TAKE",
+  "LANE_PRIORITY",
+]);
+
+const ENEMY_EVENT_TYPES = new Set([
+  "PLAYER_DEATH", "BAD_ENGAGE", "ROAM_FAIL",
+  "SKIRMISH_LOSS", "OBJECTIVE_SETUP_FAIL",
+]);
+
+const EVENT_ICONS = {
+  CHAMPION_KILL: "\u2694\uFE0F",
+  PLAYER_DEATH: "\uD83D\uDC80",
+  DRAGON_FIGHT: "\uD83D\uDC09",
+  BARON_FIGHT: "\uD83D\uDC32",
+  TOWER_TAKE: "\uD83C\uDFF0",
+  SKIRMISH_WIN: "\u2694\uFE0F",
+  TEAMFIGHT_FOLLOWUP: "\uD83E\uDD1D",
+  OBJECTIVE_SETUP_WIN: "\u2705",
+  OBJECTIVE_SETUP_FAIL: "\u274C",
+  HORDE: "\uD83D\uDC7E",
+};
+
+const LANE_LABELS = {
+  MID_LANE: "\uBBF8\uB4DC", MID_RIVER: "\uBBF8\uB4DC",
+  TOP_LANE: "\uD0D1", TOP_RIVER: "\uD0D1", BARON_RIVER: "\uD0D1",
+  BOT_LANE: "\uBD07", BOT_RIVER: "\uBD07", DRAGON_RIVER: "\uBD07",
+  TOP_JUNGLE: "\uC815\uAE00", BOT_JUNGLE: "\uC815\uAE00",
+};
+
+function classifyTimelineEvent(evt, objectiveTimeline) {
+  const type = evt.eventType;
+  // For DRAGON_FIGHT / BARON_FIGHT, check objectiveTimeline for team info
+  if (type === "DRAGON_FIGHT" || type === "BARON_FIGHT") {
+    const objMatch = (objectiveTimeline || []).find((o) =>
+      Math.abs(parseMsFromLabel(o.timeLabel) - evt.timestampMs) < 30000 &&
+      o.type === "OBJECTIVE"
+    );
+    if (objMatch) {
+      return {
+        track: objMatch.team === "ALLY" ? "ALLY" : "ENEMY",
+        laneZone: LANE_LABELS[evt.laneHint] || "",
+        icon: EVENT_ICONS[type] || "\u26A0\uFE0F",
+      };
+    }
+    // Default: if player involved positively
+    return {
+      track: evt.isPlayerInvolved ? "ALLY" : "ENEMY",
+      laneZone: LANE_LABELS[evt.laneHint] || "",
+      icon: EVENT_ICONS[type] || "\u26A0\uFE0F",
+    };
+  }
+
+  if (ALLY_EVENT_TYPES.has(type)) {
+    return { track: "ALLY", laneZone: LANE_LABELS[evt.laneHint] || "", icon: EVENT_ICONS[type] || "\u2694\uFE0F" };
+  }
+  if (ENEMY_EVENT_TYPES.has(type)) {
+    return { track: "ENEMY", laneZone: LANE_LABELS[evt.laneHint] || "", icon: EVENT_ICONS[type] || "\u26A0\uFE0F" };
+  }
+  // Fallback
+  return {
+    track: evt.isPlayerInvolved ? "ALLY" : "ENEMY",
+    laneZone: LANE_LABELS[evt.laneHint] || "",
+    icon: EVENT_ICONS[type] || "\u2B50",
+  };
+}
+
+function parseMsFromLabel(label) {
+  if (!label) return 0;
+  const parts = label.split(":");
+  return ((parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0)) * 1000;
+}
+
+function buildDualTimelineData(sample) {
+  const norm = sample.normalized;
+  if (!norm) return null;
+
+  const events = (norm.timelineEvents || []).map((evt) => {
+    const cls = classifyTimelineEvent(evt, norm.objectiveTimeline);
+    return { ...evt, ...cls };
+  });
+
+  // Also add objective events that aren't already in timelineEvents
+  (norm.objectiveTimeline || []).forEach((obj) => {
+    const objMs = parseMsFromLabel(obj.timeLabel);
+    const alreadyPresent = events.some((e) => Math.abs(e.timestampMs - objMs) < 10000 && (
+      e.eventType === "DRAGON_FIGHT" || e.eventType === "BARON_FIGHT" || e.eventType === "TOWER_TAKE"
+    ));
+    if (!alreadyPresent) {
+      events.push({
+        eventId: `obj_${obj.timeLabel}`,
+        timestampMs: objMs,
+        timestampLabel: obj.timeLabel,
+        phase: obj.phase,
+        eventType: obj.type === "STRUCTURE" ? "TOWER_TAKE" : "DRAGON_FIGHT",
+        importance: obj.type === "OBJECTIVE" ? 4 : 3,
+        isPlayerInvolved: false,
+        laneHint: obj.lane || "",
+        summary: obj.label,
+        track: obj.team === "ALLY" ? "ALLY" : "ENEMY",
+        laneZone: LANE_LABELS[obj.lane] || "",
+        icon: obj.type === "STRUCTURE" ? "\uD83C\uDFF0" : "\uD83D\uDC09",
+      });
+    }
+  });
+
+  events.sort((a, b) => a.timestampMs - b.timestampMs);
+
+  const totalMs = (norm.matchInfo?.durationSeconds || 1800) * 1000;
+  const phases = [
+    { phase: "EARLY", startMs: 0, endMs: Math.min(900000, totalMs) },
+    { phase: "MID", startMs: 900000, endMs: Math.min(1800000, totalMs) },
+  ];
+  if (totalMs > 1800000) {
+    phases.push({ phase: "LATE", startMs: 1800000, endMs: totalMs });
+  }
+
+  return { events, phases, totalMs };
+}
+
+function computeMomentum(events, totalMs) {
+  const segMs = 300000; // 5 minutes
+  const segments = [];
+  for (let start = 0; start < totalMs; start += segMs) {
+    const end = Math.min(start + segMs, totalMs);
+    const segEvents = events.filter((e) => e.timestampMs >= start && e.timestampMs < end);
+    const ally = segEvents.filter((e) => e.track === "ALLY").length;
+    const enemy = segEvents.filter((e) => e.track === "ENEMY").length;
+    segments.push({ start, end, ally, enemy, total: ally + enemy });
+  }
+  return segments;
+}
+
+function renderDualTimeline(sample) {
+  if (!dom.dualTimeline) return;
+
+  if (dom.dualDetail) {
+    dom.dualDetail.classList.remove("dual-tl-detail--open");
+    dom.dualDetail.innerHTML = "";
+  }
+
+  const data = buildDualTimelineData(sample);
+  if (!data || data.events.length === 0) {
+    dom.dualTimeline.innerHTML = '<p class="muted">\uB4C0\uC5BC\uD2B8\uB799 \uD0C0\uC784\uB77C\uC778 \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.</p>';
+    return;
+  }
+
+  const { events, phases, totalMs } = data;
+  const momentum = computeMomentum(events, totalMs);
+
+  // Phase bands
+  const phaseBands = phases.map((p) => {
+    const widthPct = ((p.endMs - p.startMs) / totalMs) * 100;
+    const phaseClass = p.phase === "EARLY" ? "early" : p.phase === "MID" ? "mid" : "late";
+    const label = p.phase === "EARLY" ? "\uCD08\uBC18" : p.phase === "MID" ? "\uC911\uBC18" : "\uD6C4\uBC18";
+    return `<div class="dual-tl-phase dual-tl-phase--${phaseClass}" style="width:${widthPct}%">
+      <span class="dual-tl-phase-label">${label}</span>
+    </div>`;
+  }).join("");
+
+  // Tick marks every 5 min
+  const ticks = [];
+  for (let ms = 300000; ms < totalMs; ms += 300000) {
+    const leftPct = (ms / totalMs) * 100;
+    const label = `${Math.floor(ms / 60000)}:00`;
+    ticks.push(`<div class="dual-tl-tick" style="left:${leftPct}%"></div>`);
+    ticks.push(`<div class="dual-tl-tick-label" style="left:${leftPct}%">${label}</div>`);
+  }
+
+  // Resolve vertical stacking for overlapping events
+  const allyEvents = events.filter((e) => e.track === "ALLY");
+  const enemyEvents = events.filter((e) => e.track === "ENEMY");
+
+  function resolveVerticalOffset(evts) {
+    const placed = [];
+    return evts.map((e) => {
+      const leftPct = (e.timestampMs / totalMs) * 100;
+      let row = 0;
+      for (const p of placed) {
+        if (Math.abs(p.leftPct - leftPct) < 8) {
+          row = Math.max(row, p.row + 1);
+        }
+      }
+      placed.push({ leftPct, row });
+      return { ...e, leftPct, row };
+    });
+  }
+
+  const allyPlaced = resolveVerticalOffset(allyEvents);
+  const enemyPlaced = resolveVerticalOffset(enemyEvents);
+
+  function renderEventChip(e, track) {
+    const vertOffset = track === "ALLY"
+      ? `bottom: ${4 + e.row * 54}px`
+      : `top: ${4 + e.row * 54}px`;
+    const summary = e.summary || e.eventType;
+    const importance = Number.isFinite(Number(e.importance)) ? Number(e.importance) : 0;
+    return `<div class="dual-tl-event dual-tl-event--${track.toLowerCase()}"
+        style="left:${e.leftPct}%; ${vertOffset}"
+        data-importance="${importance}"
+        data-event-id="${escapeAttr(e.eventId || "")}"
+        title="${escapeAttr(summary)}">
+      <span class="dual-tl-event-icon">${escapeHtml(e.icon || "")}</span>
+      <span class="dual-tl-event-time">${escapeHtml(e.timestampLabel || "")}</span>
+      <span class="dual-tl-event-summary">${escapeHtml(summary)}</span>
+      ${e.laneZone ? `<span class="dual-tl-event-lane">${escapeHtml(e.laneZone)}</span>` : ""}
+    </div>`;
+  }
+
+  const allyChips = allyPlaced.map((e) => renderEventChip(e, "ALLY")).join("");
+  const enemyChips = enemyPlaced.map((e) => renderEventChip(e, "ENEMY")).join("");
+
+  // Segment click zones
+  const segmentZones = momentum.map((seg, i) => {
+    const leftPct = (seg.start / totalMs) * 100;
+    const widthPct = ((seg.end - seg.start) / totalMs) * 100;
+    return `<div class="dual-tl-segment" data-seg-index="${i}" data-seg-start="${seg.start}" data-seg-end="${seg.end}"
+        style="left:${leftPct}%; width:${widthPct}%"></div>`;
+  }).join("");
+
+  // Momentum bar
+  const momentumBar = momentum.map((seg) => {
+    const widthPct = ((seg.end - seg.start) / totalMs) * 100;
+    let cls = "neutral";
+    if (seg.ally > seg.enemy) cls = "ally";
+    else if (seg.enemy > seg.ally) cls = "enemy";
+    return `<div class="dual-tl-momentum-seg dual-tl-momentum-seg--${cls}" style="width:${widthPct}%"></div>`;
+  }).join("");
+
+  dom.dualTimeline.innerHTML = `
+    <div class="dual-tl-scroll">
+      <div class="dual-tl-phases">${phaseBands}</div>
+      <div class="dual-tl-axis"></div>
+      ${ticks.join("")}
+      <div class="dual-tl-track--ally">
+        <span class="dual-tl-track-label">\uC544\uAD70</span>
+        ${allyChips}
+      </div>
+      <div class="dual-tl-track--enemy">
+        <span class="dual-tl-track-label">\uC801\uAD70</span>
+        ${enemyChips}
+      </div>
+      ${segmentZones}
+    </div>
+    <div class="dual-tl-momentum">${momentumBar}</div>
+  `;
+
+  // Store data for detail panel
+  dom.dualTimeline._data = data;
+  dom.dualTimeline._momentum = momentum;
+  dom.dualTimeline._analysis = sample.analysis;
+}
+
+function handleDualTimelineClick(event) {
+  if (!dom.dualTimeline) return;
+  const seg = event.target.closest(".dual-tl-segment");
+  if (!seg || !dom.dualTimeline.contains(seg)) return;
+
+  dom.dualTimeline.querySelectorAll(".dual-tl-segment").forEach((segment) => {
+    segment.classList.remove("dual-tl-segment--active");
+  });
+  seg.classList.add("dual-tl-segment--active");
+
+  renderDualTimelineDetail(
+    parseInt(seg.dataset.segStart, 10),
+    parseInt(seg.dataset.segEnd, 10),
+    dom.dualTimeline._data,
+    dom.dualTimeline._momentum,
+    dom.dualTimeline._analysis,
+  );
+}
+
+function bindDualTimelineEvents() {
+  if (!dom.dualTimeline || dom.dualTimeline.dataset.bound === "true") return;
+  dom.dualTimeline.addEventListener("click", handleDualTimelineClick);
+  dom.dualTimeline.dataset.bound = "true";
+}
+
+function renderDualTimelineDetail(startMs, endMs, data, momentum, analysis) {
+  if (!dom.dualDetail) return;
+  if (!data) return;
+
+  const segEvents = data.events.filter((e) => e.timestampMs >= startMs && e.timestampMs < endMs);
+  const allyEvts = segEvents.filter((e) => e.track === "ALLY");
+  const enemyEvts = segEvents.filter((e) => e.track === "ENEMY");
+
+  const startLabel = `${Math.floor(startMs / 60000)}:00`;
+  const endLabel = `${Math.floor(endMs / 60000)}:00`;
+
+  // Find matching phase summary
+  const phaseSummaries = analysis?.phaseSummaries || [];
+  let phaseNote = "";
+  for (const ps of phaseSummaries) {
+    const phaseStart = ps.phase === "EARLY" ? 0 : ps.phase === "MID" ? 900000 : 1800000;
+    const phaseEnd = ps.phase === "EARLY" ? 900000 : ps.phase === "MID" ? 1800000 : Infinity;
+    if (startMs < phaseEnd && endMs > phaseStart) {
+      const ratingEmoji = ps.rating === "GOOD" ? "\uD83D\uDFE2" : ps.rating === "BAD" ? "\uD83D\uDD34" : "\uD83D\uDFE1";
+      const phaseLabel = ps.phase === "EARLY" ? "\uCD08\uBC18" : ps.phase === "MID" ? "\uC911\uBC18" : "\uD6C4\uBC18";
+      phaseNote = `<div class="dual-tl-detail-phase">
+        ${ratingEmoji} <strong>${escapeHtml(phaseLabel)}</strong>: ${escapeHtml(ps.summary || "")}
+        ${ps.focus ? `<br><em>${escapeHtml(ps.focus)}</em>` : ""}
+      </div>`;
+      break;
+    }
+  }
+
+  function renderDetailEvent(e) {
+    const summary = e.summary || e.eventType;
+    return `<div class="dual-tl-detail-event">
+      <span class="dual-tl-detail-event-time">${escapeHtml(e.icon || "")} ${escapeHtml(e.timestampLabel || "")}</span>
+      ${e.laneZone ? `<span class="dual-tl-event-lane">${escapeHtml(e.laneZone)}</span>` : ""}
+      <div>${escapeHtml(summary)}</div>
+    </div>`;
+  }
+
+  dom.dualDetail.innerHTML = `
+    <div class="dual-tl-detail-header">
+      <h4>${startLabel} ~ ${endLabel}</h4>
+      <div class="dual-tl-detail-momentum">
+        <span class="ally-count">\uC544\uAD70 <strong>${allyEvts.length}</strong></span>
+        vs
+        <span class="enemy-count">\uC801\uAD70 <strong>${enemyEvts.length}</strong></span>
+      </div>
+    </div>
+    <div class="dual-tl-detail-grid">
+      <div class="dual-tl-detail-col dual-tl-detail-col--ally">
+        <h5>\uC544\uAD70 \uD589\uB3D9</h5>
+        ${allyEvts.length > 0 ? allyEvts.map(renderDetailEvent).join("") : '<p class="muted">\uC774 \uAD6C\uAC04\uC5D0 \uC544\uAD70 \uC774\uBCA4\uD2B8 \uC5C6\uC74C</p>'}
+      </div>
+      <div class="dual-tl-detail-col dual-tl-detail-col--enemy">
+        <h5>\uC801\uAD70 \uD589\uB3D9</h5>
+        ${enemyEvts.length > 0 ? enemyEvts.map(renderDetailEvent).join("") : '<p class="muted">\uC774 \uAD6C\uAC04\uC5D0 \uC801\uAD70 \uC774\uBCA4\uD2B8 \uC5C6\uC74C</p>'}
+      </div>
+    </div>
+    ${phaseNote}
+  `;
+  dom.dualDetail.classList.add("dual-tl-detail--open");
+}
+
 function renderWardTimeline(sample) {
   const ward = sample.normalized?.wardTimeline;
   if (!ward) {
@@ -1347,6 +1962,7 @@ function renderSample(sample) {
   renderComparison(sample);
   renderPlaytimeScore(sample);
   renderLaningStats(sample);
+  renderDualTimeline(sample);
   renderObjectiveTimeline(sample);
   renderKdaTimeline(sample);
   renderWardTimeline(sample);
@@ -1577,6 +2193,7 @@ async function handleLogin(event) {
   applyPendingUi();
   setView("LOADING_MATCHES");
   dom.loginStatus.textContent = `${account.gameName}#${account.tagLine} 조회 중...`;
+  queueChampionVersionLoad(); // DDragon 버전/에셋을 API 호출과 병렬로 준비
 
   try {
     const payload = { ...account, matchCount: 10 };
@@ -1597,6 +2214,7 @@ async function handleLogin(event) {
       ranked: result.ranked,
       rankedStatus: result.rankedStatus,
       rankedError: result.rankedError,
+      championMastery: result.championMastery || [],
     };
     state.recentMatches = result.matches || [];
     if (remember) saveAccount(account);
@@ -1617,47 +2235,170 @@ async function handleLogin(event) {
 
 function renderMatchList() {
   const matches = state.recentMatches;
+  const acct = state.account;
+
+  // ── 프로필 통계 계산 ──
+  const wins = matches.filter((m) => m.result === "WIN").length;
+  const losses = matches.length - wins;
+  const winRate = matches.length > 0 ? Math.round((wins / matches.length) * 100) : 0;
+
+  const avgKills = matches.length > 0 ? (matches.reduce((s, m) => s + (m.kills || 0), 0) / matches.length).toFixed(1) : "0";
+  const avgDeaths = matches.length > 0 ? (matches.reduce((s, m) => s + (m.deaths || 0), 0) / matches.length).toFixed(1) : "0";
+  const avgAssists = matches.length > 0 ? (matches.reduce((s, m) => s + (m.assists || 0), 0) / matches.length).toFixed(1) : "0";
+
+  // 역할 분포
+  const roleCounts = {};
+  matches.forEach((m) => { roleCounts[m.role] = (roleCounts[m.role] || 0) + 1; });
+  const roleEntries = Object.entries(roleCounts).sort((a, b) => b[1] - a[1]);
+
+  // 상위 마스터리 챔피언
+  const mastery = acct.championMastery || [];
+  const topMastery = mastery.slice(0, 5).map((m) => ({
+    name: championNameFromId(m.championId),
+    level: m.championLevel,
+    points: m.championPoints,
+  })).filter((m) => m.name);
+
+  // 프로필 아이콘 URL
+  const iconUrl = profileIconUrl(acct.profileIconId);
+
+  // 랭크 정보
+  const ranked = acct.ranked;
+  const tierColors = {
+    iron: "#8b8b8b", bronze: "#b5733a", silver: "#8e9aaa", gold: "#f0b35b",
+    platinum: "#4ba6a6", emerald: "#2ea66b", diamond: "#6b7fe8",
+    master: "#b46bda", grandmaster: "#e04e4e", challenger: "#f0c74e",
+  };
+  const tierColor = ranked ? (tierColors[(ranked.tier || "").toLowerCase()] || "var(--muted)") : "var(--muted)";
 
   dom.matchListHeader.innerHTML = `
-    <div class="match-list-identity">
-      <h2>${state.account.riotId || `${state.account.gameName}#${state.account.tagLine}`}</h2>
-      ${state.account.ranked ? `
-        <span class="rank-badge rank-badge--${(state.account.ranked.tier || "").toLowerCase()}">
-          ${state.account.ranked.tier} ${state.account.ranked.rank} · ${state.account.ranked.lp} LP · 승률 ${state.account.ranked.winRate}%
-        </span>
-      ` : state.account.rankedStatus === "error" ? `
-        <span class="rank-badge rank-badge--unavailable" title="${state.account.rankedError || "랭크 정보를 불러오지 못했습니다."}">
-          랭크 조회 실패
-        </span>
-      ` : ""}
-      ${state.account.summonerLevel ? `<span class="level-badge">Lv. ${state.account.summonerLevel}</span>` : ""}
-      <p class="muted">최근 ${matches.length}게임 요약 · 클릭하면 상세 AI 분석</p>
-      <button class="login-submit login-submit--small" data-logout-btn>다른 계정</button>
+    <div class="profile-header">
+      <div class="profile-header__top">
+        <div class="profile-identity">
+          ${iconUrl
+            ? `<img class="profile-icon" src="${iconUrl}" alt="프로필 아이콘" onerror="this.style.display='none'" />`
+            : `<div class="profile-icon profile-icon--fallback">${(acct.riotId || acct.gameName || "?")[0]}</div>`
+          }
+          <div class="profile-identity__text">
+            <h2 class="profile-name">${escapeHtml(acct.riotId || `${acct.gameName}#${acct.tagLine}`)}</h2>
+            ${acct.summonerLevel ? `<span class="level-badge">Lv. ${acct.summonerLevel}</span>` : ""}
+          </div>
+        </div>
+        <button class="login-submit login-submit--small" data-logout-btn>다른 계정</button>
+      </div>
+
+      <div class="profile-header__body">
+        ${ranked ? `
+          <div class="profile-rank-card" style="--tier-color: ${tierColor}">
+            <div class="profile-rank-card__tier">
+              <span class="tier-emblem">${(ranked.tier || "?")[0]}</span>
+              <div>
+                <strong class="tier-name">${ranked.tier} ${ranked.rank}</strong>
+                <span class="tier-lp">${ranked.lp} LP</span>
+              </div>
+            </div>
+            <div class="profile-rank-card__record">
+              <span>${ranked.wins}승 ${ranked.losses}패</span>
+              <span class="tier-winrate">승률 ${ranked.winRate}%</span>
+            </div>
+          </div>
+        ` : acct.rankedStatus === "error" ? `
+          <div class="profile-rank-card profile-rank-card--na">
+            <span class="muted">랭크 조회 실패</span>
+          </div>
+        ` : `
+          <div class="profile-rank-card profile-rank-card--na">
+            <span class="muted">Unranked</span>
+          </div>
+        `}
+
+        <div class="profile-stats-block">
+          <div class="profile-winrate">
+            <div class="winrate-ring" style="--wr: ${winRate}">
+              <span>${winRate}%</span>
+            </div>
+            <div class="winrate-detail">
+              <span class="winrate-record">${wins}승 ${losses}패</span>
+              <span class="muted">최근 ${matches.length}게임</span>
+            </div>
+          </div>
+          <div class="profile-avg-kda">
+            <span class="meta-label">평균 KDA</span>
+            <strong>${avgKills} / <span class="kda-death">${avgDeaths}</span> / ${avgAssists}</strong>
+          </div>
+        </div>
+
+        <div class="profile-roles">
+          <span class="meta-label">플레이 역할</span>
+          <div class="role-bar-list">
+            ${roleEntries.map(([role, count]) => `
+              <div class="role-bar-item">
+                <span class="role-bar-label">${role}</span>
+                <div class="role-bar-track">
+                  <div class="role-bar-fill" style="width: ${Math.round((count / matches.length) * 100)}%"></div>
+                </div>
+                <span class="role-bar-count">${count}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        ${topMastery.length > 0 ? `
+          <div class="profile-mastery">
+            <span class="meta-label">숙련도 Top</span>
+            <div class="mastery-chip-list">
+              ${topMastery.map((m) => {
+                const squareUrl = championSquareUrl(m.name);
+                return `
+                  <div class="mastery-chip">
+                    ${squareUrl ? `<img src="${squareUrl}" alt="${championDisplayName(m.name)}" />` : `<span class="mastery-chip__icon">${championMonogram(m.name)}</span>`}
+                    <div class="mastery-chip__text">
+                      <strong>${championDisplayName(m.name)}</strong>
+                      <span>M${m.level} · ${formatMasteryPoints(m.points)}</span>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        ` : ""}
+      </div>
     </div>
   `;
 
-  dom.matchListGrid.innerHTML = matches.map((m) => `
-    <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
-      <div class="msc-row1">
-        <div class="match-summary-champion">
-          ${championAvatarMarkup(m.champion, "small")}
-          <div>
-            <strong>${championDisplayName(m.champion)}</strong>
-            <span class="meta-label">${m.role}</span>
+  dom.matchListGrid.innerHTML = matches.map((m) => {
+    const masteryInfo = findMasteryForChampion(m.champion);
+    const masteryBadge = masteryInfo
+      ? `<span class="msc-mastery">M${masteryInfo.championLevel}</span>`
+      : "";
+    const kdaRatio = m.deaths > 0 ? ((m.kills + m.assists) / m.deaths).toFixed(2) : "Perfect";
+
+    return `
+      <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
+        <div class="msc-result-bar" data-result="${m.result}"></div>
+        <div class="msc-row1">
+          <div class="match-summary-champion">
+            ${championAvatarMarkup(m.champion, "small")}
+            <div>
+              <strong>${championDisplayName(m.champion)}</strong>
+              <span class="meta-label">${m.role} ${masteryBadge}</span>
+            </div>
           </div>
+          <div class="msc-kda-block">
+            <span class="match-summary-kda"><span>${m.kills}</span>/<span class="kda-death">${m.deaths}</span>/<span>${m.assists}</span></span>
+            <span class="msc-kda-ratio">${kdaRatio}${kdaRatio !== "Perfect" ? ":1" : ""}</span>
+          </div>
+          <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
         </div>
-        <span class="match-summary-kda"><span>${m.kills}</span>/<span class="kda-death">${m.deaths}</span>/<span>${m.assists}</span></span>
-        <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
-      </div>
-      <div class="msc-row2">
-        <span class="match-summary-cs">${m.csPerMin} CS/m</span>
-        <span class="match-summary-duration">${m.durationLabel}</span>
-        <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
-        <span class="match-summary-patch">${compactPatchLabel(m.gameVersion)}</span>
-        <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
-      </div>
-    </button>
-  `).join("");
+        <div class="msc-row2">
+          <span class="match-summary-cs">${m.csPerMin} CS/m</span>
+          <span class="match-summary-duration">${m.durationLabel}</span>
+          <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
+          <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
+        </div>
+      </button>
+    `;
+  }).join("");
 
   applyPendingUi();
 }
@@ -1698,19 +2439,34 @@ async function startDetailAnalysis(matchId) {
   if (state.isDetailPending) return;
 
   state.isDetailPending = true;
+  setDetailProgress("prepare", {
+    message: `${matchId} 상세 분석을 준비하고 있습니다.`,
+    progress: 8,
+  });
   applyPendingUi();
   setView("LOADING_DETAIL");
   syncRecentFormWithAccount();
 
   try {
+    setDetailProgress("lookup", {
+      message: "이미 저장된 분석이 있는지 확인하고 있습니다.",
+      progress: 24,
+    });
+
     // 1. 프리페치 캐시 확인 (즉시 렌더)
     const prefetched = state.prefetchedSamples?.get(matchId);
     if (prefetched) {
       const match = sampleMatchSummary(prefetched);
       state.currentSampleId = prefetched.sampleId || findSampleIdForMatch(matchId) || state.currentSampleId;
+      setDetailProgress("compose", {
+        message: "저장된 분석으로 리포트를 구성하고 있습니다.",
+        progress: 88,
+        skippedSteps: ["riot", "ai"],
+      });
       renderSample(prefetched);
       dom.fetchStatus.textContent = `${state.currentSampleId || matchId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
       setView("DETAIL_VIEW");
+      completeDetailProgress("저장된 분석 리포트를 열었습니다.");
       return;
     }
 
@@ -1718,19 +2474,39 @@ async function startDetailAnalysis(matchId) {
     const cachedSampleId = findSampleIdForMatch(matchId);
 
     if (cachedSampleId) {
+      setDetailProgress("compose", {
+        message: `${cachedSampleId} 저장 분석을 불러와 리포트를 구성하고 있습니다.`,
+        progress: 88,
+        skippedSteps: ["riot", "ai"],
+      });
       dom.fetchStatus.textContent = `${matchId} 저장된 분석을 여는 중입니다.`;
       await selectSample(cachedSampleId);
       setView("DETAIL_VIEW");
+      completeDetailProgress("저장된 분석 리포트를 열었습니다.");
       return;
     }
 
     // 3. 직접 생성
+    setDetailProgress("riot", {
+      message: "Riot 매치 데이터와 타임라인을 확인하고 있습니다.",
+      progress: 42,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    startSoftDetailProgress("ai", `${matchId} AI 분석을 생성하고 있습니다. 보통 2~5분 정도 걸릴 수 있습니다.`, {
+      progress: 64,
+    });
     dom.fetchStatus.textContent = `${matchId} AI 분석 진행 중... (2~5분 소요)`;
     const result = await handleGenerateSample(matchId);
+    setDetailProgress("compose", {
+      message: `${result.sampleId} 샘플을 저장하고 리포트를 구성하고 있습니다.`,
+      progress: 92,
+    });
     await selectSample(result.sampleId);
     setView("DETAIL_VIEW");
+    completeDetailProgress("새 분석 리포트를 열었습니다.");
   } catch (error) {
     dom.fetchStatus.textContent = `상세 분석 열기 실패: ${formatRetryMessage(error)}`;
+    failDetailProgress(formatRetryMessage(error));
     setView("MATCH_LIST");
   } finally {
     state.isDetailPending = false;
@@ -1824,6 +2600,89 @@ async function init() {
   }
 
   applyPendingUi();
+  initTabSystem();
+  bindDualTimelineEvents();
+}
+
+// ─── Tab system ─────────────────────────────────────────────────────────
+
+function switchTab(tabId) {
+  const dashboard = document.getElementById("main-content");
+  if (!dashboard) return;
+
+  // Update tab-bar buttons
+  dashboard.querySelectorAll(".tab-btn").forEach((btn) => {
+    const isActive = btn.dataset.tab === tabId;
+    btn.classList.toggle("tab-btn--active", isActive);
+    btn.setAttribute("aria-selected", isActive);
+  });
+
+  // Update tab pages
+  dashboard.querySelectorAll(".tab-page").forEach((page) => {
+    page.classList.toggle("tab-page--active", page.id === tabId);
+  });
+
+  // Update sidebar nav
+  if (dom.sectionNav) {
+    dom.sectionNav.querySelectorAll(".tab-link").forEach((link) => {
+      const isActive = link.dataset.tabTarget === tabId;
+      link.classList.toggle("tab-link--active", isActive);
+      link.setAttribute("aria-selected", isActive);
+    });
+  }
+
+  dashboard.dataset.activeTab = tabId;
+  localStorage.setItem("lol-coach-active-tab", tabId);
+}
+
+function initTabSystem() {
+  // Tab bar click handler
+  if (dom.tabBar) {
+    dom.tabBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab-btn");
+      if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
+    });
+  }
+
+  // Sidebar nav click handler
+  if (dom.sectionNav) {
+    dom.sectionNav.addEventListener("click", (e) => {
+      const link = e.target.closest(".tab-link");
+      if (link && link.dataset.tabTarget) switchTab(link.dataset.tabTarget);
+    });
+  }
+
+  // Restore last active tab
+  const savedTab = localStorage.getItem("lol-coach-active-tab");
+  if (savedTab && document.getElementById(savedTab)) {
+    switchTab(savedTab);
+  }
+
+  // Collapsible card handlers
+  document.querySelectorAll("[data-collapse-toggle]").forEach((heading) => {
+    heading.addEventListener("click", () => {
+      const card = heading.closest("[data-card-id]");
+      if (!card) return;
+      const id = card.dataset.cardId;
+      const isCollapsed = card.hasAttribute("data-collapsed");
+      if (isCollapsed) {
+        card.removeAttribute("data-collapsed");
+      } else {
+        card.setAttribute("data-collapsed", "");
+      }
+      // Persist
+      const store = JSON.parse(localStorage.getItem("lol-coach-collapsed") || "{}");
+      if (isCollapsed) { delete store[id]; } else { store[id] = true; }
+      localStorage.setItem("lol-coach-collapsed", JSON.stringify(store));
+    });
+  });
+
+  // Restore collapsed states
+  const collapsed = JSON.parse(localStorage.getItem("lol-coach-collapsed") || "{}");
+  Object.keys(collapsed).forEach((id) => {
+    const card = document.querySelector(`[data-card-id="${id}"]`);
+    if (card) card.setAttribute("data-collapsed", "");
+  });
 }
 
 init();

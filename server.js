@@ -1877,9 +1877,9 @@ async function handleRecentMatches(req, res) {
       headers,
     );
 
-    // summoner + league + matchIds 병렬 호출
+    // summoner + league + matchIds + mastery 병렬 호출
     const platformHost = `${platformRegion.toLowerCase()}.api.riotgames.com`;
-    const [matchIds, summonerData, leagueData] = await Promise.all([
+    const [matchIds, summonerData, leagueData, masteryData] = await Promise.all([
       requestJson(
         `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(account.puuid)}/ids?start=0&count=${matchCount}`,
         headers,
@@ -1889,6 +1889,10 @@ async function handleRecentMatches(req, res) {
         headers,
       ).catch(() => null),
       null, // league-v4는 summonerId가 필요해서 아래에서 후속 호출
+      requestJson(
+        `https://${platformHost}/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(account.puuid)}/top?count=20`,
+        headers,
+      ).catch(() => null),
     ]);
 
     // league-v4: summonerId로 랭크 정보 조회
@@ -1943,6 +1947,7 @@ async function handleRecentMatches(req, res) {
       ranked,
       rankedStatus,
       rankedError,
+      championMastery: masteryData || [],
       matches,
     });
   } catch (error) {
