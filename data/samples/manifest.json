@@ -1,6 +1,54 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8173054731",
+      "matchId": "KR_8173054731",
+      "label": "sample-kr-8173054731 · SUPPORT WIN",
+      "champion": "Thresh",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-15",
+      "theme": "쓰레쉬의 높은 킬 관여(79%)와 시야 장악(73)으로 오브젝트·구조물 압박을 주도하며 27분 만에 승리한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8173054731/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8173054731/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8173054731/sample-kr-8173054731-notes.md"
+    },
+    {
+      "id": "sample-kr-8173002661",
+      "matchId": "KR_8173002661",
+      "label": "sample-kr-8173002661 · JUNGLE WIN",
+      "champion": "Graves",
+      "publicAlias": "완두콩#oOoO",
+      "collectedDate": "2026-04-15",
+      "theme": "불안정한 초중반을 개인 화력으로 버텨낸 뒤, 후반 바론 확보와 구조물 압박으로 역전승을 완성한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8173002661/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8173002661/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8173002661/sample-kr-8173002661-notes.md"
+    },
+    {
+      "id": "sample-kr-8172966998",
+      "matchId": "KR_8172966998",
+      "label": "sample-kr-8172966998 · SUPPORT WIN",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-15",
+      "theme": "초반 연속 데스로 크게 흔들렸지만, 중반 오브젝트 합류와 팀 협동으로 역전승을 거둔 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8172966998/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8172966998/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8172966998/sample-kr-8172966998-notes.md"
+    },
+    {
+      "id": "sample-kr-8172883349",
+      "matchId": "KR_8172883349",
+      "label": "sample-kr-8172883349 · SUPPORT WIN",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-14",
+      "theme": "10데스의 불안정한 중반을 버텨낸 뒤 후반 구조물 압박과 오브젝트 합류로 역전승을 이끌어낸 세라핀 서포터 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8172883349/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8172883349/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8172883349/sample-kr-8172883349-notes.md"
+    },
+    {
       "id": "sample-kr-8171847804",
       "matchId": "KR_8171847804",
       "label": "sample-kr-8171847804 · SUPPORT WIN",

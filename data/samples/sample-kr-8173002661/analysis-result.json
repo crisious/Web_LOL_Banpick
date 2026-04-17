@@ -1,0 +1,227 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "generatedAt": "2026-04-15T01:31:11.541Z",
+    "language": "ko",
+    "analysisMode": "coaching",
+    "matchId": "KR_8173002661",
+    "riotId": "완두콩#oOoO",
+    "champion": "Graves",
+    "position": "JUNGLE",
+    "result": "WIN",
+    "analysisId": "ai_sample-kr-8173002661_1776216671541"
+  },
+  "matchSummary": {
+    "headline": "불안정한 초중반을 개인 화력으로 버텨낸 뒤, 후반 바론 확보와 구조물 압박으로 역전승을 완성한 경기."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 2/4로 흔들렸지만 중반부터 그레이브즈의 화력을 극대화하며 팀 킬의 66%에 관여했습니다. 특히 후반 6킬 0데스로 완벽한 클린업을 보여줬고, 바론 확보 후 구조물을 연쇄적으로 밀어 승리를 마무리한 점이 인상적입니다. 다만 드래곤을 하나도 확보하지 못한 점과 중반 반복적인 데스는 오브젝트 운영과 포지셔닝 측면에서 개선이 필요합니다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "kills": 2,
+      "deaths": 4,
+      "assists": 2,
+      "summary": "초반 정글 주도권을 잡지 못하고 4데스를 기록하며 불안정하게 출발했습니다. 14분경 오브젝트도 내주면서 상대 정글에게 흐름을 빼앗겼습니다.",
+      "tone": "negative"
+    },
+    {
+      "phase": "MID",
+      "kills": 9,
+      "deaths": 5,
+      "assists": 3,
+      "summary": "9킬로 폭발적인 화력을 보여줬지만, 5데스가 동반되며 '킬을 따고 죽는' 패턴이 반복됐습니다. 바론과 드래곤 등 주요 오브젝트를 상대에게 내주며 팀 운영이 흔들렸습니다.",
+      "tone": "mixed"
+    },
+    {
+      "phase": "LATE",
+      "kills": 6,
+      "deaths": 0,
+      "assists": 1,
+      "summary": "후반 6킬 0데스로 완벽한 캐리력을 발휘했습니다. 33분 바론 확보 후 연속 구조물 파괴로 경기를 마무리하며, 후반 클로징 능력이 빛났습니다.",
+      "tone": "positive"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "압도적인 딜량과 캐리력",
+      "description": "52,724의 챔피언 대상 피해량은 정글 포지션에서 매우 높은 수치입니다. 그레이브즈의 화력을 극대화하는 빌드와 교전 참여로 팀의 핵심 딜러 역할을 수행했습니다.",
+      "relatedEventIds": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_051"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "후반 무결점 클린업",
+      "description": "후반(30분 이후) 6킬 0데스를 기록하며, 초중반의 불안정함을 완전히 극복했습니다. 체력 관리와 진입 타이밍 판단이 후반으로 갈수록 정교해졌습니다.",
+      "relatedEventIds": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_051"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "바론 후 신속한 구조물 전환",
+      "description": "33분 바론 확보 후 약 2분 만에 다수의 타워를 연쇄 파괴하며 승리 조건을 확실하게 닫았습니다. 오브젝트 확보 후 즉시 구조물로 전환하는 판단이 정확했습니다.",
+      "relatedEventIds": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_050",
+        "evt_051"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "weak_1",
+      "title": "초반 정글 안정성 부족",
+      "description": "초반 4데스는 그레이브즈의 스케일링을 지연시켰습니다. 상대 정글과의 조우나 갱킹 경로에서 리스크 관리가 필요합니다. 초반에는 안정적인 파밍 루트를 우선하는 것이 좋습니다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "id": "weak_2",
+      "title": "드래곤 오브젝트 컨트롤 전무",
+      "description": "팀이 드래곤을 0개 확보하고 상대에게 4개를 내준 것은 정글러로서 오브젝트 주도권이 부족했음을 보여줍니다. 드래곤 스폰 타이머에 맞춘 사전 와딩과 라인 우선권 확보가 필요합니다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_015",
+        "evt_025",
+        "evt_035"
+      ]
+    },
+    {
+      "id": "weak_3",
+      "title": "중반 반복적 데스와 포지셔닝 리스크",
+      "description": "중반 5데스 중 상당수가 핵심 구도에서 발생했습니다. 킬을 따낸 후 후속 포지셔닝이 불안정하거나, 과도한 진입으로 역킬을 당하는 패턴이 보입니다. 교전 후 즉시 이탈 경로를 확보하는 습관이 필요합니다.",
+      "relatedEventIds": [
+        "evt_011",
+        "evt_014",
+        "evt_017",
+        "evt_026",
+        "evt_033"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_1",
+      "text": "초반(~14분) 데스를 2회 이하로 관리하기 — 그레이브즈는 아이템 의존도가 높으므로 초반 안정적 파밍이 핵심입니다.",
+      "priority": "high"
+    },
+    {
+      "id": "chk_2",
+      "text": "드래곤 스폰 1분 전에 해당 사이드 시야를 확보하고 라이너와 합류 타이밍을 맞추기.",
+      "priority": "high"
+    },
+    {
+      "id": "chk_3",
+      "text": "킬 획득 후 체력이 40% 이하라면 무리한 추가 교전 대신 즉시 리셋 판단하기.",
+      "priority": "medium"
+    },
+    {
+      "id": "chk_4",
+      "text": "중반 오브젝트 교환 시 팀원 생존 여부를 확인하고, 수적 불리 시 오브젝트 트레이드로 전환하기.",
+      "priority": "medium"
+    },
+    {
+      "id": "chk_5",
+      "text": "후반처럼 바론 확보 후 즉시 구조물 전환하는 패턴을 중반 오브젝트에도 적용하기.",
+      "priority": "low"
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_009",
+      "timestampLabel": "13:59",
+      "phase": "EARLY",
+      "title": "초반 오브젝트 상실",
+      "description": "초반 4데스 상황에서 주요 오브젝트까지 내주며 상대에게 초반 주도권을 완전히 빼앗겼습니다. 이 시점이 게임에서 가장 어려운 구간의 시작이었습니다.",
+      "impact": "negative"
+    },
+    {
+      "eventId": "evt_028",
+      "timestampLabel": "26:42",
+      "phase": "MID",
+      "title": "바론 상실",
+      "description": "상대에게 바론을 내주며 경기 흐름이 위험해졌습니다. 중반 반복 데스로 바론 구도에서 수적 열세가 발생한 결과입니다.",
+      "impact": "negative"
+    },
+    {
+      "eventId": "evt_039",
+      "timestampLabel": "33:36",
+      "phase": "LATE",
+      "title": "역전의 바론 확보",
+      "description": "후반 0데스 흐름을 이어가며 바론 확보에 성공, 경기의 전환점을 만들었습니다. 이 바론이 최종 클로징의 기반이 되었습니다.",
+      "impact": "positive"
+    },
+    {
+      "eventId": "evt_045",
+      "timestampLabel": "35:09",
+      "phase": "LATE",
+      "title": "연쇄 구조물 파괴 시작",
+      "description": "바론 버프를 활용해 타워를 연쇄적으로 파괴하기 시작했습니다. 이후 약 30초 만에 다수의 구조물을 밀어내며 승리를 확정지었습니다.",
+      "impact": "positive"
+    },
+    {
+      "eventId": "evt_051",
+      "timestampLabel": "35:33",
+      "phase": "LATE",
+      "title": "최종 구조물 압박 완성",
+      "description": "마지막 타워까지 파괴하며 넥서스 진입로를 확보, 35분 40초에 승리를 마무리했습니다.",
+      "impact": "positive"
+    }
+  ],
+  "evidenceIndex": {
+    "strengths": {
+      "str_1": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_051"
+      ],
+      "str_2": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_051"
+      ],
+      "str_3": [
+        "evt_039",
+        "evt_045",
+        "evt_048",
+        "evt_050",
+        "evt_051"
+      ]
+    },
+    "weaknesses": {
+      "weak_1": [
+        "evt_009"
+      ],
+      "weak_2": [
+        "evt_009",
+        "evt_015",
+        "evt_025",
+        "evt_035"
+      ],
+      "weak_3": [
+        "evt_011",
+        "evt_014",
+        "evt_017",
+        "evt_026",
+        "evt_033"
+      ]
+    }
+  },
+  "schemaVersion": "1.0"
+}
