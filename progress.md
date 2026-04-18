@@ -35,46 +35,25 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 
 ## 샘플 데이터 상태
 
-- 실제 Riot API 기반 샘플 4건 저장 완료.
+- 총 26건 저장 (레거시 rule-based 2건 + KR AI 분석 24건).
+- 계정 커버리지: `매운맛 비스킷#KR1` (대부분), `핑거샷#KR1`, `완두콩#oOoO`.
+- 포지션 커버리지: SUPPORT 중심 + JUNGLE / MID / TOP 일부 포함.
+- 챔피언 다양성: DrMundo, Nasus, Galio, Malphite, Rell, Nautilus, Braum, Senna, Thresh, Lulu, Morgana, Pantheon, Seraphine, Graves, Xerath 등.
+- 최신 샘플 수집일: 2026-04-18 (sample-kr-8048864259, sample-kr-8173098718).
 
-### sample-001
+### 샘플 디렉터리 구조
 
-- Match ID: `KR_8166489844`
-- Champion/Role/Result: `Nasus / MID / LOSS`
-- 분석 소스: rule-based (`match_timeline`)
-- Theme: 초반 라인 불안 + 오브젝트 합류는 꾸준 + 바론 이후 전환/생존 아쉬움
+각 샘플에 다음 파일 저장:
 
-### sample-002
+- `raw-account.json` — Riot account-v1 응답
+- `raw-match.json` — match-v5 상세
+- `raw-timeline.json` — match-v5 타임라인
+- `normalized-match.json` — 정규화된 단일 스키마
+- `analysis-result.json` — primary 분석 (Claude 또는 fallback)
+- `comparison-result.json` — AI 비교 결과 (AI 분석 샘플만)
+- `{id}-notes.md` — 수집 메모
 
-- Match ID: `KR_8166674448`
-- Champion/Role/Result: `Dr. Mundo / JUNGLE / WIN`
-- 분석 소스: rule-based (`match_timeline`)
-- Theme: 정글 오브젝트 템포 좋음 + 데스 관리 아쉬움 + 후반 구조물 마무리 보완 필요
-
-### sample-kr-8166637996
-
-- Match ID: `KR_8166637996`
-- Champion/Role/Result: `Dr. Mundo / JUNGLE / WIN`
-- 분석 소스: rule-based (`match_timeline`)
-- Theme: 드래곤과 바론 관여 꾸준, 오브젝트 이후 전환 안정성이 관건
-
-### sample-kr-8166601659
-
-- Match ID: `KR_8166601659`
-- Champion/Role/Result: `Dr. Mundo / JUNGLE / WIN`
-- 분석 소스: **AI 에이전트** (`claude_ai`)
-- Comparison: `comparison-result.json` 생성됨 (agreementRate: 17%)
-- Theme: 10데스에도 불구하고 문도의 탱킹과 팀 합류로 49킬 역전승
-
-### 저장 위치
-
-- `data/samples/sample-001/`
-- `data/samples/sample-002/`
-- `data/samples/sample-kr-8166637996/`
-- `data/samples/sample-kr-8166601659/`
-- 각 샘플에 `raw-account.json`, `raw-match.json`, `raw-timeline.json`, `normalized-match.json`, `analysis-result.json`, `{id}-notes.md` 저장
-- AI 에이전트 분석 샘플에는 추가로 `comparison-result.json` 저장
-- `data/samples/manifest.json`로 샘플 인덱스 관리
+`data/samples/manifest.json`로 전체 샘플 인덱스 관리.
 
 ## 현재 웹 앱 상태
 
@@ -95,7 +74,11 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 ### `POST /api/recent-matches`
 
 - Riot ID 기준 최근 경기 후보 조회
+- 페이지네이션: `start` (기본 0), `matchCount` (≤20, 기본 10), 응답에 `hasMore` 포함
 - 후보별 `champion / role / result / duration / KDA / sampleFitScore` 반환
+- 랭크 조회: `league-v4/entries/by-puuid/{puuid}` (summoner-v4의 encryptedSummonerId 제거 대응)
+- 챔피언 숙련도: `champion-mastery/v4/by-puuid/{puuid}/top?count=20` 포함
+- IP 기반 rate-limit 10초
 
 ### `POST /api/generate-sample`
 
@@ -115,17 +98,17 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 
 ### 현재 레이아웃
 
-- 상단: 전적 사이트형 topbar
-- 좌측: Player Hub 사이드 레일
+- 상단: 전적 사이트형 topbar + 랭크 카드 (솔랭/자랭 fallback, 미랭크/조회 실패 분리)
+- 좌측: Player Hub 사이드 레일 + 챔피언 숙련도 스냅샷 (Lv/포인트)
 - 우측 본문:
   - Headline
   - Quick View
-  - 핵심 지표
-  - Saved Reports
-  - Phase Review
-  - Strengths / Weaknesses
-  - Next Game Checklist
-  - Key Moments
+  - 최근 경기 리스트 + "이전 10개 더 보기" 페이지네이션 (10초 rate-limit)
+  - 상세 분석은 탭 구조로 재편:
+    - Overview (Phase Review / Strengths / Weaknesses / Checklist)
+    - Progress (KDA/시야/빌드 타임라인 등)
+    - Mastery (챔피언 숙련도 + 경기 내 활용)
+    - AI Comparison (agreement rate + 3열 그리드)
   - Evidence Ledger
 
 ### GUI 방향
@@ -164,6 +147,9 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
   - `comparison-result.json` 생성 확인 (agreements: 1, claudeOnly: 5, codexOnly: 5)
   - Claude + Codex 병렬 실행 정상
   - 서버측 응답 정규화 (string→객체) 동작 확인
+- 페이지네이션 + league-v4 by-puuid 마이그레이션 (2026-04-18~19):
+  - 최근 경기 10개씩 페이지네이션, `hasMore` 응답 확인
+  - Riot 스펙 변경(summoner-v4 `encryptedSummonerId` 제거) 이후 랭크 조회 by-puuid로 전환
 
 ## 현재 남은 블로커
 
@@ -270,7 +256,8 @@ Claude 실패, Codex 성공 → primary = Codex
 
 ## 다음 추천 작업
 
-1. `comparison-result.json` UI 뷰 추가 (레드팀 비교 패널)
-2. 다중 경기 누적 분석 뷰 추가
-3. Riot 개발 키 갱신 자동화 또는 안내 개선
-4. AI 프롬프트 고도화 (출력 스키마 준수율 개선)
+1. 다중 경기 누적 분석 뷰 (최근 N경기 트렌드 — 챔피언/포지션별 패턴)
+2. Riot 개발 키 갱신 자동화 또는 안내 개선
+3. AI 프롬프트 고도화 (출력 스키마 준수율 개선)
+4. 탭 전환 시 초기 로딩 지연 최적화 (Progress/Mastery 탭의 사전 렌더)
+5. Riot RSO OAuth 전환 (프로덕션 승인 이후)
