@@ -155,7 +155,7 @@ function renderLivePanel() {
       ${summaryTile("현재 단계", `${actingTeam.name} ${step.label}`, `${pickOrderLabel(step.order)} · ${sideLabel(actingSide)}`)}
       ${summaryTile("턴 / 전체", `${step.turn} / ${store.sequence.length}`, `${step.type} slot ${step.slot + 1}`)}
       ${summaryTile("현재 매칭", `${currentTeam(resolved.sideToTeam.blue).name} vs ${currentTeam(resolved.sideToTeam.red).name}`, `Blue ${currentTeam(resolved.sideToTeam.blue).name} · Red ${currentTeam(resolved.sideToTeam.red).name}`)}
-      ${summaryTile("남은 시간", draftStore.formatTimer(store.live.remainingMs), `${store.series.gameLabel} · ${store.series.format}`)}
+      ${summaryTile("남은 시간", draftStore.formatTimer(store.live.remainingMs), `${store.series.gameLabel} · ${store.series.format} · Patch ${store.series.patch}`)}
     </div>
 
     <div class="action-row">

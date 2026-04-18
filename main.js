@@ -46,6 +46,7 @@ const dom = {
   matchListView: document.querySelector("[data-match-list-view]"),
   matchListGrid: document.querySelector("[data-match-list-grid]"),
   matchListHeader: document.querySelector("[data-match-list-header]"),
+  matchListFooter: document.querySelector("[data-match-list-footer]"),
   backToListBtn: document.querySelector("[data-back-to-list]"),
   scorePanel: document.querySelector("[data-score-panel]"),
   objectiveSummary: document.querySelector("[data-objective-summary]"),
@@ -75,6 +76,8 @@ const state = {
   view: "LOGGED_OUT",
   account: null,
   recentMatches: [],
+  recentMatchesHasMore: false,
+  isLoadMorePending: false,
   prefetchedSamples: new Map(),
   riotApiKey: "",
   detailProgress: {
@@ -87,6 +90,8 @@ const state = {
   },
   detailProgressTimer: null,
 };
+
+const REPORT_STRIP_LIMIT = 6;
 
 const HTML_ESCAPE = {
   "&": "&amp;",
@@ -356,6 +361,66 @@ function compactPatchLabel(version) {
     return `${parts[0]}.${parts[1]}`;
   }
   return text;
+}
+
+function matchPatchLabel(version) {
+  const patch = compactPatchLabel(version);
+  return patch ? `패치 ${patch}` : "패치 -";
+}
+
+const TIER_LABELS = {
+  IRON: "아이언",
+  BRONZE: "브론즈",
+  SILVER: "실버",
+  GOLD: "골드",
+  PLATINUM: "플래티넘",
+  EMERALD: "에메랄드",
+  DIAMOND: "다이아몬드",
+  MASTER: "마스터",
+  GRANDMASTER: "그랜드마스터",
+  CHALLENGER: "챌린저",
+};
+
+const RANKED_QUEUE_LABELS = {
+  RANKED_SOLO_5x5: "솔로랭크",
+  RANKED_FLEX_SR: "자유랭크",
+};
+
+function normalizeRankedSnapshot(ranked) {
+  if (!ranked || typeof ranked !== "object") return null;
+  const tier = String(ranked.tier || "").trim().toUpperCase();
+  if (!tier) return null;
+  const rank = String(ranked.rank || "").trim().toUpperCase();
+  const queueType = String(ranked.queueType || "RANKED_SOLO_5x5").trim();
+
+  return {
+    ...ranked,
+    queueType,
+    queueLabel: ranked.queueLabel || RANKED_QUEUE_LABELS[queueType] || "랭크",
+    tier,
+    tierLabel: TIER_LABELS[tier] || tier,
+    rank,
+    lp: Number.isFinite(Number(ranked.lp)) ? Number(ranked.lp) : 0,
+    wins: Number.isFinite(Number(ranked.wins)) ? Number(ranked.wins) : 0,
+    losses: Number.isFinite(Number(ranked.losses)) ? Number(ranked.losses) : 0,
+    winRate: Number.isFinite(Number(ranked.winRate)) ? Number(ranked.winRate) : 0,
+  };
+}
+
+function rankedDivisionLabel(ranked) {
+  if (!ranked?.rank || ["MASTER", "GRANDMASTER", "CHALLENGER"].includes(ranked.tier)) {
+    return "";
+  }
+  return ranked.rank;
+}
+
+function rankedDisplayName(ranked) {
+  return [ranked?.tierLabel, rankedDivisionLabel(ranked)].filter(Boolean).join(" ") || "랭크";
+}
+
+function rankedEmblemLabel(ranked) {
+  const label = ranked?.tierLabel || ranked?.tier || "?";
+  return label.slice(0, 1).toUpperCase();
 }
 
 function championDisplayName(name) {
@@ -857,6 +922,25 @@ function sampleMatchSummary(sample) {
   };
 }
 
+function visibleReportSamples() {
+  const samples = state.manifest || [];
+  if (samples.length <= REPORT_STRIP_LIMIT) {
+    return samples;
+  }
+
+  const currentSample = samples.find((sample) => sample.id === state.currentSampleId);
+  const visible = currentSample ? [currentSample] : [];
+
+  for (const sample of samples) {
+    if (visible.length >= REPORT_STRIP_LIMIT) break;
+    if (sample.id !== currentSample?.id) {
+      visible.push(sample);
+    }
+  }
+
+  return visible;
+}
+
 async function fetchJson(path, options) {
   const response = await fetch(path, options);
   const payload = await response.json();
@@ -941,7 +1025,7 @@ function renderSampleSwitcher() {
     .join("");
 
   if (dom.reportStrip) {
-    dom.reportStrip.innerHTML = state.manifest
+    dom.reportStrip.innerHTML = visibleReportSamples()
       .map((sample) => {
         const meta = parseReportMeta(sample);
         const resultText = meta.result === "WIN" ? "승리" : meta.result === "LOSS" ? "패배" : meta.result;
@@ -1216,20 +1300,56 @@ function renderKeyMoments(sample) {
     .join("");
 }
 
+function collectEvidenceEventIds(node) {
+  const ids = new Set();
+  const walk = (value) => {
+    if (value == null) return;
+    if (typeof value === "string") {
+      if (/^evt_\w+$/.test(value)) ids.add(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(walk);
+      return;
+    }
+    if (typeof value === "object") {
+      Object.values(value).forEach(walk);
+    }
+  };
+  walk(node);
+  return [...ids];
+}
+
 function renderEvidence(sample) {
   const timelineMap = evidenceMap(sample);
   const idx = sample.analysis?.evidenceIndex;
 
+  const isRuleBasedArray =
+    Array.isArray(idx) && idx.length > 0 && typeof idx[0] === "object" && !Array.isArray(idx[0]);
+
   let evidenceEntries;
-  if (Array.isArray(idx)) {
-    // rule-based: 이미 완전한 객체 배열
+  if (isRuleBasedArray) {
     evidenceEntries = idx;
   } else {
-    // AI: { eventIds: [...] } 또는 { highImportanceEvents: [...] } 등 다양한 형식
-    const ids = idx?.eventIds || idx?.highImportanceEvents || idx?.playerInvolvedEvents || [];
-    evidenceEntries = (Array.isArray(ids) ? ids : [])
-      .map((eventId) => timelineMap.get(eventId))
-      .filter(Boolean);
+    let ids = collectEvidenceEventIds(idx);
+
+    // fallback: evidenceIndex에서 ID를 못 뽑으면 인사이트 항목의 relatedEventIds 합성
+    if (ids.length === 0) {
+      const insights = [
+        ...(sample.analysis?.strengths || []),
+        ...(sample.analysis?.weaknesses || []),
+        ...(sample.analysis?.keyMoments || []),
+      ];
+      ids = [...new Set(insights.flatMap((it) => it.relatedEventIds || []))];
+    }
+
+    const order = new Map(
+      (sample.normalized?.timelineEvents || []).map((e, i) => [e.eventId, e.timestampMs ?? i]),
+    );
+    evidenceEntries = ids
+      .map((id) => timelineMap.get(id))
+      .filter(Boolean)
+      .sort((a, b) => (order.get(a.eventId) ?? 0) - (order.get(b.eventId) ?? 0));
   }
 
   if (evidenceEntries.length === 0) {
@@ -2005,6 +2125,7 @@ function renderCandidates(matches) {
             <span>${match.role}</span>
             <span class="candidate-result" data-result="${match.result}">${resultLabel(match.result)}</span>
             <span>${match.durationLabel}</span>
+            <span>${matchPatchLabel(match.gameVersion)}</span>
             <span>${match.kills}/${match.deaths}/${match.assists}</span>
           </div>
           <div class="candidate-meta candidate-meta--secondary">
@@ -2217,6 +2338,7 @@ async function handleLogin(event) {
       championMastery: result.championMastery || [],
     };
     state.recentMatches = result.matches || [];
+    state.recentMatchesHasMore = Boolean(result.hasMore);
     if (remember) saveAccount(account);
 
     renderMatchList();
@@ -2263,7 +2385,7 @@ function renderMatchList() {
   const iconUrl = profileIconUrl(acct.profileIconId);
 
   // 랭크 정보
-  const ranked = acct.ranked;
+  const ranked = normalizeRankedSnapshot(acct.ranked);
   const tierColors = {
     iron: "#8b8b8b", bronze: "#b5733a", silver: "#8e9aaa", gold: "#f0b35b",
     platinum: "#4ba6a6", emerald: "#2ea66b", diamond: "#6b7fe8",
@@ -2291,9 +2413,10 @@ function renderMatchList() {
         ${ranked ? `
           <div class="profile-rank-card" style="--tier-color: ${tierColor}">
             <div class="profile-rank-card__tier">
-              <span class="tier-emblem">${(ranked.tier || "?")[0]}</span>
+              <span class="tier-emblem">${escapeHtml(rankedEmblemLabel(ranked))}</span>
               <div>
-                <strong class="tier-name">${ranked.tier} ${ranked.rank}</strong>
+                <span class="tier-queue">${escapeHtml(ranked.queueLabel)}</span>
+                <strong class="tier-name">${escapeHtml(rankedDisplayName(ranked))}</strong>
                 <span class="tier-lp">${ranked.lp} LP</span>
               </div>
             </div>
@@ -2308,7 +2431,7 @@ function renderMatchList() {
           </div>
         ` : `
           <div class="profile-rank-card profile-rank-card--na">
-            <span class="muted">Unranked</span>
+            <span class="muted">랭크 기록 없음</span>
           </div>
         `}
 
@@ -2372,6 +2495,7 @@ function renderMatchList() {
       ? `<span class="msc-mastery">M${masteryInfo.championLevel}</span>`
       : "";
     const kdaRatio = m.deaths > 0 ? ((m.kills + m.assists) / m.deaths).toFixed(2) : "Perfect";
+    const patchLabel = matchPatchLabel(m.gameVersion);
 
     return `
       <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
@@ -2394,13 +2518,72 @@ function renderMatchList() {
           <span class="match-summary-cs">${m.csPerMin} CS/m</span>
           <span class="match-summary-duration">${m.durationLabel}</span>
           <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
+          <span class="match-summary-patch">${patchLabel}</span>
           <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
         </div>
       </button>
     `;
   }).join("");
 
+  renderMatchListFooter();
   applyPendingUi();
+}
+
+function renderMatchListFooter() {
+  const footer = dom.matchListFooter;
+  if (!footer) return;
+  if (!state.recentMatchesHasMore) {
+    footer.innerHTML = "";
+    return;
+  }
+  const loading = state.isLoadMorePending;
+  footer.innerHTML = `
+    <button type="button" class="match-list-more-btn" data-match-more ${loading ? "disabled" : ""}>
+      ${loading ? "불러오는 중..." : `이전 경기 10개 더 보기 <span class="match-list-more-btn__hint">현재 ${state.recentMatches.length}개</span>`}
+    </button>
+  `;
+}
+
+async function loadMoreRecentMatches() {
+  if (state.isLoadMorePending || !state.recentMatchesHasMore) return;
+  const acct = state.account;
+  if (!acct) return;
+
+  state.isLoadMorePending = true;
+  renderMatchListFooter();
+
+  try {
+    const payload = {
+      gameName: acct.gameName,
+      tagLine: acct.tagLine,
+      platformRegion: acct.platformRegion || "KR",
+      matchCount: 10,
+      start: state.recentMatches.length,
+    };
+    const userApiKey = getUserApiKey();
+    if (userApiKey) payload.riotApiKey = userApiKey;
+
+    const result = await fetchJson("/api/recent-matches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const incoming = result.matches || [];
+    const existing = new Set(state.recentMatches.map((m) => m.matchId));
+    const fresh = incoming.filter((m) => !existing.has(m.matchId));
+    state.recentMatches = [...state.recentMatches, ...fresh];
+    state.recentMatchesHasMore = Boolean(result.hasMore) && fresh.length > 0;
+
+    renderMatchList();
+    prefetchAndAnalyzeAll();
+  } catch (error) {
+    state.recentMatchesHasMore = true;
+    renderMatchListFooter();
+    alert(`이전 경기 불러오기 실패: ${formatRetryMessage(error)}`);
+  } finally {
+    state.isLoadMorePending = false;
+  }
 }
 
 // ─── Background analysis queue ────────────────────────────────────────────
@@ -2557,6 +2740,14 @@ async function init() {
     startDetailAnalysis(card.dataset.matchDetail);
   });
 
+  if (dom.matchListFooter) {
+    dom.matchListFooter.addEventListener("click", (event) => {
+      if (event.target.closest("[data-match-more]")) {
+        loadMoreRecentMatches();
+      }
+    });
+  }
+
   dom.backToListBtn.addEventListener("click", () => setView("MATCH_LIST"));
 
   dom.matchListHeader.addEventListener("click", (event) => {
@@ -2564,6 +2755,7 @@ async function init() {
       localStorage.removeItem("lol-coach-account");
       state.account = null;
       state.recentMatches = [];
+      state.recentMatchesHasMore = false;
       setView("LOGGED_OUT");
     }
   });

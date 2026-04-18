@@ -117,6 +117,39 @@ function queueLabel(queueId) {
   return labels[queueId] || `QUEUE_${queueId}`;
 }
 
+function rankedQueueLabel(queueType) {
+  const labels = {
+    RANKED_SOLO_5x5: "솔로랭크",
+    RANKED_FLEX_SR: "자유랭크",
+  };
+  return labels[queueType] || queueType || "랭크";
+}
+
+function buildRankedSnapshot(entry) {
+  if (!entry) return null;
+  const wins = Number(entry.wins || 0);
+  const losses = Number(entry.losses || 0);
+  return {
+    queueType: entry.queueType || "",
+    queueLabel: rankedQueueLabel(entry.queueType),
+    tier: entry.tier || "",
+    rank: entry.rank || "",
+    lp: Number(entry.leaguePoints || 0),
+    wins,
+    losses,
+    winRate: Math.round((wins / Math.max(1, wins + losses)) * 100),
+  };
+}
+
+function selectRankedEntry(entries) {
+  if (!Array.isArray(entries)) return null;
+  return (
+    entries.find((entry) => entry.queueType === "RANKED_SOLO_5x5") ||
+    entries.find((entry) => entry.queueType === "RANKED_FLEX_SR") ||
+    null
+  );
+}
+
 function normalizeRole(role) {
   const map = {
     TOP: "TOP",
@@ -1854,6 +1887,7 @@ async function handleRecentMatches(req, res) {
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
     const matchCount = Math.min(Math.max(Number(body.matchCount || 10), 1), 20);
+    const start = Math.max(0, Number(body.start || 0));
 
     if (!gameName || !tagLine) {
       sendJson(res, 400, { ok: false, error: "gameName and tagLine are required." });
@@ -1878,49 +1912,43 @@ async function handleRecentMatches(req, res) {
     );
 
     // summoner + league + matchIds + mastery 병렬 호출
+    // league-v4/by-puuid: Riot이 summoner-v4 id 응답 제거 이후의 신규 엔드포인트
     const platformHost = `${platformRegion.toLowerCase()}.api.riotgames.com`;
-    const [matchIds, summonerData, leagueData, masteryData] = await Promise.all([
+    let rankedLookupError = null;
+    const [matchIds, summonerData, leagueEntries, masteryData] = await Promise.all([
       requestJson(
-        `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(account.puuid)}/ids?start=0&count=${matchCount}`,
+        `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(account.puuid)}/ids?start=${start}&count=${matchCount}`,
         headers,
       ),
       requestJson(
         `https://${platformHost}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(account.puuid)}`,
         headers,
       ).catch(() => null),
-      null, // league-v4는 summonerId가 필요해서 아래에서 후속 호출
+      requestJson(
+        `https://${platformHost}/lol/league/v4/entries/by-puuid/${encodeURIComponent(account.puuid)}`,
+        headers,
+      ).catch((error) => {
+        rankedLookupError = error;
+        return null;
+      }),
       requestJson(
         `https://${platformHost}/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(account.puuid)}/top?count=20`,
         headers,
       ).catch(() => null),
     ]);
 
-    // league-v4: summonerId로 랭크 정보 조회
     let ranked = null;
     let rankedStatus = "unranked";
     let rankedError = null;
-    if (summonerData?.id) {
-      try {
-        const entries = await requestJson(
-          `https://${platformHost}/lol/league/v4/entries/by-summoner/${encodeURIComponent(summonerData.id)}`,
-          headers,
-        );
-        const solo = entries.find((e) => e.queueType === "RANKED_SOLO_5x5");
-        if (solo) {
-          ranked = {
-            tier: solo.tier,
-            rank: solo.rank,
-            lp: solo.leaguePoints,
-            wins: solo.wins,
-            losses: solo.losses,
-            winRate: Math.round((solo.wins / Math.max(1, solo.wins + solo.losses)) * 100),
-          };
-          rankedStatus = "ok";
-        }
-      } catch (error) {
-        rankedStatus = "error";
-        rankedError = error?.message || "ranked lookup failed";
+    if (Array.isArray(leagueEntries)) {
+      const rankedEntry = selectRankedEntry(leagueEntries);
+      if (rankedEntry) {
+        ranked = buildRankedSnapshot(rankedEntry);
+        rankedStatus = "ok";
       }
+    } else if (rankedLookupError) {
+      rankedStatus = "error";
+      rankedError = rankedLookupError?.message || "ranked lookup failed";
     }
 
 
@@ -1942,6 +1970,8 @@ async function handleRecentMatches(req, res) {
       puuid: account.puuid,
       platformRegion,
       matchCount,
+      start,
+      hasMore: Array.isArray(matchIds) && matchIds.length >= matchCount,
       summonerLevel: summonerData?.summonerLevel || null,
       profileIconId: summonerData?.profileIconId || null,
       ranked,
