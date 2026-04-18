@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node --check main.js)",
+      "Bash(node --check admin.js)",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} size=%{size_download}\\\\n\" 'http://127.0.0.1:8123/main.js?v=20260417')",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} size=%{size_download}\\\\n\" 'http://127.0.0.1:8123/main.js')",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} size=%{size_download}\\\\n\" 'http://127.0.0.1:8123/styles.css')",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} size=%{size_download}\\\\n\" 'http://127.0.0.1:8123/admin.html')",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} size=%{size_download}\\\\n\" 'http://127.0.0.1:8123/api/samples')",
+      "Bash(curl -s http://127.0.0.1:8123/api/samples/sample-kr-8048864259)",
+      "Bash(curl -s 'http://127.0.0.1:8123/main.js?v=20260418')",
+      "Bash(curl -s 'http://127.0.0.1:8123/styles.css?v=20260418')",
+      "Bash(python3 -c ' *)",
+      "Bash(lsof -i :8123 -sTCP:LISTEN -t)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s 'http://127.0.0.1:8123/main.js?v=20260419')",
+      "Bash(curl -s 'http://127.0.0.1:8123/styles.css?v=20260419')",
+      "Bash(git commit -m ' *)",
+      "Bash(git fetch *)"
+    ]
+  }
+}
