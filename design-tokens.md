@@ -82,18 +82,23 @@
 
 ## 4. 보더 반경
 
-고정된 radius 스케일:
+**토큰화 완료** (5-tier canonical scale):
 
-| 값 | 용도 |
-|---|---|
-| `4~6px` | 작은 배지, 결과 라벨 (`__result`) |
-| `8px` | 진행바, 인라인 칩 |
-| `10~12px` | 기본 인터랙티브 요소, 챔피언 배너 |
-| `16~18px` | tab-btn, 중간 카드 |
-| `20~22px` | meta/stat/sample 카드 (**카드 표준**) |
-| `28px` | hero-panel, panel (**최상위 패널 표준**) |
-| `999px` | pill, winloss-pill, 원형 버튼 |
-| `50%` | 원형 아이콘/아바타 |
+| 토큰 | 값 | 용도 |
+|---|---|---|
+| `--radius-sm` | `8px` | 진행바, 인라인 칩, 작은 인터랙티브 |
+| `--radius-md` | `16px` | 중간 카드 |
+| `--radius-lg` | `22px` | meta/stat/sample 카드 (**카드 표준**) |
+| `--radius-xl` | `28px` | hero-panel, panel (**최상위 패널 표준**) |
+| `--radius-pill` | `999px` | pill, winloss-pill, 원형 버튼 |
+| `--radius-circle` | `50%` | 원형 아이콘/아바타 |
+
+**Outlier (consolidation 후보 — 브라우저 검증 후 다음 이터레이션)**
+- `3px` (3곳) / `4px` (7곳) / `6px` (5곳) — `--radius-sm`(8px)로 상향 병합 검토
+- `10px` (9곳) / `12px` (5곳) / `14px` (1곳) — `--radius-sm`(8px) 또는 `--radius-md`(16px) 분기
+- `18px` (6곳) — `--radius-md`(16px)로 하향 병합 검토 (tab-btn 등)
+- `20px` (1곳) — `--radius-lg`(22px)로 상향 병합 검토
+- `5px 0 0 5px` / `10px 0 0 10px` (비대칭 쇼트핸드) — 토큰화 비대상 (타임라인 엣지 전용)
 
 ## 5. 반응형 브레이크포인트
 
