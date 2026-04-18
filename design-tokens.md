@@ -44,19 +44,37 @@
 - 패밀리 (제목): `Georgia, "Times New Roman", serif` — hero/panel h1~h3, 탭/insight/moment 제목, detail-progress 헤드
 - 베이스: `16px` / line-height 본문 `1.6`
 
-**사이즈 스케일** (rem 기준, 빈도순 재구성)
+**사이즈 스케일** (토큰화 완료 — 10-tier)
 
-| 용도 | 값 |
-|---|---|
-| 마이크로 라벨 (eyebrow/meta-label/event-chip) | `0.58rem` ~ `0.74rem` |
-| 바디 small | `0.82rem` |
-| 바디 | `0.92rem` |
-| 값 강조 (stat 숫자) | `1.15rem` ~ `1.3rem` |
-| 섹션 제목 | `clamp(1.2rem, 1.6vw, 1.55rem)` |
-| topbar 제목 | `clamp(1.2rem, 2vw, 1.75rem)` |
-| 헤드라인 (detail) | `clamp(1.7rem, 2.6vw, 2.4rem)` |
-| 챔피언 배너 이름 | `1.6rem` |
-| 대형 지표 (e.g. 승률) | `3.2rem` |
+| 토큰 | 값 | 흡수한 원본 값 | 용도 |
+|---|---|---|---|
+| `--fs-xs` | `0.7rem` | 0.58 / 0.6 / 0.64 / 0.66 / 0.68 / 0.7 / 0.72 | 마이크로 라벨 (eyebrow, meta-label, event-chip) |
+| `--fs-sm` | `0.78rem` | 0.74 / 0.75 / 0.76 / 0.78 | 칩/작은 메타 |
+| `--fs-base` | `0.85rem` | 0.8 / 0.82 / 0.84 / 0.85 | 바디 small (카드 내부 본문) |
+| `--fs-md` | `0.92rem` | 0.88 / 0.9 / 0.92 / 0.95 / 0.98 | 바디 (탭/버튼/기본 본문) |
+| `--fs-lg` | `1.1rem` | 1 / 1.05 / 1.08 / 1.1 / 1.15 | 값 강조 (작은 stat 숫자) |
+| `--fs-xl` | `1.25rem` | 1.2 / 1.25 / 1.3 / 1.35 | 섹션 제목 |
+| `--fs-2xl` | `1.4rem` | 1.4 | topbar 제목 |
+| `--fs-3xl` | `1.6rem` | 1.6 | 챔피언 배너 이름 |
+| `--fs-display` | `1.8rem` | 1.8 | 헤드라인 (detail h2) |
+| `--fs-hero` | `3.2rem` | 3.2 | 대형 지표 (e.g. 승률) |
+
+**미토큰화 (clamp 기반 반응형)**
+- 섹션 제목: `clamp(1.2rem, 1.6vw, 1.55rem)` — 뷰포트 스케일링 전용
+- topbar 제목: `clamp(1.2rem, 2vw, 1.75rem)`
+- 헤드라인 (detail hero): `clamp(1.7rem, 2.6vw, 2.4rem)`
+
+**토큰화 시 시각 변화 (consolidation)**
+- `0.58~0.72rem` (마이크로 라벨 7종) → `0.7rem` 통일: 가장 작은 글자는 살짝 커지고, `0.72rem` 쓰던 곳은 동일
+- `0.8~0.85rem` (바디 small 4종) → `0.85rem` 통일: 살짝 커짐 (가독성 ↑)
+- `0.88~0.98rem` (바디 5종) → `0.92rem` 통일: 중앙값 수렴
+- `1~1.15rem` (강조 값 5종) → `1.1rem` 통일: 작은 숫자 강조 살짝 커짐
+- `1.2~1.35rem` (섹션 제목 4종) → `1.25rem` 통일
+
+**기본**
+- 패밀리 (본문): `"Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif`
+- 패밀리 (제목): `Georgia, "Times New Roman", serif` — hero/panel h1~h3, 탭/insight/moment 제목, detail-progress 헤드
+- 베이스: `16px` / line-height 본문 `1.6`
 
 **letter-spacing**
 - 마이크로 라벨: `0.18em` ~ `0.22em` + `text-transform: uppercase`
@@ -177,7 +195,7 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 1. **radius 스케일 과다** — 6, 8, 10, 12, 14, 16, 18, 20, 22, 28, 999 중 실질적으로 분기점은 `8 / 16 / 22 / 28 / 999` 5개면 충분. 토큰화 필요.
 2. **알파 배경이 하드코딩** — `rgba(255,255,255,0.03 / 0.04 / 0.06 / 0.08)`이 수십 곳. `--surface-1/2/3` 변수화 후보.
 3. **정보 블루(`#78baff` 계열)가 미토큰화** — hover/panel--nav에서 반복 사용.
-4. **font-size 스케일 혼재** — `0.58, 0.6, 0.64, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.85, 0.88, 0.9, 0.92, 0.95`까지 촘촘. 7단계 스케일 정리 필요 (e.g. `xs/sm/base/md/lg/xl/display`).
+4. ~~**font-size 스케일 혼재**~~ — **완료** (iteration 3). 10-tier (`--fs-xs ~ --fs-hero`)로 통합. clamp 기반 반응형 3종만 미토큰.
 5. **gap 스케일 통일** — `8, 10, 12, 14, 16, 18, 22`가 혼재. `--space-1 ~ --space-6`으로 정리 시 레이아웃 일관성 향상.
 6. **브레이크포인트 부족** — `1180 / 760` 2개. 480px 미만 대응이 약함.
 7. **Georgia serif 제목** — 정체성이지만, 영문/한글 혼용 시 행간 불균일. 한글 제목만 sans 유지하는 옵션 검토 가능.
