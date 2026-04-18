@@ -4,11 +4,12 @@
 
 ## 주요 기능
 
-### Riot ID 로그인 + 10게임 요약
+### Riot ID 로그인 + 최근 경기 리스트
 - Riot ID(gameName + tagLine + region) 입력으로 시작
-- 최근 10게임 요약을 즉시 표시 (챔피언, 역할, 승패, KDA, CS/분, 시간, 큐타입)
+- 최근 10게임 요약을 즉시 표시 (챔피언, 역할, 승패, KDA, CS/분, 시간, 큐타입, 패치)
+- "이전 경기 10개 더 보기" 버튼으로 10개 단위 페이지네이션 (API 요청 간 10초 rate-limit)
 - localStorage로 계정 기억 — 새로고침 시 자동 로그인
-- 랭크 정보(티어, LP, 승률) 함께 표시
+- 랭크 카드: 한글 티어 + 솔로/자유 큐 라벨, Master/GM/Challenger는 디비전 미표시, 솔로 없으면 자유랭크로 fallback, 조회 실패/미랭크 분리
 
 ### AI 듀얼 에이전트 분석
 - **Claude** (코칭 분석): 장점/약점을 균형 있게 분석, 개선점 중심
@@ -32,9 +33,11 @@
 - 타워 / 오브젝트 타임라인
 
 ### 데이터 파이프라인
-- Riot API: account-v1 → match-v5 (detail + timeline) → summoner-v4 → league-v4
+- Riot API: account-v1 → match-v5 (detail + timeline) → summoner-v4 (level/icon) → league-v4/entries/by-puuid (ranked)
 - 정규화: challenges 객체(70+ 필드), 와드/아이템/오브젝트 타임라인 추출
 - 분석: AI 에이전트 → 스키마 검증 → 서버측 필드 정규화 → 저장
+
+> **Riot API 변경 대응**: summoner-v4 응답에서 `encryptedSummonerId`가 제거된 이후, 랭크 조회는 `league-v4/entries/by-puuid/{puuid}` 신규 엔드포인트를 사용합니다.
 
 ## 화면 흐름
 
@@ -121,7 +124,7 @@ node server.js
 |---|---|---|
 | GET | `/api/samples` | 저장된 샘플 목록 |
 | GET | `/api/samples/:id` | 샘플 번들 (normalized + analysis + comparison) |
-| POST | `/api/recent-matches` | Riot ID 기준 최근 10게임 요약 |
+| POST | `/api/recent-matches` | Riot ID 기준 최근 경기 요약 (body: `start`, `matchCount` ≤ 20, 응답: `hasMore`) |
 | POST | `/api/generate-sample` | 선택한 경기 AI 분석 + 샘플 생성 |
 
 ## AI 에이전트 아키텍처
