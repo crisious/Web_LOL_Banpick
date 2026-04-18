@@ -1,0 +1,692 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-18T17:35:41.717Z",
+  "sampleId": "sample-kr-8177088087",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "analyzedAt": "2026-04-19",
+      "language": "ko",
+      "matchId": "KR_8177088087",
+      "analysisId": "ai_sample-kr-8177088087_1776533741716",
+      "generatedAt": "2026-04-18T17:35:41.716Z"
+    },
+    "matchSummary": {
+      "headline": "초반 드래곤 템포를 잡았으나 중·후반 반복 데스와 바론 2회 헌납으로 역전패한 AP 말파이트 정글 경기"
+    },
+    "coachSummary": {
+      "overallSummary": "초반 오브젝트 합류와 파밍 효율은 좋았습니다. 그러나 중반 이후 핵심 교전에서 데스가 반복되며 팀의 운영 주도권을 잃었고, 바론을 두 차례 내주면서 패배로 이어졌습니다. 말파이트 궁극기 진입 후 생존 루트를 미리 계획하고, 오브젝트 구도에서 팀과 함께 시야를 확보한 뒤 싸움을 거는 습관이 필요합니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "초반 드래곤 합류 타이밍",
+        "description": "6분 드래곤 타이밍에 정확히 합류해 팀에 오브젝트 우선권을 만들었습니다. 정글러로서 초반 오브젝트 템포 인식이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "높은 파밍 효율",
+        "description": "분당 CS 7.0으로 정글 챔피언 기준 우수한 파밍 효율을 유지했습니다. 교전 합류와 파밍 사이 밸런스를 잘 잡았습니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_018"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "중반 드래곤 교전 기여",
+        "description": "20분 드래곤 교전에 합류해 두 번째 드래곤을 확보했습니다. 오브젝트 타이밍마다 적극적으로 참여하려는 의지가 돋보였습니다.",
+        "relatedEventIds": [
+          "evt_018"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "중반 반복 데스로 운영 붕괴",
+        "description": "16분~28분 사이 4회 사망하며 팀의 운영 안정감을 무너뜨렸습니다. 궁극기 진입 후 이탈 타이밍을 잡지 못하거나, 불리한 수싸움에 들어간 것으로 보입니다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_020",
+          "evt_026",
+          "evt_029"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "후반 결정적 순간 생존 실패",
+        "description": "30분대 두 번의 데스가 바론 헌납과 게임 종료로 직결됐습니다. 후반에는 한 번의 데스 비용이 극도로 높으므로, 무리한 진입보다 팀과 함께 방어적 포지셔닝이 필요합니다.",
+        "relatedEventIds": [
+          "evt_030",
+          "evt_034"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "바론·오브젝트 구도 장악력 부족",
+        "description": "바론을 두 차례(22분, 30분) 모두 상대에게 내줬고, 오브젝트 헌납이 총 4회 발생했습니다. 시야 확보 없이 바론 구도를 형성하거나, 스미트 싸움에서 불리한 위치를 잡았을 가능성이 높습니다.",
+        "relatedEventIds": [
+          "evt_007",
+          "evt_021",
+          "evt_023",
+          "evt_031",
+          "evt_032"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "궁극기 진입 전 팀원 후속 가능 여부를 반드시 확인하고, 혼자 들어가는 상황을 줄이세요.",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_2",
+        "text": "바론 구도 형성 60초 전부터 주변 시야(핑크 와드 포함)를 2개 이상 확보하세요.",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_3",
+        "text": "데스 직후 다음 스폰까지 상대가 얻는 오브젝트를 예측하고, 리스폰 후 즉시 방어 동선을 잡으세요.",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_4",
+        "text": "후반(25분+)에는 궁극기 없이 전방 시야를 잡으러 가지 마세요. 궁극기 쿨타임을 기준으로 교전 타이밍을 관리하세요.",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_5",
+        "text": "AP 말파이트 빌드 특성상 원딜·미드 캐리에 궁극기를 적중시키는 것이 최우선입니다. 진입 대상 우선순위를 교전 전에 정하세요.",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "6:00",
+        "phase": "EARLY",
+        "title": "첫 드래곤 확보",
+        "description": "초반 드래곤 타이밍에 정확히 합류해 오브젝트 주도권을 확보한 좋은 판단이었습니다.",
+        "sentiment": "POSITIVE"
+      },
+      {
+        "eventId": "evt_007",
+        "timestampLabel": "12:35",
+        "phase": "EARLY",
+        "title": "오브젝트 헌납으로 초반 리드 반납",
+        "description": "12분 주요 오브젝트를 상대에게 내주며 초반에 쌓은 템포 우위가 줄어들었습니다.",
+        "sentiment": "NEGATIVE"
+      },
+      {
+        "eventId": "evt_021",
+        "timestampLabel": "22:35",
+        "phase": "MID",
+        "title": "첫 바론 헌납",
+        "description": "바론 구도에서 팀이 주도권을 잡지 못하고 상대에게 바론을 내줬습니다. 이후 골드 격차가 벌어지는 분기점이 됐습니다.",
+        "sentiment": "NEGATIVE"
+      },
+      {
+        "eventId": "evt_018",
+        "timestampLabel": "20:28",
+        "phase": "MID",
+        "title": "두 번째 드래곤 확보",
+        "description": "중반 드래곤 교전에 합류해 팀의 두 번째 드래곤을 챙겼습니다. 오브젝트 의식이 좋았습니다.",
+        "sentiment": "POSITIVE"
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "30:04",
+        "phase": "LATE",
+        "title": "후반 결정적 데스",
+        "description": "30분 교전에서 생존하지 못하며 상대에게 바론과 억제기를 내줄 빌미를 제공했습니다. 게임 종료로 이어진 핵심 장면입니다.",
+        "sentiment": "NEGATIVE"
+      }
+    ],
+    "evidenceIndex": {
+      "strengths": {
+        "str_1": [
+          "evt_001"
+        ],
+        "str_2": [
+          "evt_001",
+          "evt_018"
+        ],
+        "str_3": [
+          "evt_018"
+        ]
+      },
+      "weaknesses": {
+        "weak_1": [
+          "evt_014",
+          "evt_020",
+          "evt_026",
+          "evt_029"
+        ],
+        "weak_2": [
+          "evt_030",
+          "evt_034"
+        ],
+        "weak_3": [
+          "evt_007",
+          "evt_021",
+          "evt_023",
+          "evt_031",
+          "evt_032"
+        ]
+      },
+      "keyMoments": [
+        "evt_001",
+        "evt_007",
+        "evt_018",
+        "evt_021",
+        "evt_030"
+      ]
+    },
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "matchId": "KR_8177088087",
+      "queueLabel": "RANKED_SOLO",
+      "champion": "Malphite",
+      "position": "JUNGLE",
+      "result": "LOSS",
+      "durationLabel": "32:27",
+      "participantId": 7,
+      "confidence": "medium",
+      "note": "제공된 타임라인 이벤트와 경기 통계만 근거로 분석했으며, 실제 위치 좌표·스킬 사용·시야 위치 정보는 포함하지 않았다."
+    },
+    "matchSummary": {
+      "oneLine": "초중반 드래곤 합류와 교전 개입은 있었지만, 핵심 오브젝트 전후 생존 실패가 반복되며 바론 2회와 후반 주도권을 모두 넘긴 경기다.",
+      "coreDiagnosis": "겉으로는 6킬, 26,858 피해량, 7 CS/분으로 영향력이 있어 보이지만 실제 승패를 가른 구간에서는 데스가 오브젝트 손실로 직결됐다.",
+      "redteamAngle": "이 경기는 '싸움에 참여했다'는 사실보다 '싸움 이후 맵에 남아 오브젝트를 통제했는가'가 더 중요했는데, 그 연결이 계속 끊겼다."
+    },
+    "coachSummary": {
+      "overallFlow": "초반 6분 드래곤 타이밍 합류로 오브젝트 템포를 만들 여지는 있었지만, 9~13분 사이 데스와 오브젝트 세팅 실패가 겹치며 안정적인 리드 구조로 굳히지 못했다. 중반에는 킬과 피해량을 만들었으나 16:52, 21:58, 26:57, 28:30의 반복 데스가 바론·구조물 손실과 맞물리며 팀 운영을 끊었다. 후반 30분 이후에는 생존 실패 직후 바론과 추가 오브젝트를 내주면서 복구 가능한 교전력이 실제 승리 조건으로 전환되지 못했다.",
+      "hiddenPattern": "좋은 장면은 대부분 '합류' 단위로 보이고, 나쁜 장면은 '합류 이후 생존·재정비·시야 유지' 단계에서 반복된다.",
+      "lossCondition": "말파이트 정글의 한타 개시력은 있었지만, 사망 타이밍이 너무 오브젝트 밀집 구간에 몰려 있어 상위 티어에서는 바로 내셔·타워·시야 장악으로 처벌받는 구조다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반에는 드래곤 합류로 출발점은 만들었지만, 9:58 데스와 12:35 오브젝트 세팅 실패가 이어져 초반 주도권이 안정적으로 고정되지 않았다.",
+        "redteamRead": "초반 장점은 '드래곤에 갔다' 수준에 가깝고, 이후 턴 관리가 무너져 실질적인 맵 장악으로 이어지지 않았다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_004",
+          "evt_007"
+        ]
+      },
+      "MID": {
+        "summary": "중반에는 6킬 4어시스트로 교전 관여가 높았지만, 동시에 4데스를 기록했고 바론 구도와 오브젝트 세팅 실패가 누적됐다.",
+        "redteamRead": "통계상 가장 활발한 구간이지만 실제로는 리스크도 가장 컸다. 킬을 만든 만큼 죽어서, 팀이 다음 오브젝트를 준비할 시간이 사라졌다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_018",
+          "evt_020",
+          "evt_021",
+          "evt_023",
+          "evt_026",
+          "evt_029"
+        ]
+      },
+      "LATE": {
+        "summary": "후반에는 30:04와 31:24의 결정적 데스로 바론과 추가 오브젝트 손실을 막지 못했다.",
+        "redteamRead": "후반 말파이트의 가치는 살아 있는 궁극기 압박인데, 이 구간에서는 생존 자체가 무너지며 챔피언의 존재 가치가 크게 떨어졌다.",
+        "relatedEventIds": [
+          "evt_030",
+          "evt_031",
+          "evt_032",
+          "evt_034"
+        ]
+      }
+    },
+    "strengths": [
+      {
+        "id": "strength_01",
+        "title": "초중반 드래곤 타이밍에 반응은 했다",
+        "description": "6:00, 20:28 드래곤 타이밍에 합류해 오브젝트 교전에 참여했다. 정글러로서 완전히 사이드나 정글링에 고립된 경기는 아니었다.",
+        "criticalCaveat": "다만 드래곤 합류 자체가 장점으로 보이는 것과 별개로, 이후 생존과 시야 재장악이 이어지지 않아 오브젝트 템포가 장기 주도권으로 전환되지 않았다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_018"
+        ]
+      },
+      {
+        "id": "strength_02",
+        "title": "중반 교전 영향력은 수치상 확인된다",
+        "description": "중반 구간에 6킬 4어시스트를 기록했고, 최종 피해량도 26,858로 낮지 않았다. 교전에서 아무 영향도 못 준 패배는 아니다.",
+        "criticalCaveat": "문제는 이 영향력이 승리 조건과 분리됐다는 점이다. 킬과 피해량이 바론·타워·시야 장악으로 연결되지 않고, 데스와 교환되며 가치가 희석됐다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_018",
+          "evt_020",
+          "evt_026",
+          "evt_029"
+        ]
+      },
+      {
+        "id": "strength_03",
+        "title": "정글 성장 자체는 완전히 무너지지 않았다",
+        "description": "32:27 경기에서 CS 227, 7 CS/분, 레벨 16, 골드 14,377을 기록했다. 성장 기반이 없는 상태에서 무리하게 한타만 건 경기는 아니었다.",
+        "criticalCaveat": "하지만 성장형 수치가 높을수록 핵심 타이밍 데스의 비용도 커진다. 특히 말파이트 정글이 살아 있어야 상대가 바론 시야와 진입 각을 조심하는데, 후반 데스로 그 압박이 사라졌다.",
+        "relatedEventIds": [
+          "evt_020",
+          "evt_021",
+          "evt_030",
+          "evt_031"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weakness_01",
+        "title": "오브젝트 전후 생존 실패가 반복됐다",
+        "description": "9:58, 16:52, 21:58, 26:57, 28:30, 30:04, 31:24에 플레이어 데스가 기록됐다. 특히 중후반 데스가 바론 및 오브젝트 손실 구간과 가깝다.",
+        "structuralProblem": "단순히 많이 죽은 것이 아니라, 죽는 시간이 팀이 맵을 잡아야 하는 타이밍에 몰렸다. 이러면 킬을 앞서거나 한타를 잘 열어도 다음 40초 동안 팀이 아무것도 못 한다.",
+        "highTierExposure": "상위 티어에서는 이런 데스가 즉시 바론, 깊은 시야, 미드 타워 압박, 다음 드래곤 선점으로 이어진다. 상대가 실수하지 않으면 복구 시간이 거의 없다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_014",
+          "evt_020",
+          "evt_026",
+          "evt_029",
+          "evt_030",
+          "evt_034"
+        ]
+      },
+      {
+        "id": "weakness_02",
+        "title": "오브젝트 세팅이 '합류'에만 치우쳤다",
+        "description": "드래곤 교전 합류는 있었지만, 12:35, 25:42, 31:13에 중요한 오브젝트나 구조물을 내주는 이벤트가 반복됐다.",
+        "structuralProblem": "오브젝트를 먹으러 가는 판단은 있었지만, 그 전에 라인 주도권·시야·귀환 타이밍을 맞춰두는 구조가 약했다. 결과적으로 현장에는 도착해도 좋은 구도에서 싸우지 못했을 가능성이 높다.",
+        "highTierExposure": "상위 티어 상대는 말파이트 궁극기 각을 피하면서 먼저 시야를 지우고, 진입 강제 상황을 만든다. 준비 없이 합류하는 방식은 강제 이니시 챔피언의 장점을 크게 깎는다.",
+        "relatedEventIds": [
+          "evt_007",
+          "evt_023",
+          "evt_032",
+          "evt_001",
+          "evt_018"
+        ]
+      },
+      {
+        "id": "weakness_03",
+        "title": "교전 성과가 운영 이득으로 변환되지 않았다",
+        "description": "팀은 34킬을 기록했고 플레이어도 6/7/9, 킬관여율 44%를 남겼지만, 최종적으로 팀 타워는 3개에 그쳤고 상대에게 바론 2회, 타워 8개를 허용했다.",
+        "structuralProblem": "싸움에서 무언가를 얻은 뒤 라인 정리, 시야 전진, 타워 압박, 바론 견제 중 하나로 이어지는 후속 플랜이 약했다. 그래서 좋은 교전도 상대 실수나 단발성 킬에 의존한 장면으로 남았다.",
+        "highTierExposure": "킬 이후 전환이 느리면 상위 티어에서는 상대가 웨이브를 먼저 밀고 재정비해 다음 오브젝트를 선점한다. 이 경기의 22:35, 30:31 바론 손실이 그 구조적 약점을 보여준다.",
+        "relatedEventIds": [
+          "evt_018",
+          "evt_021",
+          "evt_023",
+          "evt_030",
+          "evt_031",
+          "evt_032"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "check_01",
+        "action": "오브젝트 60초 전에는 정글 캠프보다 생존·귀환·시야 턴을 우선한다.",
+        "successCriteria": "다음 경기에서 드래곤 또는 바론 60초 전 사망을 0회로 줄인다.",
+        "relatedWeaknessIds": [
+          "weakness_01",
+          "weakness_02"
+        ]
+      },
+      {
+        "id": "check_02",
+        "action": "궁극기 사용 후 바로 추가 추격하지 말고, 상대 핵심 스킬과 아군 후속 위치를 확인한 뒤 2차 진입 여부를 결정한다.",
+        "successCriteria": "한타 개시 후 10초 안에 사망하는 장면을 줄이고, 교전 이후 살아서 시야나 오브젝트로 전환한다.",
+        "relatedWeaknessIds": [
+          "weakness_01",
+          "weakness_03"
+        ]
+      },
+      {
+        "id": "check_03",
+        "action": "킬을 만든 직후 콜을 하나로 고정한다: 타워, 드래곤, 바론 시야, 귀환 중 하나만 즉시 선택한다.",
+        "successCriteria": "교전 승리 후 20초 안에 팀이 한 방향으로 움직이는 장면을 만든다.",
+        "relatedWeaknessIds": [
+          "weakness_03"
+        ]
+      },
+      {
+        "id": "check_04",
+        "action": "바론이 살아 있는 20분 이후에는 죽기 전에 반드시 '내가 죽으면 바론이 나가는가'를 기준으로 교전 각을 거른다.",
+        "successCriteria": "20분 이후 바론 근처 또는 바론 직전 데스를 0~1회로 제한한다.",
+        "relatedWeaknessIds": [
+          "weakness_01",
+          "weakness_03"
+        ]
+      },
+      {
+        "id": "check_05",
+        "action": "드래곤 합류가 성공했더라도 다음 라인과 시야를 잡지 못하면 성공으로 계산하지 않는다.",
+        "successCriteria": "오브젝트 참여 후 30초 안에 제어 와드·렌즈·라인 푸시 중 최소 하나의 후속 행동을 수행한다.",
+        "relatedWeaknessIds": [
+          "weakness_02"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "6:00",
+        "phase": "EARLY",
+        "title": "초반 드래곤 합류",
+        "whatHappened": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "redteamInterpretation": "좋은 출발점이지만, 이후 9~13분 구간의 데스와 오브젝트 손실을 보면 이 장면이 장기 주도권으로 고정되지는 않았다."
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "9:58",
+        "phase": "EARLY",
+        "title": "초반 첫 치명 데스",
+        "whatHappened": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+        "redteamInterpretation": "정글러의 초반 데스는 단순 KDA 손실이 아니라 캠프, 시야, 다음 오브젝트 준비 시간을 동시에 잃는 문제다."
+      },
+      {
+        "eventId": "evt_007",
+        "timestampLabel": "12:35",
+        "phase": "EARLY",
+        "title": "오브젝트 세팅 실패",
+        "whatHappened": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
+        "redteamInterpretation": "6분 드래곤 합류가 있었음에도 12분대 세팅 실패가 나온 것은, 오브젝트를 '먹는 순간'보다 '다음 턴 준비'가 약했다는 신호다."
+      },
+      {
+        "eventId": "evt_020",
+        "timestampLabel": "21:58",
+        "phase": "MID",
+        "title": "바론 직전 중반 데스",
+        "whatHappened": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamInterpretation": "이 데스 직후 22:35 바론 구도가 이어진다. 정글러가 이 타이밍에 죽으면 스마이트 압박과 진입 압박이 동시에 사라진다."
+      },
+      {
+        "eventId": "evt_021",
+        "timestampLabel": "22:35",
+        "phase": "MID",
+        "title": "첫 바론 손실",
+        "whatHappened": "바론 구도에 관여했지만 상대에게 바론을 내줬다.",
+        "redteamInterpretation": "바론을 내준 장면 자체보다 더 중요한 것은 그 직전 데스와 연결된 구조다. 이는 우연한 바론 손실이 아니라 준비 단계 붕괴에 가깝다."
+      },
+      {
+        "eventId": "evt_029",
+        "timestampLabel": "28:30",
+        "phase": "MID",
+        "title": "중반 마지막 데스 누적",
+        "whatHappened": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamInterpretation": "30분 이후 후반 결정 구도로 넘어가기 직전의 데스다. 이 시점부터는 한 번의 사망이 다음 바론과 억제기 압박까지 연결될 수 있다."
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "30:04",
+        "phase": "LATE",
+        "title": "후반 결정적 생존 실패",
+        "whatHappened": "후반 결정적인 구도에서 생존하지 못했다.",
+        "redteamInterpretation": "말파이트가 후반에 살아 있으면 상대는 진입 각을 계속 의식해야 한다. 이 데스는 챔피언의 존재 압박을 제거한 장면이다."
+      },
+      {
+        "eventId": "evt_031",
+        "timestampLabel": "30:31",
+        "phase": "LATE",
+        "title": "두 번째 바론 손실",
+        "whatHappened": "바론 구도에 관여했지만 상대에게 바론을 내줬다.",
+        "redteamInterpretation": "30:04 데스 이후 27초 만에 바론 손실 이벤트가 발생했다. 후반 데스가 곧 오브젝트 손실로 전환된 가장 직접적인 근거다."
+      },
+      {
+        "eventId": "evt_034",
+        "timestampLabel": "31:24",
+        "phase": "LATE",
+        "title": "마무리 구간 추가 데스",
+        "whatHappened": "후반 결정적인 구도에서 생존하지 못했다.",
+        "redteamInterpretation": "이미 바론을 내준 뒤 추가 데스가 발생하면서 수비 턴을 만들 여지까지 줄었다. 후반 복구력보다 붕괴 속도가 더 빨랐다."
+      }
+    ],
+    "evidenceIndex": {
+      "playerStatEvidence": {
+        "kda": "6/7/9, KDA 2.14",
+        "cs": "227 CS, 7 CS/분",
+        "damageToChampions": 26858,
+        "visionScore": 55,
+        "killParticipation": 0.44,
+        "teamKills": 34,
+        "teamObjectives": {
+          "teamDragons": 2,
+          "enemyDragons": 3,
+          "teamBarons": 0,
+          "enemyBarons": 2,
+          "teamTowers": 3,
+          "enemyTowers": 8
+        }
+      },
+      "eventEvidence": [
+        {
+          "eventId": "evt_001",
+          "timestampLabel": "6:00",
+          "phase": "EARLY",
+          "eventType": "DRAGON_FIGHT",
+          "importance": 4,
+          "usedFor": [
+            "strength_01",
+            "weakness_02",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_004",
+          "timestampLabel": "9:58",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "usedFor": [
+            "weakness_01",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_007",
+          "timestampLabel": "12:35",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "weakness_02",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_014",
+          "timestampLabel": "16:52",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "strength_02",
+            "weakness_01"
+          ]
+        },
+        {
+          "eventId": "evt_018",
+          "timestampLabel": "20:28",
+          "phase": "MID",
+          "eventType": "DRAGON_FIGHT",
+          "importance": 5,
+          "usedFor": [
+            "strength_01",
+            "strength_02",
+            "weakness_02",
+            "weakness_03"
+          ]
+        },
+        {
+          "eventId": "evt_020",
+          "timestampLabel": "21:58",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "strength_03",
+            "weakness_01",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_021",
+          "timestampLabel": "22:35",
+          "phase": "MID",
+          "eventType": "BARON_FIGHT",
+          "importance": 5,
+          "usedFor": [
+            "strength_03",
+            "weakness_03",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_023",
+          "timestampLabel": "25:42",
+          "phase": "MID",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "weakness_02",
+            "weakness_03"
+          ]
+        },
+        {
+          "eventId": "evt_026",
+          "timestampLabel": "26:57",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "strength_02",
+            "weakness_01"
+          ]
+        },
+        {
+          "eventId": "evt_029",
+          "timestampLabel": "28:30",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "strength_02",
+            "weakness_01",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_030",
+          "timestampLabel": "30:04",
+          "phase": "LATE",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "strength_03",
+            "weakness_01",
+            "weakness_03",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_031",
+          "timestampLabel": "30:31",
+          "phase": "LATE",
+          "eventType": "BARON_FIGHT",
+          "importance": 5,
+          "usedFor": [
+            "strength_03",
+            "weakness_03",
+            "keyMoments"
+          ]
+        },
+        {
+          "eventId": "evt_032",
+          "timestampLabel": "31:13",
+          "phase": "LATE",
+          "eventType": "OBJECTIVE_SETUP_FAIL",
+          "importance": 5,
+          "usedFor": [
+            "weakness_02",
+            "weakness_03"
+          ]
+        },
+        {
+          "eventId": "evt_034",
+          "timestampLabel": "31:24",
+          "phase": "LATE",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "usedFor": [
+            "weakness_01",
+            "keyMoments"
+          ]
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "초반 드래곤 합류 타이밍",
+        "claudeNote": "6분 드래곤 타이밍에 정확히 합류해 팀에 오브젝트 우선권을 만들었습니다. 정글러로서 초반 오브젝트 템포 인식이 좋았습니다.",
+        "codexNote": "6:00, 20:28 드래곤 타이밍에 합류해 오브젝트 교전에 참여했다. 정글러로서 완전히 사이드나 정글링에 고립된 경기는 아니었다."
+      },
+      {
+        "category": "strength",
+        "topic": "중반 드래곤 교전 기여",
+        "claudeNote": "20분 드래곤 교전에 합류해 두 번째 드래곤을 확보했습니다. 오브젝트 타이밍마다 적극적으로 참여하려는 의지가 돋보였습니다.",
+        "codexNote": "6:00, 20:28 드래곤 타이밍에 합류해 오브젝트 교전에 참여했다. 정글러로서 완전히 사이드나 정글링에 고립된 경기는 아니었다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 반복 데스로 운영 붕괴",
+        "claudeNote": "16분~28분 사이 4회 사망하며 팀의 운영 안정감을 무너뜨렸습니다. 궁극기 진입 후 이탈 타이밍을 잡지 못하거나, 불리한 수싸움에 들어간 것으로 보입니다.",
+        "codexNote": "팀은 34킬을 기록했고 플레이어도 6/7/9, 킬관여율 44%를 남겼지만, 최종적으로 팀 타워는 3개에 그쳤고 상대에게 바론 2회, 타워 8개를 허용했다."
+      },
+      {
+        "category": "weakness",
+        "topic": "후반 결정적 순간 생존 실패",
+        "claudeNote": "30분대 두 번의 데스가 바론 헌납과 게임 종료로 직결됐습니다. 후반에는 한 번의 데스 비용이 극도로 높으므로, 무리한 진입보다 팀과 함께 방어적 포지셔닝이 필요합니다.",
+        "codexNote": "9:58, 16:52, 21:58, 26:57, 28:30, 30:04, 31:24에 플레이어 데스가 기록됐다. 특히 중후반 데스가 바론 및 오브젝트 손실 구간과 가깝다."
+      },
+      {
+        "category": "weakness",
+        "topic": "바론·오브젝트 구도 장악력 부족",
+        "claudeNote": "바론을 두 차례(22분, 30분) 모두 상대에게 내줬고, 오브젝트 헌납이 총 4회 발생했습니다. 시야 확보 없이 바론 구도를 형성하거나, 스미트 싸움에서 불리한 위치를 잡았을 가능성이 높습니다.",
+        "codexNote": "9:58, 16:52, 21:58, 26:57, 28:30, 30:04, 31:24에 플레이어 데스가 기록됐다. 특히 중후반 데스가 바론 및 오브젝트 손실 구간과 가깝다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "높은 파밍 효율",
+        "note": "분당 CS 7.0으로 정글 챔피언 기준 우수한 파밍 효율을 유지했습니다. 교전 합류와 파밍 사이 밸런스를 잘 잡았습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "정글 성장 자체는 완전히 무너지지 않았다",
+        "note": "32:27 경기에서 CS 227, 7 CS/분, 레벨 16, 골드 14,377을 기록했다. 성장 기반이 없는 상태에서 무리하게 한타만 건 경기는 아니었다."
+      }
+    ],
+    "agreementRate": 83
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "analyzedAt": "2026-04-19",
+    "language": "ko",
+    "matchId": "KR_8177088087",
+    "analysisId": "ai_sample-kr-8177088087_1776533741716",
+    "generatedAt": "2026-04-18T17:35:41.716Z"
+  },
+  "matchSummary": {
+    "headline": "초반 드래곤 템포를 잡았으나 중·후반 반복 데스와 바론 2회 헌납으로 역전패한 AP 말파이트 정글 경기"
+  },
+  "coachSummary": {
+    "overallSummary": "초반 오브젝트 합류와 파밍 효율은 좋았습니다. 그러나 중반 이후 핵심 교전에서 데스가 반복되며 팀의 운영 주도권을 잃었고, 바론을 두 차례 내주면서 패배로 이어졌습니다. 말파이트 궁극기 진입 후 생존 루트를 미리 계획하고, 오브젝트 구도에서 팀과 함께 시야를 확보한 뒤 싸움을 거는 습관이 필요합니다."
+  },
+  "phaseSummaries": [],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "초반 드래곤 합류 타이밍",
+      "description": "6분 드래곤 타이밍에 정확히 합류해 팀에 오브젝트 우선권을 만들었습니다. 정글러로서 초반 오브젝트 템포 인식이 좋았습니다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "높은 파밍 효율",
+      "description": "분당 CS 7.0으로 정글 챔피언 기준 우수한 파밍 효율을 유지했습니다. 교전 합류와 파밍 사이 밸런스를 잘 잡았습니다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_018"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "중반 드래곤 교전 기여",
+      "description": "20분 드래곤 교전에 합류해 두 번째 드래곤을 확보했습니다. 오브젝트 타이밍마다 적극적으로 참여하려는 의지가 돋보였습니다.",
+      "relatedEventIds": [
+        "evt_018"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "weak_1",
+      "title": "중반 반복 데스로 운영 붕괴",
+      "description": "16분~28분 사이 4회 사망하며 팀의 운영 안정감을 무너뜨렸습니다. 궁극기 진입 후 이탈 타이밍을 잡지 못하거나, 불리한 수싸움에 들어간 것으로 보입니다.",
+      "relatedEventIds": [
+        "evt_014",
+        "evt_020",
+        "evt_026",
+        "evt_029"
+      ]
+    },
+    {
+      "id": "weak_2",
+      "title": "후반 결정적 순간 생존 실패",
+      "description": "30분대 두 번의 데스가 바론 헌납과 게임 종료로 직결됐습니다. 후반에는 한 번의 데스 비용이 극도로 높으므로, 무리한 진입보다 팀과 함께 방어적 포지셔닝이 필요합니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_034"
+      ]
+    },
+    {
+      "id": "weak_3",
+      "title": "바론·오브젝트 구도 장악력 부족",
+      "description": "바론을 두 차례(22분, 30분) 모두 상대에게 내줬고, 오브젝트 헌납이 총 4회 발생했습니다. 시야 확보 없이 바론 구도를 형성하거나, 스미트 싸움에서 불리한 위치를 잡았을 가능성이 높습니다.",
+      "relatedEventIds": [
+        "evt_007",
+        "evt_021",
+        "evt_023",
+        "evt_031",
+        "evt_032"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_1",
+      "text": "궁극기 진입 전 팀원 후속 가능 여부를 반드시 확인하고, 혼자 들어가는 상황을 줄이세요.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_2",
+      "text": "바론 구도 형성 60초 전부터 주변 시야(핑크 와드 포함)를 2개 이상 확보하세요.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_3",
+      "text": "데스 직후 다음 스폰까지 상대가 얻는 오브젝트를 예측하고, 리스폰 후 즉시 방어 동선을 잡으세요.",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_4",
+      "text": "후반(25분+)에는 궁극기 없이 전방 시야를 잡으러 가지 마세요. 궁극기 쿨타임을 기준으로 교전 타이밍을 관리하세요.",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_5",
+      "text": "AP 말파이트 빌드 특성상 원딜·미드 캐리에 궁극기를 적중시키는 것이 최우선입니다. 진입 대상 우선순위를 교전 전에 정하세요.",
+      "priority": "MEDIUM"
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_001",
+      "timestampLabel": "6:00",
+      "phase": "EARLY",
+      "title": "첫 드래곤 확보",
+      "description": "초반 드래곤 타이밍에 정확히 합류해 오브젝트 주도권을 확보한 좋은 판단이었습니다.",
+      "sentiment": "POSITIVE"
+    },
+    {
+      "eventId": "evt_007",
+      "timestampLabel": "12:35",
+      "phase": "EARLY",
+      "title": "오브젝트 헌납으로 초반 리드 반납",
+      "description": "12분 주요 오브젝트를 상대에게 내주며 초반에 쌓은 템포 우위가 줄어들었습니다.",
+      "sentiment": "NEGATIVE"
+    },
+    {
+      "eventId": "evt_021",
+      "timestampLabel": "22:35",
+      "phase": "MID",
+      "title": "첫 바론 헌납",
+      "description": "바론 구도에서 팀이 주도권을 잡지 못하고 상대에게 바론을 내줬습니다. 이후 골드 격차가 벌어지는 분기점이 됐습니다.",
+      "sentiment": "NEGATIVE"
+    },
+    {
+      "eventId": "evt_018",
+      "timestampLabel": "20:28",
+      "phase": "MID",
+      "title": "두 번째 드래곤 확보",
+      "description": "중반 드래곤 교전에 합류해 팀의 두 번째 드래곤을 챙겼습니다. 오브젝트 의식이 좋았습니다.",
+      "sentiment": "POSITIVE"
+    },
+    {
+      "eventId": "evt_030",
+      "timestampLabel": "30:04",
+      "phase": "LATE",
+      "title": "후반 결정적 데스",
+      "description": "30분 교전에서 생존하지 못하며 상대에게 바론과 억제기를 내줄 빌미를 제공했습니다. 게임 종료로 이어진 핵심 장면입니다.",
+      "sentiment": "NEGATIVE"
+    }
+  ],
+  "evidenceIndex": {
+    "strengths": {
+      "str_1": [
+        "evt_001"
+      ],
+      "str_2": [
+        "evt_001",
+        "evt_018"
+      ],
+      "str_3": [
+        "evt_018"
+      ]
+    },
+    "weaknesses": {
+      "weak_1": [
+        "evt_014",
+        "evt_020",
+        "evt_026",
+        "evt_029"
+      ],
+      "weak_2": [
+        "evt_030",
+        "evt_034"
+      ],
+      "weak_3": [
+        "evt_007",
+        "evt_021",
+        "evt_023",
+        "evt_031",
+        "evt_032"
+      ]
+    },
+    "keyMoments": [
+      "evt_001",
+      "evt_007",
+      "evt_018",
+      "evt_021",
+      "evt_030"
+    ]
+  },
+  "schemaVersion": "1.0"
+}

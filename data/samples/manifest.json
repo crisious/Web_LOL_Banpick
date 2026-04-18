@@ -1,6 +1,30 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8178628796",
+      "matchId": "KR_8178628796",
+      "label": "sample-kr-8178628796 · JUNGLE LOSS",
+      "champion": "Graves",
+      "publicAlias": "완두콩#oOoO",
+      "collectedDate": "2026-04-18",
+      "theme": "초반 킬을 따냈으나 곧바로 되죽으며 템포를 잃었고, 팀 전체가 무너져 8분 만에 조기 종료된 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8178628796/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8178628796/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8178628796/sample-kr-8178628796-notes.md"
+    },
+    {
+      "id": "sample-kr-8177088087",
+      "matchId": "KR_8177088087",
+      "label": "sample-kr-8177088087 · JUNGLE LOSS",
+      "champion": "Malphite",
+      "publicAlias": "완두콩#oOoO",
+      "collectedDate": "2026-04-18",
+      "theme": "초반 드래곤 템포를 잡았으나 중·후반 반복 데스와 바론 2회 헌납으로 역전패한 AP 말파이트 정글 경기",
+      "normalizedPath": "/data/samples/sample-kr-8177088087/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8177088087/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8177088087/sample-kr-8177088087-notes.md"
+    },
+    {
       "id": "sample-kr-8048864259",
       "matchId": "KR_8048864259",
       "label": "sample-kr-8048864259 · SUPPORT WIN",
