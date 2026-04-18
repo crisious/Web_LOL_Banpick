@@ -1,6 +1,54 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8048864259",
+      "matchId": "KR_8048864259",
+      "label": "sample-kr-8048864259 · SUPPORT WIN",
+      "champion": "Senna",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-18",
+      "theme": "드래곤 템포와 중반 합류로 이긴 경기지만, 세나 본인은 중요한 교전 직후 반복적으로 생존을 잃어 상위 티어에서는 승리보다 역전 빌미가 더 크게 드러날 수 있는 경기였다.",
+      "normalizedPath": "/data/samples/sample-kr-8048864259/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8048864259/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8048864259/sample-kr-8048864259-notes.md"
+    },
+    {
+      "id": "sample-kr-8173098718",
+      "matchId": "KR_8173098718",
+      "label": "sample-kr-8173098718 · SUPPORT LOSS",
+      "champion": "Thresh",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-18",
+      "theme": "오브젝트 타이밍에 자주 합류 좋았지만, 오브젝트 이후 생존과 전환이 아쉬웠음 경기",
+      "normalizedPath": "/data/samples/sample-kr-8173098718/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8173098718/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8173098718/sample-kr-8173098718-notes.md"
+    },
+    {
+      "id": "sample-kr-8173154527",
+      "matchId": "KR_8173154527",
+      "label": "sample-kr-8173154527 · SUPPORT WIN",
+      "champion": "Nautilus",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-17",
+      "theme": "초반 2데스로 흔들렸지만, 오브젝트 합류와 시야 장악으로 팀 승리를 견인한 노틸러스 서포터 경기",
+      "normalizedPath": "/data/samples/sample-kr-8173154527/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8173154527/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8173154527/sample-kr-8173154527-notes.md"
+    },
+    {
+      "id": "sample-kr-8175209213",
+      "matchId": "KR_8175209213",
+      "label": "sample-kr-8175209213 · SUPPORT WIN",
+      "champion": "Xerath",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-17",
+      "theme": "시야 장악과 오브젝트 합류로 팀 승리에 기여했지만, 7데스의 포지셔닝 불안정이 아쉬운 제라스 서포터 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8175209213/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8175209213/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8175209213/sample-kr-8175209213-notes.md"
+    },
+    {
       "id": "sample-kr-8173054731",
       "matchId": "KR_8173054731",
       "label": "sample-kr-8173054731 · SUPPORT WIN",

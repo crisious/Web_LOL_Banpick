@@ -1,0 +1,815 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-17T02:00:35.521Z",
+  "sampleId": "sample-kr-8175209213",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "analysisVersion": "1.0",
+      "generatedAt": "2026-04-17T02:00:35.520Z",
+      "language": "ko",
+      "matchId": "KR_8175209213",
+      "riotId": "매운맛 비스킷#KR1",
+      "champion": "Xerath",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "analysisId": "ai_sample-kr-8175209213_1776391235520"
+    },
+    "matchSummary": {
+      "headline": "시야 장악과 오브젝트 합류로 팀 승리에 기여했지만, 7데스의 포지셔닝 불안정이 아쉬운 제라스 서포터 경기."
+    },
+    "coachSummary": {
+      "overallSummary": "28분 만에 드래곤 4개, 바론 1개, 타워 11개를 챙기며 압도적으로 승리한 경기입니다. 시야 점수 81은 서포터로서 훌륭한 수치이며 오브젝트 타이밍에 꾸준히 합류한 점도 좋았습니다. 다만 초반 레인에서 3데스를 내주며 흔들렸고, 중반에도 반복적인 데스가 이어져 총 7데스를 기록했습니다. 제라스는 사거리가 긴 만큼 교전 시 후방 포지셔닝을 더 의식하면 같은 기여도에서 생존율을 크게 높일 수 있습니다. 킬 관여율 30%는 서포터 기준으로 낮은 편이므로, 로밍이나 합류 타이밍을 조금 더 적극적으로 잡아보는 것을 추천합니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "timeRange": "0:00~14:00",
+        "summary": "레인 단계에서 3데스를 내주며 불안정한 출발을 했지만, 드래곤 합류와 정글 오브젝트 확보로 팀 차원의 템포는 유지했습니다.",
+        "kda": "0/3/2"
+      },
+      {
+        "phase": "MID",
+        "timeRange": "14:00~28:00",
+        "summary": "2킬 7어시스트로 교전 기여도가 올라갔으나 4데스가 추가되며 생존 문제가 지속되었습니다. 드래곤 2개 추가 확보와 바론 확보에 관여하며 팀 운영에 핵심적으로 참여했고, 이후 구조물 연쇄 파괴로 경기를 마무리했습니다.",
+        "kda": "2/4/7"
+      },
+      {
+        "phase": "LATE",
+        "timeRange": "28:00~",
+        "summary": "경기가 중반에 마무리되어 후반 구간은 발생하지 않았습니다.",
+        "kda": "0/0/0"
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "뛰어난 시야 장악력",
+        "description": "시야 점수 81은 28분 경기에서 매우 우수한 수치입니다. 분당 약 2.85의 시야 점수로, 맵 정보 제공에 크게 기여했습니다. 이러한 시야 우위가 팀의 오브젝트 독점(드래곤 4:0, 바론 1:0)에 직접적으로 연결되었습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_020",
+          "evt_025",
+          "evt_028"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "오브젝트 합류와 팀 기여",
+        "description": "드래곤 4개, 바론 1개를 팀이 모두 챙기는 과정에서 핵심 타이밍에 합류하여 오브젝트 템포를 유지했습니다. 특히 25:50 바론 확보는 경기를 마무리 짓는 결정적 계기가 되었습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_025",
+          "evt_028"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "서포터 딜량 기여",
+        "description": "서포터 제라스로 10,711의 챔피언 피해량을 기록하며 팀 교전에서 화력 보조 역할을 충실히 수행했습니다. 제라스의 장거리 스킬을 활용해 교전 전 포킹과 견제에 기여한 부분이 돋보입니다.",
+        "relatedEventIds": [
+          "evt_025",
+          "evt_028"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "초반 레인 안정성 부족",
+        "description": "5:43에 첫 데스를 기록하며 레인 주도권을 잃었습니다. 초반 0/3/2로 레인 단계에서 큰 압박을 받았으며, 이는 상대 봇 듀오에게 골드 및 경험치 우위를 허용했습니다. 제라스 서포터는 긴 사거리를 활용해 안전 거리를 유지하는 것이 핵심입니다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "중반 반복 데스로 인한 운영 불안정",
+        "description": "15:19, 16:35, 24:53, 27:28에 연속적으로 데스를 기록하며 중반 운영 안정감이 흔들렸습니다. 특히 15~17분 구간에서 짧은 간격으로 2회 사망한 것은 리스폰 후 곧바로 위험 지역에 복귀했을 가능성을 시사합니다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_015",
+          "evt_026",
+          "evt_032"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "낮은 킬 관여율",
+        "description": "팀 총 37킬 중 11킬에만 관여하여 킬 관여율이 30%에 그쳤습니다. 서포터 기준으로는 50~60%가 이상적인 수치이며, 잦은 데스로 인한 부활 대기 시간이 합류 기회를 줄인 것으로 보입니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_011",
+          "evt_015",
+          "evt_026",
+          "evt_032"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "교전 시 제라스의 최대 사거리를 의식하고, 팀원 뒤 1스킬 거리 이상 후방에서 포지셔닝하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_2",
+        "text": "데스 후 리스폰 시 미니맵을 먼저 확인하고, 적 위치가 불분명하면 안전한 경로로 합류하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_3",
+        "text": "초반 레인에서 무리한 견제보다 안전 CS 보조와 시야 확보에 우선순위 두기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_4",
+        "text": "팀 교전 발생 시 더 적극적으로 합류하여 킬 관여율 50% 이상 목표로 설정하기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_5",
+        "text": "존야의 모래시계 활용 타이밍을 연습하여 위급 상황에서 생존율 높이기",
+        "priority": "LOW"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "5:43",
+        "phase": "EARLY",
+        "title": "초반 첫 데스",
+        "description": "레인 초반 교전에서 먼저 잡히며 상대에게 주도권을 넘겨주었습니다. 제라스의 사거리 이점을 활용하지 못한 포지셔닝이 원인으로 보입니다.",
+        "impact": "NEGATIVE",
+        "coachTip": "레벨 3~5 구간에서 상대 서포터의 올인 사거리를 파악하고, 그 밖에서 Q로 견제하는 습관을 들여보세요."
+      },
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "6:34",
+        "phase": "EARLY",
+        "title": "첫 드래곤 합류",
+        "description": "데스 직후에도 드래곤 타이밍에 합류하여 팀 오브젝트를 확보했습니다. 개인 불리에도 팀 플레이를 우선한 좋은 판단이었습니다.",
+        "impact": "POSITIVE",
+        "coachTip": "이처럼 오브젝트 타이밍 인식이 좋으니, 합류 전 체력/마나 상태만 한 번 더 체크하면 더 안전하게 기여할 수 있습니다."
+      },
+      {
+        "eventId": "evt_028",
+        "timestampLabel": "25:50",
+        "phase": "MID",
+        "title": "바론 확보 기여",
+        "description": "바론 확보에 직접 관여하며 경기의 결정적 전환점을 만들었습니다. 이 바론 버프로 팀이 구조물 5개를 연속 파괴하며 경기를 마무리했습니다.",
+        "impact": "POSITIVE",
+        "coachTip": "바론 전 시야 세팅과 합류 타이밍이 잘 맞았습니다. 이런 매크로 감각을 유지하세요."
+      },
+      {
+        "eventId": "evt_011",
+        "timestampLabel": "15:19",
+        "phase": "MID",
+        "title": "중반 연속 데스 시작",
+        "description": "중반 핵심 교전에서 데스를 내주며 이후 16:35에도 연속 사망했습니다. 짧은 간격의 연속 데스는 팀 전투력을 크게 약화시킵니다.",
+        "impact": "NEGATIVE",
+        "coachTip": "한 번 데스를 낸 직후에는 30초간 안전 플레이를 의식적으로 실천해보세요. 연속 데스 방지가 승률에 큰 영향을 줍니다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "usedIn": [
+          "weak_1",
+          "chk_3",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_002",
+        "usedIn": [
+          "str_1",
+          "str_2",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_003",
+        "usedIn": [
+          "str_1"
+        ]
+      },
+      {
+        "eventId": "evt_011",
+        "usedIn": [
+          "weak_2",
+          "weak_3",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "usedIn": [
+          "weak_2",
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_020",
+        "usedIn": [
+          "str_1"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "usedIn": [
+          "str_1",
+          "str_2",
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_026",
+        "usedIn": [
+          "weak_2",
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_028",
+        "usedIn": [
+          "str_1",
+          "str_2",
+          "str_3",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_032",
+        "usedIn": [
+          "weak_2",
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_036",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_037",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_038",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_039",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_040",
+        "usedIn": [
+          "str_2"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "analysisMode": "coaching_redteam",
+      "matchId": "KR_8175209213",
+      "player": "매운맛 비스킷#KR1",
+      "champion": "Xerath",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "duration": "28:26",
+      "dataLimitations": [
+        "타임라인에 모든 킬/데스/시야 설치 이벤트가 제공되지는 않았으므로, 구체 장면 평가는 제공된 주요 이벤트와 페이즈 통계에 근거한다.",
+        "팀 전체 골드 추정값이 0으로 제공되어 골드 격차 기반 평가는 제외했다."
+      ]
+    },
+    "matchSummary": {
+      "oneLine": "팀은 드래곤 4개, 바론 1개, 포탑 11개로 압도했지만, Xerath 서포터 개인 관점에서는 오브젝트 합류 성과가 반복 데스와 낮은 킬 관여율에 가려진 승리였다.",
+      "resultContext": "승리 자체는 강한 오브젝트 운영과 후반 구조물 압박으로 완성됐으나, 플레이어의 2/7/9, 킬 관여율 30%, 중반 연속 데스는 상위 티어에서 바로 처벌될 수 있는 구조적 약점이다."
+    },
+    "coachSummary": {
+      "overallFlow": "초반에는 드래곤 타이밍에 합류하며 팀 오브젝트 흐름에는 기여했지만, 페이즈 통계상 EARLY 0/3/2로 안정성이 크게 떨어졌다. 중반에는 드래곤과 바론 주변에서 영향력을 만들었으나, 15:19, 16:35, 24:53, 27:28 데스가 반복되며 '오브젝트는 챙기지만 직후 생존하지 못하는' 패턴이 뚜렷했다. 최종적으로 팀이 4용, 바론, 대량 포탑 철거로 이겼지만, 이 승리는 개인 포지셔닝의 안정성보다 팀의 압도적 맵 장악과 상대의 응징 부족에 더 의존한 면이 있다.",
+      "redteamDiagnosis": "겉으로 보면 높은 시야 점수 81과 오브젝트 전승이 좋아 보이지만, 핵심 문제는 시야와 합류가 실제 생존 가능한 위치 선정으로 이어지지 않았다는 점이다. Xerath 서포터는 장거리 포킹 챔피언임에도 7데스를 기록했고, 팀 37킬 중 관여율이 30%에 그쳤다. 이는 '교전 근처에는 있었지만 결정적 스킬 적중, 안전거리 유지, 후속 포지션 전환' 중 일부가 반복적으로 흔들렸을 가능성을 시사한다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반은 팀 오브젝트 흐름에 올라탔지만 개인 안정성은 낮았다. 5:43 데스 이후 6:34 드래곤 합류로 손실을 일부 회복했으나, 페이즈 통계상 EARLY 3데스는 라인전 또는 초반 합류 구도에서 반복적으로 먼저 맞는 구조였음을 보여준다.",
+        "redteamRead": "초반 오브젝트 기여가 있었기 때문에 표면상 나쁘지 않아 보일 수 있지만, 상위 티어에서는 3데스 서포터가 드래곤 하나로 손실을 덮기 어렵다. 특히 Xerath는 라인 주도권과 거리 유지가 생명인데 초반 사망이 누적되면 이후 시야 선점도 위험한 방식으로 강제된다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_003"
+        ]
+      },
+      "MID": {
+        "summary": "중반은 경기의 핵심 구간이었다. 드래곤과 바론 흐름에는 관여했지만, 15:19, 16:35, 24:53, 27:28에 반복 데스가 발생했다. 팀은 24:18 드래곤과 25:50 바론으로 주도권을 이어갔지만, 플레이어 개인은 오브젝트 전후 생존 관리가 불안정했다.",
+        "redteamRead": "이 구간의 문제는 단순히 많이 죽었다가 아니라, 죽은 타이밍이 모두 중반 핵심 구도라는 점이다. 오브젝트 전에는 시야를 잡다가, 오브젝트 후에는 추격이나 정리 구도에서, 혹은 구조물 압박 전환 중에 위치가 과감해졌을 가능성이 높다. 이 패턴은 팀이 앞설수록 더 잘 드러나는 '우세 상황의 거리 감각 붕괴'로 볼 수 있다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_015",
+          "evt_020",
+          "evt_025",
+          "evt_026",
+          "evt_028",
+          "evt_032",
+          "evt_036",
+          "evt_037",
+          "evt_038",
+          "evt_039",
+          "evt_040"
+        ]
+      },
+      "LATE": {
+        "summary": "제공된 데이터상 LATE 이벤트는 없고, 경기는 28:26에 종료됐다. 실질적으로 중반 바론 이후 포탑 연쇄 철거가 종료 조건이 됐다.",
+        "redteamRead": "후반 운영 검증은 거의 되지 않았다. 이 경기는 긴 후반 한타 능력으로 이긴 게임이라기보다, 중반 오브젝트와 바론 이후 상대가 구조물 방어에 실패하면서 끝난 게임에 가깝다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "title": "오브젝트 타이밍 합류 자체는 놓치지 않았다",
+        "detail": "6:34 드래곤, 24:18 드래곤, 25:50 바론 구간에 플레이어 관여가 확인된다. 개인 KDA는 낮았지만, 중요한 오브젝트 타이밍에 완전히 분리되어 있지는 않았다.",
+        "redteamCaveat": "다만 합류했다는 사실이 좋은 포지셔닝을 의미하지는 않는다. 이 경기에서는 오브젝트 관여 직후 또는 주변 구도에서 사망이 반복되어, 합류 품질은 별도로 의심해야 한다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_025",
+          "evt_028"
+        ]
+      },
+      {
+        "title": "팀의 승리 조건 전환을 따라가는 능력은 있었다",
+        "detail": "중반 바론 이후 팀은 27:56부터 28:11까지 구조물을 연쇄적으로 철거하며 승리 조건을 포탑 압박으로 전환했다. 플레이어가 직접 관여한 이벤트는 아니지만, 앞선 바론 관여가 이 구조물 전환의 출발점이었다.",
+        "redteamCaveat": "구조물 철거 이벤트 대부분은 플레이어 비관여로 표시되어 있다. 따라서 이 장점은 개인 캐리라기보다, 팀의 큰 흐름에서 이탈하지 않은 정도로 제한해서 봐야 한다.",
+        "relatedEventIds": [
+          "evt_028",
+          "evt_036",
+          "evt_037",
+          "evt_038",
+          "evt_039",
+          "evt_040"
+        ]
+      },
+      {
+        "title": "시야 활동량은 충분했다",
+        "detail": "최종 시야 점수 81은 28분 게임의 서포터 기준으로 활동량 자체가 높았음을 보여준다. 오브젝트 4용, 바론 1회, 포탑 11개 흐름과 결합하면 맵 장악 과정에 일정 부분 기여했을 가능성이 있다.",
+        "redteamCaveat": "높은 시야 점수가 곧 좋은 시야는 아니다. 7데스와 포지셔닝 리스크 신호를 함께 보면, 시야를 잡는 위치와 타이밍이 과도하게 위험했거나, 시야 확보 후 빠지는 기준이 약했을 수 있다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_020",
+          "evt_025",
+          "evt_028"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "오브젝트 이후 생존 전환이 매우 약했다",
+        "detail": "24:18 드래곤 관여 직후 24:53에 사망했고, 25:50 바론 관여 이후 27:28에 다시 사망했다. 오브젝트를 얻은 뒤 시야 정리, 귀환, 라인 배치 전환 중 안전 기준이 무너지는 패턴이 의심된다.",
+        "impact": "상위 티어에서는 오브젝트를 먹고도 서포터가 끊기면 바로 미드 주도권, 바론 버프 운영, 다음 시야 라인이 무너진다. 이 경기에서는 팀 격차가 커서 묻혔지만 재현되면 역전 빌미가 된다.",
+        "relatedEventIds": [
+          "evt_025",
+          "evt_026",
+          "evt_028",
+          "evt_032"
+        ]
+      },
+      {
+        "title": "초반 안정성이 결과보다 훨씬 나빴다",
+        "detail": "EARLY 페이즈가 0킬 3데스 2어시스트로 기록됐다. 타임라인에 구체적으로 확인되는 5:43 데스 외에도 초반 사망이 누적된 상태였고, 이는 라인 주도권형 포킹 서포터인 Xerath의 기본 승리 조건과 충돌한다.",
+        "impact": "초반에 죽어도 팀이 용을 먹으면 괜찮아 보일 수 있지만, 실제로는 바텀 압박권, 첫 귀환 타이밍, 강가 시야 선점권을 잃는다. 더 강한 상대라면 첫 드래곤 합류 전에 이미 라인이 잠겼을 가능성이 크다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002"
+        ]
+      },
+      {
+        "title": "팀 승리에 비해 개인 관여도가 낮았다",
+        "detail": "팀 총 37킬 중 킬 관여율이 30%에 그쳤고, 최종 KDA는 2/7/9였다. 팀이 크게 이긴 경기에서 서포터 Xerath가 11킬 관여에 머문 것은, 포킹 압박이나 CC 연계가 팀 교전 성과로 충분히 연결되지 않았을 가능성을 보여준다.",
+        "impact": "승리 경기라서 문제로 보이지 않을 수 있지만, 이런 수치는 '팀이 이기는 곳에 항상 먼저 자리 잡고 있었다'기보다 '팀이 이긴 교전 중 상당수에서 영향권 밖에 있었거나 먼저 죽었다'는 해석이 가능하다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_015",
+          "evt_026",
+          "evt_032",
+          "evt_036",
+          "evt_037",
+          "evt_038",
+          "evt_039",
+          "evt_040"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "오브젝트 획득 직후 10초 규칙 적용",
+        "description": "드래곤이나 바론을 먹은 직후에는 추격, 와드 제거, 포킹을 바로 하지 말고 먼저 아군 위치와 적 부활/진입 각을 확인한다.",
+        "successCriteria": "다음 5게임에서 오브젝트 획득 후 60초 이내 데스를 게임당 1회 이하로 제한한다.",
+        "relatedWeaknessIds": [
+          "poor_post_objective_survivability"
+        ]
+      },
+      {
+        "item": "Xerath 사거리 밖 위험 행동 줄이기",
+        "description": "스킬을 맞히기 위해 앞으로 한 걸음 더 나가는 장면을 줄이고, E가 빠진 상태에서는 시야 없는 강가와 정글 입구에 단독 진입하지 않는다.",
+        "successCriteria": "라인전 10분 전 데스를 0~1회로 제한하고, 첫 드래곤 전 사망을 없앤다.",
+        "relatedWeaknessIds": [
+          "weak_early_stability",
+          "positioning_risk"
+        ]
+      },
+      {
+        "item": "시야 점수보다 시야 회수 경로를 점검",
+        "description": "와드를 박는 것보다 박고 살아서 빠지는 루트를 먼저 정한다. 와드 설치 전 '아군이 바로 백업 가능한가'를 기준으로 진입 여부를 결정한다.",
+        "successCriteria": "시야 설치 또는 제거 직후 30초 내 사망 장면을 리플레이에서 따로 표시하고, 같은 위치 반복 사망을 제거한다.",
+        "relatedWeaknessIds": [
+          "positioning_risk"
+        ]
+      },
+      {
+        "item": "승리 중일수록 킬 관여 위치를 보수적으로 재설정",
+        "description": "팀이 앞서는 상황에서는 딜을 더 넣는 것보다 살아서 CC, 시야, 포킹 압박을 계속 제공하는 가치가 높다. 한타 시작 전에는 딜러 뒤쪽 또는 측면 안전거리에서 시작한다.",
+        "successCriteria": "팀이 10킬 이상 앞선 게임에서도 데스가 5회를 넘지 않도록 관리한다.",
+        "relatedWeaknessIds": [
+          "low_kill_participation_in_win"
+        ]
+      },
+      {
+        "item": "리플레이에서 데스 전 15초만 따로 복기",
+        "description": "각 데스의 직접 원인보다 15초 전 위치 선택, 시야 정보, 아군 거리, 스킬 보유 상태를 체크한다.",
+        "successCriteria": "다음 경기 전 이번 게임의 5:43, 15:19, 16:35, 24:53, 27:28 데스를 같은 기준으로 분류한다.",
+        "relatedWeaknessIds": [
+          "weak_early_stability",
+          "poor_post_objective_survivability",
+          "positioning_risk"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "5:43",
+        "phase": "EARLY",
+        "title": "초반 첫 확인 데스",
+        "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+        "redteamRead": "EARLY 3데스 흐름의 시작점으로 볼 수 있다. 이후 드래곤 합류가 있었더라도, 초반 포킹 서포터가 먼저 죽는 패턴은 라인 주도권과 강가 시야를 동시에 약화시킨다.",
+        "riskLevel": "high"
+      },
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "6:34",
+        "phase": "EARLY",
+        "title": "첫 드래곤 합류",
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "redteamRead": "긍정 장면이지만 앞선 데스를 완전히 상쇄하지는 않는다. 결과적으로 오브젝트는 챙겼지만, 과정상 안정적으로 주도권을 만든 것인지 팀의 커버로 수습한 것인지 구분해야 한다.",
+        "riskLevel": "medium"
+      },
+      {
+        "eventId": "evt_011",
+        "timestampLabel": "15:19",
+        "phase": "MID",
+        "title": "중반 첫 핵심 데스",
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamRead": "중반 전환 시점의 데스는 단순 손실보다 크다. 이 타이밍에 서포터가 죽으면 다음 오브젝트 준비 시야가 늦어지고, Xerath의 포킹 압박 구간도 짧아진다.",
+        "riskLevel": "high"
+      },
+      {
+        "eventId": "evt_015",
+        "timestampLabel": "16:35",
+        "phase": "MID",
+        "title": "반복 데스 신호",
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamRead": "15:19 이후 약 1분 16초 만에 다시 사망했다. 한 번의 실수보다 더 중요한 것은 재정비 전 같은 위험 판단이 반복됐다는 점이다.",
+        "riskLevel": "high"
+      },
+      {
+        "eventId": "evt_025",
+        "timestampLabel": "24:18",
+        "phase": "MID",
+        "title": "중요 드래곤 확보 구도",
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "redteamRead": "팀의 4용 흐름에 연결되는 긍정 장면이지만, 바로 뒤 24:53 사망과 함께 보면 '오브젝트 성공 후 빠지는 설계'가 약했다.",
+        "riskLevel": "medium"
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "24:53",
+        "phase": "MID",
+        "title": "드래곤 직후 데스",
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamRead": "오브젝트를 먹은 지 35초 만의 데스다. 이 장면은 이번 경기의 핵심 약점인 '성과 직후 생존 실패'를 가장 직접적으로 보여준다.",
+        "riskLevel": "critical"
+      },
+      {
+        "eventId": "evt_028",
+        "timestampLabel": "25:50",
+        "phase": "MID",
+        "title": "바론 확보 관여",
+        "summary": "바론 확보에 관여하며 경기 흐름을 다시 붙잡았다.",
+        "redteamRead": "경기를 끝내는 재료를 만든 장면이다. 다만 바론 이후 27:28 데스가 이어졌기 때문에, 바론 버프 운영에서 개인 생존 기준은 여전히 불안했다.",
+        "riskLevel": "medium"
+      },
+      {
+        "eventId": "evt_032",
+        "timestampLabel": "27:28",
+        "phase": "MID",
+        "title": "마무리 전 불필요한 추가 데스",
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "redteamRead": "팀이 곧 구조물을 연쇄 철거하며 게임을 끝냈지만, 개인적으로는 마무리 운영에서 살아남아 압박을 유지하지 못했다. 상대가 더 강했다면 이 데스는 바론 압박 지연으로 이어질 수 있었다.",
+        "riskLevel": "high"
+      },
+      {
+        "eventId": "evt_036",
+        "timestampLabel": "27:56",
+        "phase": "MID",
+        "title": "바론 이후 구조물 압박 시작",
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "redteamRead": "승리의 직접적인 마무리 흐름이지만 플레이어 비관여 이벤트다. 이 경기는 개인 생존 실패에도 팀이 구조물을 밀 수 있을 만큼 앞서 있었던 경기로 해석해야 한다.",
+        "riskLevel": "low"
+      }
+    ],
+    "evidenceIndex": {
+      "playerStatEvidence": {
+        "kills": 2,
+        "deaths": 7,
+        "assists": 9,
+        "kda": 1.57,
+        "killParticipation": 0.3,
+        "visionScore": 81,
+        "damageToChampions": 10711,
+        "teamTotalKills": 37,
+        "teamDragons": 4,
+        "enemyDragons": 0,
+        "teamBarons": 1,
+        "enemyBarons": 0,
+        "teamTowers": 11,
+        "enemyTowers": 2
+      },
+      "phaseEvidence": {
+        "EARLY": {
+          "kills": 0,
+          "deaths": 3,
+          "assists": 2,
+          "interpretation": "초반 안정성 부족 근거"
+        },
+        "MID": {
+          "kills": 2,
+          "deaths": 4,
+          "assists": 7,
+          "interpretation": "중반 관여는 있었지만 반복 사망이 집중된 근거"
+        },
+        "LATE": {
+          "kills": 0,
+          "deaths": 0,
+          "assists": 0,
+          "interpretation": "실질적인 후반 검증 데이터 부족"
+        }
+      },
+      "events": [
+        {
+          "eventId": "evt_001",
+          "timestampLabel": "5:43",
+          "phase": "EARLY",
+          "eventType": "PLAYER_DEATH",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "초반 안정성 부족",
+            "포지셔닝 리스크"
+          ]
+        },
+        {
+          "eventId": "evt_002",
+          "timestampLabel": "6:34",
+          "phase": "EARLY",
+          "eventType": "DRAGON_FIGHT",
+          "importance": 4,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "오브젝트 합류",
+            "초반 손실 일부 회복"
+          ]
+        },
+        {
+          "eventId": "evt_003",
+          "timestampLabel": "8:43",
+          "phase": "EARLY",
+          "eventType": "OBJECTIVE_SETUP_WIN",
+          "importance": 4,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 차원의 오브젝트 준비"
+          ]
+        },
+        {
+          "eventId": "evt_011",
+          "timestampLabel": "15:19",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "중반 핵심 구도 데스",
+            "운영 안정감 저하"
+          ]
+        },
+        {
+          "eventId": "evt_015",
+          "timestampLabel": "16:35",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "반복 데스 패턴",
+            "재정비 실패 가능성"
+          ]
+        },
+        {
+          "eventId": "evt_020",
+          "timestampLabel": "18:49",
+          "phase": "MID",
+          "eventType": "DRAGON_FIGHT",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 오브젝트 템포"
+          ]
+        },
+        {
+          "eventId": "evt_025",
+          "timestampLabel": "24:18",
+          "phase": "MID",
+          "eventType": "DRAGON_FIGHT",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "중요 드래곤 합류",
+            "오브젝트 성공"
+          ]
+        },
+        {
+          "eventId": "evt_026",
+          "timestampLabel": "24:53",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "드래곤 직후 생존 실패",
+            "오브젝트 후 전환 약점"
+          ]
+        },
+        {
+          "eventId": "evt_028",
+          "timestampLabel": "25:50",
+          "phase": "MID",
+          "eventType": "BARON_FIGHT",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "바론 확보 관여",
+            "승리 조건 전환"
+          ]
+        },
+        {
+          "eventId": "evt_032",
+          "timestampLabel": "27:28",
+          "phase": "MID",
+          "eventType": "PLAYER_DEATH",
+          "importance": 5,
+          "isPlayerInvolved": true,
+          "usedFor": [
+            "바론 이후 생존 실패",
+            "마무리 운영 리스크"
+          ]
+        },
+        {
+          "eventId": "evt_036",
+          "timestampLabel": "27:56",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "승리 마무리"
+          ]
+        },
+        {
+          "eventId": "evt_037",
+          "timestampLabel": "27:57",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "승리 마무리"
+          ]
+        },
+        {
+          "eventId": "evt_038",
+          "timestampLabel": "28:07",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "승리 마무리"
+          ]
+        },
+        {
+          "eventId": "evt_039",
+          "timestampLabel": "28:10",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "승리 마무리"
+          ]
+        },
+        {
+          "eventId": "evt_040",
+          "timestampLabel": "28:11",
+          "phase": "MID",
+          "eventType": "TOWER_TAKE",
+          "importance": 5,
+          "isPlayerInvolved": false,
+          "usedFor": [
+            "팀 구조물 압박",
+            "승리 마무리"
+          ]
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "뛰어난 시야 장악력",
+        "claudeNote": "시야 점수 81은 28분 경기에서 매우 우수한 수치입니다. 분당 약 2.85의 시야 점수로, 맵 정보 제공에 크게 기여했습니다. 이러한 시야 우위가 팀의 오브젝트 독점(드래곤 4:0, 바론 1:0)에 직접적으로 연결되었습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 합류와 팀 기여",
+        "claudeNote": "드래곤 4개, 바론 1개를 팀이 모두 챙기는 과정에서 핵심 타이밍에 합류하여 오브젝트 템포를 유지했습니다. 특히 25:50 바론 확보는 경기를 마무리 짓는 결정적 계기가 되었습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 레인 안정성 부족",
+        "claudeNote": "5:43에 첫 데스를 기록하며 레인 주도권을 잃었습니다. 초반 0/3/2로 레인 단계에서 큰 압박을 받았으며, 이는 상대 봇 듀오에게 골드 및 경험치 우위를 허용했습니다. 제라스 서포터는 긴 사거리를 활용해 안전 거리를 유지하는 것이 핵심입니다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "서포터 딜량 기여",
+        "note": "서포터 제라스로 10,711의 챔피언 피해량을 기록하며 팀 교전에서 화력 보조 역할을 충실히 수행했습니다. 제라스의 장거리 스킬을 활용해 교전 전 포킹과 견제에 기여한 부분이 돋보입니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 반복 데스로 인한 운영 불안정",
+        "note": "15:19, 16:35, 24:53, 27:28에 연속적으로 데스를 기록하며 중반 운영 안정감이 흔들렸습니다. 특히 15~17분 구간에서 짧은 간격으로 2회 사망한 것은 리스폰 후 곧바로 위험 지역에 복귀했을 가능성을 시사합니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "낮은 킬 관여율",
+        "note": "팀 총 37킬 중 11킬에만 관여하여 킬 관여율이 30%에 그쳤습니다. 서포터 기준으로는 50~60%가 이상적인 수치이며, 잦은 데스로 인한 부활 대기 시간이 합류 기회를 줄인 것으로 보입니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "팀의 승리 조건 전환을 따라가는 능력은 있었다"
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 이후 생존 전환이 매우 약했다"
+      },
+      {
+        "category": "weakness",
+        "topic": "팀 승리에 비해 개인 관여도가 낮았다"
+      }
+    ],
+    "agreementRate": 50
+  }
+}

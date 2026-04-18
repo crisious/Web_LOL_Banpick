@@ -1,0 +1,1677 @@
+{
+  "schemaVersion": "1.0",
+  "sourceMeta": {
+    "sourceType": "riot_match_v5",
+    "fetchedAt": "2026-04-17T01:58:12.692Z",
+    "platformRegion": "KR",
+    "regionalCluster": "ASIA",
+    "rawMatchId": "KR_8175209213"
+  },
+  "playerContext": {
+    "puuid": "NyCNzzJ1J46bvvbSdQyHNsGiJh5hzaxRLu6scZk6TvH6_DkRCDZ7iKuf8jjf3zNE59idvqLuVn6K5Q",
+    "riotId": "매운맛 비스킷#KR1",
+    "isAnonymous": true,
+    "participantId": 10
+  },
+  "matchInfo": {
+    "matchId": "KR_8175209213",
+    "queueId": 420,
+    "queueLabel": "RANKED_SOLO",
+    "mapId": 11,
+    "mapLabel": "SUMMONERS_RIFT",
+    "gameVersion": "16.8.764.3737",
+    "gameCreation": "2026-04-16T10:12:53.017Z",
+    "durationSeconds": 1706,
+    "durationLabel": "28:26",
+    "result": "WIN",
+    "champion": "Xerath",
+    "position": "SUPPORT",
+    "teamId": 200
+  },
+  "playerStats": {
+    "kills": 2,
+    "deaths": 7,
+    "assists": 9,
+    "kda": 1.57,
+    "cs": 30,
+    "csPerMinute": 1.06,
+    "goldEarned": 8511,
+    "damageToChampions": 10711,
+    "visionScore": 81,
+    "killParticipation": 0.3,
+    "champLevel": 13,
+    "summonerSpells": [
+      4,
+      7
+    ],
+    "items": [
+      2031,
+      3157,
+      2524,
+      3871,
+      0,
+      3020,
+      3364
+    ]
+  },
+  "challengeStats": {
+    "damagePerMinute": 376.67098136942377,
+    "goldPerMinute": 299.3025037765667,
+    "visionScorePerMinute": 2.868040108762355,
+    "killParticipation": 0.2972972972972973,
+    "teamDamagePercentage": 0.09786283989273342,
+    "soloKills": 0,
+    "laneMinionsFirst10Minutes": 15,
+    "maxCsAdvantageOnLaneOpponent": 14,
+    "maxLevelLeadLaneOpponent": 2,
+    "turretPlatesTaken": 1,
+    "earlyLaningPhaseGoldExpAdvantage": 0,
+    "controlWardsPlaced": 11,
+    "skillshotsDodged": 57,
+    "outnumberedKills": 0
+  },
+  "teamContext": {
+    "teamTotalKills": 37,
+    "teamGoldEstimate": 0,
+    "teamDragons": 4,
+    "teamBarons": 1,
+    "teamTowers": 11,
+    "enemyDragons": 0,
+    "enemyBarons": 0,
+    "enemyTowers": 2
+  },
+  "phaseContext": {
+    "early": {
+      "startMs": 0,
+      "endMs": 900000,
+      "kills": 0,
+      "deaths": 3,
+      "assists": 2,
+      "notableEventCount": 7
+    },
+    "mid": {
+      "startMs": 900001,
+      "endMs": 1800000,
+      "kills": 2,
+      "deaths": 4,
+      "assists": 7,
+      "notableEventCount": 31
+    },
+    "late": {
+      "startMs": 1800001,
+      "endMs": 1691797,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "notableEventCount": 0
+    }
+  },
+  "timelineEvents": [
+    {
+      "eventId": "evt_001",
+      "timestampMs": 343423,
+      "timestampLabel": "5:43",
+      "phase": "EARLY",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 6,
+        "eventIndex": 32
+      }
+    },
+    {
+      "eventId": "evt_002",
+      "timestampMs": 394109,
+      "timestampLabel": "6:34",
+      "phase": "EARLY",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+      "rawRef": {
+        "frameIndex": 7,
+        "eventIndex": 19
+      }
+    },
+    {
+      "eventId": "evt_003",
+      "timestampMs": 523438,
+      "timestampLabel": "8:43",
+      "phase": "EARLY",
+      "eventType": "OBJECTIVE_SETUP_WIN",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_RIVER",
+      "summary": "정글 오브젝트를 챙기며 구조물 압박 재료를 마련했다.",
+      "rawRef": {
+        "frameIndex": 9,
+        "eventIndex": 43
+      }
+    },
+    {
+      "eventId": "evt_004",
+      "timestampMs": 544648,
+      "timestampLabel": "9:04",
+      "phase": "EARLY",
+      "eventType": "OBJECTIVE_SETUP_WIN",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_RIVER",
+      "summary": "정글 오브젝트를 챙기며 구조물 압박 재료를 마련했다.",
+      "rawRef": {
+        "frameIndex": 10,
+        "eventIndex": 2
+      }
+    },
+    {
+      "eventId": "evt_005",
+      "timestampMs": 582233,
+      "timestampLabel": "9:42",
+      "phase": "EARLY",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 3,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 10,
+        "eventIndex": 20
+      }
+    },
+    {
+      "eventId": "evt_006",
+      "timestampMs": 591400,
+      "timestampLabel": "9:51",
+      "phase": "EARLY",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 10,
+        "eventIndex": 26
+      }
+    },
+    {
+      "eventId": "evt_007",
+      "timestampMs": 728399,
+      "timestampLabel": "12:08",
+      "phase": "EARLY",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+      "rawRef": {
+        "frameIndex": 13,
+        "eventIndex": 10
+      }
+    },
+    {
+      "eventId": "evt_008",
+      "timestampMs": 814355,
+      "timestampLabel": "13:34",
+      "phase": "EARLY",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 3,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 14,
+        "eventIndex": 37
+      }
+    },
+    {
+      "eventId": "evt_009",
+      "timestampMs": 819506,
+      "timestampLabel": "13:39",
+      "phase": "EARLY",
+      "eventType": "PLAYER_DEATH",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 14,
+        "eventIndex": 39
+      }
+    },
+    {
+      "eventId": "evt_010",
+      "timestampMs": 914871,
+      "timestampLabel": "15:14",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 16,
+        "eventIndex": 17
+      }
+    },
+    {
+      "eventId": "evt_011",
+      "timestampMs": 919281,
+      "timestampLabel": "15:19",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 16,
+        "eventIndex": 21
+      }
+    },
+    {
+      "eventId": "evt_012",
+      "timestampMs": 920092,
+      "timestampLabel": "15:20",
+      "phase": "MID",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 16,
+        "eventIndex": 23
+      }
+    },
+    {
+      "eventId": "evt_013",
+      "timestampMs": 935414,
+      "timestampLabel": "15:35",
+      "phase": "MID",
+      "eventType": "OBJECTIVE_SETUP_WIN",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_RIVER",
+      "summary": "정글 오브젝트를 챙기며 구조물 압박 재료를 마련했다.",
+      "rawRef": {
+        "frameIndex": 16,
+        "eventIndex": 37
+      }
+    },
+    {
+      "eventId": "evt_014",
+      "timestampMs": 980681,
+      "timestampLabel": "16:20",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 17,
+        "eventIndex": 15
+      }
+    },
+    {
+      "eventId": "evt_015",
+      "timestampMs": 995784,
+      "timestampLabel": "16:35",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 17,
+        "eventIndex": 30
+      }
+    },
+    {
+      "eventId": "evt_016",
+      "timestampMs": 1052435,
+      "timestampLabel": "17:32",
+      "phase": "MID",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 18,
+        "eventIndex": 16
+      }
+    },
+    {
+      "eventId": "evt_017",
+      "timestampMs": 1053169,
+      "timestampLabel": "17:33",
+      "phase": "MID",
+      "eventType": "CHAMPION_KILL",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "rawRef": {
+        "frameIndex": 18,
+        "eventIndex": 17
+      }
+    },
+    {
+      "eventId": "evt_018",
+      "timestampMs": 1096309,
+      "timestampLabel": "18:16",
+      "phase": "MID",
+      "eventType": "TEAMFIGHT_FOLLOWUP",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 19,
+        "eventIndex": 11
+      }
+    },
+    {
+      "eventId": "evt_019",
+      "timestampMs": 1111916,
+      "timestampLabel": "18:31",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "BOT_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 19,
+        "eventIndex": 20
+      }
+    },
+    {
+      "eventId": "evt_020",
+      "timestampMs": 1129132,
+      "timestampLabel": "18:49",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+      "rawRef": {
+        "frameIndex": 19,
+        "eventIndex": 31
+      }
+    },
+    {
+      "eventId": "evt_021",
+      "timestampMs": 1145168,
+      "timestampLabel": "19:05",
+      "phase": "MID",
+      "eventType": "SKIRMISH_WIN",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 20,
+        "eventIndex": 0
+      }
+    },
+    {
+      "eventId": "evt_022",
+      "timestampMs": 1160386,
+      "timestampLabel": "19:20",
+      "phase": "MID",
+      "eventType": "TEAMFIGHT_FOLLOWUP",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 20,
+        "eventIndex": 9
+      }
+    },
+    {
+      "eventId": "evt_023",
+      "timestampMs": 1277464,
+      "timestampLabel": "21:17",
+      "phase": "MID",
+      "eventType": "CHAMPION_KILL",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "rawRef": {
+        "frameIndex": 22,
+        "eventIndex": 12
+      }
+    },
+    {
+      "eventId": "evt_024",
+      "timestampMs": 1391003,
+      "timestampLabel": "23:11",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "BOT_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 24,
+        "eventIndex": 12
+      }
+    },
+    {
+      "eventId": "evt_025",
+      "timestampMs": 1458460,
+      "timestampLabel": "24:18",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "DRAGON_RIVER",
+      "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+      "rawRef": {
+        "frameIndex": 25,
+        "eventIndex": 16
+      }
+    },
+    {
+      "eventId": "evt_026",
+      "timestampMs": 1493673,
+      "timestampLabel": "24:53",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 25,
+        "eventIndex": 43
+      }
+    },
+    {
+      "eventId": "evt_027",
+      "timestampMs": 1519558,
+      "timestampLabel": "25:19",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "BOT_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 26,
+        "eventIndex": 12
+      }
+    },
+    {
+      "eventId": "evt_028",
+      "timestampMs": 1550723,
+      "timestampLabel": "25:50",
+      "phase": "MID",
+      "eventType": "BARON_FIGHT",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "BARON_RIVER",
+      "summary": "바론 확보에 관여하며 경기 흐름을 다시 붙잡았다.",
+      "rawRef": {
+        "frameIndex": 26,
+        "eventIndex": 45
+      }
+    },
+    {
+      "eventId": "evt_029",
+      "timestampMs": 1630610,
+      "timestampLabel": "27:10",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 8
+      }
+    },
+    {
+      "eventId": "evt_030",
+      "timestampMs": 1640146,
+      "timestampLabel": "27:20",
+      "phase": "MID",
+      "eventType": "TEAMFIGHT_FOLLOWUP",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 17
+      }
+    },
+    {
+      "eventId": "evt_031",
+      "timestampMs": 1645158,
+      "timestampLabel": "27:25",
+      "phase": "MID",
+      "eventType": "TEAMFIGHT_FOLLOWUP",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전 후속 합류로 킬 관여를 만들었다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 21
+      }
+    },
+    {
+      "eventId": "evt_032",
+      "timestampMs": 1648532,
+      "timestampLabel": "27:28",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "importance": 5,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 24
+      }
+    },
+    {
+      "eventId": "evt_033",
+      "timestampMs": 1649507,
+      "timestampLabel": "27:29",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 28
+      }
+    },
+    {
+      "eventId": "evt_034",
+      "timestampMs": 1668538,
+      "timestampLabel": "27:48",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 51
+      }
+    },
+    {
+      "eventId": "evt_035",
+      "timestampMs": 1669239,
+      "timestampLabel": "27:49",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 4,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 54
+      }
+    },
+    {
+      "eventId": "evt_036",
+      "timestampMs": 1676048,
+      "timestampLabel": "27:56",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 56
+      }
+    },
+    {
+      "eventId": "evt_037",
+      "timestampMs": 1677820,
+      "timestampLabel": "27:57",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "TOP_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 28,
+        "eventIndex": 57
+      }
+    },
+    {
+      "eventId": "evt_038",
+      "timestampMs": 1687183,
+      "timestampLabel": "28:07",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 29,
+        "eventIndex": 14
+      }
+    },
+    {
+      "eventId": "evt_039",
+      "timestampMs": 1690925,
+      "timestampLabel": "28:10",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "BOT_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 29,
+        "eventIndex": 20
+      }
+    },
+    {
+      "eventId": "evt_040",
+      "timestampMs": 1691797,
+      "timestampLabel": "28:11",
+      "phase": "MID",
+      "eventType": "TOWER_TAKE",
+      "importance": 5,
+      "isPlayerInvolved": false,
+      "laneHint": "MID_LANE",
+      "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+      "rawRef": {
+        "frameIndex": 29,
+        "eventIndex": 21
+      }
+    }
+  ],
+  "derivedSignals": {
+    "hasEarlyLeadMoments": true,
+    "hasMidGameThrowRisk": true,
+    "hasObjectiveControlIssues": false,
+    "hasStrongRoamingPattern": false,
+    "hasPositioningRisk": true,
+    "candidateThemes": [
+      "weak_early_stability",
+      "strong_objective_tempo",
+      "poor_post_objective_survivability"
+    ]
+  },
+  "playtimeScore": {
+    "overall": 6.7,
+    "categories": {
+      "combat": 3.2,
+      "income": 5.9,
+      "vision": 10,
+      "survival": 6,
+      "objective": 10,
+      "structure": 10
+    },
+    "label": "양호"
+  },
+  "objectiveTimeline": [
+    {
+      "time": 394109,
+      "timeLabel": "6:34",
+      "phase": "EARLY",
+      "type": "OBJECTIVE",
+      "subtype": "DRAGON",
+      "lane": "",
+      "team": "ALLY",
+      "label": "드래곤 (water dragon)"
+    },
+    {
+      "time": 523438,
+      "timeLabel": "8:43",
+      "phase": "EARLY",
+      "type": "OBJECTIVE",
+      "subtype": "HORDE",
+      "lane": "",
+      "team": "ALLY",
+      "label": "공허 유충"
+    },
+    {
+      "time": 535624,
+      "timeLabel": "8:55",
+      "phase": "EARLY",
+      "type": "OBJECTIVE",
+      "subtype": "HORDE",
+      "lane": "",
+      "team": "ALLY",
+      "label": "공허 유충"
+    },
+    {
+      "time": 544648,
+      "timeLabel": "9:04",
+      "phase": "EARLY",
+      "type": "OBJECTIVE",
+      "subtype": "HORDE",
+      "lane": "",
+      "team": "ALLY",
+      "label": "공허 유충"
+    },
+    {
+      "time": 728399,
+      "timeLabel": "12:08",
+      "phase": "EARLY",
+      "type": "OBJECTIVE",
+      "subtype": "DRAGON",
+      "lane": "",
+      "team": "ALLY",
+      "label": "드래곤 (earth dragon)"
+    },
+    {
+      "time": 914871,
+      "timeLabel": "15:14",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "OUTER_TURRET",
+      "lane": "TOP_LANE",
+      "team": "ALLY",
+      "label": "탑 외곽 타워"
+    },
+    {
+      "time": 935414,
+      "timeLabel": "15:35",
+      "phase": "MID",
+      "type": "OBJECTIVE",
+      "subtype": "RIFTHERALD",
+      "lane": "",
+      "team": "ALLY",
+      "label": "전령"
+    },
+    {
+      "time": 980681,
+      "timeLabel": "16:20",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "OUTER_TURRET",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 외곽 타워"
+    },
+    {
+      "time": 1111916,
+      "timeLabel": "18:31",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "OUTER_TURRET",
+      "lane": "BOT_LANE",
+      "team": "ALLY",
+      "label": "봇 외곽 타워"
+    },
+    {
+      "time": 1129132,
+      "timeLabel": "18:49",
+      "phase": "MID",
+      "type": "OBJECTIVE",
+      "subtype": "DRAGON",
+      "lane": "",
+      "team": "ALLY",
+      "label": "드래곤 (chemtech dragon)"
+    },
+    {
+      "time": 1229908,
+      "timeLabel": "20:29",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "OUTER_TURRET",
+      "lane": "TOP_LANE",
+      "team": "ENEMY",
+      "label": "탑 외곽 타워"
+    },
+    {
+      "time": 1391003,
+      "timeLabel": "23:11",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INNER_TURRET",
+      "lane": "BOT_LANE",
+      "team": "ALLY",
+      "label": "봇 내부 타워"
+    },
+    {
+      "time": 1458460,
+      "timeLabel": "24:18",
+      "phase": "MID",
+      "type": "OBJECTIVE",
+      "subtype": "DRAGON",
+      "lane": "",
+      "team": "ALLY",
+      "label": "드래곤 (chemtech dragon)"
+    },
+    {
+      "time": 1506510,
+      "timeLabel": "25:06",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "OUTER_TURRET",
+      "lane": "MID_LANE",
+      "team": "ENEMY",
+      "label": "미드 외곽 타워"
+    },
+    {
+      "time": 1519558,
+      "timeLabel": "25:19",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "BASE_TURRET",
+      "lane": "BOT_LANE",
+      "team": "ALLY",
+      "label": "봇 억제기 타워"
+    },
+    {
+      "time": 1550723,
+      "timeLabel": "25:50",
+      "phase": "MID",
+      "type": "OBJECTIVE",
+      "subtype": "BARON_NASHOR",
+      "lane": "",
+      "team": "ALLY",
+      "label": "바론"
+    },
+    {
+      "time": 1630610,
+      "timeLabel": "27:10",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INNER_TURRET",
+      "lane": "TOP_LANE",
+      "team": "ALLY",
+      "label": "탑 내부 타워"
+    },
+    {
+      "time": 1649507,
+      "timeLabel": "27:29",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INNER_TURRET",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 내부 타워"
+    },
+    {
+      "time": 1668538,
+      "timeLabel": "27:48",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "BASE_TURRET",
+      "lane": "TOP_LANE",
+      "team": "ALLY",
+      "label": "탑 억제기 타워"
+    },
+    {
+      "time": 1669239,
+      "timeLabel": "27:49",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "BASE_TURRET",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 억제기 타워"
+    },
+    {
+      "time": 1676048,
+      "timeLabel": "27:56",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INHIBITOR_BUILDING",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 억제기"
+    },
+    {
+      "time": 1677820,
+      "timeLabel": "27:57",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INHIBITOR_BUILDING",
+      "lane": "TOP_LANE",
+      "team": "ALLY",
+      "label": "탑 억제기"
+    },
+    {
+      "time": 1687183,
+      "timeLabel": "28:07",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "NEXUS_TURRET",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 넥서스 타워"
+    },
+    {
+      "time": 1690925,
+      "timeLabel": "28:10",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "INHIBITOR_BUILDING",
+      "lane": "BOT_LANE",
+      "team": "ALLY",
+      "label": "봇 억제기"
+    },
+    {
+      "time": 1691797,
+      "timeLabel": "28:11",
+      "phase": "MID",
+      "type": "STRUCTURE",
+      "subtype": "NEXUS_TURRET",
+      "lane": "MID_LANE",
+      "team": "ALLY",
+      "label": "미드 넥서스 타워"
+    }
+  ],
+  "kdaTimeline": [
+    {
+      "time": 0,
+      "timeLabel": "0:00",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "kda": 0,
+      "event": "게임 시작"
+    },
+    {
+      "time": 343423,
+      "timeLabel": "5:43",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 1,
+      "assists": 0,
+      "kda": 0,
+      "event": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 582233,
+      "timeLabel": "9:42",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 1,
+      "assists": 1,
+      "kda": 1,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "SKIRMISH_WIN"
+    },
+    {
+      "time": 591400,
+      "timeLabel": "9:51",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 2,
+      "assists": 1,
+      "kda": 0.5,
+      "event": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 814355,
+      "timeLabel": "13:34",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 2,
+      "assists": 2,
+      "kda": 1,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "SKIRMISH_WIN"
+    },
+    {
+      "time": 819506,
+      "timeLabel": "13:39",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 3,
+      "assists": 2,
+      "kda": 0.67,
+      "event": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 919281,
+      "timeLabel": "15:19",
+      "phase": "MID",
+      "kills": 0,
+      "deaths": 4,
+      "assists": 2,
+      "kda": 0.5,
+      "event": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 920092,
+      "timeLabel": "15:20",
+      "phase": "MID",
+      "kills": 0,
+      "deaths": 4,
+      "assists": 3,
+      "kda": 0.75,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "SKIRMISH_WIN"
+    },
+    {
+      "time": 995784,
+      "timeLabel": "16:35",
+      "phase": "MID",
+      "kills": 0,
+      "deaths": 5,
+      "assists": 3,
+      "kda": 0.6,
+      "event": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 1052435,
+      "timeLabel": "17:32",
+      "phase": "MID",
+      "kills": 0,
+      "deaths": 5,
+      "assists": 4,
+      "kda": 0.8,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "SKIRMISH_WIN"
+    },
+    {
+      "time": 1053169,
+      "timeLabel": "17:33",
+      "phase": "MID",
+      "kills": 1,
+      "deaths": 5,
+      "assists": 4,
+      "kda": 1,
+      "event": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "eventType": "CHAMPION_KILL"
+    },
+    {
+      "time": 1096309,
+      "timeLabel": "18:16",
+      "phase": "MID",
+      "kills": 1,
+      "deaths": 5,
+      "assists": 5,
+      "kda": 1.2,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "TEAMFIGHT_FOLLOWUP"
+    },
+    {
+      "time": 1145168,
+      "timeLabel": "19:05",
+      "phase": "MID",
+      "kills": 1,
+      "deaths": 5,
+      "assists": 6,
+      "kda": 1.4,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "SKIRMISH_WIN"
+    },
+    {
+      "time": 1160386,
+      "timeLabel": "19:20",
+      "phase": "MID",
+      "kills": 1,
+      "deaths": 5,
+      "assists": 7,
+      "kda": 1.6,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "TEAMFIGHT_FOLLOWUP"
+    },
+    {
+      "time": 1277464,
+      "timeLabel": "21:17",
+      "phase": "MID",
+      "kills": 2,
+      "deaths": 5,
+      "assists": 7,
+      "kda": 1.8,
+      "event": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "eventType": "CHAMPION_KILL"
+    },
+    {
+      "time": 1493673,
+      "timeLabel": "24:53",
+      "phase": "MID",
+      "kills": 2,
+      "deaths": 6,
+      "assists": 7,
+      "kda": 1.5,
+      "event": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    },
+    {
+      "time": 1640146,
+      "timeLabel": "27:20",
+      "phase": "MID",
+      "kills": 2,
+      "deaths": 6,
+      "assists": 8,
+      "kda": 1.67,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "TEAMFIGHT_FOLLOWUP"
+    },
+    {
+      "time": 1645158,
+      "timeLabel": "27:25",
+      "phase": "MID",
+      "kills": 2,
+      "deaths": 6,
+      "assists": 9,
+      "kda": 1.83,
+      "event": "교전 후속 합류로 킬 관여를 만들었다.",
+      "eventType": "TEAMFIGHT_FOLLOWUP"
+    },
+    {
+      "time": 1648532,
+      "timeLabel": "27:28",
+      "phase": "MID",
+      "kills": 2,
+      "deaths": 7,
+      "assists": 9,
+      "kda": 1.57,
+      "event": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+      "eventType": "PLAYER_DEATH"
+    }
+  ],
+  "wardTimeline": {
+    "events": [
+      {
+        "time": 31929,
+        "timeLabel": "0:31",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 173934,
+        "timeLabel": "2:53",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 322554,
+        "timeLabel": "5:22",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 398084,
+        "timeLabel": "6:38",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 450540,
+        "timeLabel": "7:30",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 531716,
+        "timeLabel": "8:51",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 639154,
+        "timeLabel": "10:39",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 643595,
+        "timeLabel": "10:43",
+        "phase": "EARLY",
+        "action": "KILLED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 654485,
+        "timeLabel": "10:54",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 710714,
+        "timeLabel": "11:50",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 767446,
+        "timeLabel": "12:47",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 784826,
+        "timeLabel": "13:04",
+        "phase": "EARLY",
+        "action": "KILLED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 897270,
+        "timeLabel": "14:57",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 908892,
+        "timeLabel": "15:08",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 913267,
+        "timeLabel": "15:13",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 974482,
+        "timeLabel": "16:14",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1077310,
+        "timeLabel": "17:57",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1151357,
+        "timeLabel": "19:11",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1165429,
+        "timeLabel": "19:25",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1173772,
+        "timeLabel": "19:33",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 1175341,
+        "timeLabel": "19:35",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1176611,
+        "timeLabel": "19:36",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1184050,
+        "timeLabel": "19:44",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1192144,
+        "timeLabel": "19:52",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1215459,
+        "timeLabel": "20:15",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "YELLOW_TRINKET"
+      },
+      {
+        "time": 1293416,
+        "timeLabel": "21:33",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1325592,
+        "timeLabel": "22:05",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1335780,
+        "timeLabel": "22:15",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1337979,
+        "timeLabel": "22:17",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1375497,
+        "timeLabel": "22:55",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1381891,
+        "timeLabel": "23:01",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1409255,
+        "timeLabel": "23:29",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1449473,
+        "timeLabel": "24:09",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1452812,
+        "timeLabel": "24:12",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1468046,
+        "timeLabel": "24:28",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1471731,
+        "timeLabel": "24:31",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1558393,
+        "timeLabel": "25:58",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1575350,
+        "timeLabel": "26:15",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1580814,
+        "timeLabel": "26:20",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "CONTROL_WARD"
+      },
+      {
+        "time": 1584128,
+        "timeLabel": "26:24",
+        "phase": "MID",
+        "action": "KILLED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1584969,
+        "timeLabel": "26:24",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1588914,
+        "timeLabel": "26:28",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      },
+      {
+        "time": 1594926,
+        "timeLabel": "26:34",
+        "phase": "MID",
+        "action": "PLACED",
+        "wardType": "SIGHT_WARD"
+      }
+    ],
+    "summary": {
+      "totalPlaced": 35,
+      "totalKilled": 8,
+      "controlWardsPlaced": 11,
+      "wardsPerMinute": 1.21,
+      "byPhase": {
+        "EARLY": 11,
+        "MID": 24,
+        "LATE": 0
+      }
+    }
+  },
+  "itemTimeline": [
+    {
+      "time": 3669,
+      "timeLabel": "0:03",
+      "phase": "EARLY",
+      "itemId": 2003
+    },
+    {
+      "time": 3936,
+      "timeLabel": "0:03",
+      "phase": "EARLY",
+      "itemId": 2003
+    },
+    {
+      "time": 299970,
+      "timeLabel": "4:59",
+      "phase": "EARLY",
+      "itemId": 1052
+    },
+    {
+      "time": 302465,
+      "timeLabel": "5:02",
+      "phase": "EARLY",
+      "itemId": 1001
+    },
+    {
+      "time": 302933,
+      "timeLabel": "5:02",
+      "phase": "EARLY",
+      "itemId": 2055
+    },
+    {
+      "time": 358474,
+      "timeLabel": "5:58",
+      "phase": "EARLY",
+      "itemId": 2031
+    },
+    {
+      "time": 506215,
+      "timeLabel": "8:26",
+      "phase": "EARLY",
+      "itemId": 1052
+    },
+    {
+      "time": 509055,
+      "timeLabel": "8:29",
+      "phase": "EARLY",
+      "itemId": 3364
+    },
+    {
+      "time": 509689,
+      "timeLabel": "8:29",
+      "phase": "EARLY",
+      "itemId": 2055
+    },
+    {
+      "time": 596960,
+      "timeLabel": "9:56",
+      "phase": "EARLY",
+      "itemId": 1029
+    },
+    {
+      "time": 836545,
+      "timeLabel": "13:56",
+      "phase": "EARLY",
+      "itemId": 2420
+    },
+    {
+      "time": 840156,
+      "timeLabel": "14:00",
+      "phase": "EARLY",
+      "itemId": 3020
+    },
+    {
+      "time": 841437,
+      "timeLabel": "14:01",
+      "phase": "EARLY",
+      "itemId": 2055
+    },
+    {
+      "time": 841671,
+      "timeLabel": "14:01",
+      "phase": "EARLY",
+      "itemId": 2055
+    },
+    {
+      "time": 948289,
+      "timeLabel": "15:48",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 948523,
+      "timeLabel": "15:48",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1108656,
+      "timeLabel": "18:28",
+      "phase": "MID",
+      "itemId": 3157
+    },
+    {
+      "time": 1234348,
+      "timeLabel": "20:34",
+      "phase": "MID",
+      "itemId": 1028
+    },
+    {
+      "time": 1234782,
+      "timeLabel": "20:34",
+      "phase": "MID",
+      "itemId": 2022
+    },
+    {
+      "time": 1238423,
+      "timeLabel": "20:38",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1351599,
+      "timeLabel": "22:31",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1351833,
+      "timeLabel": "22:31",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1354071,
+      "timeLabel": "22:34",
+      "phase": "MID",
+      "itemId": 3067
+    },
+    {
+      "time": 1354839,
+      "timeLabel": "22:34",
+      "phase": "MID",
+      "itemId": 1033
+    },
+    {
+      "time": 1536170,
+      "timeLabel": "25:36",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1536403,
+      "timeLabel": "25:36",
+      "phase": "MID",
+      "itemId": 2055
+    },
+    {
+      "time": 1682280,
+      "timeLabel": "28:02",
+      "phase": "MID",
+      "itemId": 2524
+    }
+  ]
+}

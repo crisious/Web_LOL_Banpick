@@ -1,0 +1,681 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-17T02:16:07.800Z",
+  "sampleId": "sample-kr-8173154527",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "matchId": "KR_8173154527",
+      "analysisLanguage": "ko",
+      "analyzedAt": "2026-04-17T00:00:00Z",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8173154527_1776392167800",
+      "generatedAt": "2026-04-17T02:16:07.800Z"
+    },
+    "matchSummary": {
+      "headline": "초반 2데스로 흔들렸지만, 오브젝트 합류와 시야 장악으로 팀 승리를 견인한 노틸러스 서포터 경기"
+    },
+    "coachSummary": {
+      "overallSummary": "이번 경기는 초반 라인전에서 두 차례 잡히며 불안정하게 시작했지만, 드래곤·바론 등 핵심 오브젝트 타이밍마다 꾸준히 합류하며 팀 싸움의 축 역할을 해냈습니다. 시야 점수 65는 24분 경기 치고 매우 훌륭하며, 어시스트 13개로 팀 교전 기여도가 높았습니다. 다만 킬 관여율이 32%로 다소 낮고, 중반에도 포지셔닝 실수로 불필요한 데스를 내준 점은 아쉽습니다. 바론 이후 구조물 압박 전환은 모범적이었고, 후반에는 데스 없이 안정적으로 마무리했습니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "3분 37초와 11분 45초에 각각 데스를 내주며 라인전 안정성이 부족했습니다. 그러나 6분과 12분 58초 드래곤 싸움에 합류하며 오브젝트 템포를 놓치지 않았고, 어시스트 6개로 팀 교전에 적극 참여했습니다.",
+        "kills": 0,
+        "deaths": 2,
+        "assists": 6
+      },
+      {
+        "phase": "MID",
+        "summary": "바론 확보(21:08)와 다수의 타워 압박에 관여하며 승리 조건을 만들었습니다. 하지만 19분 06초와 22분 28초에 핵심 구간에서 데스를 내주며 운영 안정감이 흔들린 장면이 있었습니다. 바론 이후 구조물 전환은 빠르고 효과적이었습니다.",
+        "kills": 0,
+        "deaths": 2,
+        "assists": 7
+      },
+      {
+        "phase": "LATE",
+        "summary": "후반부에는 데스 없이 안정적으로 경기를 마무리했습니다. 팀이 중반 우위를 그대로 밀어붙여 빠르게 경기를 끝낸 덕분에 후반 교전 자체가 거의 발생하지 않았습니다.",
+        "kills": 0,
+        "deaths": 0,
+        "assists": 0
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "뛰어난 시야 장악력",
+        "description": "24분 경기에서 시야 점수 65는 매우 높은 수치입니다. 꾸준한 와드 관리와 시야 제거로 팀의 정보전에서 우위를 가져갔으며, 이는 오브젝트 선점과 구조물 압박의 기반이 되었습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_008",
+          "evt_025",
+          "evt_027"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "오브젝트 타이밍 합류",
+        "description": "드래곤 3개와 바론 1개 확보에 꾸준히 관여했습니다. 특히 12분 58초 드래곤과 21분 08초 바론 싸움에 직접 합류하며 오브젝트 주도권을 팀에게 넘겨주었습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_008",
+          "evt_025",
+          "evt_027"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "바론 후 구조물 전환 속도",
+        "description": "바론 확보(21:08) 이후 약 3분 만에 다수의 타워를 밀어내며 승리 조건을 빠르게 구조물로 전환했습니다. 24분 14초에는 직접 타워 압박에 관여하며 마무리를 앞당겼습니다.",
+        "relatedEventIds": [
+          "evt_027",
+          "evt_028",
+          "evt_032",
+          "evt_034",
+          "evt_035",
+          "evt_036"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "초반 라인전 생존력 부족",
+        "description": "3분 37초에 첫 데스를 내준 것은 레벨 2~3 구간의 교전 판단이나 포지셔닝에 개선이 필요함을 보여줍니다. 서포터의 초반 데스는 원딜의 라인 주도권에도 직접적인 영향을 줍니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_007"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "중반 핵심 구간 포지셔닝 실수",
+        "description": "19분 06초와 22분 28초, 오브젝트 전후로 데스를 내주었습니다. 특히 바론 직후(22:28) 데스는 팀이 우위를 극대화할 시점에 인원 불리를 만들 수 있는 위험한 장면이었습니다.",
+        "relatedEventIds": [
+          "evt_024",
+          "evt_030"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "킬 관여율 개선 필요",
+        "description": "팀 총 41킬 중 어시스트 13개로 킬 관여율이 32%에 머물렀습니다. 노틸러스의 CC 능력을 고려하면 더 많은 교전에 참여하거나 이니시에이팅으로 킬 전환에 기여할 여지가 있습니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_007",
+          "evt_024",
+          "evt_030"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "레벨 1~3 구간에서 상대 서포터·원딜의 스킬 쿨타임을 확인한 뒤 교전에 들어가기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_2",
+        "text": "오브젝트 싸움 직후 체력·위치 점검하고, 무리한 추격 대신 시야 확보로 전환하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_3",
+        "text": "노틸러스 Q(닻 투척) 적중률을 높이기 위해 미니맵을 보고 안개 속 훅 시도 연습하기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_4",
+        "text": "팀 교전 시 이니시 이후 즉시 빠지지 말고, 궁극기·E로 추가 CC를 이어붙여 킬 관여율 높이기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_5",
+        "text": "바론·드래곤 스폰 60초 전에 해당 지역 시야를 선점하는 루틴 만들기",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "3:37",
+        "title": "초반 첫 데스",
+        "description": "레벨 2~3 교전에서 먼저 잡히며 라인 주도권을 상대에게 넘겨주었습니다. 상대의 올인 타이밍을 예측하지 못한 포지셔닝이 원인으로 보입니다.",
+        "impact": "NEGATIVE"
+      },
+      {
+        "eventId": "evt_008",
+        "timestampLabel": "12:58",
+        "title": "두 번째 드래곤 합류",
+        "description": "드래곤 타이밍에 맞춰 합류하며 오브젝트를 확보했습니다. 초반 데스에도 불구하고 오브젝트 싸움에서 역할을 다한 좋은 장면입니다.",
+        "impact": "POSITIVE"
+      },
+      {
+        "eventId": "evt_027",
+        "timestampLabel": "21:08",
+        "title": "바론 확보 관여",
+        "description": "바론 싸움에 직접 참여하여 확보에 성공했습니다. 이 바론 버프가 이후 연쇄 타워 파괴의 기반이 되었으며, 경기 승리의 결정적 전환점이었습니다.",
+        "impact": "POSITIVE"
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "22:28",
+        "title": "바론 후 불필요한 데스",
+        "description": "바론 버프가 살아있는 상태에서 데스를 내주었습니다. 팀이 구조물을 밀어야 하는 핵심 시간대에 인원 불리를 만들 수 있었던 아쉬운 장면입니다.",
+        "impact": "NEGATIVE"
+      },
+      {
+        "eventId": "evt_034",
+        "timestampLabel": "24:14",
+        "title": "직접 타워 압박 관여",
+        "description": "구조물 압박에 직접 참여하며 경기 마무리에 기여했습니다. 바론 이후의 빠른 전환이 돋보인 장면입니다.",
+        "impact": "POSITIVE"
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "usedIn": [
+          "weak_1",
+          "chk_1"
+        ]
+      },
+      {
+        "eventId": "evt_002",
+        "usedIn": [
+          "str_1",
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_007",
+        "usedIn": [
+          "weak_1",
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_008",
+        "usedIn": [
+          "str_1",
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_023",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_024",
+        "usedIn": [
+          "weak_2",
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "usedIn": [
+          "str_1",
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_027",
+        "usedIn": [
+          "str_1",
+          "str_2",
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_028",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_030",
+        "usedIn": [
+          "weak_2",
+          "chk_2"
+        ]
+      },
+      {
+        "eventId": "evt_032",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_034",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_035",
+        "usedIn": [
+          "str_3"
+        ]
+      },
+      {
+        "eventId": "evt_036",
+        "usedIn": [
+          "str_3"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "matchId": "KR_8173154527",
+      "queue": "RANKED_SOLO",
+      "champion": "Nautilus",
+      "position": "SUPPORT",
+      "targetPlayer": "매운맛 비스킷#KR1",
+      "participantId": 5,
+      "result": "WIN",
+      "duration": "24:38"
+    },
+    "matchSummary": "오브젝트와 구조물 흐름은 압도적으로 가져갔지만, 노틸러스 본인은 초중반 주요 타이밍마다 먼저 죽는 패턴이 반복되어 상위 티어에서는 승리보다 리스크가 더 크게 보일 경기였다.",
+    "coachSummary": {
+      "overall": "팀은 드래곤 3개, 바론 1개, 포탑 11개를 가져가며 빠르게 게임을 닫았다. 그러나 개인 관점에서는 0/4/13, 킬 관여율 32%로 팀의 41킬 경기치고 영향력이 넓게 퍼지지 않았고, 데스가 모두 초중반 템포 구간에 몰려 있었다.",
+      "redteamRead": "겉으로는 탱커 서포터가 몸을 대며 오브젝트를 열어준 경기처럼 보이지만, 실제로는 교전 시작 후 생존 설계가 약했고 일부 승리 전환은 상대가 오브젝트 이후 처벌을 제대로 하지 못했기 때문에 가능했다. 특히 19:06, 22:28 데스는 이미 유리한 게임에서도 운영 안정성을 무너뜨릴 수 있는 반복 신호다.",
+      "hiddenPattern": "드래곤이나 바론 같은 큰 타이밍에는 합류하지만, 그 직전 또는 직후에 본인이 먼저 끊기는 장면이 반복된다. 이는 단순한 피지컬 문제가 아니라 시야를 잡는 순서, 진입 각도, 교전 종료 후 이탈 판단의 문제로 봐야 한다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반에는 드래곤 타이밍을 챙기는 장면이 있었지만, 3:37과 11:45에 두 번 직접 데스를 기록해 라인전과 첫 오브젝트 사이의 안정성이 낮았다.",
+        "redteamConcern": "초반 0킬 2데스 6어시는 겉으로는 교전 참여처럼 보일 수 있으나, 노틸러스가 먼저 죽는 방식이면 다음 단계 시야 장악과 라인 이동권이 팀에게 전가된다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002",
+          "evt_003",
+          "evt_007",
+          "evt_008"
+        ]
+      },
+      "MID": {
+        "summary": "중반에는 바론과 구조물 연쇄 압박으로 게임이 크게 기울었지만, 19:06과 22:28에 또다시 핵심 구도에서 죽으며 유리한 게임을 불필요하게 흔들었다.",
+        "redteamConcern": "18:33 이후 구조물 압박, 21:08 바론, 23분대 마무리 흐름은 강했지만, 그 사이 두 번의 데스가 있었다. 더 강한 상대라면 이 데스를 바론 역전, 드래곤 교환, 현상금 회수로 바꿨을 가능성이 높다.",
+        "relatedEventIds": [
+          "evt_023",
+          "evt_024",
+          "evt_025",
+          "evt_027",
+          "evt_028",
+          "evt_030",
+          "evt_032",
+          "evt_034",
+          "evt_035",
+          "evt_036"
+        ]
+      },
+      "LATE": {
+        "summary": "게임이 24:38에 종료되어 실제 후반 운영 검증 구간은 없었다.",
+        "redteamConcern": "후반 데스가 0인 것은 안정성이 입증된 것이 아니라, 팀이 중반 구조물과 바론 흐름으로 게임을 닫아 후반 리스크가 드러나지 않은 결과에 가깝다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "id": "strength_1",
+        "title": "큰 오브젝트 타이밍에는 합류 의식이 있었다",
+        "description": "6:03, 12:58 드래곤 구간과 21:08 바론 구간에서 팀의 오브젝트 흐름에 연결되었다. 팀이 드래곤 3개와 바론 1개를 가져간 점을 보면 최소한 주요 시간대에 완전히 따로 노는 문제는 없었다.",
+        "redteamCaveat": "다만 합류 자체가 좋은 판단을 의미하지는 않는다. 이 경기에서는 오브젝트 전후 생존 문제가 반복되어, 합류 후 다음 턴까지 설계하는 능력은 아직 검증되지 않았다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_008",
+          "evt_027"
+        ]
+      },
+      {
+        "id": "strength_2",
+        "title": "구조물 승리 조건으로 전환되는 흐름에 늦지 않았다",
+        "description": "18:33 이후 포탑 압박이 연속으로 발생했고, 24:14에는 본인도 구조물 압박에 관여했다. 팀이 11개 포탑을 가져가며 게임을 빠르게 끝낸 것은 강한 승리 조건이었다.",
+        "redteamCaveat": "구조물 전환이 좋았던 것은 사실이지만, 대부분의 포탑 이벤트가 본인 직접 관여가 아니었다. 개인 주도라기보다 팀 전체의 압도적 흐름에 탑승한 측면이 크다.",
+        "relatedEventIds": [
+          "evt_023",
+          "evt_028",
+          "evt_032",
+          "evt_034",
+          "evt_035",
+          "evt_036"
+        ]
+      },
+      {
+        "id": "strength_3",
+        "title": "시야 점수는 경기 시간 대비 충분히 높았다",
+        "description": "24분 38초 경기에서 비전 점수 65는 서포터로서 시야 활동량 자체는 높았다는 근거가 된다. 빠른 오브젝트 확보와 구조물 압박을 가능하게 만든 기반 중 하나로 볼 수 있다.",
+        "redteamCaveat": "시야 점수가 높아도 시야를 잡는 타이밍과 동선이 안전했다는 뜻은 아니다. 4데스가 모두 주요 템포 구간에 나왔기 때문에, 시야 활동량은 높지만 시야를 잡는 과정의 리스크 관리가 부족했을 가능성이 있다.",
+        "relatedEventIds": [
+          "evt_008",
+          "evt_024",
+          "evt_027",
+          "evt_030"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weakness_1",
+        "title": "먼저 끊기는 데스가 초중반에 반복됐다",
+        "description": "3:37, 11:45, 19:06, 22:28에 모두 본인 데스가 기록됐다. 특히 노틸러스는 한 번 들어가면 빠져나오기 어려운 챔피언이라, 진입 판단이 틀리면 팀 전체가 다음 오브젝트 턴을 잃는다.",
+        "whyItMattersHigherTier": "상위 티어에서는 탱커 서포터의 데스를 단순 교환으로 봐주지 않는다. 시야 주도권, 미드 라인 선푸시, 오브젝트 시작권까지 연쇄로 회수당한다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_007",
+          "evt_024",
+          "evt_030"
+        ]
+      },
+      {
+        "id": "weakness_2",
+        "title": "오브젝트 이후 생존 설계가 약했다",
+        "description": "드래곤과 바론 흐름은 가져갔지만, 19:06 데스 직후 19:13 드래곤 이벤트가 이어지고, 21:08 바론 이후 22:28에 다시 죽었다. 이 패턴은 오브젝트를 먹은 뒤 시야 재정비와 이탈 경로 설정이 느슨했음을 의심하게 한다.",
+        "whyItMattersHigherTier": "오브젝트를 먹고도 서포터가 죽으면 다음 웨이브 압박이나 시야 확장이 늦어진다. 강팀 상대로는 '먹고 끝'이 아니라 '먹고 다음 턴까지 잠그기'가 되어야 한다.",
+        "relatedEventIds": [
+          "evt_024",
+          "evt_025",
+          "evt_027",
+          "evt_030"
+        ]
+      },
+      {
+        "id": "weakness_3",
+        "title": "팀 킬 수 대비 개인 영향력이 과소했다",
+        "description": "팀이 41킬을 기록한 경기에서 본인은 13어시스트, 킬 관여율 32%였다. 압도적으로 이긴 경기치고는 교전 연결 범위가 좁았고, 승리의 중심축이었다고 보기 어렵다.",
+        "whyItMattersHigherTier": "팀이 크게 이기는 판에서도 관여율이 낮다면, 비슷하거나 불리한 판에서는 존재감이 더 급격히 줄어들 수 있다. 특히 로밍 신호도 강하게 잡히지 않아, 바텀 밖 영향력 확장에 의문이 남는다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_008",
+          "evt_023",
+          "evt_027",
+          "evt_034"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "check_1",
+        "item": "첫 귀환 전과 첫 드래곤 전에는 '내가 먼저 맞아도 팀이 즉시 호응 가능한가'를 진입 기준으로 삼기",
+        "successCriteria": "10분 전 불필요한 선데스를 0회로 줄이고, 드래곤 전 시야 설치 후 살아서 합류한다.",
+        "targetsWeaknessIds": [
+          "weakness_1"
+        ]
+      },
+      {
+        "id": "check_2",
+        "item": "오브젝트를 먹은 직후 10초 안에 다음 행동을 고정하기: 이탈, 미드 압박, 적 정글 시야 중 하나만 선택",
+        "successCriteria": "오브젝트 획득 후 60초 이내 서포터 단독 데스를 만들지 않는다.",
+        "targetsWeaknessIds": [
+          "weakness_2"
+        ]
+      },
+      {
+        "id": "check_3",
+        "item": "노틸러스 궁극기와 점멸 사용 전, 아군 딜러 위치가 화면 안에 있는지 확인하기",
+        "successCriteria": "교전 시작 후 본인이 먼저 죽더라도 최소 1킬 이상 확정되는 각에서만 진입한다.",
+        "targetsWeaknessIds": [
+          "weakness_1",
+          "weakness_3"
+        ]
+      },
+      {
+        "id": "check_4",
+        "item": "라인전 이후 미드-정글과 함께 움직이는 턴을 의식적으로 만들기",
+        "successCriteria": "15분까지 드래곤 또는 전령/타워 전환에 직접 관여한 이벤트를 최소 2회 만든다.",
+        "targetsWeaknessIds": [
+          "weakness_3"
+        ]
+      },
+      {
+        "id": "check_5",
+        "item": "시야 점수보다 '살아서 유지한 시야'를 우선하기",
+        "successCriteria": "와드 설치 후 귀환 또는 합류 경로를 미리 정하고, 시야 작업 중 데스를 0회로 제한한다.",
+        "targetsWeaknessIds": [
+          "weakness_2"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "3:37",
+        "phase": "EARLY",
+        "title": "첫 초반 데스",
+        "analysis": "초반부터 먼저 끊기며 라인전과 첫 오브젝트 준비의 안정성이 떨어졌다. 노틸러스의 초반 데스는 단순 손해가 아니라 바텀 주도권과 강가 시야를 동시에 약하게 만든다.",
+        "redteamInterpretation": "이후 팀이 이겼기 때문에 묻혔지만, 더 강한 상대라면 이 첫 데스를 바텀 다이브나 첫 드래곤 압박으로 연결했을 가능성이 높다."
+      },
+      {
+        "eventId": "evt_008",
+        "timestampLabel": "12:58",
+        "phase": "EARLY",
+        "title": "드래곤 타이밍 직접 관여",
+        "analysis": "본인이 직접 관여한 드래곤 구간이다. 팀 오브젝트 흐름에는 연결되었지만, 이미 11:45에 한 차례 더 죽은 직후라 안정적으로 주도한 오브젝트라고 보기는 어렵다.",
+        "redteamInterpretation": "좋은 결과가 나왔지만 과정상 리스크가 있었다. 상대가 직전 데스를 더 강하게 굴렸다면 이 드래곤 합류 자체가 어려웠을 수 있다."
+      },
+      {
+        "eventId": "evt_024",
+        "timestampLabel": "19:06",
+        "phase": "MID",
+        "title": "중반 핵심 구도 데스",
+        "analysis": "18:33 구조물 압박 이후 유리한 흐름에서 나온 데스다. 19:13 드래곤 이벤트가 바로 이어졌기 때문에, 이 죽음은 오브젝트 전후 안정성을 떨어뜨리는 위험 신호다.",
+        "redteamInterpretation": "팀이 드래곤 흐름을 유지했기 때문에 결과적으로 커버됐지만, 이 장면은 상대가 역전 발판을 잡을 수 있는 가장 현실적인 창구였다."
+      },
+      {
+        "eventId": "evt_027",
+        "timestampLabel": "21:08",
+        "phase": "MID",
+        "title": "바론 확보 관여",
+        "analysis": "바론 확보에 관여하며 경기 마무리 조건을 만들었다. 이 장면 자체는 승리 전환의 핵심 근거다.",
+        "redteamInterpretation": "다만 바론 획득 후 22:28에 다시 데스가 발생했다. 바론을 먹는 능력과 바론 이후 안전하게 굴리는 능력은 별개로 평가해야 한다."
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "22:28",
+        "phase": "MID",
+        "title": "바론 이후 추가 데스",
+        "analysis": "바론을 확보한 뒤 가장 조심해야 할 굴리기 구간에서 다시 죽었다. 유리한 상태에서의 데스라 더 치명적인 습관 신호다.",
+        "redteamInterpretation": "이번 경기는 상대가 포탑 0개, 바론 0개로 반격하지 못했지만, 상위 티어에서는 바론 버프 인원 손실을 웨이브 클리어 시간 벌기와 현상금 회수로 바꿨을 가능성이 높다."
+      },
+      {
+        "eventId": "evt_034",
+        "timestampLabel": "24:14",
+        "phase": "MID",
+        "title": "마무리 구조물 압박 직접 관여",
+        "analysis": "마무리 단계의 구조물 압박에 직접 관여했다. 게임을 닫는 행동에는 늦지 않았다.",
+        "redteamInterpretation": "하지만 이 장면만으로 중반 운영이 안정적이었다고 판단하면 안 된다. 앞선 두 번의 중반 데스가 상대 실수와 팀 우위에 의해 가려진 경기다."
+      }
+    ],
+    "evidenceIndex": {
+      "evt_001": {
+        "timestampLabel": "3:37",
+        "phase": "EARLY",
+        "eventType": "PLAYER_DEATH",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다."
+      },
+      "evt_002": {
+        "timestampLabel": "6:03",
+        "phase": "EARLY",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      "evt_003": {
+        "timestampLabel": "8:37",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "importance": 4,
+        "isPlayerInvolved": false,
+        "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다."
+      },
+      "evt_007": {
+        "timestampLabel": "11:45",
+        "phase": "EARLY",
+        "eventType": "PLAYER_DEATH",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다."
+      },
+      "evt_008": {
+        "timestampLabel": "12:58",
+        "phase": "EARLY",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 4,
+        "isPlayerInvolved": true,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      "evt_023": {
+        "timestampLabel": "18:33",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      "evt_024": {
+        "timestampLabel": "19:06",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다."
+      },
+      "evt_025": {
+        "timestampLabel": "19:13",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      "evt_027": {
+        "timestampLabel": "21:08",
+        "phase": "MID",
+        "eventType": "BARON_FIGHT",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "summary": "바론 확보에 관여하며 경기 흐름을 다시 붙잡았다."
+      },
+      "evt_028": {
+        "timestampLabel": "21:51",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      "evt_030": {
+        "timestampLabel": "22:28",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다."
+      },
+      "evt_032": {
+        "timestampLabel": "23:52",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      "evt_034": {
+        "timestampLabel": "24:14",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": true,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      "evt_035": {
+        "timestampLabel": "24:17",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      "evt_036": {
+        "timestampLabel": "24:18",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "importance": 5,
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      }
+    }
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "뛰어난 시야 장악력",
+        "claudeNote": "24분 경기에서 시야 점수 65는 매우 높은 수치입니다. 꾸준한 와드 관리와 시야 제거로 팀의 정보전에서 우위를 가져갔으며, 이는 오브젝트 선점과 구조물 압박의 기반이 되었습니다.",
+        "codexNote": "24분 38초 경기에서 비전 점수 65는 서포터로서 시야 활동량 자체는 높았다는 근거가 된다. 빠른 오브젝트 확보와 구조물 압박을 가능하게 만든 기반 중 하나로 볼 수 있다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 타이밍 합류",
+        "claudeNote": "드래곤 3개와 바론 1개 확보에 꾸준히 관여했습니다. 특히 12분 58초 드래곤과 21분 08초 바론 싸움에 직접 합류하며 오브젝트 주도권을 팀에게 넘겨주었습니다.",
+        "codexNote": "6:03, 12:58 드래곤 구간과 21:08 바론 구간에서 팀의 오브젝트 흐름에 연결되었다. 팀이 드래곤 3개와 바론 1개를 가져간 점을 보면 최소한 주요 시간대에 완전히 따로 노는 문제는 없었다."
+      },
+      {
+        "category": "strength",
+        "topic": "바론 후 구조물 전환 속도",
+        "claudeNote": "바론 확보(21:08) 이후 약 3분 만에 다수의 타워를 밀어내며 승리 조건을 빠르게 구조물로 전환했습니다. 24분 14초에는 직접 타워 압박에 관여하며 마무리를 앞당겼습니다.",
+        "codexNote": "18:33 이후 포탑 압박이 연속으로 발생했고, 24:14에는 본인도 구조물 압박에 관여했다. 팀이 11개 포탑을 가져가며 게임을 빠르게 끝낸 것은 강한 승리 조건이었다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "weakness",
+        "topic": "초반 라인전 생존력 부족",
+        "note": "3분 37초에 첫 데스를 내준 것은 레벨 2~3 구간의 교전 판단이나 포지셔닝에 개선이 필요함을 보여줍니다. 서포터의 초반 데스는 원딜의 라인 주도권에도 직접적인 영향을 줍니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 핵심 구간 포지셔닝 실수",
+        "note": "19분 06초와 22분 28초, 오브젝트 전후로 데스를 내주었습니다. 특히 바론 직후(22:28) 데스는 팀이 우위를 극대화할 시점에 인원 불리를 만들 수 있는 위험한 장면이었습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "킬 관여율 개선 필요",
+        "note": "팀 총 41킬 중 어시스트 13개로 킬 관여율이 32%에 머물렀습니다. 노틸러스의 CC 능력을 고려하면 더 많은 교전에 참여하거나 이니시에이팅으로 킬 전환에 기여할 여지가 있습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "weakness",
+        "topic": "먼저 끊기는 데스가 초중반에 반복됐다",
+        "note": "3:37, 11:45, 19:06, 22:28에 모두 본인 데스가 기록됐다. 특히 노틸러스는 한 번 들어가면 빠져나오기 어려운 챔피언이라, 진입 판단이 틀리면 팀 전체가 다음 오브젝트 턴을 잃는다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 이후 생존 설계가 약했다",
+        "note": "드래곤과 바론 흐름은 가져갔지만, 19:06 데스 직후 19:13 드래곤 이벤트가 이어지고, 21:08 바론 이후 22:28에 다시 죽었다. 이 패턴은 오브젝트를 먹은 뒤 시야 재정비와 이탈 경로 설정이 느슨했음을 의심하게 한다."
+      },
+      {
+        "category": "weakness",
+        "topic": "팀 킬 수 대비 개인 영향력이 과소했다",
+        "note": "팀이 41킬을 기록한 경기에서 본인은 13어시스트, 킬 관여율 32%였다. 압도적으로 이긴 경기치고는 교전 연결 범위가 좁았고, 승리의 중심축이었다고 보기 어렵다."
+      }
+    ],
+    "agreementRate": 50
+  }
+}
