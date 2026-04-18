@@ -14,6 +14,14 @@
   --rose-soft: rgba(255, 134, 120, 0.14);
   --amber-soft: rgba(240, 179, 91, 0.16);
   --shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+  --surface-1: var(--surface-1);
+  --surface-2: var(--surface-2);
+  --surface-3: var(--surface-3);
+  --surface-4: var(--surface-4);
+  --info: #78baff;
+  --info-soft: var(--info-soft);
+  --info-muted: var(--info-muted);
+  --info-border: var(--info-border);
 }
 
 * {
@@ -175,7 +183,7 @@ body::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--surface-2);
   pointer-events: none;
 }
 
@@ -243,7 +251,7 @@ body::after {
 .sample-chip,
 .candidate-card {
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   padding: 18px;
 }
 
@@ -258,14 +266,14 @@ body::after {
   cursor: pointer;
   border: 1px solid var(--line);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
 .candidate-card--button:hover {
   transform: translateY(-2px);
-  border-color: rgba(120, 186, 255, 0.38);
-  background: rgba(120, 186, 255, 0.08);
+  border-color: var(--info-border);
+  background: var(--info-soft);
 }
 
 .meta-card strong,
@@ -383,7 +391,7 @@ body::after {
 
 .panel--nav {
   background:
-    linear-gradient(180deg, rgba(120, 186, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, var(--info-soft), transparent 34%),
     var(--panel);
 }
 
@@ -445,7 +453,7 @@ body::after {
   padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   max-width: 100%;
 }
 
@@ -486,7 +494,7 @@ body::after {
   padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--text);
   font-size: 0.82rem;
   letter-spacing: 0.08em;
@@ -516,7 +524,7 @@ body::after {
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--text);
   text-decoration: none;
   font: inherit;
@@ -527,8 +535,8 @@ body::after {
 .section-link:hover,
 .section-link:focus-visible {
   transform: translateY(-1px);
-  border-color: rgba(120, 186, 255, 0.38);
-  background: rgba(120, 186, 255, 0.08);
+  border-color: var(--info-border);
+  background: var(--info-soft);
 }
 
 .section-link.tab-link--active {
@@ -552,7 +560,7 @@ body::after {
   padding: 10px 22px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--muted);
   font: inherit;
   font-size: 0.92rem;
@@ -562,8 +570,8 @@ body::after {
 }
 
 .tab-btn:hover {
-  border-color: rgba(120, 186, 255, 0.38);
-  background: rgba(120, 186, 255, 0.08);
+  border-color: var(--info-border);
+  background: var(--info-soft);
   color: var(--text);
 }
 
@@ -624,7 +632,7 @@ body::after {
   height: 8px;
   overflow: hidden;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-4);
 }
 
 .detail-progress__bar span {
@@ -661,7 +669,7 @@ body::after {
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--muted);
 }
 
@@ -927,7 +935,7 @@ body::after {
   border-radius: 8px;
   font-size: 0.64rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   color: var(--muted);
   margin-top: 3px;
 }
@@ -961,7 +969,7 @@ body::after {
 }
 
 .dual-tl-segment:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
 }
 
 .dual-tl-segment--active {
@@ -1070,7 +1078,7 @@ body::after {
   min-height: 48px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   color: var(--text);
   padding: 0 14px;
   font: inherit;
@@ -1092,13 +1100,13 @@ body::after {
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(120, 186, 255, 0.16);
+  border: 1px solid var(--info-muted);
   background: rgba(12, 19, 32, 0.42);
 }
 
 .panel--reports {
   background:
-    linear-gradient(180deg, rgba(120, 186, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, var(--info-soft), transparent 34%),
     var(--panel);
 }
 
@@ -1117,7 +1125,7 @@ body::after {
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
 }
 
 .trend-callout h4 {
@@ -1146,7 +1154,7 @@ body::after {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
 }
 
 .trend-stat strong {
@@ -1177,15 +1185,15 @@ body::after {
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
 }
 
 .trend-panel--positive {
-  background: linear-gradient(180deg, rgba(89, 209, 178, 0.1), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(89, 209, 178, 0.1), var(--surface-1));
 }
 
 .trend-panel--negative {
-  background: linear-gradient(180deg, rgba(255, 134, 120, 0.1), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(255, 134, 120, 0.1), var(--surface-1));
 }
 
 .trend-list {
@@ -1197,7 +1205,7 @@ body::after {
   padding: 12px 14px;
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   color: var(--text);
   line-height: 1.5;
 }
@@ -1209,7 +1217,7 @@ body::after {
   padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--text);
   font-size: 0.8rem;
 }
@@ -1227,7 +1235,7 @@ body::after {
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px);
   color: inherit;
@@ -1241,15 +1249,15 @@ body::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--surface-2);
   pointer-events: none;
 }
 
 .report-card:hover,
 .report-card[data-active='true'] {
   transform: translateY(-2px);
-  border-color: rgba(120, 186, 255, 0.38);
-  background: rgba(120, 186, 255, 0.08);
+  border-color: var(--info-border);
+  background: var(--info-soft);
 }
 
 .report-card__top {
@@ -1302,7 +1310,7 @@ body::after {
   padding: 8px 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
   color: var(--text);
   font-size: 0.74rem;
   letter-spacing: 0.14em;
@@ -1370,7 +1378,7 @@ body::after {
   padding: 8px 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
 }
 
 .candidate-head h4 {
@@ -1412,7 +1420,7 @@ body::after {
   padding: 14px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-1);
 }
 
 .snapshot-item strong {
@@ -1424,7 +1432,7 @@ body::after {
 .snapshot-footnote {
   margin: 0;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--surface-4);
   color: var(--muted);
 }
 
@@ -1486,11 +1494,11 @@ body::after {
 }
 
 .phase-card[data-rating='GOOD'] {
-  background: linear-gradient(180deg, rgba(89, 209, 178, 0.14), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(89, 209, 178, 0.14), var(--surface-1));
 }
 
 .phase-card[data-rating='BAD'] {
-  background: linear-gradient(180deg, rgba(255, 134, 120, 0.14), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(255, 134, 120, 0.14), var(--surface-1));
 }
 
 .phase-tag {
@@ -1504,15 +1512,15 @@ body::after {
 .insight-card {
   border-radius: 22px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
 }
 
 .insight-card[data-kind='strength'] {
-  background: linear-gradient(180deg, rgba(89, 209, 178, 0.08), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(89, 209, 178, 0.08), var(--surface-1));
 }
 
 .insight-card[data-kind='weakness'] {
-  background: linear-gradient(180deg, rgba(255, 134, 120, 0.08), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgba(255, 134, 120, 0.08), var(--surface-1));
 }
 
 .insight-card__header h4,
@@ -1553,7 +1561,7 @@ body::after {
   padding: 18px;
   border-radius: 22px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
 }
 
 .checklist-item {
@@ -1670,7 +1678,7 @@ body::after {
 .score-bar-track {
   height: 7px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   overflow: hidden;
 }
 
@@ -1703,7 +1711,7 @@ body::after {
   flex: 1;
   height: 10px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   display: flex;
   overflow: hidden;
 }
@@ -1789,7 +1797,7 @@ body::after {
 }
 
 .laning-stat-item {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 12px 10px;
@@ -1827,7 +1835,7 @@ body::after {
 .ward-stat {
   text-align: center;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 10px;
 }
@@ -2052,7 +2060,7 @@ body::after {
 .login-form select {
   width: 100%;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--text);
@@ -2146,7 +2154,7 @@ body::after {
 .api-key-details input {
   width: 100%;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--text);
@@ -2243,7 +2251,7 @@ body::after {
 /* ── Rank card ── */
 
 .profile-rank-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 14px 18px;
@@ -2411,7 +2419,7 @@ body::after {
 .role-bar-track {
   flex: 1;
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   border-radius: 3px;
   overflow: hidden;
   min-width: 40px;
@@ -2449,7 +2457,7 @@ body::after {
   align-items: center;
   gap: 8px;
   padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   border-radius: 8px;
   font-size: 0.76rem;
 }
@@ -2680,7 +2688,7 @@ body::after {
   border-radius: 8px;
   font-size: 0.78rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   color: var(--text);
   border: 1px solid var(--line);
 }
@@ -2703,7 +2711,7 @@ body::after {
   border-radius: 6px;
   font-size: 0.72rem;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
 }
 .kda-death { color: var(--rose); }
 
@@ -2717,7 +2725,7 @@ body::after {
 }
 .score-badge--mvp { background: var(--accent); color: #11161a; }
 .score-badge--good { background: var(--mint-soft); color: var(--mint); }
-.score-badge--avg { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
+.score-badge--avg { background: var(--surface-4); color: var(--muted); }
 
 /* Desktop: row wrappers act as transparent grid passthrough */
 .msc-row1, .msc-row2 { display: contents; }
@@ -2776,7 +2784,7 @@ body::after {
 .comparison-rate-track {
   height: 8px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   overflow: hidden;
 }
 
@@ -2815,7 +2823,7 @@ body::after {
 .comparison-column-title--codex { color: var(--rose); border-color: var(--rose); }
 
 .comparison-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 16px;
@@ -2883,7 +2891,7 @@ body::after {
   padding: 6px 14px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-3);
   color: var(--accent);
   font-size: 0.8rem;
   cursor: pointer;
@@ -3209,8 +3217,8 @@ body::after {
   min-height: 24px;
   padding: 0 9px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--surface-4);
+  background: var(--surface-2);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -3242,7 +3250,7 @@ body::after {
   background:
     var(--champion-art, linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))),
     radial-gradient(circle at top left, rgba(240, 179, 91, 0.32), transparent 58%),
-    linear-gradient(180deg, rgba(89, 209, 178, 0.12), rgba(255, 255, 255, 0.04));
+    linear-gradient(180deg, rgba(89, 209, 178, 0.12), var(--surface-2));
   background-size: cover, auto, auto;
   background-position: var(--champion-art-position, center top), center, center;
   color: var(--text);
