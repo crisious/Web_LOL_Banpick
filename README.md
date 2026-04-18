@@ -65,7 +65,7 @@
 .
 ├── index.html          # 대시보드 UI (로그인 + 10게임 + 상세)
 ├── main.js             # 프론트엔드 상태 머신 + 렌더링
-├── styles.css          # 다크 테마 + 반응형
+├── styles.css          # 다크 테마 + 반응형 (CSS 변수 기반 토큰 시스템)
 ├── server.js           # API 서버 + Riot API + AI 에이전트 오케스트레이터
 ├── .env                # RIOT_API_KEY, PORT (gitignore)
 ├── .env.example
@@ -80,8 +80,27 @@
 │           ├── analysis-result.json
 │           ├── comparison-result.json    # AI 비교 결과 (있는 경우)
 │           └── sample-*-notes.md
+├── design-tokens.md    # 디자인 시스템 토큰 스냅샷 (color / radius / space / font-size)
+├── .claude/
+│   ├── agents/         # design-auditor: styles.css 이터레이티브 개선 전담 에이전트
+│   └── commands/       # /design-audit, /design-apply 슬래시 커맨드
 └── progress.md         # 프로젝트 진행 상황 기록
 ```
+
+## 디자인 시스템
+
+[styles.css](styles.css)는 `:root` CSS 변수로 토큰화된 다크 테마입니다.
+
+- **Color**: `--bg`, `--panel`, `--text`, `--accent`, `--mint`/`--rose` 승패 계열, `--surface-1~4` 내부 레이어, `--info*` 정보 블루
+- **Radius**: `--radius-sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
+- **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
+- **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
+- 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
+
+### Claude Code 디자인 자동화
+
+- `/design-audit [스코프]` — `design-auditor` 에이전트가 [styles.css](styles.css)를 스코프별(radius/colors/fontsize/gap/all)로 이터레이티브 개선. `index.html` 구조와 `main.js` 속성 셀렉터는 변경하지 않음
+- `/design-apply [diff]` — claude.ai Project에서 받은 CSS 제안을 안전하게 반영
 
 ## 로컬 실행
 
