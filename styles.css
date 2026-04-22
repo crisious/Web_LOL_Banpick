@@ -746,7 +746,7 @@ body::after {
 
 .detail-progress__step[data-step-state="running"] {
   color: var(--accent);
-  border-color: rgba(240, 179, 91, 0.34);
+  border-color: var(--amber-border);
   background: rgba(240, 179, 91, 0.1);
 }
 
