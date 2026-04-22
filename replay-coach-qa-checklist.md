@@ -13,6 +13,13 @@
 - 접속 주소: `http://127.0.0.1:8123`
 - `.env`에 유효한 `RIOT_API_KEY` 설정 필요
 
+### Smoke 자동화
+
+- `powershell -ExecutionPolicy Bypass -File scripts/qa-smoke.ps1`
+- 범위: 홈 화면 응답, `/api/samples`, 대표 sample 상세, DOM dump, 데스크톱/태블릿/모바일 스크린샷
+- 산출물: `test-artifacts/qa-automation/<timestamp>/`
+- 이 문서의 체크리스트 중 A, B의 기본 진입 검증을 자동 smoke로 먼저 수행하고, 라이브 Riot API 경로는 수동/E2E로 이어서 확인
+
 ## 테스트 계정
 
 ### 1. 메인 계정

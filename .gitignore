@@ -3,3 +3,4 @@
 *.log
 .claude/settings.local.json
 .claude/worktrees/
+test-artifacts/qa-automation/

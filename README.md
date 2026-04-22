@@ -104,6 +104,7 @@
 ├── design-tokens.md    # 디자인 시스템 토큰 스냅샷 (color / radius / space / font-size)
 ├── scripts/
 │   └── design-audit.js # styles.css 토큰 커버리지 / 하드코딩 literal / breakpoint 감사 CLI
+│   └── qa-smoke.ps1    # 서버 기동 + 핵심 API + DOM dump + 반응형 스크린샷 smoke QA
 ├── .claude/
 │   ├── agents/         # design-auditor: styles.css 이터레이티브 개선 전담 에이전트
 │   └── commands/       # /design-audit, /design-apply 슬래시 커맨드
@@ -126,6 +127,12 @@
 - `node scripts/design-audit.js --scope <scope> --format markdown` — 로컬 감사 CLI. `styles.css`의 color/radius/spacing/font-size/breakpoint 상태를 집계하고, 하드코딩 literal과 미정의 custom property를 잡아줌. `main.js`, `index.html`도 함께 읽어 런타임 CSS 변수 여부를 구분함
 - `/design-audit [스코프]` — `design-auditor` 에이전트가 위 감사 결과를 바탕으로 [styles.css](styles.css)를 스코프별(radius/colors/fontsize/gap/breakpoint/all)로 이터레이티브 개선. `index.html` 구조와 `main.js` 속성 셀렉터는 변경하지 않음
 - `/design-apply [diff]` — claude.ai Project에서 받은 CSS 제안을 안전하게 반영
+
+### QA Smoke Automation
+
+- `powershell -ExecutionPolicy Bypass -File scripts/qa-smoke.ps1` — 로컬 smoke QA. 필요하면 서버를 직접 띄우고, `GET /`, `GET /api/samples`, `GET /api/samples/:id`, headless Chrome DOM dump, 데스크톱/태블릿/모바일 스크린샷까지 자동 수행
+- 산출물은 `test-artifacts/qa-automation/<timestamp>/`에 생성되며, `report.md`, `summary.json`, `home-*.png`, `home.dom.html`, `server.*.log`를 남김
+- 기본적으로 `main.js`와 샘플 API만 검증하므로 Riot 실시간 API rate limit 없이도 반복 실행 가능
 
 ## 로컬 실행
 
