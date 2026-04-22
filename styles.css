@@ -31,6 +31,15 @@
   --rose-border: rgba(255, 134, 120, 0.34);
   --amber-border: rgba(240, 179, 91, 0.34);
   --shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.28);
+  /* State color alpha scale — iteration 7 (token cleanup) */
+  --mint-bg-weak: rgba(89, 209, 178, 0.06);
+  --mint-bg-soft: rgba(89, 209, 178, 0.1);
+  --mint-bg-medium: rgba(89, 209, 178, 0.28);
+  --rose-bg-soft: rgba(255, 134, 120, 0.1);
+  --rose-bg-medium: rgba(255, 134, 120, 0.28);
+  --amber-bg-soft: rgba(240, 179, 91, 0.08);
+  --amber-bg-deep: rgba(240, 179, 91, 0.18);
+  --amber-bg-strong: rgba(240, 179, 91, 0.3);
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 16px;
