@@ -2,6 +2,8 @@
 
 리그 오브 레전드 경기 데이터를 Riot API로 수집하고, AI 에이전트(Claude + Codex)가 코칭 관점에서 분석하는 웹 애플리케이션입니다.
 
+주력 화면은 `/`의 **Replay Coach 대시보드**이며, 저장소 안에는 별도로 **Fearless Draft 방송 관리자 패널** 프로토타입(`/admin.html`)도 함께 포함되어 있습니다.
+
 ## 주요 기능
 
 ### Riot ID 로그인 + 최근 경기 리스트
@@ -31,6 +33,8 @@
 - 시야 & 와드 분석
 - 빌드 오더 타임라인
 - 타워 / 오브젝트 타임라인
+- 좁은 모바일(≤480px) 최적화, 전역 `:focus-visible`, `prefers-reduced-motion` 대응
+- LOADING_DETAIL 스피너 + 재사용 가능한 skeleton/shimmer 로딩 유틸
 
 ### 데이터 파이프라인
 - Riot API: account-v1 → match-v5 (detail + timeline) → summoner-v4 (level/icon) → league-v4/entries/by-puuid (ranked)
@@ -38,6 +42,18 @@
 - 분석: AI 에이전트 → 스키마 검증 → 서버측 필드 정규화 → 저장
 
 > **Riot API 변경 대응**: summoner-v4 응답에서 `encryptedSummonerId`가 제거된 이후, 랭크 조회는 `league-v4/entries/by-puuid/{puuid}` 신규 엔드포인트를 사용합니다.
+
+## 포함된 화면
+
+### 1. Replay Coach 대시보드 (`/`)
+- Riot ID로 최근 경기 10개를 조회하고, 저장된 샘플 또는 새 분석 결과를 상세 리포트로 확인
+- Riot API + Claude/Codex CLI + 서버측 정규화 파이프라인 사용
+- 저장 샘플, 비교 분석, 추세 리포트까지 한 화면에서 탐색
+
+### 2. Fearless Draft 관리자 패널 프로토타입 (`/admin.html`)
+- 방송용 드래프트 메타 정보, 현재 턴, 타이머, 양 팀 픽/밴/페어리스 상태를 수동 편집
+- `draft-state.js`의 localStorage 스토어를 사용한 정적 프로토타입
+- Replay Coach API 파이프라인과는 별개로 실험 중인 보조 도구
 
 ## 화면 흐름
 
@@ -58,6 +74,7 @@
 - **AI**: Claude CLI (`claude --print`) + Codex CLI (`codex exec -`)
 - **데이터**: Riot Match-V5 + Timeline API
 - **폰트**: Pretendard Variable
+- **상태 저장**: `localStorage` (계정 기억, Draft 관리자 프로토타입 상태)
 
 ## 주요 파일
 
@@ -66,6 +83,10 @@
 ├── index.html          # 대시보드 UI (로그인 + 10게임 + 상세)
 ├── main.js             # 프론트엔드 상태 머신 + 렌더링
 ├── styles.css          # 다크 테마 + 반응형 (CSS 변수 기반 토큰 시스템)
+├── admin.html          # Fearless Draft 방송 관리자 패널 프로토타입
+├── admin.css           # 관리자 패널 스타일
+├── admin.js            # 관리자 패널 렌더링 + 입력 핸들링
+├── draft-state.js      # Draft 상태 store / timer / localStorage 유틸
 ├── server.js           # API 서버 + Riot API + AI 에이전트 오케스트레이터
 ├── .env                # RIOT_API_KEY, PORT (gitignore)
 ├── .env.example
@@ -92,9 +113,10 @@
 [styles.css](styles.css)는 `:root` CSS 변수로 토큰화된 다크 테마입니다.
 
 - **Color**: `--bg`, `--panel`, `--text`, `--accent`, `--mint`/`--rose` 승패 계열, `--surface-1~4` 내부 레이어, `--info*` 정보 블루
-- **Radius**: `--radius-sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
+- **Radius**: `--radius-xs/sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
 - **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
 - **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
+- **최근 UI 정리**: `--tint-*`, `--shadow-hover`, 결과별 match-summary-card 엣지 바, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
 - 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
 
 ### Claude Code 디자인 자동화
@@ -108,6 +130,7 @@
 
 - Node.js v18+
 - (AI 분석 사용 시) `claude` CLI, `codex` CLI 설치 및 로그인
+- `npm install` 불필요 (내장 Node 모듈만 사용)
 
 ### 1. 환경 변수
 
@@ -128,7 +151,10 @@ PORT=8123
 node server.js
 ```
 
-브라우저에서 [http://127.0.0.1:8123](http://127.0.0.1:8123) 접속
+브라우저에서 아래 경로로 접속:
+
+- Replay Coach: [http://127.0.0.1:8123](http://127.0.0.1:8123)
+- Draft 관리자 패널 프로토타입: [http://127.0.0.1:8123/admin.html](http://127.0.0.1:8123/admin.html)
 
 ### 3. 테스트 계정
 

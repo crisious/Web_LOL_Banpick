@@ -1,0 +1,201 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "matchId": "KR_8180998112",
+    "analyzedPlayer": "매운맛 비스킷#KR1",
+    "champion": "Thresh",
+    "position": "SUPPORT",
+    "result": "WIN",
+    "durationLabel": "37:15",
+    "analyzedAt": "2026-04-21T00:00:00Z",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8180998112_1776781137255",
+    "generatedAt": "2026-04-21T14:18:57.255Z"
+  },
+  "matchSummary": {
+    "headline": "11데스에도 불구하고 시야 장악(109점)과 후반 구조물 압박으로 팀 승리를 이끌어낸 경기."
+  },
+  "coachSummary": {
+    "overallSummary": "초·중반에 포지셔닝 실수로 데스가 과도하게 쌓였지만, 꾸준한 시야 운용과 오브젝트 합류, 후반 구조물 전환 판단이 팀 승리의 토대가 되었습니다. 데스 횟수를 줄이면 같은 기여도에서 훨씬 안정적인 서포터가 될 수 있습니다."
+  },
+  "phaseSummaries": [],
+  "strengths": [
+    {
+      "id": "str_01",
+      "title": "뛰어난 시야 장악력",
+      "description": "109 시야 점수는 37분 경기 기준 매우 높은 수치입니다. 쓰레쉬의 와드 운용과 시야 장악이 팀의 오브젝트 의사결정에 큰 기여를 했습니다.",
+      "relatedEventIds": [
+        "evt_029",
+        "evt_041"
+      ]
+    },
+    {
+      "id": "str_02",
+      "title": "후반 구조물 전환 판단",
+      "description": "31:26과 37:11 타워 압박에 직접 관여하며, 킬 싸움이 아닌 구조물로 승리 조건을 전환하는 판단력을 보여줬습니다.",
+      "relatedEventIds": [
+        "evt_040",
+        "evt_048"
+      ]
+    },
+    {
+      "id": "str_03",
+      "title": "오브젝트 합류와 팀 기여",
+      "description": "바론(24:48)과 드래곤(32:05) 타이밍에 꾸준히 합류하며 팀 3드래곤·1바론 확보에 기여했습니다. 16어시스트는 팀 교전 참여 의지를 보여줍니다.",
+      "relatedEventIds": [
+        "evt_029",
+        "evt_041"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_01",
+      "title": "초반 레인 생존력 부족",
+      "description": "4:46과 6:05에 연속 데스를 내주며 초반 레인 주도권을 상실했습니다. 쓰레쉬의 공격적 진입 타이밍이 상대 정글 개입이나 쿨다운 관리 없이 이뤄진 것으로 보입니다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_002"
+      ]
+    },
+    {
+      "id": "wk_02",
+      "title": "중반 반복적 포지셔닝 실수",
+      "description": "18:04~28:37 구간에서 5데스가 발생했습니다. 특히 오브젝트 확보 직후(바론 이후 25:56 데스) 경계를 풀며 잡히는 패턴이 반복되었습니다.",
+      "relatedEventIds": [
+        "evt_021",
+        "evt_023",
+        "evt_025",
+        "evt_031",
+        "evt_034"
+      ]
+    },
+    {
+      "id": "wk_03",
+      "title": "오브젝트 이후 생존 관리 미흡",
+      "description": "바론 확보(24:48) 후 25:56에 데스, 드래곤 합류(32:05) 후 32:15에 데스가 발생했습니다. 오브젝트를 챙긴 뒤 후퇴 타이밍 판단이 개선되어야 합니다.",
+      "relatedEventIds": [
+        "evt_031",
+        "evt_042"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_01",
+      "text": "교전 진입 전 상대 정글러 위치를 미니맵으로 반드시 확인한다.",
+      "priority": "high"
+    },
+    {
+      "id": "chk_02",
+      "text": "오브젝트(바론·드래곤) 확보 직후에는 즉시 안전 지역으로 후퇴하고, 추가 교전을 삼간다.",
+      "priority": "high"
+    },
+    {
+      "id": "chk_03",
+      "text": "초반 레인에서 체력 50% 이하일 때 공격적 플레이를 자제하고, 포션·리콜 타이밍을 확보한다.",
+      "priority": "high"
+    },
+    {
+      "id": "chk_04",
+      "text": "쓰레쉬 훅 실패 후 전진하지 않고 뒤로 빠지는 습관을 들인다.",
+      "priority": "medium"
+    },
+    {
+      "id": "chk_05",
+      "text": "팀 교전 시 이니시에이터가 아닌 필러(후속 CC) 역할로 포지셔닝하여 불필요한 선데스를 줄인다.",
+      "priority": "medium"
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_001",
+      "timestampLabel": "4:46",
+      "phase": "EARLY",
+      "title": "첫 번째 데스 – 레인 주도권 상실",
+      "description": "초반 첫 교전에서 먼저 잡히며 바텀 레인 템포를 내줬습니다. 이후 연쇄 데스의 시작점이 되었습니다."
+    },
+    {
+      "eventId": "evt_029",
+      "timestampLabel": "24:48",
+      "phase": "MID",
+      "title": "바론 확보 – 경기 전환점",
+      "description": "바론 확보에 팀이 성공하며 경기 흐름을 되찾은 핵심 순간입니다. 시야 운용이 바론 콜에 기여했습니다."
+    },
+    {
+      "eventId": "evt_031",
+      "timestampLabel": "25:56",
+      "phase": "MID",
+      "title": "바론 직후 데스 – 이점 반감",
+      "description": "바론 확보 직후 1분여 만에 데스를 내주며 바론 버프의 이점을 온전히 활용하지 못했습니다."
+    },
+    {
+      "eventId": "evt_040",
+      "timestampLabel": "31:26",
+      "phase": "LATE",
+      "title": "타워 압박 – 승리 조건 전환",
+      "description": "구조물 압박에 관여하며 킬 의존에서 구조물 중심 승리 조건으로 전환하는 판단을 보여줬습니다."
+    },
+    {
+      "eventId": "evt_048",
+      "timestampLabel": "37:11",
+      "phase": "LATE",
+      "title": "최종 타워 파괴 – 마무리",
+      "description": "마지막 타워 압박에 참여하며 경기를 마무리 지었습니다."
+    }
+  ],
+  "evidenceIndex": {
+    "evt_001": [
+      "wk_01",
+      "chk_03"
+    ],
+    "evt_002": [
+      "wk_01",
+      "chk_01"
+    ],
+    "evt_021": [
+      "wk_02"
+    ],
+    "evt_023": [
+      "wk_02"
+    ],
+    "evt_024": [
+      "wk_02"
+    ],
+    "evt_025": [
+      "wk_02"
+    ],
+    "evt_029": [
+      "str_03",
+      "str_01"
+    ],
+    "evt_031": [
+      "wk_03",
+      "chk_02"
+    ],
+    "evt_032": [
+      "wk_02"
+    ],
+    "evt_034": [
+      "wk_02"
+    ],
+    "evt_040": [
+      "str_02"
+    ],
+    "evt_041": [
+      "str_03"
+    ],
+    "evt_042": [
+      "wk_03",
+      "chk_02"
+    ],
+    "evt_044": [
+      "wk_03"
+    ],
+    "evt_048": [
+      "str_02"
+    ]
+  },
+  "schemaVersion": "1.0"
+}

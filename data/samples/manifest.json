@@ -1,6 +1,30 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8181030943",
+      "matchId": "KR_8181030943",
+      "label": "sample-kr-8181030943 · SUPPORT WIN",
+      "champion": "Braum",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-22",
+      "theme": "브라움의 꾸준한 오브젝트 합류와 높은 시야 점수로 팀을 24분 만에 승리로 이끈 경기",
+      "normalizedPath": "/data/samples/sample-kr-8181030943/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8181030943/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8181030943/sample-kr-8181030943-notes.md"
+    },
+    {
+      "id": "sample-kr-8180998112",
+      "matchId": "KR_8180998112",
+      "label": "sample-kr-8180998112 · SUPPORT WIN",
+      "champion": "Thresh",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-21",
+      "theme": "11데스에도 불구하고 시야 장악(109점)과 후반 구조물 압박으로 팀 승리를 이끌어낸 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8180998112/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8180998112/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8180998112/sample-kr-8180998112-notes.md"
+    },
+    {
       "id": "sample-kr-8178628796",
       "matchId": "KR_8178628796",
       "label": "sample-kr-8178628796 · JUNGLE LOSS",

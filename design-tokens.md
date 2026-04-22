@@ -31,9 +31,17 @@
 | `--info-soft` | `rgba(120, 186, 255, 0.08)` | 정보 블루 배경 |
 | `--info-muted` | `rgba(120, 186, 255, 0.16)` | 정보 블루 중간 톤 (보더) |
 | `--info-border` | `rgba(120, 186, 255, 0.38)` | 정보 블루 보더 hover |
+| `--on-accent` | `#11161a` | 액센트 배경 위 텍스트 (고대비) |
+| `--tint-amber` | `rgba(240, 179, 91, 0.14)` | panel--headline / hero-panel 상단 틴트 |
+| `--tint-mint` | `rgba(89, 209, 178, 0.14)` | panel--snapshot/samples/strengths 틴트 |
+| `--tint-rose` | `rgba(255, 134, 120, 0.12)` | panel--fetcher/weaknesses 틴트 |
+| `--tint-info` | `rgba(120, 186, 255, 0.12)` | panel--nav 틴트 |
+| `--mint-border` | `rgba(89, 209, 178, 0.34)` | 승/긍정 상태 보더 (winloss-pill, match-card 엣지) |
+| `--rose-border` | `rgba(255, 134, 120, 0.34)` | 패/경고 상태 보더 (winloss-pill, match-card 엣지) |
+| `--amber-border` | `rgba(240, 179, 91, 0.34)` | 액센트 보더 (match-list-more-btn) |
+| `--shadow-hover` | `0 16px 32px rgba(0, 0, 0, 0.28)` | 카드 호버 깊이감 |
 
 **미토큰화 색상** (남은 하드코딩)
-- `#11161a` / `#1c1711` — 버튼 글자색 (액센트 배경 위). 고대비 텍스트 전용 → `--on-accent` 후보
 - `rgba(255, 255, 255, 0.025)` — 바디 그리드 오버레이 (단일 사용)
 - `rgba(120, 186, 255, 0.36)` / `rgba(120, 186, 255, 0.1)` — LOADING_DETAIL fetch-status 전용 (단일 사용. 토큰화 보류)
 
@@ -104,41 +112,42 @@
 | `--space-5` | `16px` | 14곳 | 카드 간 기본 |
 | `--space-6` | `22px` | 8곳 | 패널/섹션 간 |
 
-**Outlier (consolidation 후보)**
+**Outlier (consolidation 완료 — iteration 4)**
 - `1px`(1) / `2px`(4) — 극한 타이트 영역 전용, 토큰화 보류
-- `6px`(6) — `--space-2`(8px)로 병합 검토
-- `14px`(7) — `--space-5`(16px)로 병합 검토
-- `18px`(2) — `--space-5`(16px)로 병합 검토
-- `20px`(2) / `24px`(1) — `--space-6`(22px)로 병합 검토
+- ~~`6px` → `--space-2`~~ · ~~`14px`/`18px` → `--space-5`~~ · ~~`20px`/`24px` → `--space-6`~~ 모두 흡수
 
 ## 4. 보더 반경
 
-**토큰화 완료** (5-tier canonical scale):
+**토큰화 완료** (6-tier canonical scale):
 
 | 토큰 | 값 | 용도 |
 |---|---|---|
-| `--radius-sm` | `8px` | 진행바, 인라인 칩, 작은 인터랙티브 |
-| `--radius-md` | `16px` | 중간 카드 |
+| `--radius-xs` | `4px` | 얇은 진행바, 마이크로 칩, 이벤트 스트라이프 |
+| `--radius-sm` | `8px` | 중소 카드, 버튼 표면, 칩 |
+| `--radius-md` | `16px` | 중간 카드, 탭 버튼 |
 | `--radius-lg` | `22px` | meta/stat/sample 카드 (**카드 표준**) |
 | `--radius-xl` | `28px` | hero-panel, panel (**최상위 패널 표준**) |
 | `--radius-pill` | `999px` | pill, winloss-pill, 원형 버튼 |
 | `--radius-circle` | `50%` | 원형 아이콘/아바타 |
 
-**Outlier (consolidation 후보 — 브라우저 검증 후 다음 이터레이션)**
-- `3px` (3곳) / `4px` (7곳) / `6px` (5곳) — `--radius-sm`(8px)로 상향 병합 검토
-- `10px` (9곳) / `12px` (5곳) / `14px` (1곳) — `--radius-sm`(8px) 또는 `--radius-md`(16px) 분기
-- `18px` (6곳) — `--radius-md`(16px)로 하향 병합 검토 (tab-btn 등)
-- `20px` (1곳) — `--radius-lg`(22px)로 상향 병합 검토
-- `5px 0 0 5px` / `10px 0 0 10px` (비대칭 쇼트핸드) — 토큰화 비대상 (타임라인 엣지 전용)
+**Outlier 흡수 내역 (iteration 4)**
+- `3px` / `4px` / `5px` / `6px` → `--radius-xs`(4px)
+- `10px` / `12px` → `--radius-sm`(8px)
+- `14px` / `18px` → `--radius-md`(16px)
+- `20px` → `--radius-lg`(22px)
+
+**보존 대상 (비대칭 쇼트핸드, 타임라인 엣지 전용)**
+- `5px 0 0 5px` / `0 5px 5px 0` — dual-tl 이벤트 좌/우 플래그
+- `10px 0 0 10px` — 레거시 타임라인 엣지
 
 ## 5. 반응형 브레이크포인트
 
-3개만 존재 ([styles.css:2897, 2946, 3302](styles.css)):
+4개 존재:
 
 - `@media (max-width: 1180px)` — 메인 워크스페이스 2열 → 1열
-- `@media (max-width: 760px)` — 모바일 (두 곳에서 선언됨 — 통합 후보)
-
-**현재 gap이 비는 구간**: 480px 미만 (좁은 모바일) 최적화 명시 없음.
+- `@media (max-width: 760px)` ×2 — 모바일 (dual-track timeline 섹션 별도 선언 — 통합 후보)
+- `@media (max-width: 480px)` — 좁은 모바일 (iteration 4 추가): shell/panel 패딩·radius 축소, profile icon 48px 축소
+- `@media (prefers-reduced-motion: reduce)` — 모션 최소화 (iteration 4 추가): 전역 animation/transition 0.01ms, hover lift(`translateY`) 차단
 
 ## 6. 상호작용 · 모션
 
@@ -154,23 +163,40 @@
 | 성공/승 | `rgba(89, 209, 178, 0.34)` | `var(--mint-soft)` |
 | 실패/패 | `rgba(255, 134, 120, 0.34)` | `var(--rose-soft)` |
 
-**panel 컬러 틴트** (panel 변형별 상단 그라디언트 0.08~0.1 alpha)
-- `.panel--headline` → amber
-- `.panel--snapshot` / `.panel--samples` / `.panel--strengths` → mint
-- `.panel--nav` → info blue
-- `.panel--fetcher` / `.panel--weaknesses` → rose
+**panel 컬러 틴트** (iteration 5 — 토큰화 + 가시성 상향, alpha 0.12~0.14, stop 38%)
+- `.panel--headline` → `--tint-amber`
+- `.panel--snapshot` / `.panel--samples` / `.panel--strengths` → `--tint-mint`
+- `.panel--nav` → `--tint-info`
+- `.panel--fetcher` / `.panel--weaknesses` → `--tint-rose`
+- `.hero-panel` → 135° amber + 330° mint 이중 그라디언트 (둘 다 `--tint-*`)
+
+**카드 호버 (iteration 5 — 깊이감 통일)**
+- `.candidate-card--button:hover` / `.report-card:hover` / `.sample-chip:hover` 모두 `box-shadow: var(--shadow-hover)` 추가
+- transition에 `box-shadow 180ms ease` 포함
 
 ## 7. 탭 컴포넌트 (4탭 기준)
 
 현재 상세 화면은 4탭 구조 (Overview / Progress / Mastery / AI Comparison).
 
 ```
-.tab-bar     → flex, gap 8px, sticky top 0, z-index 20
-              배경: linear-gradient(to bottom, var(--bg) 60%, transparent)
-.tab-btn     → 10px 22px / radius 18px / border var(--line)
-              0.92rem / 600 weight / color var(--muted)
-.tab-btn:hover → 정보 블루 hover
-.tab-btn--active → 액센트 보더 + amber-soft 배경 + accent 텍스트
+.tab-bar          → flex, gap 8px, sticky top 0, z-index 20
+                    배경: linear-gradient(to bottom, var(--bg) 60%, transparent)
+.tab-bar::after   → sticky 하단 12px fade shadow (iteration 6 추가) — 스크롤 시 탭바와
+                    콘텐츠 경계를 시각화, black 0.28 → transparent 그라디언트
+.tab-btn          → padding var(--space-3) 22px / radius var(--radius-md) / border var(--line)
+                    var(--fs-md) / 600 weight / color var(--muted)
+.tab-btn:hover    → 정보 블루 hover
+.tab-btn--active  → 액센트 보더 + amber-soft 배경 + accent 텍스트
+```
+
+**Match summary card 계층** (iteration 6)
+
+```
+.match-summary-card         → 좌측 3px ::before 엣지 바 (기본 var(--line))
+.match-summary-card[data-result="WIN"]::before  → var(--mint)
+.match-summary-card[data-result="LOSS"]::before → var(--rose)
+.match-summary-card[WIN/LOSS] 배경 → linear-gradient(90deg, var(--tint-mint|rose), var(--panel) 42%)
+.match-summary-card:hover   → translateY(-1px) + var(--shadow-hover) + accent 보더
 ```
 
 ## 8. 배경 장식 (바디 레벨)
@@ -185,6 +211,10 @@
 
 - `.skip-link` — 포커스 시 드러나는 스킵 링크 (`pill + accent`)
 - `.sr-only` — 시각적으로만 숨김
+- **전역 `:focus-visible`** — `2px solid var(--accent)` + `2px` offset (iteration 4 추가)
+- **`prefers-reduced-motion`** — 모션 억제 블록 (iteration 4 추가, §5 참조). 신규 `shimmer` / `spin` 애니메이션도 자동 억제 (`*` 전역 규칙으로 커버)
+- **스켈레톤 유틸** (iteration 6 추가): `.skeleton` + `.skeleton--line/--block/--card` + `@keyframes shimmer` (1.4s infinite). 로딩 플레이스홀더 재사용 가능
+- **로딩 인디케이터** (iteration 6): `[data-view="LOADING_DETAIL"] .fetch-status::before` 회전 스피너 (info 색, 0.8s linear)
 - 모든 상호작용 요소가 `transition` 지정되어 있음
 - `aria-*` 처리는 [main.js](main.js)에서 동적으로 관리됨 (디자인 변경 시 `[data-view]` / `[data-result]` 속성 셀렉터 주의)
 
@@ -192,14 +222,23 @@
 
 claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 
-1. **radius 스케일 과다** — 6, 8, 10, 12, 14, 16, 18, 20, 22, 28, 999 중 실질적으로 분기점은 `8 / 16 / 22 / 28 / 999` 5개면 충분. 토큰화 필요.
-2. **알파 배경이 하드코딩** — `rgba(255,255,255,0.03 / 0.04 / 0.06 / 0.08)`이 수십 곳. `--surface-1/2/3` 변수화 후보.
-3. **정보 블루(`#78baff` 계열)가 미토큰화** — hover/panel--nav에서 반복 사용.
+1. ~~**radius 스케일 과다**~~ — **완료** (iteration 4). 6-tier (`--radius-xs ~ --radius-xl`)로 토큰화. 비대칭 쇼트핸드 3개만 보존.
+2. ~~**알파 배경 하드코딩**~~ — **완료** (이전 이터레이션). `--surface-1~4` 토큰화.
+3. ~~**정보 블루(`#78baff`) 미토큰화**~~ — **완료** (이전 이터레이션). `--info`, `--info-soft/muted/border` 토큰화.
 4. ~~**font-size 스케일 혼재**~~ — **완료** (iteration 3). 10-tier (`--fs-xs ~ --fs-hero`)로 통합. clamp 기반 반응형 3종만 미토큰.
-5. **gap 스케일 통일** — `8, 10, 12, 14, 16, 18, 22`가 혼재. `--space-1 ~ --space-6`으로 정리 시 레이아웃 일관성 향상.
-6. **브레이크포인트 부족** — `1180 / 760` 2개. 480px 미만 대응이 약함.
-7. **Georgia serif 제목** — 정체성이지만, 영문/한글 혼용 시 행간 불균일. 한글 제목만 sans 유지하는 옵션 검토 가능.
-8. **panel 틴트 그라디언트가 거의 안 보임** — 0.08~0.1 alpha로 매우 은은. 또는 의도적 — claude.ai에 스크린샷으로 판단 맡기기.
+5. ~~**gap 스케일 통일**~~ — **완료** (iteration 4). `--space-1 ~ --space-6`으로 정리, 6/14/18/20/24px outlier 모두 흡수.
+6. ~~**브레이크포인트 부족**~~ — **완료** (iteration 4). 480px 추가.
+7. ~~**on-accent 미토큰화**~~ — **완료** (iteration 4). `--on-accent: #11161a`로 통합.
+8. ~~**`:focus-visible` / `prefers-reduced-motion` 부재**~~ — **완료** (iteration 4). 전역 포커스 링 + 모션 억제 블록 추가.
+9. ~~**panel 틴트 그라디언트가 거의 안 보임**~~ — **완료** (iteration 5). `--tint-*` 4종 토큰화, alpha 0.08→0.12~0.14 상향, stop 34%→38% 확장.
+10. ~~**상태 보더 하드코딩**~~ — **완료** (iteration 5). `--mint-border` / `--rose-border` 토큰화 (winloss-pill).
+11. ~~**카드 호버 깊이감 부재**~~ — **완료** (iteration 5). `--shadow-hover` 토큰, 카드 3종에 적용.
+12. **Georgia serif 제목** — 정체성이지만, 영문/한글 혼용 시 행간 불균일. 한글 제목만 sans 유지하는 옵션 검토 가능.
+13. **두 번 선언된 `@media (max-width: 760px)`** — 통합 후보. dual-track timeline 전용 규칙이 §33 섹션에 별도 있음.
+14. **report-badge / rank-badge 배경 alpha 잔여 하드코딩** — 0.06/0.1/0.15/0.25/0.28/0.3 등 산재. 추후 이터레이션에서 `--tint-*` 재사용 검토.
+15. ~~**match-summary-card 계층 약함**~~ — **완료** (iteration 6). 좌측 3px 결과색 엣지 바 + `--tint-mint/rose` 배경 + hover 시 `--shadow-hover` + 1px lift 추가.
+16. ~~**탭바 sticky 시 경계 불명확**~~ — **완료** (iteration 6). `.tab-bar::after` 12px fade shadow로 스크롤 경계 시각화.
+17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
 
 ## 11. claude.ai 사용 팁
 
