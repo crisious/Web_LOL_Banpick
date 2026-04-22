@@ -160,7 +160,6 @@ body::after {
 
 .topbar-title {
   margin: 6px 0 0;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(1.2rem, 2vw, 1.75rem);
   line-height: 1.18;
   letter-spacing: -0.01em;
@@ -246,7 +245,6 @@ body::after {
 .insight-card h4,
 .moment-copy h4,
 .candidate-card h4 {
-  font-family: Georgia, "Times New Roman", serif;
 }
 
 .hero-copy h1,
@@ -671,7 +669,6 @@ body::after {
 
 .detail-progress__head h2 {
   margin: 6px 0 0;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(1.25rem, 2vw, 1.7rem);
   line-height: 1.15;
 }
@@ -1185,7 +1182,6 @@ body::after {
 
 .trend-callout h4 {
   margin: 10px 0 8px;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: var(--fs-xl);
   line-height: 1.2;
 }
@@ -1344,7 +1340,6 @@ body::after {
 
 .report-card h4 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: var(--fs-lg);
 }
 
@@ -1439,7 +1434,6 @@ body::after {
 
 .candidate-head h4 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: var(--fs-lg);
 }
 
@@ -2398,8 +2392,8 @@ body::after {
   height: 60px;
   border-radius: var(--radius-circle);
   background: conic-gradient(
-    var(--mint) calc(var(--wr) * 1%),
-    var(--rose) calc(var(--wr) * 1%)
+    var(--mint) calc(var(--wr, 0) * 1%),
+    var(--rose) calc(var(--wr, 0) * 1%)
   );
   display: flex;
   align-items: center;
@@ -3242,6 +3236,52 @@ body::after {
     padding-top: 10px;
     font-size: var(--fs-md);
   }
+
+  /* ── Dual-track timeline responsive ───────────────────────────────────── */
+  .tab-bar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 4px 0 12px;
+  }
+
+  .tab-btn {
+    padding: 8px 14px;
+    font-size: var(--fs-base);
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .detail-progress {
+    padding: 14px;
+  }
+
+  .detail-progress__head {
+    align-items: start;
+  }
+
+  .detail-progress__steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detail-progress__step {
+    min-height: 58px;
+  }
+
+  .dual-tl-scroll {
+    min-width: 600px;
+    height: 280px;
+  }
+
+  .dual-tl-event {
+    max-width: 110px;
+    padding: 4px 7px;
+    font-size: var(--fs-xs);
+  }
+
+  .dual-tl-detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
 }
 
 .sample-chip__row,
@@ -3381,54 +3421,6 @@ body::after {
 
 .champion-inline--snapshot strong {
   margin: 0;
-}
-
-/* ── Dual-track timeline responsive ───────────────────────────────────── */
-@media (max-width: 760px) {
-  .tab-bar {
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding: 4px 0 12px;
-  }
-
-  .tab-btn {
-    padding: 8px 14px;
-    font-size: var(--fs-base);
-    flex: 1 1 auto;
-    text-align: center;
-  }
-
-  .detail-progress {
-    padding: 14px;
-  }
-
-  .detail-progress__head {
-    align-items: start;
-  }
-
-  .detail-progress__steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .detail-progress__step {
-    min-height: 58px;
-  }
-
-  .dual-tl-scroll {
-    min-width: 600px;
-    height: 280px;
-  }
-
-  .dual-tl-event {
-    max-width: 110px;
-    padding: 4px 7px;
-    font-size: var(--fs-xs);
-  }
-
-  .dual-tl-detail-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
 }
 
 /* ── Loading skeleton + shimmer ──────────────────────────────────────── */
