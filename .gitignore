@@ -4,4 +4,5 @@
 .claude/settings.local.json
 .claude/worktrees/
 test-artifacts/qa-automation/
+test-artifacts/design-audit/
 .superpowers/

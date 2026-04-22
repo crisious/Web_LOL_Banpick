@@ -40,16 +40,31 @@
 | `--rose-border` | `rgba(255, 134, 120, 0.34)` | 패/경고 상태 보더 (winloss-pill, match-card 엣지) |
 | `--amber-border` | `rgba(240, 179, 91, 0.34)` | 액센트 보더 (match-list-more-btn) |
 | `--shadow-hover` | `0 16px 32px rgba(0, 0, 0, 0.28)` | 카드 호버 깊이감 |
+| `--mint-bg-weak` | `rgba(89, 209, 178, 0.06)` | 옅은 mint 배경 (ally row, kill event) |
+| `--mint-bg-soft` | `rgba(89, 209, 178, 0.1)` | WIN 배지 / 진행 스텝 done / 긍정 추세 배경 (0.08→0.10 consolidation) |
+| `--mint-bg-medium` | `rgba(89, 209, 178, 0.28)` | WIN 계열 강조 border |
+| `--rose-bg-weak` | `rgba(255, 134, 120, 0.06)` | 옅은 rose 배경 (enemy row, death event) |
+| `--rose-bg-soft` | `rgba(255, 134, 120, 0.1)` | LOSS 배지 / 약점 카드 / 부정 추세 배경 (0.08→0.10 consolidation) |
+| `--rose-bg-medium` | `rgba(255, 134, 120, 0.28)` | LOSS 계열 강조 border |
+| `--amber-bg-soft` | `rgba(240, 179, 91, 0.08)` | 추세 패널 상단 / 액티브 세그먼트 배경 |
+| `--amber-bg-deep` | `rgba(240, 179, 91, 0.18)` | body radial-gradient / sample-chip 배경 |
+| `--amber-bg-strong` | `rgba(240, 179, 91, 0.3)` | rank-badge gold border |
 
-**미토큰화 색상** (남은 하드코딩)
-- `rgba(255, 255, 255, 0.025)` — 바디 그리드 오버레이 (단일 사용)
-- `rgba(120, 186, 255, 0.36)` / `rgba(120, 186, 255, 0.1)` — LOADING_DETAIL fetch-status 전용 (단일 사용. 토큰화 보류)
+**미토큰화 색상** (남은 하드코딩, 모두 2회 이하 사용 — 후속 이터레이션 후보, 이슈 #18)
+
+- `rgba(255, 255, 255, 0.025)` / `rgba(255, 255, 255, 0.035)` — 바디 그리드 오버레이 (단일 사용)
+- `rgba(120, 186, 255, 0.36)` / `rgba(120, 186, 255, 0.1)` — LOADING_DETAIL fetch-status 전용 (단일 사용)
+- `rgba(89, 209, 178, 0.03)` / `rgba(255, 134, 120, 0.03)` — 카드 배경 gradient 페이드아웃 (비교 카드 하단)
+- `rgba(89, 209, 178, 0.24)` / `rgba(89, 209, 178, 0.25)` / `rgba(89, 209, 178, 0.04)` / `rgba(89, 209, 178, 0.18)` — 기타 mint 단독 사용 alpha
+- `rgba(255, 134, 120, 0.04)` / `rgba(255, 134, 120, 0.25)` / `rgba(255, 134, 120, 0.42)` — 기타 rose 단독 사용 alpha
+- `rgba(255, 156, 143, 0.24)` / `rgba(255, 156, 143, 0.12)` — **#ff9c8f orphan rose 변형** (candidate-head LOSS). 기본 `--rose`와 다른 RGB — 통일 여부는 후속 이터레이션에서 결정
+- `rgba(240, 179, 91, 0.04)` / `rgba(240, 179, 91, 0.1)` / `rgba(240, 179, 91, 0.14)` / `rgba(240, 179, 91, 0.15)` / `rgba(240, 179, 91, 0.25)` / `rgba(240, 179, 91, 0.32)` / `rgba(240, 179, 91, 0.34)` / `rgba(240, 179, 91, 0.38)` / `rgba(240, 179, 91, 0.4)` — 기타 amber 단독 사용 alpha (0.34는 `--amber-border`와 같은 값이나 별도 selector에서 수동 사용)
 
 ## 2. 타이포
 
 **기본**
 - 패밀리 (본문): `"Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif`
-- 패밀리 (제목): `Georgia, "Times New Roman", serif` — hero/panel h1~h3, 탭/insight/moment 제목, detail-progress 헤드
+- 패밀리 (제목): body에서 `Pretendard Variable` 상속 — 제목 계층은 `font-weight` 600~800 + size + letter-spacing로 구성 (iteration 7에서 Georgia 제거)
 - 베이스: `16px` / line-height 본문 `1.6`
 
 **사이즈 스케일** (토큰화 완료 — 10-tier)
@@ -79,14 +94,19 @@
 - `1~1.15rem` (강조 값 5종) → `1.1rem` 통일: 작은 숫자 강조 살짝 커짐
 - `1.2~1.35rem` (섹션 제목 4종) → `1.25rem` 통일
 
-**기본**
-- 패밀리 (본문): `"Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif`
-- 패밀리 (제목): `Georgia, "Times New Roman", serif` — hero/panel h1~h3, 탭/insight/moment 제목, detail-progress 헤드
-- 베이스: `16px` / line-height 본문 `1.6`
-
 **letter-spacing**
 - 마이크로 라벨: `0.18em` ~ `0.22em` + `text-transform: uppercase`
 - 헤드라인: `-0.005em` ~ `-0.01em`
+
+**Responsive body base (미토큰화 예외)**
+
+body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰 스케일에서 분리.
+
+- 데스크톱 `16px` (body 기본)
+- 태블릿 `≤760px` → `15px`
+- 좁은 모바일 `≤480px` → `14px`
+
+단계적 축소 설계. design-audit `--scope fontSize` 에서 이 3개 라인은 "알려진 예외"로 간주한다.
 
 ## 3. 간격 · 레이아웃
 
@@ -145,9 +165,9 @@
 4개 존재:
 
 - `@media (max-width: 1180px)` — 메인 워크스페이스 2열 → 1열
-- `@media (max-width: 760px)` ×2 — 모바일 (dual-track timeline 섹션 별도 선언 — 통합 후보)
-- `@media (max-width: 480px)` — 좁은 모바일 (iteration 4 추가): shell/panel 패딩·radius 축소, profile icon 48px 축소
-- `@media (prefers-reduced-motion: reduce)` — 모션 최소화 (iteration 4 추가): 전역 animation/transition 0.01ms, hover lift(`translateY`) 차단
+- `@media (max-width: 760px)` — 모바일 (iteration 7에서 단일 블록으로 통합. 내부에 Dual-track timeline 전용 섹션 보존)
+- `@media (max-width: 480px)` — 좁은 모바일: shell/panel 패딩·radius 축소, profile icon 48px 축소
+- `@media (prefers-reduced-motion: reduce)` — 모션 최소화 (애니메이션/transition 0.01ms, hover lift 차단)
 
 ## 6. 상호작용 · 모션
 
@@ -233,12 +253,13 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 9. ~~**panel 틴트 그라디언트가 거의 안 보임**~~ — **완료** (iteration 5). `--tint-*` 4종 토큰화, alpha 0.08→0.12~0.14 상향, stop 34%→38% 확장.
 10. ~~**상태 보더 하드코딩**~~ — **완료** (iteration 5). `--mint-border` / `--rose-border` 토큰화 (winloss-pill).
 11. ~~**카드 호버 깊이감 부재**~~ — **완료** (iteration 5). `--shadow-hover` 토큰, 카드 3종에 적용.
-12. **Georgia serif 제목** — 정체성이지만, 영문/한글 혼용 시 행간 불균일. 한글 제목만 sans 유지하는 옵션 검토 가능.
-13. **두 번 선언된 `@media (max-width: 760px)`** — 통합 후보. dual-track timeline 전용 규칙이 §33 섹션에 별도 있음.
-14. **report-badge / rank-badge 배경 alpha 잔여 하드코딩** — 0.06/0.1/0.15/0.25/0.28/0.3 등 산재. 추후 이터레이션에서 `--tint-*` 재사용 검토.
+12. ~~**Georgia serif 제목**~~ — **완료** (iteration 7). 6곳 `font-family: Georgia` 선언 제거, Pretendard 단일화. 계층은 weight/size/letter-spacing로 유지.
+13. ~~**두 번 선언된 `@media (max-width: 760px)`**~~ — **완료** (iteration 7). Dual-track timeline 전용 블록을 메인 모바일 블록 내부로 병합. 선택자 충돌 없음.
+14. ~~**report-badge / rank-badge 배경 alpha 잔여 하드코딩**~~ — **완료** (iteration 7). `--{state}-bg-{weak|soft|medium}` / `--amber-bg-{soft|deep|strong}` 9개 신규 토큰으로 흡수. 컬러 커버리지 80.5% → 87.8%. 0.08↔0.10 consolidation 적용. #ff9c8f 변형, 0.03/0.04/0.24/0.25/0.32/0.34/0.38/0.4 alpha edge case는 #18로 이관.
 15. ~~**match-summary-card 계층 약함**~~ — **완료** (iteration 6). 좌측 3px 결과색 엣지 바 + `--tint-mint/rose` 배경 + hover 시 `--shadow-hover` + 1px lift 추가.
 16. ~~**탭바 sticky 시 경계 불명확**~~ — **완료** (iteration 6). `.tab-bar::after` 12px fade shadow로 스크롤 경계 시각화.
 17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
+18. **잔여 edge-case alpha (iteration 7에서 이월)** — #ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요), gradient 페이드아웃 0.03 (comparison-card), rank-badge hex 3종(#cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum), amber 0.34 raw(L752, 값은 `--amber-border`와 동일 — selector-level 수동 토큰 적용 후보). 대부분 1~2회 사용이라 후속 이터레이션에서 일괄 정리.
 
 ## 11. claude.ai 사용 팁
 
