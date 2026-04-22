@@ -3294,7 +3294,7 @@ body::after {
 }
 
 .candidate-head__tag--result[data-result="WIN"] {
-  color: var(--accent-strong);
+  color: var(--mint);
   border-color: rgba(89, 209, 178, 0.24);
   background: rgba(89, 209, 178, 0.12);
 }
