@@ -119,7 +119,7 @@
 - **Radius**: `--radius-xs/sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
 - **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
 - **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
-- **최근 UI 정리** (iter.8): 사이드바 슬림화(identity-card + sample-switcher + collapsed intake), Overview compact detail-header + 3-tile metrics, 10게임 OP.GG row format, 탭 전환 skeleton placeholder. iter.7: 상태색 알파 토큰 9종, Georgia 제거, 760px 통합, `--wr` fallback. 그 이전: `--tint-*`, `--shadow-hover`, match-summary-card 엣지 바, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
+- **최근 UI 정리** (iter.9): tab-trends에 최근 20경기 누적 분석 3개 패널(recent-aggregate / champion-breakdown / role-breakdown) 추가, 세션 캐시 + 새로고침 버튼. iter.8: 사이드바 슬림화, Overview compact detail-header, 10게임 OP.GG row format, 탭 전환 skeleton. iter.7: 상태색 알파 토큰 9종, Georgia 제거, 760px 통합, `--wr` fallback. 그 이전: `--tint-*`, `--shadow-hover`, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
 - 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
 
 ### Claude Code 디자인 자동화

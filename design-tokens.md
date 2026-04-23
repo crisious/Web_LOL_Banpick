@@ -245,6 +245,31 @@ body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰
 
 **탭 skeleton** — `.tab-page__skeleton` 컨테이너에 `.skeleton--block` 3개. `data-rendering="true"` 속성으로 상태 표시. 첫 진입 시 200ms 최소 노출, 재진입은 `data-rendered-once` 캐시로 즉시.
 
+## iteration 9 신규 컴포넌트
+
+**`.wr-bar`** — 승률 수평 바.
+
+- 높이 8px, `--rose-bg-soft` 배경 위에 mint `.wr-bar__fill` width로 승률 표현
+- `style="--wr-fill-pct: 70%"` 인라인 변수로 제어
+- `.panel--recent-aggregate .wr-bar`는 10px 높이 + max-width 100%
+
+**`.panel--recent-aggregate`** — 최근 20경기 요약.
+
+- head: h3 + refresh-btn 좌우 정렬
+- body: 승패 record + wr-bar + metric grid (KDA / CS/분 / 평균 게임 시간)
+- status line: 로딩/에러/빈 상태 메시지 (기본 hidden)
+
+**`.breakdown-row`** — 6-column grid.
+
+- 데스크톱: icon / label / count / wr-bar / wr-text / kda+cs
+- 모바일 ≤760px: `grid-template-areas`로 3줄 stack
+- champion-breakdown과 role-breakdown이 공유
+
+**`.refresh-btn`** — 경량 utility 버튼.
+
+- `--surface-2` 배경 + `--line` 보더. hover 시 `--info-soft` + `--info-border`
+- disabled 시 opacity 0.6 + not-allowed 커서
+
 ## 8. 배경 장식 (바디 레벨)
 
 - radial-gradient 민트 (top-left, 0.18 alpha, 28%)
@@ -287,6 +312,7 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
 18. **잔여 edge-case alpha (iteration 7에서 이월)** — #ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요), gradient 페이드아웃 0.03 (comparison-card), rank-badge hex 3종(#cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum), amber 0.34 raw(L752, 값은 `--amber-border`와 동일 — selector-level 수동 토큰 적용 후보). 대부분 1~2회 사용이라 후속 이터레이션에서 일괄 정리.
 19. ~~**Layout / IA — 사이드바 비대, topbar 노이즈, Overview 삼중 텍스트, 10게임 카드 밀도, 탭 blank flash**~~ — **완료** (iteration 8). 사이드바 3단 슬림화(identity-card + sample-switcher + details intake), topbar 제거, detail-header + detail-metrics 병합, 10게임 OP.GG row format, 첫 진입 탭 skeleton placeholder. JS `data-*` 셀렉터 대부분 보존 (삭제: sampleId, heroMatch, themeCopy, heroPills, sectionNav, overallSummary, gameFlowSummary, snapshotResult, snapshotConfidence).
+20. ~~**다중 경기 누적 분석 뷰 — 최근 N경기 챔피언·포지션 브레이크다운**~~ — **완료** (iteration 9). tab-trends에 panel--recent-aggregate + panel--champion-breakdown + panel--role-breakdown 3개 신규 패널 추가. 기존 /api/recent-matches 재사용, 서버 변경 없음. aggregateRecentStats 순수 함수로 집계. 탭 진입 시 lazy fetch + 세션 캐시 + 새로고침 버튼. 계정 전환 시 자동 invalidate.
 
 ## 11. claude.ai 사용 팁
 
