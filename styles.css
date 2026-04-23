@@ -3221,11 +3221,6 @@ body::after {
   gap: var(--space-2);
 }
 
-/* Skeleton variant for tab transition — extends existing .skeleton system */
-.tab-page[data-rendering="true"] .tab-page__real-content {
-  display: none;
-}
-
 .tab-page__skeleton {
   display: flex;
   flex-direction: column;
