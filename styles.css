@@ -295,27 +295,6 @@ body::after {
   padding: 18px;
 }
 
-.candidate-card--button {
-  width: 100%;
-  display: grid;
-  gap: var(--space-3);
-  min-height: 100%;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.candidate-card--button:hover {
-  transform: translateY(-2px);
-  border-color: var(--info-border);
-  background: var(--info-soft);
-  box-shadow: var(--shadow-hover);
-}
 
 .meta-card strong,
 .snapshot-item strong,
@@ -2162,7 +2141,6 @@ body::after {
 .login-submit:disabled,
 .match-summary-card:disabled,
 .fetch-form button:disabled,
-.candidate-card--button:disabled,
 .back-to-list-btn:disabled {
   opacity: 0.56;
   cursor: not-allowed;

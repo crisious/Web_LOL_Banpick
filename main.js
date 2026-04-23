@@ -2109,29 +2109,22 @@ function renderCandidates(matches) {
   dom.candidateList.innerHTML = matches
     .map(
       (match) => `
-        <button class="candidate-card candidate-card--button" type="button" data-generate-match="${match.matchId}">
-          <div class="candidate-head">
-            <div class="champion-inline">
-              ${championAvatarMarkup(match.champion, "medium")}
-              <div class="candidate-head__copy">
-                <span class="meta-label">${match.matchId}</span>
-                <h4>${championDisplayName(match.champion)}</h4>
-                ${candidateIdentityMetaMarkup(match)}
-              </div>
+        <button class="match-row" type="button" data-generate-match="${match.matchId}" data-result="${match.result}" aria-pressed="false">
+          <span class="match-row__icon">${championAvatarMarkup(match.champion, "medium")}</span>
+          <div class="match-row__main">
+            <div class="match-row__title">
+              <strong class="match-row__champion">${championDisplayName(match.champion)}</strong>
+              <span class="match-row__role">${match.role || ""}</span>
+              <span class="match-row__queue">${compactQueueLabel(match.queueType) || ""}</span>
+              <span class="match-row__patch">${matchPatchLabel(match.gameVersion) || ""}</span>
             </div>
-            <span class="candidate-fit">fit ${match.sampleFitScore}</span>
+            <div class="match-row__stats">
+              <span class="match-row__kda">${match.kills}/${match.deaths}/${match.assists}</span>
+              <span class="match-row__duration">${match.durationLabel || ""}</span>
+              <span class="match-row__cs">${buildCandidateCardSummary(match)}</span>
+            </div>
           </div>
-          <div class="candidate-meta candidate-meta--primary">
-            <span>${match.role}</span>
-            <span class="candidate-result" data-result="${match.result}">${resultLabel(match.result)}</span>
-            <span>${match.durationLabel}</span>
-            <span>${matchPatchLabel(match.gameVersion)}</span>
-            <span>${match.kills}/${match.deaths}/${match.assists}</span>
-          </div>
-          <div class="candidate-meta candidate-meta--secondary">
-            <span>${buildCandidateCardSummary(match)}</span>
-          </div>
-          <p>${match.champion} ${match.role} 기준으로 바로 샘플 생성 가능한 경기입니다.</p>
+          <span class="match-row__result" data-result="${match.result}">${resultLabel(match.result)}</span>
         </button>
       `,
     )
