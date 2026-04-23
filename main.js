@@ -2702,6 +2702,10 @@ async function init() {
   dom.candidateList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-generate-match]");
     if (!button) return;
+    if (button && dom.candidateList) {
+      dom.candidateList.querySelectorAll("[data-generate-match]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+      button.setAttribute("aria-pressed", "true");
+    }
     handleGenerateSample(button.dataset.generateMatch)
       .then((result) => selectSample(result.sampleId))
       .then(() => {
