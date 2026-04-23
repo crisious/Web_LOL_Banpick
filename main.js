@@ -2790,8 +2790,39 @@ function switchTab(tabId) {
     page.classList.toggle("tab-page--active", page.id === tabId);
   });
 
+  const target = document.getElementById(tabId);
+  if (target && !target.dataset.renderedOnce && tabId !== "tab-overview") {
+    showTabSkeleton(target);
+    // Minimum skeleton visibility (200ms) avoids visual flicker when
+    // the subsequent render is synchronous and near-instant.
+    setTimeout(() => {
+      hideTabSkeleton(target);
+      target.dataset.renderedOnce = "true";
+    }, 200);
+  }
+
   dashboard.dataset.activeTab = tabId;
   localStorage.setItem("lol-coach-active-tab", tabId);
+}
+
+function showTabSkeleton(tabPage) {
+  if (tabPage.querySelector(".tab-page__skeleton")) return;
+  const skel = document.createElement("div");
+  skel.className = "tab-page__skeleton";
+  skel.setAttribute("aria-hidden", "true");
+  skel.innerHTML = `
+    <div class="skeleton skeleton--block" style="height: 120px"></div>
+    <div class="skeleton skeleton--block" style="height: 80px"></div>
+    <div class="skeleton skeleton--block" style="height: 140px"></div>
+  `;
+  tabPage.prepend(skel);
+  tabPage.dataset.rendering = "true";
+}
+
+function hideTabSkeleton(tabPage) {
+  const skel = tabPage.querySelector(".tab-page__skeleton");
+  if (skel) skel.remove();
+  delete tabPage.dataset.rendering;
 }
 
 function initTabSystem() {
