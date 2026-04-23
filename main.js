@@ -61,6 +61,16 @@ const dom = {
   detailProgressBar: document.querySelector("[data-detail-progress-bar]"),
   detailProgressSteps: document.querySelector("[data-detail-progress-steps]"),
   detailProgressMessage: document.querySelector("[data-detail-progress-message]"),
+  recentAggregate: document.querySelector("[data-recent-aggregate]"),
+  refreshStats: document.querySelector("[data-refresh-stats]"),
+  overallWl: document.querySelector("[data-overall-wl]"),
+  overallWrText: document.querySelector("[data-overall-wr-text]"),
+  overallWrBar: document.querySelector("[data-overall-wr-bar]"),
+  wrFill: document.querySelector("[data-wr-fill]"),
+  overallKda: document.querySelector("[data-overall-kda]"),
+  overallCs: document.querySelector("[data-overall-cs]"),
+  overallDuration: document.querySelector("[data-overall-duration]"),
+  recentAggregateStatus: document.querySelector("[data-recent-aggregate-status]"),
 };
 
 const state = {
@@ -83,6 +93,10 @@ const state = {
     skippedSteps: [],
   },
   detailProgressTimer: null,
+  recentStats: null,
+  recentStatsAccount: null,
+  recentStatsLoading: false,
+  recentStatsError: null,
 };
 
 const REPORT_STRIP_LIMIT = 6;
@@ -939,6 +953,143 @@ function renderTrendPanel() {
         : `<div class="trend-list__item">반복 약점 표본 적음</div>`;
   }
 }
+
+// ─── Recent-aggregate: fetch + render ────────────────────────────────────────
+
+function currentAccountKey() {
+  if (!state.account) return null;
+  return `${state.account.gameName}#${state.account.tagLine}@${state.account.platformRegion}`;
+}
+
+async function fetchRecentStats({ force = false } = {}) {
+  if (!state.account) {
+    renderRecentStatsEmpty("계정을 먼저 설정하세요");
+    return;
+  }
+  if (state.recentStatsLoading) return;
+  const accountKey = currentAccountKey();
+  if (!force && state.recentStats && state.recentStatsAccount === accountKey) {
+    return;
+  }
+
+  state.recentStatsLoading = true;
+  state.recentStatsError = null;
+  toggleRefreshButton(true);
+  showRecentAggregateStatus("최근 20경기 불러오는 중…");
+
+  try {
+    const res = await fetch("/api/recent-matches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameName: state.account.gameName,
+        tagLine: state.account.tagLine,
+        platformRegion: state.account.platformRegion,
+        riotApiKey: state.account.riotApiKey || undefined,
+        start: 0,
+        matchCount: 20,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.ok === false) {
+      throw new Error(data?.error || `요청 실패 (HTTP ${res.status})`);
+    }
+
+    const matches = Array.isArray(data.matches) ? data.matches : [];
+    if (matches.length === 0) {
+      state.recentStats = {
+        overall: { count: 0, wins: 0, losses: 0, wrPct: 0, avgKda: 0, avgCsPerMin: 0, avgDurationSec: 0 },
+        byChampion: [],
+        byRole: [],
+      };
+      state.recentStatsAccount = accountKey;
+      renderRecentStatsEmpty("최근 경기 없음");
+      return;
+    }
+
+    state.recentStats = aggregateRecentStats(matches);
+    state.recentStatsAccount = accountKey;
+    state.recentStatsError = null;
+    hideRecentAggregateStatus();
+
+    renderRecentAggregate();
+    if (typeof renderChampionBreakdown === "function") renderChampionBreakdown();
+    if (typeof renderRoleBreakdown === "function") renderRoleBreakdown();
+  } catch (error) {
+    state.recentStatsError = error.message || String(error);
+    renderRecentStatsError(state.recentStatsError);
+  } finally {
+    state.recentStatsLoading = false;
+    toggleRefreshButton(false);
+  }
+}
+
+function toggleRefreshButton(loading) {
+  if (!dom.refreshStats) return;
+  dom.refreshStats.disabled = Boolean(loading);
+  dom.refreshStats.textContent = loading ? "불러오는 중…" : "↻ 새로고침";
+}
+
+function showRecentAggregateStatus(message) {
+  if (!dom.recentAggregateStatus) return;
+  dom.recentAggregateStatus.textContent = message;
+  dom.recentAggregateStatus.hidden = false;
+}
+
+function hideRecentAggregateStatus() {
+  if (!dom.recentAggregateStatus) return;
+  dom.recentAggregateStatus.textContent = "";
+  dom.recentAggregateStatus.hidden = true;
+}
+
+function renderRecentStatsError(message) {
+  showRecentAggregateStatus(message || "불러오기 실패. 잠시 후 다시 시도하세요.");
+}
+
+function renderRecentStatsEmpty(message) {
+  if (dom.overallWl) dom.overallWl.textContent = "—";
+  if (dom.overallWrText) dom.overallWrText.textContent = "승률 —";
+  if (dom.overallKda) dom.overallKda.textContent = "—";
+  if (dom.overallCs) dom.overallCs.textContent = "—";
+  if (dom.overallDuration) dom.overallDuration.textContent = "—";
+  if (dom.wrFill) dom.wrFill.style.setProperty("--wr-fill-pct", "0%");
+  showRecentAggregateStatus(message || "최근 경기 없음");
+}
+
+function renderRecentAggregate() {
+  if (!state.recentStats || !dom.recentAggregate) return;
+  const { overall } = state.recentStats;
+
+  if (dom.overallWl) {
+    dom.overallWl.textContent = overall.count === 0 ? "—" : `${overall.wins}W ${overall.losses}L`;
+  }
+  if (dom.overallWrText) {
+    dom.overallWrText.textContent = overall.count === 0 ? "승률 —" : `승률 ${overall.wrPct}%`;
+  }
+  if (dom.wrFill) {
+    dom.wrFill.style.setProperty("--wr-fill-pct", `${overall.wrPct}%`);
+  }
+  if (dom.overallKda) {
+    dom.overallKda.textContent = overall.count === 0 ? "—" : overall.avgKda.toFixed(2);
+  }
+  if (dom.overallCs) {
+    dom.overallCs.textContent = overall.count === 0 ? "—" : overall.avgCsPerMin.toFixed(1);
+  }
+  if (dom.overallDuration) {
+    dom.overallDuration.textContent = overall.count === 0 ? "—" : formatDurationSeconds(overall.avgDurationSec);
+  }
+
+  hideRecentAggregateStatus();
+}
+
+function formatDurationSeconds(totalSeconds) {
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return "—";
+  const m = Math.floor(totalSeconds / 60);
+  const s = Math.floor(totalSeconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function buildCompactHeadline(sample) {
   const match = sampleMatchSummary(sample);
@@ -2895,8 +3046,24 @@ function switchTab(tabId) {
     }, 200);
   }
 
+  if (tabId === "tab-trends") {
+    maybeFetchRecentStats();
+  }
+
   dashboard.dataset.activeTab = tabId;
   localStorage.setItem("lol-coach-active-tab", tabId);
+}
+
+function maybeFetchRecentStats() {
+  if (!state.account) return;
+  const accountKey = currentAccountKey();
+  if (state.recentStats && state.recentStatsAccount === accountKey) {
+    renderRecentAggregate();
+    if (typeof renderChampionBreakdown === "function") renderChampionBreakdown();
+    if (typeof renderRoleBreakdown === "function") renderRoleBreakdown();
+    return;
+  }
+  fetchRecentStats();
 }
 
 function showTabSkeleton(tabPage) {
@@ -2959,6 +3126,12 @@ function initTabSystem() {
     const card = document.querySelector(`[data-card-id="${id}"]`);
     if (card) card.setAttribute("data-collapsed", "");
   });
+
+  if (dom.refreshStats) {
+    dom.refreshStats.addEventListener("click", () => {
+      fetchRecentStats({ force: true });
+    });
+  }
 }
 
 init();

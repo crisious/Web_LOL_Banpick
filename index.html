@@ -293,6 +293,37 @@
             </div>
           </section>
 
+          <section class="panel panel--recent-aggregate" data-recent-aggregate aria-labelledby="recent-aggregate-title">
+            <div class="panel--recent-aggregate__head">
+              <h3 id="recent-aggregate-title">최근 20경기</h3>
+              <button type="button" class="refresh-btn" data-refresh-stats aria-label="최근 20경기 다시 불러오기">↻ 새로고침</button>
+            </div>
+            <div class="recent-aggregate__body">
+              <div class="recent-aggregate__record">
+                <strong data-overall-wl>—</strong>
+                <span data-overall-wr-text>승률 —</span>
+              </div>
+              <div class="wr-bar" data-overall-wr-bar>
+                <span class="wr-bar__fill" data-wr-fill style="--wr-fill-pct: 0%"></span>
+              </div>
+              <div class="recent-aggregate__stats">
+                <div class="metric">
+                  <span class="meta-label">평균 KDA</span>
+                  <strong data-overall-kda>—</strong>
+                </div>
+                <div class="metric">
+                  <span class="meta-label">CS/분</span>
+                  <strong data-overall-cs>—</strong>
+                </div>
+                <div class="metric">
+                  <span class="meta-label">평균 게임 시간</span>
+                  <strong data-overall-duration>—</strong>
+                </div>
+              </div>
+              <p class="panel--recent-aggregate__status muted" data-recent-aggregate-status hidden></p>
+            </div>
+          </section>
+
           <section class="panel panel--reports" id="reports" aria-labelledby="reports-title">
             <div class="section-heading">
               <h3 id="reports-title">저장된 경기 리포트 빠른 비교</h3>
