@@ -71,6 +71,9 @@ const dom = {
   overallCs: document.querySelector("[data-overall-cs]"),
   overallDuration: document.querySelector("[data-overall-duration]"),
   recentAggregateStatus: document.querySelector("[data-recent-aggregate-status]"),
+  championBreakdown: document.querySelector("[data-champion-breakdown]"),
+  championBreakdownList: document.querySelector("[data-champion-breakdown-list]"),
+  championBreakdownFooter: document.querySelector("[data-champion-breakdown-footer]"),
 };
 
 const state = {
@@ -1080,6 +1083,46 @@ function renderRecentAggregate() {
   }
 
   hideRecentAggregateStatus();
+}
+
+const CHAMPION_BREAKDOWN_TOP_N = 5;
+
+function renderChampionBreakdown() {
+  if (!state.recentStats || !dom.championBreakdownList) return;
+  const { byChampion } = state.recentStats;
+
+  if (byChampion.length === 0) {
+    dom.championBreakdownList.innerHTML = '<li class="muted">최근 경기 없음</li>';
+    if (dom.championBreakdownFooter) dom.championBreakdownFooter.hidden = true;
+    return;
+  }
+
+  const top = byChampion.slice(0, CHAMPION_BREAKDOWN_TOP_N);
+  const rest = byChampion.slice(CHAMPION_BREAKDOWN_TOP_N);
+
+  dom.championBreakdownList.innerHTML = top
+    .map(
+      (c) => `
+        <li class="breakdown-row" data-champion="${c.champion}">
+          <span class="breakdown-row__icon">${championAvatarMarkup(c.champion, "small")}</span>
+          <span class="breakdown-row__label">${championDisplayName(c.champion)}</span>
+          <span class="breakdown-row__count">${c.count}경기</span>
+          <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${c.wrPct}%"></span></span>
+          <span class="breakdown-row__wr-text">${c.wrPct}%</span>
+          <span class="breakdown-row__kda">KDA ${c.avgKda.toFixed(2)}</span>
+        </li>
+      `,
+    )
+    .join("");
+
+  if (dom.championBreakdownFooter) {
+    if (rest.length > 0) {
+      dom.championBreakdownFooter.textContent = `기타 (${rest.length}챔피언, ${rest.reduce((s, c) => s + c.count, 0)}경기)`;
+      dom.championBreakdownFooter.hidden = false;
+    } else {
+      dom.championBreakdownFooter.hidden = true;
+    }
+  }
 }
 
 function formatDurationSeconds(totalSeconds) {
