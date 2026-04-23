@@ -74,6 +74,8 @@ const dom = {
   championBreakdown: document.querySelector("[data-champion-breakdown]"),
   championBreakdownList: document.querySelector("[data-champion-breakdown-list]"),
   championBreakdownFooter: document.querySelector("[data-champion-breakdown-footer]"),
+  roleBreakdown: document.querySelector("[data-role-breakdown]"),
+  roleBreakdownList: document.querySelector("[data-role-breakdown-list]"),
 };
 
 const state = {
@@ -1123,6 +1125,40 @@ function renderChampionBreakdown() {
       dom.championBreakdownFooter.hidden = true;
     }
   }
+}
+
+const ROLE_INITIAL = {
+  TOP: "TOP",
+  JUNGLE: "JG",
+  MID: "MID",
+  ADC: "ADC",
+  SUPPORT: "SUP",
+  UNKNOWN: "?",
+};
+
+function renderRoleBreakdown() {
+  if (!state.recentStats || !dom.roleBreakdownList) return;
+  const { byRole } = state.recentStats;
+
+  if (byRole.length === 0) {
+    dom.roleBreakdownList.innerHTML = '<li class="muted">최근 경기 없음</li>';
+    return;
+  }
+
+  dom.roleBreakdownList.innerHTML = byRole
+    .map(
+      (r) => `
+        <li class="breakdown-row" data-role="${r.role}">
+          <span class="breakdown-row__icon breakdown-row__icon--role">${ROLE_INITIAL[r.role] || r.role.slice(0, 3)}</span>
+          <span class="breakdown-row__label">${r.role}</span>
+          <span class="breakdown-row__count">${r.count}경기</span>
+          <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${r.wrPct}%"></span></span>
+          <span class="breakdown-row__wr-text">${r.wrPct}%</span>
+          <span class="breakdown-row__kda">KDA ${r.avgKda.toFixed(2)}</span>
+        </li>
+      `,
+    )
+    .join("");
 }
 
 function formatDurationSeconds(totalSeconds) {
