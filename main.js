@@ -810,6 +810,96 @@ function buildTrendSnapshot() {
   };
 }
 
+function aggregateRecentStats(matches) {
+  const safe = Array.isArray(matches) ? matches : [];
+  const overall = {
+    count: safe.length,
+    wins: 0,
+    losses: 0,
+    wrPct: 0,
+    avgKda: 0,
+    avgCsPerMin: 0,
+    avgDurationSec: 0,
+  };
+
+  const championMap = new Map();
+  const roleMap = new Map();
+
+  let totalKills = 0;
+  let totalDeaths = 0;
+  let totalAssists = 0;
+  let csPerMinSum = 0;
+  let durationSum = 0;
+
+  for (const m of safe) {
+    if (m.result === "WIN") overall.wins += 1;
+    else if (m.result === "LOSS") overall.losses += 1;
+    totalKills += m.kills || 0;
+    totalDeaths += m.deaths || 0;
+    totalAssists += m.assists || 0;
+    csPerMinSum += Number(m.csPerMin) || 0;
+    durationSum += Number(m.durationSeconds) || 0;
+
+    const championKey = m.champion || "Unknown";
+    if (!championMap.has(championKey)) {
+      championMap.set(championKey, { champion: championKey, count: 0, wins: 0, kills: 0, deaths: 0, assists: 0, csPerMinSum: 0 });
+    }
+    const c = championMap.get(championKey);
+    c.count += 1;
+    if (m.result === "WIN") c.wins += 1;
+    c.kills += m.kills || 0;
+    c.deaths += m.deaths || 0;
+    c.assists += m.assists || 0;
+    c.csPerMinSum += Number(m.csPerMin) || 0;
+
+    const roleKey = m.role || "UNKNOWN";
+    if (!roleMap.has(roleKey)) {
+      roleMap.set(roleKey, { role: roleKey, count: 0, wins: 0, kills: 0, deaths: 0, assists: 0 });
+    }
+    const r = roleMap.get(roleKey);
+    r.count += 1;
+    if (m.result === "WIN") r.wins += 1;
+    r.kills += m.kills || 0;
+    r.deaths += m.deaths || 0;
+    r.assists += m.assists || 0;
+  }
+
+  const decided = overall.wins + overall.losses;
+  overall.wrPct = decided > 0 ? Math.round((overall.wins / decided) * 100) : 0;
+  overall.avgKda = computeKdaRatio(totalKills, totalDeaths, totalAssists);
+  overall.avgCsPerMin = safe.length > 0 ? +(csPerMinSum / safe.length).toFixed(1) : 0;
+  overall.avgDurationSec = safe.length > 0 ? Math.round(durationSum / safe.length) : 0;
+
+  const byChampion = Array.from(championMap.values())
+    .map((c) => ({
+      champion: c.champion,
+      count: c.count,
+      wins: c.wins,
+      wrPct: c.count > 0 ? Math.round((c.wins / c.count) * 100) : 0,
+      avgKda: computeKdaRatio(c.kills, c.deaths, c.assists),
+      avgCsPerMin: c.count > 0 ? +(c.csPerMinSum / c.count).toFixed(1) : 0,
+    }))
+    .sort((a, b) => b.count - a.count || b.wrPct - a.wrPct);
+
+  const roleOrder = { TOP: 1, JUNGLE: 2, MID: 3, ADC: 4, SUPPORT: 5, UNKNOWN: 99 };
+  const byRole = Array.from(roleMap.values())
+    .map((r) => ({
+      role: r.role,
+      count: r.count,
+      wins: r.wins,
+      wrPct: r.count > 0 ? Math.round((r.wins / r.count) * 100) : 0,
+      avgKda: computeKdaRatio(r.kills, r.deaths, r.assists),
+    }))
+    .sort((a, b) => b.count - a.count || (roleOrder[a.role] || 99) - (roleOrder[b.role] || 99));
+
+  return { overall, byChampion, byRole };
+}
+
+function computeKdaRatio(kills, deaths, assists) {
+  if (deaths === 0) return +((kills + assists) || 0).toFixed(2);
+  return +(((kills + assists) / deaths)).toFixed(2);
+}
+
 function renderTrendPanel() {
   if (!dom.trendHeadline || state.manifest.length === 0) {
     return;
