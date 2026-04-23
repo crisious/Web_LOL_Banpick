@@ -1131,6 +1131,7 @@ function renderChampionBreakdown() {
           <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${c.wrPct}%"></span></span>
           <span class="breakdown-row__wr-text">${c.wrPct}%</span>
           <span class="breakdown-row__kda">KDA ${c.avgKda.toFixed(2)}</span>
+          <span class="breakdown-row__cs">CS ${c.avgCsPerMin.toFixed(1)}</span>
         </li>
       `,
     )
@@ -3147,6 +3148,10 @@ function switchTab(tabId) {
   }
 
   if (tabId === "tab-trends") {
+    // Iter.8 skeleton covers the initial blank flash (200ms max); during the
+    // subsequent /api/recent-matches call, the recent-aggregate panel shows
+    // "—" values plus a status line ("최근 20경기 불러오는 중…") rather than
+    // keeping the skeleton up for the full fetch duration. Deliberate trade-off.
     maybeFetchRecentStats();
   }
 
