@@ -1,0 +1,587 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-23T16:09:31.262Z",
+  "sampleId": "sample-kr-8184632656",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "matchId": "KR_8184632656",
+      "riotId": "매운맛 비스킷#KR1",
+      "champion": "Maokai",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "duration": "26:47",
+      "analysisDate": "2026-04-24",
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8184632656_1776960571259",
+      "generatedAt": "2026-04-23T16:09:31.259Z"
+    },
+    "matchSummary": {
+      "headline": "마오카이 서포터로 시야 장악과 오브젝트 템포를 주도하며 26분 만에 압도적 승리를 이끌었으나, 킬 관여율이 26%로 낮아 팀 합류 타이밍에 개선 여지가 있었던 경기."
+    },
+    "coachSummary": {
+      "overallSummary": "이번 경기는 팀 전체가 압도적인 흐름을 가져간 경기였습니다. 시야 점수 80점은 26분 경기 기준으로 매우 훌륭한 수치이며, 드래곤 4개를 모두 확보하는 데 기여한 오브젝트 운영도 좋았습니다. 다만 팀 킬 31개 중 8개(킬 2 + 어시스트 6)에만 관여한 점은 서포터로서 아쉬운 부분입니다. 중반 두 번의 데스는 오브젝트 확보 직후 포지셔닝 이탈에서 발생한 것으로 보이며, 오브젝트를 챙긴 뒤 안전하게 빠지는 습관을 들이면 더 안정적인 운영이 가능합니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_01",
+        "title": "뛰어난 시야 장악력",
+        "description": "26분 47초 경기에서 시야 점수 80을 기록했습니다. 분당 약 3.0의 시야 점수는 서포터로서 매우 우수한 수치이며, 팀의 오브젝트 확보와 안전한 운영에 큰 기여를 했습니다.",
+        "relatedEventIds": [
+          "evt_018",
+          "evt_031"
+        ]
+      },
+      {
+        "id": "str_02",
+        "title": "오브젝트 중심 운영",
+        "description": "드래곤 4개를 모두 확보하고 적 드래곤 0개를 허용하는 완벽한 오브젝트 컨트롤에 기여했습니다. 드래곤 타이밍마다 합류하여 팀의 오브젝트 템포를 유지했습니다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_018",
+          "evt_031"
+        ]
+      },
+      {
+        "id": "str_03",
+        "title": "초반 킬 압박으로 흐름 선점",
+        "description": "8분 52초에 직접 킬을 만들어내며 초반 흐름을 아군 쪽으로 가져왔습니다. 이후 오브젝트 확보로 이어지는 연쇄 템포의 시발점이 되었습니다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_004"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_01",
+        "title": "낮은 킬 관여율 (26%)",
+        "description": "팀 전체 31킬 중 8개에만 관여하여 킬 관여율이 26%에 그쳤습니다. 서포터는 일반적으로 50% 이상의 킬 관여율이 기대되므로, 팀 교전 합류 타이밍과 로밍 동선을 점검할 필요가 있습니다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_023",
+          "evt_027"
+        ]
+      },
+      {
+        "id": "weak_02",
+        "title": "오브젝트 확보 후 생존 관리 미흡",
+        "description": "25분 5초에 타워를 확보한 직후 25분 16초에 바로 데스를 당했습니다. 오브젝트를 챙긴 뒤 안전하게 이탈하지 못하고 무리한 포지션에서 잡히는 패턴이 반복되고 있습니다.",
+        "relatedEventIds": [
+          "evt_029",
+          "evt_030"
+        ]
+      },
+      {
+        "id": "weak_03",
+        "title": "중반 핵심 타이밍 데스",
+        "description": "15분 42초와 25분 16초, 중반의 핵심 구도에서 두 번의 데스를 허용했습니다. 팀이 크게 앞선 경기였기에 큰 영향은 없었지만, 접전 상황이었다면 치명적인 역전 요소가 될 수 있는 데스였습니다.",
+        "relatedEventIds": [
+          "evt_010",
+          "evt_030"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_01",
+        "text": "팀 교전이 발생하는 위치를 예측하고 미리 이동하여 킬 관여율 40% 이상을 목표로 한다.",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_02",
+        "text": "오브젝트(타워·드래곤) 확보 직후 3초간 안전 지대로 후퇴하는 습관을 만든다.",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_03",
+        "text": "마오카이 W(비틀거리는 돌진)를 공격적 진입뿐 아니라 이탈용으로도 활용하는 판단을 연습한다.",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_04",
+        "text": "중반 이후 미니맵을 5초 간격으로 확인하여 적 정글러·미드 위치를 파악한 뒤 로밍 타이밍을 잡는다.",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_05",
+        "text": "점멸+점화 조합의 공격적 윈도우를 활용해 레인 킬 압박 후 로밍으로 연결하는 패턴을 시도한다.",
+        "priority": "LOW"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "8:52",
+        "phase": "EARLY",
+        "title": "초반 킬로 흐름 선점",
+        "description": "교전에서 직접 킬을 만들어내며 아군 팀의 초반 주도권을 확보한 핵심 장면입니다. 이 킬 이후 오브젝트 확보로 이어지며 스노우볼의 기점이 되었습니다."
+      },
+      {
+        "eventId": "evt_010",
+        "timestampLabel": "15:42",
+        "phase": "MID",
+        "title": "중반 불필요한 데스",
+        "description": "중반 핵심 타이밍에 데스를 허용하며 운영 안정감이 흔들린 장면입니다. 팀이 앞서고 있었기에 무리한 진입보다는 안전한 운영이 더 효과적이었을 시점이었습니다."
+      },
+      {
+        "eventId": "evt_029",
+        "timestampLabel": "25:05",
+        "phase": "MID",
+        "title": "타워 확보 관여",
+        "description": "구조물 압박에 직접 관여하며 승리 조건을 구조물 파괴로 전환하는 데 기여한 장면입니다."
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "25:16",
+        "phase": "MID",
+        "title": "타워 확보 직후 데스",
+        "description": "타워를 부순 직후 11초 만에 데스를 당한 장면입니다. 오브젝트 확보 후 이탈 타이밍 판단이 아쉬웠으며, 이 패턴을 인지하고 개선하는 것이 중요합니다."
+      },
+      {
+        "eventId": "evt_031",
+        "timestampLabel": "25:39",
+        "phase": "MID",
+        "title": "4번째 드래곤 확보",
+        "description": "팀이 4번째 드래곤을 확보하며 드래곤 소울에 도달한 장면입니다. 경기 내내 드래곤을 하나도 내주지 않은 완벽한 오브젝트 운영의 결실입니다."
+      }
+    ],
+    "evidenceIndex": {
+      "strengths": {
+        "str_01": [
+          "evt_018",
+          "evt_031"
+        ],
+        "str_02": [
+          "evt_002",
+          "evt_018",
+          "evt_031"
+        ],
+        "str_03": [
+          "evt_003",
+          "evt_004"
+        ]
+      },
+      "weaknesses": {
+        "weak_01": [
+          "evt_016",
+          "evt_023",
+          "evt_027"
+        ],
+        "weak_02": [
+          "evt_029",
+          "evt_030"
+        ],
+        "weak_03": [
+          "evt_010",
+          "evt_030"
+        ]
+      },
+      "keyMoments": [
+        "evt_003",
+        "evt_010",
+        "evt_029",
+        "evt_030",
+        "evt_031"
+      ]
+    },
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "analysisMode": "coaching",
+      "perspective": "red_team",
+      "matchId": "KR_8184632656",
+      "riotId": "매운맛 비스킷#KR1",
+      "participantId": 10,
+      "champion": "Maokai",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "gameDuration": "26:47"
+    },
+    "matchSummary": {
+      "oneLine": "팀이 압도적으로 이긴 경기였지만, 본인 플레이는 오브젝트 승리 흐름에 편승한 비중이 크고 중반 생존 실패가 반복돼 상위 구간에서는 승리를 흔들 수 있는 구조를 드러냈다.",
+      "overallFlow": "초반에는 8분대 킬 관여로 흐름을 당겼지만, 이후 경기의 핵심 승리 조건인 드래곤 4스택과 연속 타워 파괴는 팀 전체 주도에서 나온 비중이 컸다. 반면 본인은 중반 두 차례 핵심 데스로 운영 안정감을 깎았고, 31킬 경기에서 킬 관여율 26%에 그친 점은 서포터 마오카이로서 교전 연결과 선점 압박이 충분하지 않았음을 보여준다. 결과는 대승이지만, 내용상으로는 '잘 굴러가는 팀에 무난히 탑승한 경기'에 가깝고, 더 정교한 상대를 만나면 같은 패턴은 쉽게 처벌될 가능성이 높다."
+    },
+    "coachSummary": {
+      "summary": "겉으로는 오브젝트 템포와 구조물 전환이 좋은 경기처럼 보이지만, 세부적으로 보면 본인의 영향력은 팀 우세 대비 낮았다. 오브젝트 타이밍에는 맞춰 갔지만 직접 관여 표식이 적고, 관여 후 생존과 다음 구도 연결이 약해 이득을 더 크게 굴리지 못했다. 특히 15:42와 25:16 데스는 이미 팀이 유리한 판에서 불필요하게 리스크를 추가한 장면으로 읽힌다. 이 경기는 잘한 경기라기보다, 팀이 큰 우세를 잡아준 상황에서 치명적 사고를 크게 내지 못해 이긴 경기로 평가하는 편이 정확하다.",
+      "focusPoints": [
+        "오브젝트 합류 자체보다 선점-시야-이니시 후 생존까지 한 세트로 완성할 것",
+        "유리할수록 먼저 죽지 않는 판단을 우선할 것",
+        "팀 승리와 개인 기여도를 분리해서 복기할 것"
+      ]
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "초반은 7~9분 오브젝트 구간에서 팀 템포가 좋았고 8:52 직접 킬로 존재감도 있었다. 다만 9:27 흐름이 흔들린 구간이 바로 이어져, 만든 이득을 안정적으로 고정시키는 운영은 부족했다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_004",
+          "evt_005"
+        ]
+      },
+      "MID": {
+        "summary": "중반은 승패가 갈린 핵심 구간이었다. 팀은 드래곤과 연속 타워로 게임을 사실상 끝냈지만, 본인은 15:42와 25:16 두 번의 데스로 좋은 흐름에 불필요한 균열을 냈다. 구조물 전환에 일부 관여했지만, 영향력의 질보다는 팀 우세에 편승한 결과가 더 크게 보인다.",
+        "relatedEventIds": [
+          "evt_010",
+          "evt_016",
+          "evt_018",
+          "evt_023",
+          "evt_027",
+          "evt_029",
+          "evt_030",
+          "evt_031",
+          "evt_032",
+          "evt_033",
+          "evt_034"
+        ]
+      },
+      "LATE": {
+        "summary": "실질적인 후반은 오지 않았다. 이는 운영 완성도가 높아서라기보다, 팀이 중반에 상대를 무너뜨려 후반 검증 단계 자체가 생략된 결과에 가깝다.",
+        "relatedEventIds": []
+      }
+    },
+    "strengths": [
+      {
+        "title": "오브젝트 타이밍에 최소한의 합류는 유지했다",
+        "description": "드래곤 타이밍 전후에 팀 템포가 계속 이어졌고, 초반 8분대 직접 킬까지 더해져 완전히 게임 밖으로 밀려나진 않았다. 다만 이는 '주도적 캐리'라기보다 팀 흐름을 크게 해치지 않은 장점으로 보는 편이 정확하다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_018",
+          "evt_031"
+        ]
+      },
+      {
+        "title": "유리한 판에서 구조물 전환 흐름에는 발을 맞췄다",
+        "description": "18분 이후 타워 연쇄 파괴 국면에서 최소한 합류 타이밍은 맞췄고, 25:05에는 직접 관여 표식도 있다. 교전 승리를 허공에 버리지 않고 넥서스 방향 압박으로 연결한 점은 긍정적이다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_023",
+          "evt_027",
+          "evt_029",
+          "evt_032",
+          "evt_033",
+          "evt_034"
+        ]
+      },
+      {
+        "title": "시야 수치 자체는 팀 운영을 뒷받침할 수준이었다",
+        "description": "비전 점수 80은 26분 게임 기준으로 낮지 않다. 경기 내용상 본인의 직접 교전 관여가 적었던 만큼, 최소한 시야 제공으로 팀의 오브젝트 장악을 보조한 가치는 있었다고 볼 수 있다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_018",
+          "evt_031"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "팀 대승 대비 개인 영향력이 너무 낮았다",
+        "description": "31킬 경기에서 서포터 마오카이의 킬 관여율이 26%에 그친 것은 구조적으로 낮다. 팀이 계속 싸움과 오브젝트를 열었는데 본인 개입 흔적은 제한적이었고, 이는 상위 티어에서 '있어도 되고 없어도 되는 서포터'로 읽히기 쉽다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_016",
+          "evt_018",
+          "evt_023",
+          "evt_031"
+        ]
+      },
+      {
+        "title": "이득 직후 생존 관리가 약해 좋은 장면의 기대값을 깎았다",
+        "description": "15:42와 25:16 데스는 둘 다 팀이 주도권을 가진 중반에 발생했다. 유리할수록 탱 서포터의 가치는 먼저 맞아주는 것보다 '죽지 않고 다음 시야와 다음 이니시를 준비하는 것'에 가까운데, 이 부분이 무너졌다.",
+        "relatedEventIds": [
+          "evt_010",
+          "evt_029",
+          "evt_030"
+        ]
+      },
+      {
+        "title": "오브젝트를 챙기는 팀과 오브젝트를 설계하는 본인을 구분하지 못할 위험이 있다",
+        "description": "드래곤 4대와 타워 12개라는 결과는 매우 좋아 보이지만, 해당 이벤트 다수가 본인 비관여로 기록돼 있다. 즉 결과를 자신의 설계력으로 과대평가하면, 실제 약점인 선점 각도·교전 연결·후속 생존 문제가 복기에서 빠질 수 있다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_004",
+          "evt_016",
+          "evt_018",
+          "evt_023",
+          "evt_027",
+          "evt_031",
+          "evt_032",
+          "evt_033",
+          "evt_034"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "팀이 유리한 상태에서는 이니시 후 끝까지 박는 것보다, 스킬을 빼고 살아나와 다음 오브젝트 시야를 먼저 잡는 판단을 우선한다.",
+        "priority": "high"
+      },
+      {
+        "item": "복기할 때 드래곤/타워를 챙긴 장면마다 '내가 먼저 만든 정보와 각이 있었는지'를 체크하고, 단순 합류였으면 기여도를 낮게 평가한다.",
+        "priority": "high"
+      },
+      {
+        "item": "서포터 마오카이 기준 25분 전후 킬 관여율이 지나치게 낮으면 로밍 타이밍과 합류 경로가 늦었던 것으로 보고 원인을 찾는다.",
+        "priority": "high"
+      },
+      {
+        "item": "앞선 상황에서 죽은 장면은 반드시 따로 표시해, '상대가 잘해서 죽은 것'과 '내가 굳이 열 필요 없던 각'을 분리해 본다.",
+        "priority": "medium"
+      }
+    ],
+    "keyMoments": [
+      {
+        "title": "7분대 첫 드래곤 템포 확보",
+        "phase": "EARLY",
+        "summary": "팀이 첫 드래곤 구간 주도권을 잡으며 경기 방향을 아래쪽 맵 중심으로 굳혔다. 본인 직접 관여 표식은 없어서, 이 시점부터 이미 팀 템포 대비 개인 영향력 격차가 시작됐다고 볼 수 있다.",
+        "relatedEventIds": [
+          "evt_002"
+        ]
+      },
+      {
+        "title": "8:52 직접 킬로 초반 존재감 확보",
+        "phase": "EARLY",
+        "summary": "초반 몇 안 되는 명확한 직접 기여 장면이다. 다만 바로 뒤 흐름 안정화까지 이어졌다고 보긴 어려워, 단발성 성공으로 끝난 점이 아쉽다.",
+        "relatedEventIds": [
+          "evt_003"
+        ]
+      },
+      {
+        "title": "9분대 이득과 흔들림이 연속 발생",
+        "phase": "EARLY",
+        "summary": "9:07 오브젝트 확보 뒤 9:27 흐름이 흔들렸다. 좋은 장면을 만든 뒤 운영적으로 잠그지 못하는 패턴이 초반부터 드러난 구간이다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_005"
+        ]
+      },
+      {
+        "title": "15:42 중반 핵심 데스",
+        "phase": "MID",
+        "summary": "중반 설계 구도에서 데스를 내주며 팀의 운영 안정감을 깎았다. 이런 종류의 죽음은 비등 게임이나 상위 구간에서 바로 바론 시야, 외곽 포탑, 드래곤 주도권 손실로 연결되기 쉽다.",
+        "relatedEventIds": [
+          "evt_010"
+        ]
+      },
+      {
+        "title": "18~21분 구조물 전환 구간",
+        "phase": "MID",
+        "summary": "팀이 드래곤과 타워를 묶어 승리 조건을 구조물로 빠르게 바꿨다. 결과는 훌륭했지만 본인이 직접 만든 압박인지, 팀 우세에 맞춰 이동만 했는지는 엄격히 분리해서 봐야 한다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_018",
+          "evt_023"
+        ]
+      },
+      {
+        "title": "25:05 타워 관여 직후 25:16 데스",
+        "phase": "MID",
+        "summary": "겉으로는 구조물 압박 성공처럼 보이지만, 직후 사망으로 장면의 완성도가 크게 떨어졌다. 유리한 판에서 자주 나오는 '한 박자 더 욕심내다 기대값을 깎는' 전형적 패턴이다.",
+        "relatedEventIds": [
+          "evt_029",
+          "evt_030"
+        ]
+      },
+      {
+        "title": "25분 후반 연속 마무리 압박",
+        "phase": "MID",
+        "summary": "드래곤과 연속 타워 철거로 경기가 종결됐다. 다만 이 구간 역시 팀 전체 우세가 워낙 커서, 개인 플레이의 질이 실제보다 좋게 보일 수 있는 대표 구간이다.",
+        "relatedEventIds": [
+          "evt_031",
+          "evt_032",
+          "evt_033",
+          "evt_034"
+        ]
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "7:34",
+        "phase": "EARLY",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "8:52",
+        "phase": "EARLY",
+        "eventType": "CHAMPION_KILL",
+        "isPlayerInvolved": true,
+        "summary": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다."
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "9:07",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_WIN",
+        "isPlayerInvolved": false,
+        "summary": "정글 오브젝트를 챙기며 구조물 압박 재료를 마련했다."
+      },
+      {
+        "eventId": "evt_005",
+        "timestampLabel": "9:27",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "isPlayerInvolved": false,
+        "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다."
+      },
+      {
+        "eventId": "evt_010",
+        "timestampLabel": "15:42",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다."
+      },
+      {
+        "eventId": "evt_016",
+        "timestampLabel": "18:39",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_018",
+        "timestampLabel": "19:12",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      {
+        "eventId": "evt_023",
+        "timestampLabel": "21:05",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_027",
+        "timestampLabel": "24:54",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_029",
+        "timestampLabel": "25:05",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": true,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "25:16",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다."
+      },
+      {
+        "eventId": "evt_031",
+        "timestampLabel": "25:39",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다."
+      },
+      {
+        "eventId": "evt_032",
+        "timestampLabel": "26:15",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_033",
+        "timestampLabel": "26:33",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      },
+      {
+        "eventId": "evt_034",
+        "timestampLabel": "26:34",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다."
+      }
+    ]
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "뛰어난 시야 장악력",
+        "claudeNote": "26분 47초 경기에서 시야 점수 80을 기록했습니다. 분당 약 3.0의 시야 점수는 서포터로서 매우 우수한 수치이며, 팀의 오브젝트 확보와 안전한 운영에 큰 기여를 했습니다.",
+        "codexNote": "비전 점수 80은 26분 게임 기준으로 낮지 않다. 경기 내용상 본인의 직접 교전 관여가 적었던 만큼, 최소한 시야 제공으로 팀의 오브젝트 장악을 보조한 가치는 있었다고 볼 수 있다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 중심 운영",
+        "claudeNote": "드래곤 4개를 모두 확보하고 적 드래곤 0개를 허용하는 완벽한 오브젝트 컨트롤에 기여했습니다. 드래곤 타이밍마다 합류하여 팀의 오브젝트 템포를 유지했습니다.",
+        "codexNote": "드래곤 타이밍 전후에 팀 템포가 계속 이어졌고, 초반 8분대 직접 킬까지 더해져 완전히 게임 밖으로 밀려나진 않았다. 다만 이는 '주도적 캐리'라기보다 팀 흐름을 크게 해치지 않은 장점으로 보는 편이 정확하다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 확보 후 생존 관리 미흡",
+        "claudeNote": "25분 5초에 타워를 확보한 직후 25분 16초에 바로 데스를 당했습니다. 오브젝트를 챙긴 뒤 안전하게 이탈하지 못하고 무리한 포지션에서 잡히는 패턴이 반복되고 있습니다.",
+        "codexNote": "15:42와 25:16 데스는 둘 다 팀이 주도권을 가진 중반에 발생했다. 유리할수록 탱 서포터의 가치는 먼저 맞아주는 것보다 '죽지 않고 다음 시야와 다음 이니시를 준비하는 것'에 가까운데, 이 부분이 무너졌다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "초반 킬 압박으로 흐름 선점",
+        "note": "8분 52초에 직접 킬을 만들어내며 초반 흐름을 아군 쪽으로 가져왔습니다. 이후 오브젝트 확보로 이어지는 연쇄 템포의 시발점이 되었습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "낮은 킬 관여율 (26%)",
+        "note": "팀 전체 31킬 중 8개에만 관여하여 킬 관여율이 26%에 그쳤습니다. 서포터는 일반적으로 50% 이상의 킬 관여율이 기대되므로, 팀 교전 합류 타이밍과 로밍 동선을 점검할 필요가 있습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 핵심 타이밍 데스",
+        "note": "15분 42초와 25분 16초, 중반의 핵심 구도에서 두 번의 데스를 허용했습니다. 팀이 크게 앞선 경기였기에 큰 영향은 없었지만, 접전 상황이었다면 치명적인 역전 요소가 될 수 있는 데스였습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "유리한 판에서 구조물 전환 흐름에는 발을 맞췄다",
+        "note": "18분 이후 타워 연쇄 파괴 국면에서 최소한 합류 타이밍은 맞췄고, 25:05에는 직접 관여 표식도 있다. 교전 승리를 허공에 버리지 않고 넥서스 방향 압박으로 연결한 점은 긍정적이다."
+      },
+      {
+        "category": "weakness",
+        "topic": "팀 대승 대비 개인 영향력이 너무 낮았다",
+        "note": "31킬 경기에서 서포터 마오카이의 킬 관여율이 26%에 그친 것은 구조적으로 낮다. 팀이 계속 싸움과 오브젝트를 열었는데 본인 개입 흔적은 제한적이었고, 이는 상위 티어에서 '있어도 되고 없어도 되는 서포터'로 읽히기 쉽다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트를 챙기는 팀과 오브젝트를 설계하는 본인을 구분하지 못할 위험이 있다",
+        "note": "드래곤 4대와 타워 12개라는 결과는 매우 좋아 보이지만, 해당 이벤트 다수가 본인 비관여로 기록돼 있다. 즉 결과를 자신의 설계력으로 과대평가하면, 실제 약점인 선점 각도·교전 연결·후속 생존 문제가 복기에서 빠질 수 있다."
+      }
+    ],
+    "agreementRate": 50
+  }
+}
