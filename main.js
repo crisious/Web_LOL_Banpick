@@ -966,6 +966,16 @@ function currentAccountKey() {
   return `${state.account.gameName}#${state.account.tagLine}@${state.account.platformRegion}`;
 }
 
+function invalidateRecentStatsIfAccountChanged() {
+  if (!state.recentStats) return;
+  if (state.recentStatsAccount !== currentAccountKey()) {
+    state.recentStats = null;
+    state.recentStatsAccount = null;
+    state.recentStatsError = null;
+    renderRecentStatsEmpty("");
+  }
+}
+
 async function fetchRecentStats({ force = false } = {}) {
   if (!state.account) {
     renderRecentStatsEmpty("계정을 먼저 설정하세요");
@@ -1048,7 +1058,16 @@ function hideRecentAggregateStatus() {
 }
 
 function renderRecentStatsError(message) {
-  showRecentAggregateStatus(message || "불러오기 실패. 잠시 후 다시 시도하세요.");
+  const normalizedMessage = typeof message === "string" ? message : "";
+  let displayMessage = normalizedMessage || "불러오기 실패";
+  if (normalizedMessage.includes("rate") || normalizedMessage.includes("10초") || normalizedMessage.includes("Too Many")) {
+    displayMessage = "너무 빠르게 재조회했습니다. 10초 뒤 다시 시도하세요.";
+  } else if (normalizedMessage.includes("RIOT_API_KEY") || normalizedMessage.includes("401") || normalizedMessage.includes("Forbidden") || normalizedMessage.includes("403")) {
+    displayMessage = "Riot API 키가 만료되었거나 유효하지 않습니다. .env를 갱신하세요.";
+  } else if (normalizedMessage.includes("network") || normalizedMessage.includes("Failed to fetch")) {
+    displayMessage = "네트워크 오류. 서버 상태를 확인하세요.";
+  }
+  showRecentAggregateStatus(displayMessage);
 }
 
 function renderRecentStatsEmpty(message) {
@@ -2633,6 +2652,7 @@ async function handleLogin(event) {
       rankedError: result.rankedError,
       championMastery: result.championMastery || [],
     };
+    invalidateRecentStatsIfAccountChanged();
     state.recentMatches = result.matches || [];
     state.recentMatchesHasMore = Boolean(result.hasMore);
     if (remember) saveAccount(account);
@@ -3054,6 +3074,7 @@ async function init() {
     if (event.target.closest("[data-logout-btn]")) {
       localStorage.removeItem("lol-coach-account");
       state.account = null;
+      invalidateRecentStatsIfAccountChanged();
       state.recentMatches = [];
       state.recentMatchesHasMore = false;
       setView("LOGGED_OUT");
