@@ -166,7 +166,7 @@ body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰
 4개 존재:
 
 - `@media (max-width: 1180px)` — 메인 워크스페이스 2열 → 1열
-- `@media (max-width: 760px)` — 모바일 (iteration 7에서 단일 블록으로 통합. 내부에 Dual-track timeline 전용 섹션 보존)
+- `@media (max-width: 760px)` — 모바일 (iter.7에서 단일 블록으로 통합. iter.8에서 match-row flex-wrap + detail-header flex-column 규칙 추가. 내부에 Dual-track timeline 전용 섹션 보존)
 - `@media (max-width: 480px)` — 좁은 모바일: shell/panel 패딩·radius 축소, profile icon 48px 축소
 - `@media (prefers-reduced-motion: reduce)` — 모션 최소화 (애니메이션/transition 0.01ms, hover lift 차단)
 
@@ -220,6 +220,31 @@ body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰
 .match-summary-card:hover   → translateY(-1px) + var(--shadow-hover) + accent 보더
 ```
 
+## iteration 8 신규 컴포넌트
+
+**`.identity-card`** — 사이드바 최상단 아이덴티티 블록. 아바타 + 플레이어명 + 수집일.
+
+- 배경 `var(--panel)`, 보더 `var(--line)`, radius `--radius-lg`
+- 아바타는 `--radius-md` 48px, `.identity-card__body` 는 `--space-1` gap
+- 기존 `.hero-panel` 대체 (hero-lede, hero-pills, 4 meta 카드 모두 제거)
+
+**`.match-row`** — 10게임 리스트의 OP.GG row format.
+
+- flex row, 좌측 결과색 엣지 바 3px (`.match-row::before`, `[data-result]` 로 WIN/LOSS 색)
+- `.match-row__main` 은 title (champion/role/queue/patch) + stats (KDA/duration/cs) 2줄
+- `.match-row__result` 는 우측 고정, `--mint/rose-bg-medium` 배경
+- hover / aria-pressed 시 `translateY(-1px)` + `--shadow-hover` + 정보 블루 보더
+- ≤760px에서 flex-wrap 허용, stats는 전체 폭으로 내림 (result는 order: 10)
+
+**`.detail-header` + `.detail-metrics`** — Overview 상단 압축 블록.
+
+- detail-header: 좌측 title + headline + 1줄 summary (line-clamp 2), 우측 result pill + duration
+- detail-metrics: `grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))` 로 3-4개 metric 타일
+- `--tint-amber` 상단 그라디언트 (iter.5 tint 시스템 재사용)
+- 기존 `.panel--headline` + `.panel--snapshot` 두 패널을 대체, `.snapshot-grid` 7항목을 3개 핵심으로 축소
+
+**탭 skeleton** — `.tab-page__skeleton` 컨테이너에 `.skeleton--block` 3개. `data-rendering="true"` 속성으로 상태 표시. 첫 진입 시 200ms 최소 노출, 재진입은 `data-rendered-once` 캐시로 즉시.
+
 ## 8. 배경 장식 (바디 레벨)
 
 - radial-gradient 민트 (top-left, 0.18 alpha, 28%)
@@ -261,6 +286,7 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 16. ~~**탭바 sticky 시 경계 불명확**~~ — **완료** (iteration 6). `.tab-bar::after` 12px fade shadow로 스크롤 경계 시각화.
 17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
 18. **잔여 edge-case alpha (iteration 7에서 이월)** — #ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요), gradient 페이드아웃 0.03 (comparison-card), rank-badge hex 3종(#cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum), amber 0.34 raw(L752, 값은 `--amber-border`와 동일 — selector-level 수동 토큰 적용 후보). 대부분 1~2회 사용이라 후속 이터레이션에서 일괄 정리.
+19. ~~**Layout / IA — 사이드바 비대, topbar 노이즈, Overview 삼중 텍스트, 10게임 카드 밀도, 탭 blank flash**~~ — **완료** (iteration 8). 사이드바 3단 슬림화(identity-card + sample-switcher + details intake), topbar 제거, detail-header + detail-metrics 병합, 10게임 OP.GG row format, 첫 진입 탭 skeleton placeholder. JS `data-*` 셀렉터 대부분 보존 (삭제: sampleId, heroMatch, themeCopy, heroPills, sectionNav, overallSummary, gameFlowSummary, snapshotResult, snapshotConfidence).
 
 ## 11. claude.ai 사용 팁
 

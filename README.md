@@ -119,7 +119,7 @@
 - **Radius**: `--radius-xs/sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
 - **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
 - **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
-- **최근 UI 정리** (iter.7): 상태색 알파 토큰 9종 추가(`--mint/rose-bg-{weak,soft,medium}`, `--amber-bg-{soft,deep,strong}`), Georgia 제거 → Pretendard 단일화, 760px 미디어쿼리 통합, `--wr` fallback, 컬러 커버리지 80.5% → 87.8%. 이전 이터레이션: `--tint-*`, `--shadow-hover`, match-summary-card 엣지 바, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
+- **최근 UI 정리** (iter.8): 사이드바 슬림화(identity-card + sample-switcher + collapsed intake), Overview compact detail-header + 3-tile metrics, 10게임 OP.GG row format, 탭 전환 skeleton placeholder. iter.7: 상태색 알파 토큰 9종, Georgia 제거, 760px 통합, `--wr` fallback. 그 이전: `--tint-*`, `--shadow-hover`, match-summary-card 엣지 바, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
 - 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
 
 ### Claude Code 디자인 자동화
