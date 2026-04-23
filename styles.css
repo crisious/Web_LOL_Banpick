@@ -517,37 +517,6 @@ body::after {
   box-shadow: var(--shadow-hover);
 }
 
-.section-nav {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.section-link {
-  display: block;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line);
-  background: var(--surface-1);
-  color: var(--text);
-  text-decoration: none;
-  font: inherit;
-  cursor: pointer;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.section-link:hover,
-.section-link:focus-visible {
-  transform: translateY(-1px);
-  border-color: var(--info-border);
-  background: var(--info-soft);
-}
-
-.section-link.tab-link--active {
-  border-color: var(--accent);
-  background: var(--amber-soft);
-  color: var(--accent);
-}
-
 /* ── Tab bar & tab pages ──────────────────────────────────────────────── */
 .tab-bar {
   display: flex;
@@ -3148,6 +3117,39 @@ body::after {
   display: none;
 }
 
+/* iteration 8: sidebar slim (details intake) */
+.panel--fetcher {
+  padding: var(--space-4);
+}
+
+.panel--fetcher > summary {
+  cursor: pointer;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text);
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.panel--fetcher > summary::-webkit-details-marker {
+  display: none;
+}
+
+.panel--fetcher > summary::before {
+  content: "▸ ";
+  display: inline-block;
+  color: var(--muted);
+  transition: transform 180ms ease;
+}
+
+.panel--fetcher[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.panel--fetcher[open] > summary {
+  margin-bottom: var(--space-3);
+}
+
 @media (max-width: 1180px) {
   .topbar,
   .workspace-grid,
@@ -3223,23 +3225,6 @@ body::after {
     font-size: var(--fs-base);
     color: var(--muted);
     padding-left: 48px;
-  }
-
-  /* 섹션 네비 수평 스크롤 */
-  .section-nav {
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: var(--space-2);
-    padding-bottom: 8px;
-    scrollbar-width: none;
-  }
-  .section-nav::-webkit-scrollbar { display: none; }
-  .section-link {
-    white-space: nowrap;
-    padding: 10px 14px;
-    font-size: var(--fs-base);
-    flex-shrink: 0;
   }
 
   /* 프로필 헤더 모바일 */
@@ -3757,8 +3742,6 @@ body::after {
     scroll-behavior: auto !important;
   }
 
-  .section-link:hover,
-  .section-link:focus-visible,
   .meta-card:hover,
   .stat-card:hover,
   .sample-chip:hover,

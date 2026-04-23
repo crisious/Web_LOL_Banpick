@@ -1,10 +1,6 @@
 const dom = {
-  sampleId: document.querySelector("[data-sample-id]"),
   heroPlayer: document.querySelector("[data-hero-player]"),
-  heroMatch: document.querySelector("[data-hero-match]"),
   heroDate: document.querySelector("[data-hero-date]"),
-  themeCopy: document.querySelector("[data-theme-copy]"),
-  heroPills: document.querySelector("[data-hero-pills]"),
   headline: document.querySelector("[data-headline]"),
   resultPill: document.querySelector("[data-result-pill]"),
   snapshotChampion: document.querySelector("[data-snapshot-champion]"),
@@ -57,7 +53,6 @@ const dom = {
   wardEvents: document.querySelector("[data-ward-events]"),
   buildTimeline: document.querySelector("[data-build-timeline]"),
   tabBar: document.querySelector("[data-tab-bar]"),
-  sectionNav: document.querySelector("[data-section-nav]"),
   dualTimeline: document.querySelector("[data-dual-timeline]"),
   dualDetail: document.querySelector("[data-dual-detail]"),
   detailProgress: document.querySelector("[data-detail-progress]"),
@@ -1061,11 +1056,8 @@ function renderHero(sample) {
   const match = sampleMatchSummary(sample);
   const coachSummary = sample.analysis.coachSummary || {};
   const resultText = match.result ? resultLabel(match.result) : "결과 미상";
-  dom.sampleId.textContent = sample.sampleId;
   dom.heroPlayer.textContent = sample.publicAlias;
-  dom.heroMatch.textContent = match.matchId;
   dom.heroDate.textContent = sample.collectedDate;
-  dom.themeCopy.textContent = sample.theme;
 
   dom.headline.textContent = buildCompactHeadline(sample);
   dom.headline.title = match.headline || dom.headline.textContent;
@@ -1127,18 +1119,6 @@ function renderHero(sample) {
     `;
   }
 
-  if (dom.heroPills) {
-    dom.heroPills.innerHTML = [
-      match.champion,
-      match.role,
-      resultText,
-      compactQueueLabel(match.queueType),
-      compactPatchLabel(match.gameVersion),
-    ]
-      .filter(Boolean)
-      .map((label) => `<span class="hero-pill">${label}</span>`)
-      .join("");
-  }
 }
 
 function renderStats(sample) {
@@ -2810,15 +2790,6 @@ function switchTab(tabId) {
     page.classList.toggle("tab-page--active", page.id === tabId);
   });
 
-  // Update sidebar nav
-  if (dom.sectionNav) {
-    dom.sectionNav.querySelectorAll(".tab-link").forEach((link) => {
-      const isActive = link.dataset.tabTarget === tabId;
-      link.classList.toggle("tab-link--active", isActive);
-      link.setAttribute("aria-selected", isActive);
-    });
-  }
-
   dashboard.dataset.activeTab = tabId;
   localStorage.setItem("lol-coach-active-tab", tabId);
 }
@@ -2829,14 +2800,6 @@ function initTabSystem() {
     dom.tabBar.addEventListener("click", (e) => {
       const btn = e.target.closest(".tab-btn");
       if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
-    });
-  }
-
-  // Sidebar nav click handler
-  if (dom.sectionNav) {
-    dom.sectionNav.addEventListener("click", (e) => {
-      const link = e.target.closest(".tab-link");
-      if (link && link.dataset.tabTarget) switchTab(link.dataset.tabTarget);
     });
   }
 

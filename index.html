@@ -65,70 +65,22 @@
 
       <div class="workspace-grid">
         <aside class="sidebar-stack" aria-label="플레이어 허브">
-          <section class="hero-panel" aria-labelledby="player-hub-title">
-            <div class="hero-copy">
-              <p class="eyebrow">Player Hub</p>
-              <h2 id="player-hub-title">검색과 식별 정보를 먼저 고정하는 전적 사이트형 사이드 레일</h2>
-              <p class="hero-lede" data-theme-copy></p>
+          <article class="identity-card" data-identity-card aria-labelledby="identity-title">
+            <span class="identity-card__avatar" data-snapshot-champion-icon aria-hidden="true"></span>
+            <div class="identity-card__body">
+              <strong id="identity-title" data-hero-player></strong>
+              <span class="meta-label">Collected <span data-hero-date></span></span>
             </div>
-
-            <div class="hero-meta">
-              <article class="meta-card">
-                <span class="meta-label">Sample</span>
-                <strong data-sample-id></strong>
-              </article>
-              <article class="meta-card">
-                <span class="meta-label">Player</span>
-                <strong data-hero-player></strong>
-              </article>
-              <article class="meta-card">
-                <span class="meta-label">Match</span>
-                <strong data-hero-match></strong>
-              </article>
-              <article class="meta-card">
-                <span class="meta-label">Collected</span>
-                <strong data-hero-date></strong>
-              </article>
-            </div>
-            <div class="hero-pills" data-hero-pills></div>
-          </section>
-
-          <nav class="panel panel--nav" aria-label="분석 섹션 바로가기">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Overview Tabs</p>
-                <h3>리포트 빠른 이동</h3>
-              </div>
-            </div>
-            <div class="section-nav" data-section-nav role="tablist">
-              <button class="section-link tab-link" data-tab-target="tab-overview" role="tab" aria-selected="true">개요</button>
-              <button class="section-link tab-link" data-tab-target="tab-analysis" role="tab">분석</button>
-              <button class="section-link tab-link" data-tab-target="tab-timeline" role="tab">타임라인</button>
-              <button class="section-link tab-link" data-tab-target="tab-trends" role="tab">추세</button>
-            </div>
-          </nav>
+          </article>
 
           <article class="panel panel--samples" aria-labelledby="sample-library-title">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Sample Library</p>
-                <h3 id="sample-library-title">저장된 분석 샘플 전환</h3>
-              </div>
-              <p class="section-copy">프로필 카드처럼 샘플을 바꿔 보면서 역할, 승패, 분석 문체를 비교할 수 있습니다.</p>
-            </div>
+            <h3 id="sample-library-title">저장된 샘플</h3>
             <div class="sample-switcher" data-sample-switcher></div>
           </article>
 
-          <article class="panel panel--fetcher" aria-labelledby="recent-match-title">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Riot API Intake</p>
-                <h3 id="recent-match-title">최근 경기 후보 불러오기</h3>
-              </div>
-              <p class="section-copy">전적 사이트의 검색 바처럼 Riot ID를 넣고 최근 경기 후보를 조회합니다.</p>
-            </div>
-
-            <form class="fetch-form" data-recent-form aria-labelledby="recent-match-title">
+          <details class="panel panel--fetcher" data-fetcher-details>
+            <summary>Riot ID로 최근 경기 재조회</summary>
+            <form class="fetch-form" data-recent-form aria-label="Riot ID 재조회 폼">
               <label>
                 <span>gameName</span>
                 <input name="gameName" type="text" value="매운맛 비스킷" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" />
@@ -143,10 +95,9 @@
               </label>
               <button type="submit">최근 경기 불러오기</button>
             </form>
-
-            <div class="fetch-status" data-fetch-status aria-live="polite">sample-001 실데이터는 이미 저장되어 있습니다. 필요하면 최근 경기 후보를 다시 불러와 다른 샘플도 고를 수 있습니다.</div>
+            <div class="fetch-status" data-fetch-status aria-live="polite">sample-001 실데이터는 이미 저장되어 있습니다.</div>
             <div class="candidate-list" data-candidate-list aria-live="polite"></div>
-          </article>
+          </details>
         </aside>
 
         <main class="dashboard" id="main-content" data-active-tab="tab-overview">
