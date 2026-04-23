@@ -6,19 +6,18 @@ const dom = {
   themeCopy: document.querySelector("[data-theme-copy]"),
   heroPills: document.querySelector("[data-hero-pills]"),
   headline: document.querySelector("[data-headline]"),
-  overallSummary: document.querySelector("[data-overall-summary]"),
-  gameFlowSummary: document.querySelector("[data-game-flow-summary]"),
   resultPill: document.querySelector("[data-result-pill]"),
   snapshotChampion: document.querySelector("[data-snapshot-champion]"),
   snapshotChampionIcon: document.querySelector("[data-snapshot-champion-icon]"),
   snapshotRole: document.querySelector("[data-snapshot-role]"),
-  snapshotResult: document.querySelector("[data-snapshot-result]"),
   snapshotQueue: document.querySelector("[data-snapshot-queue]"),
   snapshotDuration: document.querySelector("[data-snapshot-duration]"),
   snapshotPatch: document.querySelector("[data-snapshot-patch]"),
   snapshotMastery: document.querySelector("[data-snapshot-mastery]"),
   snapshotMasteryText: document.querySelector("[data-snapshot-mastery-text]"),
-  snapshotConfidence: document.querySelector("[data-snapshot-confidence]"),
+  detailHeader: document.querySelector("[data-detail-header]"),
+  quickSummary: document.querySelector("[data-quick-summary]"),
+  snapshotCsPerMin: document.querySelector("[data-snapshot-cs-per-min]"),
   statRibbon: document.querySelector("[data-stat-ribbon]"),
   phaseGrid: document.querySelector("[data-phase-grid]"),
   strengths: document.querySelector("[data-strengths]"),
@@ -1070,8 +1069,11 @@ function renderHero(sample) {
 
   dom.headline.textContent = buildCompactHeadline(sample);
   dom.headline.title = match.headline || dom.headline.textContent;
-  dom.overallSummary.textContent = coachSummary.overallSummary || match.headline || sample.theme || "";
-  dom.gameFlowSummary.textContent = coachSummary.gameFlowSummary || coachSummary.winLossReason || "";
+  if (dom.quickSummary) {
+    const primary = coachSummary.overallSummary?.split(/[.!?]\s/)[0]?.trim();
+    const fallback = coachSummary.gameFlowSummary?.slice(0, 120)?.trim();
+    dom.quickSummary.textContent = primary || fallback || sample.theme || "";
+  }
   dom.resultPill.dataset.result = match.result || "UNKNOWN";
   dom.resultPill.textContent = [resultText, coachSummary.winLossReason].filter(Boolean).join(" · ");
 
@@ -1086,12 +1088,13 @@ function renderHero(sample) {
     queueChampionVersionLoad();
   }
   if (dom.snapshotRole) dom.snapshotRole.textContent = match.role || "—";
-  if (dom.snapshotResult) dom.snapshotResult.textContent = resultText;
   if (dom.snapshotQueue) dom.snapshotQueue.textContent = compactQueueLabel(match.queueType);
   dom.snapshotDuration.textContent = sample.normalized?.matchInfo?.durationLabel || "—";
   dom.snapshotPatch.textContent = compactPatchLabel(match.gameVersion);
-  dom.snapshotConfidence.textContent =
-    typeof sample.analysis?.analysisMeta?.confidence === "number" ? formatPercent(sample.analysis.analysisMeta.confidence) : "—";
+  if (dom.snapshotCsPerMin) {
+    const cs = sample.normalized?.playerStats?.csPerMinute;
+    dom.snapshotCsPerMin.textContent = typeof cs === "number" ? cs.toFixed(2) : "—";
+  }
 
   // 마스터리 정보 표시
   if (dom.snapshotMastery && dom.snapshotMasteryText) {

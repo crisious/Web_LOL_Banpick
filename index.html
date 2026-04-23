@@ -178,57 +178,40 @@
           <div class="tab-page tab-page--active" id="tab-overview" role="tabpanel">
           <section class="summary-grid" id="overview" aria-labelledby="overview-title">
             <h2 class="sr-only" id="overview-title">경기 개요</h2>
-          <article class="panel panel--headline">
-            <p class="eyebrow">Headline</p>
-            <h2 data-headline></h2>
-            <p class="summary-copy" data-overall-summary></p>
-            <p class="summary-detail" data-game-flow-summary></p>
-            <div class="winloss-pill" data-result-pill></div>
-          </article>
+            <article class="detail-header" data-detail-header>
+              <div class="detail-header__main">
+                <h2 class="detail-header__title">
+                  <span data-snapshot-champion></span>
+                  <span class="dot">·</span>
+                  <span data-snapshot-role></span>
+                </h2>
+                <p class="detail-header__headline" data-headline></p>
+                <p class="detail-header__summary" data-quick-summary></p>
+              </div>
+              <div class="detail-header__result">
+                <span class="winloss-pill" data-result-pill></span>
+                <span class="detail-header__duration" data-snapshot-duration></span>
+              </div>
+            </article>
 
-          <article class="panel panel--snapshot" aria-labelledby="snapshot-title">
-            <div class="section-heading section-heading--compact">
-              <div>
-                <p class="eyebrow">Quick View</p>
-                <h3 id="snapshot-title">상단 요약 바</h3>
-              </div>
-              <p class="section-copy">전적 사이트처럼 경기 핵심 정보를 먼저 압축해서 보여줍니다.</p>
-            </div>
-            <div class="snapshot-grid">
-              <div class="snapshot-item">
-                <span class="meta-label">Champion</span>
-                <div class="champion-inline champion-inline--snapshot">
-                  <span class="champion-avatar champion-avatar--large" data-snapshot-champion-icon aria-hidden="true"></span>
-                  <strong data-snapshot-champion></strong>
-                </div>
-              </div>
-              <div class="snapshot-item">
-                <span class="meta-label">Role</span>
-                <strong data-snapshot-role></strong>
-              </div>
-              <div class="snapshot-item">
-                <span class="meta-label">Result</span>
-                <strong data-snapshot-result></strong>
-              </div>
-              <div class="snapshot-item">
+            <div class="detail-metrics" data-detail-metrics>
+              <div class="metric">
                 <span class="meta-label">Queue</span>
                 <strong data-snapshot-queue></strong>
               </div>
-              <div class="snapshot-item">
-                <span class="meta-label">Duration</span>
-                <strong data-snapshot-duration></strong>
+              <div class="metric">
+                <span class="meta-label">CS/분</span>
+                <strong data-snapshot-cs-per-min></strong>
               </div>
-              <div class="snapshot-item">
+              <div class="metric">
                 <span class="meta-label">Patch</span>
                 <strong data-snapshot-patch></strong>
               </div>
-              <div class="snapshot-item snapshot-item--mastery" data-snapshot-mastery hidden>
+              <div class="metric metric--mastery" data-snapshot-mastery hidden>
                 <span class="meta-label">Mastery</span>
                 <strong data-snapshot-mastery-text></strong>
               </div>
             </div>
-            <p class="snapshot-footnote">분석 신뢰도 <strong data-snapshot-confidence></strong></p>
-          </article>
           </section>
 
           <section class="stat-ribbon" data-stat-ribbon aria-label="핵심 지표"></section>
