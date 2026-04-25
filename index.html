@@ -10,22 +10,22 @@
   <body data-view="LOGGED_OUT">
     <a class="skip-link" href="#main-content">본문 분석 영역으로 건너뛰기</a>
 
-    <section class="login-overlay" data-login-overlay>
+    <section class="login-overlay" data-login-overlay role="region" aria-labelledby="login-title">
       <div class="login-card">
-        <h1 class="login-title">LoL Replay Coach</h1>
+        <h1 class="login-title" id="login-title">LoL Replay Coach</h1>
         <p class="login-subtitle">Riot ID를 입력하면 최근 10게임 요약을 바로 확인합니다.</p>
         <form class="login-form" data-login-form>
-          <label>
-            <span>gameName</span>
-            <input name="gameName" type="text" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" placeholder="매운맛 비스킷" />
+          <label for="login-gameName">
+            <span>게임명 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></span>
+            <input id="login-gameName" name="gameName" type="text" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" placeholder="매운맛 비스킷" autocomplete="username" />
           </label>
-          <label>
-            <span>tagLine</span>
-            <input name="tagLine" type="text" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" placeholder="KR1" />
+          <label for="login-tagLine">
+            <span>태그라인 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></span>
+            <input id="login-tagLine" name="tagLine" type="text" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" placeholder="KR1" />
           </label>
-          <label>
+          <label for="login-platformRegion">
             <span>지역</span>
-            <select name="platformRegion">
+            <select id="login-platformRegion" name="platformRegion">
               <option value="KR" selected>한국 (KR)</option>
               <option value="JP1">일본 (JP)</option>
               <option value="NA1">북미 (NA)</option>
@@ -33,12 +33,13 @@
             </select>
           </label>
           <details class="api-key-details">
-            <summary>Riot API Key (선택)</summary>
-            <p class="api-key-hint">developer.riotgames.com에서 발급받은 키를 입력하면 서버 키 대신 사용합니다. 없으면 서버 기본 키를 사용합니다.</p>
-            <input name="riotApiKey" type="text" placeholder="RGAPI-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
+            <summary>Riot API 키 (선택 사항)</summary>
+            <p class="api-key-hint">developer.riotgames.com에서 발급받은 개인 키를 입력하면 서버 기본 키 대신 사용합니다.</p>
+            <label for="login-riotApiKey" class="sr-only">Riot API 키</label>
+            <input id="login-riotApiKey" name="riotApiKey" type="text" placeholder="RGAPI-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
           </details>
-          <label class="login-remember">
-            <input type="checkbox" name="remember" checked />
+          <label class="login-remember" for="login-remember">
+            <input id="login-remember" type="checkbox" name="remember" checked />
             <span>이 계정 기억하기</span>
           </label>
           <button type="submit" class="login-submit">최근 10게임 분석 시작</button>
@@ -61,29 +62,29 @@
             <span class="identity-card__avatar" data-snapshot-champion-icon aria-hidden="true"></span>
             <div class="identity-card__body">
               <strong id="identity-title" data-hero-player></strong>
-              <span class="meta-label">Collected <span data-hero-date></span></span>
+              <span class="meta-label">수집일 <span data-hero-date></span></span>
             </div>
           </article>
 
           <article class="panel panel--samples" aria-labelledby="sample-library-title">
-            <h3 id="sample-library-title">저장된 샘플</h3>
+            <h2 id="sample-library-title">저장된 샘플</h2>
             <div class="sample-switcher" data-sample-switcher></div>
           </article>
 
           <details class="panel panel--fetcher" data-fetcher-details>
             <summary>Riot ID로 최근 경기 재조회</summary>
             <form class="fetch-form" data-recent-form aria-label="Riot ID 재조회 폼">
-              <label>
-                <span>gameName</span>
-                <input name="gameName" type="text" value="매운맛 비스킷" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" />
+              <label for="fetch-gameName">
+                <span>게임명 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></span>
+                <input id="fetch-gameName" name="gameName" type="text" value="매운맛 비스킷" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9가-힣\s_.]+" autocomplete="username" />
               </label>
-              <label>
-                <span>tagLine</span>
-                <input name="tagLine" type="text" value="KR1" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" />
+              <label for="fetch-tagLine">
+                <span>태그라인 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></span>
+                <input id="fetch-tagLine" name="tagLine" type="text" value="KR1" required minlength="2" maxlength="5" pattern="[a-zA-Z0-9]+" />
               </label>
-              <label>
-                <span>platform</span>
-                <input name="platformRegion" type="text" value="KR" required />
+              <label for="fetch-platform">
+                <span>지역</span>
+                <input id="fetch-platform" name="platformRegion" type="text" value="KR" required />
               </label>
               <button type="submit">최근 경기 불러오기</button>
             </form>
@@ -107,23 +108,22 @@
             <p class="detail-progress__message" data-detail-progress-message></p>
           </section>
 
-          <div class="tab-bar" data-tab-bar role="tablist">
-            <button class="tab-btn tab-btn--active" data-tab="tab-overview" role="tab" aria-selected="true">개요</button>
-            <button class="tab-btn" data-tab="tab-analysis" role="tab">분석</button>
-            <button class="tab-btn" data-tab="tab-timeline" role="tab">타임라인</button>
-            <button class="tab-btn" data-tab="tab-trends" role="tab">추세</button>
+          <div class="tab-bar" data-tab-bar role="tablist" aria-label="경기 분석 보기 전환">
+            <button id="tab-overview-btn" class="tab-btn tab-btn--active" data-tab="tab-overview" role="tab" aria-selected="true" aria-controls="tab-overview" tabindex="0">개요</button>
+            <button id="tab-analysis-btn" class="tab-btn" data-tab="tab-analysis" role="tab" aria-selected="false" aria-controls="tab-analysis" tabindex="-1">분석</button>
+            <button id="tab-timeline-btn" class="tab-btn" data-tab="tab-timeline" role="tab" aria-selected="false" aria-controls="tab-timeline" tabindex="-1">타임라인</button>
+            <button id="tab-trends-btn" class="tab-btn" data-tab="tab-trends" role="tab" aria-selected="false" aria-controls="tab-trends" tabindex="-1">추세</button>
           </div>
 
           <!-- TAB: 개요 -->
-          <div class="tab-page tab-page--active" id="tab-overview" role="tabpanel">
+          <div class="tab-page tab-page--active" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-btn" tabindex="0">
           <section class="summary-grid" id="overview" aria-labelledby="overview-title">
             <h2 class="sr-only" id="overview-title">경기 개요</h2>
             <article class="detail-header" data-detail-header>
               <div class="detail-header__main">
                 <h2 class="detail-header__title">
-                  <span data-snapshot-champion></span>
-                  <span class="dot">·</span>
-                  <span data-snapshot-role></span>
+                  <span data-snapshot-champion>—</span>
+                  <span class="role-tag" data-snapshot-role>—</span>
                 </h2>
                 <p class="detail-header__headline" data-headline></p>
                 <p class="detail-header__summary" data-quick-summary></p>
@@ -166,7 +166,7 @@
           </div><!-- /tab-overview -->
 
           <!-- TAB: 분석 -->
-          <div class="tab-page" id="tab-analysis" role="tabpanel">
+          <div class="tab-page" id="tab-analysis" role="tabpanel" aria-labelledby="tab-analysis-btn" tabindex="0">
 
           <section class="panel panel--phases" id="phases" aria-labelledby="phases-title">
             <div class="section-heading">
@@ -220,7 +220,7 @@
           </div><!-- /tab-analysis -->
 
           <!-- TAB: 타임라인 -->
-          <div class="tab-page" id="tab-timeline" role="tabpanel">
+          <div class="tab-page" id="tab-timeline" role="tabpanel" aria-labelledby="tab-timeline-btn" tabindex="0">
 
           <section class="section-block" id="dual-timeline" aria-labelledby="dual-timeline-title">
             <div class="section-heading">
@@ -265,7 +265,7 @@
           </div><!-- /tab-timeline -->
 
           <!-- TAB: 추세 -->
-          <div class="tab-page" id="tab-trends" role="tabpanel">
+          <div class="tab-page" id="tab-trends" role="tabpanel" aria-labelledby="tab-trends-btn" tabindex="0">
 
           <section class="panel panel--trends" id="trends" aria-labelledby="trends-title">
             <div class="section-heading">
@@ -275,8 +275,8 @@
             <div class="trend-grid">
               <article class="trend-callout">
                 <span class="meta-label">Trend Summary</span>
-                <h4 data-trend-headline></h4>
-                <p data-trend-summary></p>
+                <h4 data-trend-headline aria-live="polite">샘플을 불러오는 중…</h4>
+                <p data-trend-summary aria-live="polite"></p>
               </article>
               <div class="trend-stats" data-trend-stats></div>
               <div class="trend-tags" data-trend-tags></div>

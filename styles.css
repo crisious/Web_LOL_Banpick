@@ -64,6 +64,9 @@
   --fs-3xl: 1.6rem;
   --fs-display: 1.8rem;
   --fs-hero: 3.2rem;
+  /* a11y tokens — Phase 1 통합 */
+  --touch-min: 44px;       /* WCAG 2.5.5 최소 터치 타겟 */
+  --focus-ring: #ffd166;   /* 본문 배경 대비 13:1 */
 }
 
 * {
@@ -123,6 +126,17 @@ body::after {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+/* ── Phase 1: 글로벌 :focus-visible (키보드 사용자 전용 포커스 링) ── */
+:where(button, a, input, select, textarea, summary, [role="tab"], [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.skip-link:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .sr-only {
@@ -411,16 +425,33 @@ body::after {
     var(--panel);
 }
 
+/* Phase 6: 인사이트 카드 — 컨텍스트 컬러를 명확히
+   - 그라디언트 각도를 135도로 바꿔 좌상단에서 색이 흘러내림
+   - 보더에도 mint/rose 사용해 카드 정체성을 한눈에 인지 */
 .panel--strengths {
   background:
-    linear-gradient(180deg, var(--tint-mint), transparent 38%),
+    linear-gradient(135deg, var(--tint-mint), transparent 60%),
     var(--panel);
+  border-color: var(--mint-border);
 }
 
 .panel--weaknesses {
   background:
-    linear-gradient(180deg, var(--tint-rose), transparent 38%),
+    linear-gradient(135deg, var(--tint-rose), transparent 60%),
     var(--panel);
+  border-color: var(--rose-border);
+}
+
+/* Phase 6: 인사이트 카드 헤딩에 작은 아이콘 자리 — main.js가 ✓/! 등 prefix 추가 시 */
+.panel--strengths .section-heading h3::before {
+  content: "✓ ";
+  color: var(--mint);
+  font-weight: 800;
+}
+.panel--weaknesses .section-heading h3::before {
+  content: "! ";
+  color: var(--rose);
+  font-weight: 800;
 }
 
 .eyebrow,
@@ -452,6 +483,8 @@ body::after {
 .winloss-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min); /* Phase 1: WCAG 터치 타겟 */
   margin-top: 12px;
   padding: 10px 14px;
   border-radius: var(--radius-pill);
@@ -518,50 +551,61 @@ body::after {
 }
 
 /* ── Tab bar & tab pages ──────────────────────────────────────────────── */
+/* Phase 6: pill-container 디자인 — 알약 컨테이너 안에 토글식 탭들이 들어감
+   - 개별 박스 → 그룹 컨테이너로 시각적 통일성 강화
+   - sticky 위치는 유지하되, 거추장스럽던 ::after 그라디언트 그림자 제거 */
 .tab-bar {
   display: flex;
-  gap: var(--space-2);
-  padding: 6px 0 18px;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  margin: 6px 0 18px;
   position: sticky;
-  top: 0;
+  top: var(--space-2);
   z-index: 20;
-  background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  /* 모바일에서 탭이 많을 경우 가로 스크롤 (스크롤바는 숨김) */
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.tab-bar::-webkit-scrollbar { display: none; }
 
-.tab-bar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -12px;
-  height: 12px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.28), transparent);
-  pointer-events: none;
-}
+/* Phase 6: 그라디언트 그림자 ::after 제거됨 — 컨테이너로 자체 시각 분리됨 */
 
 .tab-btn {
-  padding: 10px 22px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line);
-  background: var(--surface-1);
+  /* Phase 6: 개별 보더/배경 제거, pill-toggle 스타일로 변경 */
+  flex: 1;
+  min-width: max-content;
+  min-height: var(--touch-min); /* Phase 1: WCAG 터치 타겟 유지 */
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: transparent;
   color: var(--muted);
   font: inherit;
   font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+  white-space: nowrap;
+  transition: background 160ms ease, color 160ms ease;
 }
 
 .tab-btn:hover {
-  border-color: var(--info-border);
-  background: var(--info-soft);
+  background: var(--surface-1);
   color: var(--text);
 }
 
 .tab-btn--active {
-  border-color: var(--accent);
-  background: var(--amber-soft);
-  color: var(--accent);
+  /* Phase 6: 활성 탭은 accent 단일 톤으로 — 컨텍스트 명확 */
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.tab-btn--active:hover {
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .tab-page {
@@ -574,12 +618,13 @@ body::after {
 }
 
 /* ── Detail analysis progress ─────────────────────────────────────────── */
+/* Phase 7: 미니멀 압축 — 패딩/간격 줄이고 라디우스를 lg로 키워 컴팩트 카드감 */
 .detail-progress {
   display: grid;
-  gap: var(--space-5);
-  padding: 18px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   background:
     linear-gradient(180deg, var(--mint-bg-soft), transparent 42%),
     var(--panel-strong);
@@ -598,22 +643,29 @@ body::after {
 }
 
 .detail-progress__head h2 {
-  margin: 6px 0 0;
-  font-size: clamp(1.25rem, 2vw, 1.7rem);
-  line-height: 1.15;
+  /* Phase 7: 헤딩 사이즈 톤다운 — 로딩 영역이 본문보다 두드러지지 않도록 */
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
 }
 
 .detail-progress__percent {
+  /* Phase 7: 헤딩 톤다운에 맞춰 퍼센트 사이즈 정리 */
   min-width: 56px;
   text-align: right;
   color: var(--accent);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .detail-progress__bar {
-  height: 8px;
+  /* Phase 7: 진행률 바 가늘게 (8px → 6px) — 압축 디자인과 비례 */
+  height: 6px;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   background: var(--surface-4);
 }
 
@@ -635,37 +687,51 @@ body::after {
   50% { opacity: 1; }
 }
 
+/* Phase 7: 6열 카드 그리드 → 한 줄 칩 스트립
+   - 데스크톱: 가로 한 줄로 6단계가 자연스럽게 읽힘
+   - 모바일(< 720px): flex-wrap으로 2~3줄로 자연스럽게 떨어짐
+   - 카드 높이 74px → 칩 32px로 압축, 시야 점유율 절반 이상 감소 */
 .detail-progress__steps {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
 .detail-progress__step {
-  display: grid;
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
-  min-height: 74px;
-  padding: 10px;
+  min-height: 32px;
+  padding: 4px var(--space-3);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   background: var(--surface-1);
   color: var(--muted);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
 }
 
 .detail-progress__step strong {
-  font-size: var(--fs-base);
-  line-height: 1.35;
+  /* 폰트 사이즈는 칩 컨텍스트에서 base보다 작게 */
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1;
 }
 
+/* Phase 7: 칩 자체의 보더와 gap만으로 시각 분리 충분 — 추가 separator 없음 */
+
 .detail-progress__dot {
-  width: 12px;
-  height: 12px;
+  /* Phase 7: 칩에 어울리는 사이즈로 축소 */
+  width: 8px;
+  height: 8px;
   border-radius: var(--radius-pill);
   border: 1px solid currentColor;
   background: transparent;
+  flex-shrink: 0;
 }
 
 .detail-progress__step[data-step-state="done"] {
@@ -1471,6 +1537,55 @@ body::after {
   color: var(--muted);
 }
 
+/* Phase 16: 헤더 칩 그룹 — 카테고리 뱃지 + 임팩트 칩 두 개를 세로로 정렬 */
+.insight-card__chips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+.insight-card__chips span {
+  /* 그룹 안에선 약간 더 컴팩트하게 */
+  padding: 6px 10px;
+  font-size: var(--fs-xs);
+}
+
+/* Phase 16: 임팩트 레벨 칩 — relatedEventIds 개수로 추정한 영향 범위 표시
+   - high (5+): 강조 색 + 진한 배경
+   - medium (3-4): 중립 보더 + 약한 배경
+   - low (1-2): 회색 톤
+   strengths는 mint 톤, weaknesses는 rose 톤 (data-kind 속성으로 분기) */
+.insight-impact {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.insight-impact--low {
+  background: var(--surface-2);
+  color: var(--muted);
+  border-color: var(--line);
+}
+[data-kind="strength"] .insight-impact--medium {
+  background: var(--mint-bg-soft);
+  color: var(--mint);
+  border-color: var(--mint-border);
+}
+[data-kind="strength"] .insight-impact--high {
+  background: var(--mint-bg-medium);
+  color: var(--text);
+  border-color: var(--mint-border);
+}
+[data-kind="weakness"] .insight-impact--medium {
+  background: var(--rose-bg-soft);
+  color: var(--rose);
+  border-color: var(--rose-border);
+}
+[data-kind="weakness"] .insight-impact--high {
+  background: var(--rose-bg-medium);
+  color: var(--text);
+  border-color: var(--rose-border);
+}
+
 .insight-evidence {
   margin-top: 10px;
   color: var(--text);
@@ -1563,29 +1678,114 @@ body::after {
 
 .score-panel {
   display: grid;
-  grid-template-columns: 140px 1fr;
+  /* Phase 5: 링이 들어갈 자리 확보 (140px → 160px) */
+  grid-template-columns: 160px 1fr;
   gap: var(--space-6);
   align-items: center;
 }
 
+@media (max-width: 720px) {
+  .score-panel {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  /* Phase 9: 디테일 헤더 — flex 컨텍스트에서 result가 자연스럽게 다음 줄로 가도록
+     이미 flex-wrap: wrap 적용됨. 추가로 result 정렬을 좌측으로 통일 */
+  .detail-header {
+    padding: var(--space-4) var(--space-5);
+  }
+  .detail-header__result {
+    align-items: flex-start;
+    width: 100%;
+    flex-direction: row;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  /* winloss-pill는 760px 쿼리에서 width:100% 처리되지만 720px 미만에서는 inline 유지 */
+  .detail-header__result .winloss-pill {
+    width: auto;
+    min-width: 96px;
+  }
+
+  /* Phase 9: 메트릭 카드 — 360px 폭에서도 2열 유지되도록 minmax 축소 */
+  .detail-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-2);
+  }
+  .detail-metrics .metric {
+    padding: var(--space-3) var(--space-4);
+  }
+  .detail-metrics .metric strong {
+    /* 모바일에서는 fs-2xl이 너무 크므로 fs-xl로 톤다운 */
+    font-size: var(--fs-xl);
+  }
+
+  /* Phase 9: 점수 링이 모바일에서 너무 크지 않도록 축소 */
+  .score-overall {
+    width: 132px;
+    height: 132px;
+  }
+  .score-overall::before {
+    inset: 8px;
+  }
+}
+
+/* Phase 5: 점수를 conic-gradient 링으로 표현
+   - 사용법: main.js에서 <div class="score-overall" style="--score: 78"> 식으로 점수(0-100) 주입
+   - --score 미설정 시 0으로 fallback (링은 비어 보이지만 깨지지 않음) */
 .score-overall {
+  --score: 0;
+  --score-color: var(--accent);
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background:
+    conic-gradient(var(--score-color) calc(var(--score) * 1%), var(--surface-2) 0);
+  display: grid;
+  place-items: center;
   text-align: center;
 }
 
+.score-overall::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--panel-strong);
+  pointer-events: none;
+}
+
 .score-overall-number {
-  font-size: var(--fs-hero);
+  position: relative;
+  font-size: var(--fs-display);
   font-weight: 800;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .score-overall-label {
-  font-size: var(--fs-md);
-  font-weight: 600;
+  position: relative;
+  font-size: var(--fs-sm);
+  font-weight: 700;
   margin-top: 4px;
+  letter-spacing: 0.02em;
+  /* Phase 5: 링 안에선 좁아서 텍스트 줄바꿈 방지 + 중복 뱃지 축소 */
+  white-space: nowrap;
+}
+
+/* Phase 5: 링 안의 뱃지는 작게 — 외곽에선 평소대로 */
+.score-overall .score-badge {
+  font-size: var(--fs-xs);
+  padding: 2px 6px;
+  margin-left: 4px;
 }
 
 .score-overall-sub {
-  font-size: var(--fs-sm);
+  position: relative;
+  font-size: var(--fs-xs);
   color: var(--muted);
   margin-top: 2px;
 }
@@ -2910,11 +3110,17 @@ body::after {
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(90deg, var(--tint-amber), var(--panel) 42%), var(--panel);
+  /* Phase 5: amber + mint 듀얼 그라디언트로 영웅감 강화 */
+  background:
+    linear-gradient(135deg, var(--tint-amber), transparent 40%),
+    linear-gradient(330deg, var(--tint-mint), transparent 50%),
+    var(--panel-strong);
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   margin-bottom: var(--space-4);
+  /* Phase 5: 모바일에서 헤더가 좁아지면 자연스럽게 줄바꿈 */
+  flex-wrap: wrap;
 }
 
 .detail-header__main {
@@ -2937,6 +3143,20 @@ body::after {
 .detail-header__title .dot {
   color: var(--muted);
   font-weight: 400;
+}
+
+/* Phase 5: 역할/포지션 등을 칩으로 강조하고 싶을 때 사용 (예: <span class="role-tag">미드</span>) */
+.detail-header__title .role-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  padding: 4px 12px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-radius: var(--radius-pill);
+  vertical-align: middle;
 }
 
 .detail-header__headline {
@@ -2972,25 +3192,61 @@ body::after {
 
 .detail-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  /* Phase 5: 미니맥스 160px로 늘려 한 카드당 호흡 확보 */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-5);
 }
 
 .detail-metrics .metric {
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-2);
+  /* Phase 5: 패딩·라디우스 키워 카드감 강조 */
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-1);
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
+  border-radius: var(--radius-lg);
+  display: grid;
   gap: var(--space-1);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.detail-metrics .metric:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
 .detail-metrics .metric strong {
-  font-size: var(--fs-lg);
+  /* Phase 5: 큰 숫자 강조 — XL 사이즈 + 고정폭 숫자 */
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
+
+/* Phase 5: 주요(primary) 메트릭 강조 — 첫 카드를 amber tint로 */
+.detail-metrics .metric--primary,
+.detail-metrics .metric:first-child {
+  background: linear-gradient(135deg, var(--tint-amber), var(--surface-1));
+  border-color: var(--amber-border);
+}
+
+.detail-metrics .metric--primary strong,
+.detail-metrics .metric:first-child strong {
+  color: var(--accent);
+}
+
+/* Phase 5/14: delta 인디케이터 (어떤 카드에서든 사용 가능 — metric, stat-card 등)
+   - Phase 5에선 .detail-metrics 한정이었으나 Phase 14에서 stat-card까지 확장하면서 일반화 */
+.metric__delta {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  margin-top: 2px;
+}
+.metric__delta--up { color: var(--mint); }
+.metric__delta--down { color: var(--rose); }
 
 .match-row {
   display: flex;
@@ -3570,21 +3826,26 @@ body::after {
   }
 
   /* ── Dual-track timeline responsive ───────────────────────────────────── */
+  /* Phase 9: pill-container는 유지하되, 모바일에선 가로 스크롤로 대응 (overflow-x: auto는 기본 규칙에 이미 있음).
+     flex-wrap을 풀고 padding은 기본값 var(--space-1) 유지. */
   .tab-bar {
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding: 4px 0 12px;
+    /* flex-wrap 제거 — 가로 스크롤 사용 (Phase 6 기본 규칙 그대로) */
+    gap: var(--space-1);
+    padding: var(--space-1);
   }
 
   .tab-btn {
-    padding: 8px 14px;
-    font-size: var(--fs-base);
+    /* Phase 9: WCAG 44px 터치 타겟 유지 (min-height는 Phase 1 규칙 그대로),
+       모바일에선 좁아도 글자 잘리지 않도록 fs-sm */
+    padding: 0 var(--space-3);
+    font-size: var(--fs-sm);
     flex: 1 1 auto;
     text-align: center;
   }
 
   .detail-progress {
-    padding: 14px;
+    /* Phase 9: Phase 7의 컴팩트 패딩 유지 */
+    padding: var(--space-3) var(--space-4);
   }
 
   .detail-progress__head {
@@ -3900,12 +4161,15 @@ body::after {
     padding: var(--space-4);
   }
 
+  /* Phase 9: pill-container 유지, 압축 패딩만 적용 */
   .tab-bar {
-    padding: var(--space-1) 0 var(--space-2);
+    padding: var(--space-1);
+    gap: 2px;
   }
 
   .tab-btn {
-    padding: 8px var(--space-3);
+    /* min-height: var(--touch-min) 은 base 규칙에서 유지됨 */
+    padding: 0 var(--space-2);
     font-size: var(--fs-sm);
   }
 
@@ -3923,11 +4187,9 @@ body::after {
   }
 }
 
-/* ── Global focus ring ───────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+/* ── Global focus ring ─────────────────────────────────────────────────
+   Phase 9: Phase 1에서 추가한 :where(...):focus-visible 규칙(--focus-ring 3px)을
+   덮어쓰지 않도록 이 레거시 규칙을 제거. 통합 토큰 --focus-ring을 단일 진실원으로 사용. */
 
 /* ── Reduced-motion preference ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

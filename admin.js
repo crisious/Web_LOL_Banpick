@@ -54,6 +54,11 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+// Phase 4: name → 안정적인 id 변환 (접근성 보조 기술이 명시적 for/id 매칭을 선호)
+function fieldId(name) {
+  return "fld-" + String(name).replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
 function selectField(config) {
   const options = config.options
     .map((option) => {
@@ -62,36 +67,39 @@ function selectField(config) {
     })
     .join("");
 
+  const id = fieldId(config.name);
   return `
-    <label class="field ${config.full ? "field--full" : ""}">
-      <span>${escapeHtml(config.label)}</span>
-      <select name="${escapeHtml(config.name)}">${options}</select>
-    </label>
+    <div class="field ${config.full ? "field--full" : ""}">
+      <label for="${id}"><span>${escapeHtml(config.label)}</span></label>
+      <select id="${id}" name="${escapeHtml(config.name)}">${options}</select>
+    </div>
   `;
 }
 
 function inputField(config) {
+  const id = fieldId(config.name);
   if (config.kind === "textarea") {
     return `
-      <label class="field ${config.full ? "field--full" : ""}">
-        <span>${escapeHtml(config.label)}</span>
-        <textarea name="${escapeHtml(config.name)}" rows="${config.rows || 4}">${escapeHtml(config.value)}</textarea>
-      </label>
+      <div class="field ${config.full ? "field--full" : ""}">
+        <label for="${id}"><span>${escapeHtml(config.label)}</span></label>
+        <textarea id="${id}" name="${escapeHtml(config.name)}" rows="${config.rows || 4}">${escapeHtml(config.value)}</textarea>
+      </div>
     `;
   }
 
   const dataUnit = config.unit ? `data-unit="${config.unit}"` : "";
   return `
-    <label class="field ${config.full ? "field--full" : ""}">
-      <span>${escapeHtml(config.label)}</span>
+    <div class="field ${config.full ? "field--full" : ""}">
+      <label for="${id}"><span>${escapeHtml(config.label)}</span></label>
       <input
+        id="${id}"
         name="${escapeHtml(config.name)}"
         type="${config.type || "text"}"
         value="${escapeHtml(config.value)}"
         ${config.attrs || ""}
         ${dataUnit}
       />
-    </label>
+    </div>
   `;
 }
 
@@ -146,7 +154,12 @@ function renderLivePanel() {
         <p class="eyebrow">Live Controls</p>
         <h2>송출 제어</h2>
       </div>
-      <span class="live-badge ${store.live.running ? "live-badge--on" : "live-badge--off"}">
+      <span
+        class="live-badge ${store.live.running ? "live-badge--on" : "live-badge--off"}"
+        role="status"
+        aria-live="polite"
+        aria-label="${store.live.running ? "방송 라이브 중" : "방송 일시정지 상태"}"
+      >
         ${store.live.running ? "LIVE" : "PAUSED"}
       </span>
     </div>

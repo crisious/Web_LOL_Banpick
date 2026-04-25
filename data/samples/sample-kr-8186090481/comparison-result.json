@@ -1,0 +1,679 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-25T19:06:35.640Z",
+  "sampleId": "sample-kr-8186090481",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "matchId": "KR_8186090481",
+      "analysisTimestamp": "2026-04-26T00:00:00Z",
+      "playerRiotId": "매운맛 비스킷#KR1",
+      "champion": "Seraphine",
+      "position": "SUPPORT",
+      "result": "WIN",
+      "durationLabel": "32:05",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8186090481_1777143995640",
+      "generatedAt": "2026-04-25T19:06:35.640Z"
+    },
+    "matchSummary": {
+      "headline": "초반 교전에서 흔들렸지만 중후반 오브젝트 합류와 구조물 압박으로 역전 승리를 이끌어낸 세라핀 서포터 경기."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 라인전에서 데스가 많아 불안정했지만, 드래곤·바론 등 핵심 오브젝트 타이밍에 꾸준히 합류하며 팀 운영에 기여했습니다. 비전 점수 89는 서포터로서 훌륭한 수치이며, 후반 구조물 압박 전환도 잘 이루어졌습니다. 다만 킬 관여율 18%는 세라핀의 유틸리티 능력 대비 낮은 편이고, 중반 포지셔닝 실수로 인한 불필요한 데스가 운영 안정감을 떨어뜨렸습니다. 교전 후 생존 의식과 팀파이트 합류 타이밍을 개선하면 더 안정적인 경기 운영이 가능합니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "7분대 직접 킬을 만들며 공격적인 시도를 했으나, 직후 역킬을 허용하고 총 3데스를 기록하며 라인 안정성이 부족했습니다. 팀 드래곤 확보에는 성공했지만 11분대 오브젝트를 내주며 흐름이 흔들렸습니다.",
+        "kda": "1/3/3"
+      },
+      {
+        "phase": "MID",
+        "summary": "드래곤 3회 합류와 바론 확보에 기여하며 오브젝트 운영의 핵심 축이 되었습니다. 그러나 21분, 26분 두 차례 데스가 발생해 운영 흐름이 끊기는 구간이 있었습니다. 구조물 전환도 이 시기에 시작되었습니다.",
+        "kda": "1/2/0"
+      },
+      {
+        "phase": "LATE",
+        "summary": "데스 없이 안정적으로 플레이하며 구조물 압박에 참여해 경기를 마무리했습니다. 바론 버프를 활용한 빠른 클로징이 인상적이었습니다.",
+        "kda": "0/0/1"
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_01",
+        "title": "꾸준한 오브젝트 합류",
+        "description": "드래곤 3회, 바론 1회 등 핵심 오브젝트 타이밍에 빠짐없이 합류하며 팀의 오브젝트 확보를 뒷받침했습니다. 서포터로서 맵 이동과 타이밍 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_021",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "id": "str_02",
+        "title": "탁월한 시야 장악력",
+        "description": "비전 점수 89는 32분 경기 기준 분당 약 2.8로, 서포터 역할에 충실한 시야 관리를 보여줍니다. 오브젝트 싸움 전 시야 확보가 팀 의사결정에 기여했을 것으로 판단됩니다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_021",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "id": "str_03",
+        "title": "후반 안정적 클로징",
+        "description": "바론 확보 이후 데스 없이 구조물 압박에 참여하며 깔끔하게 경기를 마무리했습니다. 후반 포지셔닝과 리스크 관리가 초·중반 대비 크게 개선되었습니다.",
+        "relatedEventIds": [
+          "evt_028",
+          "evt_033",
+          "evt_026"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_01",
+        "title": "초반 라인전 생존력 부족",
+        "description": "초반에 3데스를 기록하며 라인 안정성이 떨어졌습니다. 7분 킬 직후 10초 만에 역킬을 당한 것은 킬 후 후퇴 타이밍 판단이 아쉬운 장면입니다. 세라핀은 체력이 낮은 챔피언이므로 교전 후 즉시 안전 거리 확보가 중요합니다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_004"
+        ]
+      },
+      {
+        "id": "weak_02",
+        "title": "낮은 킬 관여율",
+        "description": "킬 관여율 18%(34킬 중 6관여)는 세라핀의 광역 유틸리티를 고려하면 낮은 수치입니다. 팀파이트에서 스킬 적중률을 높이거나, 로밍 타이밍을 잡아 다른 라인 교전에 합류하는 빈도를 늘려볼 필요가 있습니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_023"
+        ]
+      },
+      {
+        "id": "weak_03",
+        "title": "중반 포지셔닝 실수로 인한 불필요한 데스",
+        "description": "21분과 26분에 핵심 구도에서 데스를 허용하며 팀 운영 흐름이 끊겼습니다. 특히 오브젝트 싸움 전후 포지셔닝에서 상대의 진입 루트를 예측하지 못한 것으로 보입니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_023"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_01",
+        "text": "교전 후 킬/어시스트를 챙긴 직후 반드시 후퇴 경로를 확인하고 2초 내 안전 거리 확보하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_02",
+        "text": "팀파이트 시 세라핀 궁극기(앙코르)를 최대 인원에게 적중시키기 위해 후방 포지션 유지하기",
+        "priority": "HIGH"
+      },
+      {
+        "id": "chk_03",
+        "text": "드래곤/바론 스폰 60초 전 해당 구역 시야 선점하고, 팀원에게 핑으로 합류 유도하기",
+        "priority": "MEDIUM"
+      },
+      {
+        "id": "chk_04",
+        "text": "중반 이후 사이드 라인 푸시가 부족할 때 W(높은 음)으로 미니언 정리 보조하며 맵 압박 기여하기",
+        "priority": "LOW"
+      },
+      {
+        "id": "chk_05",
+        "text": "라인전 트레이드 후 체력이 40% 이하면 무리한 재진입 대신 베이스 후 빠른 복귀로 경험치 손해 줄이기",
+        "priority": "MEDIUM"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "7:14",
+        "phase": "EARLY",
+        "title": "초반 킬 창출",
+        "description": "직접 킬을 만들며 라인 주도권을 잡는 공격적인 플레이. 세라핀의 CC를 활용한 좋은 타이밍이었습니다."
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "7:24",
+        "phase": "EARLY",
+        "title": "킬 직후 역킬 허용",
+        "description": "킬 후 불과 10초 만에 데스를 당한 장면. 체력 관리와 후퇴 타이밍의 중요성을 보여주는 핵심 개선 포인트입니다."
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "29:41",
+        "phase": "MID",
+        "title": "바론 확보 참여",
+        "description": "바론 확보에 합류하며 경기 흐름을 결정지은 장면. 오브젝트 타이밍 합류가 승리의 핵심 요인이었습니다."
+      },
+      {
+        "eventId": "evt_028",
+        "timestampLabel": "31:15",
+        "phase": "LATE",
+        "title": "구조물 압박으로 클로징",
+        "description": "바론 버프를 활용해 구조물을 밀어내며 경기를 마무리한 장면. 후반 안정적인 운영의 결실입니다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "21:22",
+        "phase": "MID",
+        "title": "중반 핵심 구간 데스",
+        "description": "중반 운영 구간에서 불필요한 데스를 허용하며 팀 템포가 흔들린 장면. 포지셔닝 개선이 필요한 대표적 사례입니다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_003",
+        "usedIn": [
+          "str_01",
+          "weak_01",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_004",
+        "usedIn": [
+          "weak_01",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_005",
+        "usedIn": [
+          "phaseSummaries.early"
+        ]
+      },
+      {
+        "eventId": "evt_008",
+        "usedIn": [
+          "phaseSummaries.early"
+        ]
+      },
+      {
+        "eventId": "evt_012",
+        "usedIn": [
+          "str_01",
+          "str_02",
+          "phaseSummaries.mid"
+        ]
+      },
+      {
+        "eventId": "evt_019",
+        "usedIn": [
+          "weak_02",
+          "weak_03",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_021",
+        "usedIn": [
+          "str_01",
+          "str_02"
+        ]
+      },
+      {
+        "eventId": "evt_023",
+        "usedIn": [
+          "weak_02",
+          "weak_03"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "usedIn": [
+          "str_01",
+          "str_02"
+        ]
+      },
+      {
+        "eventId": "evt_026",
+        "usedIn": [
+          "str_01",
+          "str_03",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_028",
+        "usedIn": [
+          "str_03",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_033",
+        "usedIn": [
+          "str_03"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": {
+    "analysisMeta": {
+      "schemaVersion": "1.0",
+      "sourceType": "codex_redteam",
+      "language": "ko",
+      "analysisMode": "coaching",
+      "perspective": "redteam",
+      "matchId": "KR_8186090481",
+      "riotId": "매운맛 비스킷#KR1",
+      "participantId": 5,
+      "champion": "Seraphine",
+      "position": "SUPPORT",
+      "result": "WIN"
+    },
+    "matchSummary": {
+      "oneLine": "이긴 경기는 맞지만, 세라핀 서폿으로 오브젝트 타이밍에만 부분적으로 기여했고 핵심 데스로 흐름을 반복해서 흔든, 내용상 효율이 낮은 승리였다."
+    },
+    "coachSummary": {
+      "overallFlow": "초반에는 7:14 이득 직후 7:24 데스로 손해를 되돌리는 왕복 패턴이 나왔고, 중반에는 21:22와 26:42의 데스로 운영 안정감이 깨졌다. 그럼에도 팀은 23:12, 28:53 드래곤과 29:41 바론으로 템포를 유지했고, 후반은 11대0 타워 격차를 이용해 구조물로 마무리했다.",
+      "structuralIssues": "가장 큰 문제는 합류는 하지만 오래 살아남지 못해 누적 가치를 잃는 구조다. 34킬 승리 경기에서 2/5/4, 킬 관여 18%, 챔피언 피해량 6458은 서폿으로서 교전 연결과 후속 보호 영향력이 제한적이었음을 보여준다.",
+      "winDependency": "이번 승리는 본인 플레이가 판을 밀어붙였다기보다 팀 전체 오브젝트 운영과 상대의 낮은 처벌력에 더 기대었다. 상대가 타워 0개, 바론 0개에 그쳐 중반 데스들이 치명적으로 확대되지 않았다."
+    },
+    "phaseSummaries": {
+      "EARLY": {
+        "summary": "7:14 킬로 좋은 출발을 만들었지만 7:24 바로 끊기며 이득을 상쇄했다. 8:22 오브젝트 확보가 있었어도 11:47 중요한 주도권을 상대에게 내주며 초반 안정성이 약한 경기가 됐다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_004",
+          "evt_005",
+          "evt_008"
+        ]
+      },
+      "MID": {
+        "summary": "오브젝트 타이밍 합류는 이어졌지만 21:22와 26:42 핵심 데스로 운영의 연결이 계속 끊겼다. 드래곤과 바론은 챙겼지만, 이 구간은 본인 주도 교정보다 팀 운영이 개인 실수를 덮은 성격이 강했다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_019",
+          "evt_021",
+          "evt_023",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      "LATE": {
+        "summary": "후반은 캐리 구간이라기보다 이미 벌어진 구조물 격차를 안전하게 닫는 구간이었다. 본인도 종료 동선에는 합류했지만, 승리의 핵심은 개인 영향력보다 팀 전체의 구조물 스노우볼이었다.",
+        "relatedEventIds": [
+          "evt_028",
+          "evt_030",
+          "evt_031",
+          "evt_033"
+        ]
+      }
+    },
+    "strengths": [
+      {
+        "title": "오브젝트 타이밍 합류 자체는 꾸준했다",
+        "detail": "17:14, 23:12, 28:53 드래곤과 29:41 바론 구간에서 아예 비어 있지는 않았다. 판의 중심이 오브젝트로 옮겨갈 때 최소한의 인원 수와 유틸 기여는 이어졌다.",
+        "redteamNote": "다만 이것은 기본 합류에 가깝다. 34킬 경기에서 킬 관여 18%라 오브젝트 교전의 주도권을 본인이 크게 증폭했다고 보기는 어렵다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_021",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "title": "시야 투자량은 충분해 팀 운영의 바닥은 받쳤다",
+        "detail": "비전 스코어 89는 32분 경기 기준 낮지 않다. 드래곤-바론 연속 구간에서 팀이 반복적으로 먼저 템포를 잡을 최소 기반은 제공했다.",
+        "redteamNote": "문제는 시야량 대비 전투 영향력 전환이 약했다는 점이다. 시야를 깔아도 본체가 먼저 흔들리면 정보 가치가 급격히 떨어진다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_021",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "title": "후반 종료 동선에서 이탈하지 않고 구조물 전환을 따라갔다",
+        "detail": "29:41 바론 이후 31:15와 32:00 구조물 압박에 관여하며 끝내기 구간의 기본 실수는 줄였다.",
+        "redteamNote": "후반 0데스는 좋지만, 0/0/1의 낮은 관여는 캐리라기보다 이미 기운 판에서 리스크를 적게 진 결과에 더 가깝다.",
+        "relatedEventIds": [
+          "evt_026",
+          "evt_028",
+          "evt_033"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "title": "초반 이득 직후 손해를 반납하는 왕복 패턴",
+        "detail": "7:14 킬로 흐름을 당긴 뒤 10초 후 7:24 먼저 끊겼다. 초반 1/3/3은 한 번의 성공을 라인 안정성으로 연결하지 못했다는 뜻이고, 11:47 추가 흔들림까지 겹치며 초반 설계가 불안정했다.",
+        "redteamNote": "하위 구간에서는 묻혀도 상위 티어에서는 이런 10초 왕복이 바텀 주도권, 첫 용 시야, 리콜 타이밍까지 한 번에 무너뜨린다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_004",
+          "evt_008"
+        ]
+      },
+      {
+        "title": "중반 핵심 구도에서 반복된 데스로 운영 안정감을 깼다",
+        "detail": "21:22와 26:42 데스는 둘 다 다음 오브젝트 설계가 중요한 구간에서 나왔다. 서폿이 여기서 먼저 흔들리면 시야선, 진입 각, 후속 보호가 동시에 약해진다.",
+        "redteamNote": "세라핀 같은 후열 유틸 서폿은 살아서 두 번째 스킬 사이클을 돌릴 때 가치가 커진다. 이 구간의 반복 데스는 조합 가치 자체를 깎는다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_021",
+          "evt_023",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "title": "팀이 크게 이긴 경기치고 개인 영향력이 지나치게 낮다",
+        "detail": "34킬 승리에서 2/5/4, 킬 관여 18%, 챔피언 피해량 6458은 서폿 기준으로도 존재감이 약한 편이다. 후반 역시 0/0/1에 그쳐 팀이 구조물을 부수는 동안 본인 기여는 제한적이었다.",
+        "redteamNote": "이번에는 팀이 타워 11대0으로 압도하고 상대가 반격 구조를 못 만들었다. 접전 경기였다면 같은 영향력 수치는 승리를 보장하지 못한다.",
+        "relatedEventIds": [
+          "evt_024",
+          "evt_028",
+          "evt_030",
+          "evt_031",
+          "evt_033"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "item": "킬 또는 소규모 교전 승리 직후 10초 안에 추가 진입 판단을 다시 하라",
+        "why": "7:14 직후 7:24 데스처럼 한 번의 성공을 템포 이득으로 굳히지 못하고 상쇄하는 패턴을 끊어야 한다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_004"
+        ]
+      },
+      {
+        "item": "드래곤 45~60초 전 시야 설치 후에는 본체가 마지막 부쉬 체크를 하지 말고 정글 또는 앞라인 뒤에서 스킬 각만 보라",
+        "why": "21:22와 26:42 같은 중반 데스는 오브젝트 설계 구간 전체를 불안정하게 만든다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_023",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "item": "오브젝트를 먹었거나 먹기 직전 구도에서는 추격보다 생존과 리셋을 우선하라",
+        "why": "세라핀은 다음 교전까지 살아남아 보호와 후속 CC를 한 번 더 제공할 때 가치가 커진다.",
+        "relatedEventIds": [
+          "evt_021",
+          "evt_023",
+          "evt_025",
+          "evt_026"
+        ]
+      },
+      {
+        "item": "이기는 판에서도 킬 관여 25% 미만이면 영향력 부족으로 간주하고, 한타마다 보호할 캐리 1명을 미리 정해 스킬 우선순위를 고정하라",
+        "why": "이번 경기는 승리했지만 34킬 중 6관여로 서폿 역할 대비 존재감이 낮았다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_024",
+          "evt_028",
+          "evt_033"
+        ]
+      },
+      {
+        "item": "6~12분 구간은 라인 안정성 우선으로 강가와 시야 진입 빈도를 줄이고, 정글 위치 확인 전에는 선진입하지 말라",
+        "why": "초반 1/3/3과 11:47 흔들림은 라인 단계 안정성 부족을 보여준다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_008"
+        ]
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_003",
+        "timestampLabel": "7:14",
+        "phase": "EARLY",
+        "title": "좋은 시작은 만들었지만 단독으로는 의미가 약해진 첫 킬",
+        "analysis": "초반 교전에서 직접 킬을 만든 장면 자체는 좋다. 하지만 바로 이어진 손해 때문에 이 장면은 초반 주도권 확보의 근거라기보다, 관리되지 않은 이득의 시작점으로 보는 편이 더 정확하다."
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "7:24",
+        "phase": "EARLY",
+        "title": "10초 만에 템포를 반납한 핵심 실수",
+        "analysis": "레드팀 관점에서 가장 중요한 초반 장면이다. 이득 직후 데스를 내준 것은 단순 1데스가 아니라, 좋은 판단을 좋은 구조로 연결하지 못한 패턴의 노출이다."
+      },
+      {
+        "eventId": "evt_019",
+        "timestampLabel": "21:22",
+        "phase": "MID",
+        "title": "중반 설계 구간에서 나온 첫 큰 흔들림",
+        "analysis": "이 시점의 데스는 개인 손해보다 크다. 서폿이 먼저 끊기면 다음 시야 장악, 진입 각, 후속 보호가 동시에 약해져 팀 운영이 불안정해진다."
+      },
+      {
+        "eventId": "evt_021",
+        "timestampLabel": "23:12",
+        "phase": "MID",
+        "title": "팀이 드래곤 템포를 유지하며 개인 실수를 덮은 장면",
+        "analysis": "드래곤 합류는 했지만, 이 장면은 본인 캐리의 증거보다 팀이 좋은 오브젝트 운영으로 경기 흐름을 유지한 증거에 가깝다."
+      },
+      {
+        "eventId": "evt_023",
+        "timestampLabel": "26:42",
+        "phase": "MID",
+        "title": "한 번이 아니라 반복된 중반 포지션 리스크",
+        "analysis": "21:22와 비슷한 유형의 손해가 다시 나왔다. 같은 구간에서 같은 문제가 반복됐다는 점에서 실수보다 구조적 약점으로 봐야 한다."
+      },
+      {
+        "eventId": "evt_026",
+        "timestampLabel": "29:41",
+        "phase": "MID",
+        "title": "바론 확보로 경기 방향은 굳어졌지만 과정은 깔끔하지 않았다",
+        "analysis": "이 장면이 승부를 크게 기울인 것은 맞다. 다만 직전까지의 불안 요소를 팀 전체 운영력으로 봉합한 결과이기도 해서, 바론 확보만 보고 중반 플레이의 질을 높게 평가하면 과대평가가 된다."
+      },
+      {
+        "eventId": "evt_033",
+        "timestampLabel": "32:00",
+        "phase": "LATE",
+        "title": "종결 관여는 있었지만 승리의 핵심은 구조물 스노우볼",
+        "analysis": "마지막 구조물 압박에 관여했지만, 이 승리의 본질은 개인 플레이메이킹보다 이미 벌어진 타워 격차와 오브젝트 우세를 안전하게 현금화한 데 있다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "order": 1,
+        "eventId": "evt_003",
+        "timestampLabel": "7:14",
+        "phase": "EARLY",
+        "eventType": "CHAMPION_KILL",
+        "isPlayerInvolved": true,
+        "summary": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+        "analysisUse": "초반 이득 시작점"
+      },
+      {
+        "order": 2,
+        "eventId": "evt_004",
+        "timestampLabel": "7:24",
+        "phase": "EARLY",
+        "eventType": "PLAYER_DEATH",
+        "isPlayerInvolved": true,
+        "summary": "초반 교전에서 먼저 끊기며 템포가 흔들렸다.",
+        "analysisUse": "이득 직후 손해 반납 패턴의 핵심 근거"
+      },
+      {
+        "order": 3,
+        "eventId": "evt_005",
+        "timestampLabel": "8:22",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_WIN",
+        "isPlayerInvolved": false,
+        "summary": "정글 오브젝트를 챙기며 구조물 압박 재료를 마련했다.",
+        "analysisUse": "팀 차원의 초반 복구 근거"
+      },
+      {
+        "order": 4,
+        "eventId": "evt_008",
+        "timestampLabel": "11:47",
+        "phase": "EARLY",
+        "eventType": "OBJECTIVE_SETUP_FAIL",
+        "isPlayerInvolved": false,
+        "summary": "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.",
+        "analysisUse": "초반 안정성 부족 근거"
+      },
+      {
+        "order": 5,
+        "eventId": "evt_012",
+        "timestampLabel": "17:14",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": false,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "analysisUse": "팀의 오브젝트 템포 유지 근거"
+      },
+      {
+        "order": 6,
+        "eventId": "evt_019",
+        "timestampLabel": "21:22",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "analysisUse": "중반 포지션 리스크 근거"
+      },
+      {
+        "order": 7,
+        "eventId": "evt_021",
+        "timestampLabel": "23:12",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": true,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "analysisUse": "개인 실수 이후에도 팀이 템포를 유지한 근거"
+      },
+      {
+        "order": 8,
+        "eventId": "evt_023",
+        "timestampLabel": "26:42",
+        "phase": "MID",
+        "eventType": "PLAYER_DEATH",
+        "isPlayerInvolved": true,
+        "summary": "중반 핵심 구도에서 데스를 내주며 운영 안정감이 흔들렸다.",
+        "analysisUse": "반복되는 중반 데스 근거"
+      },
+      {
+        "order": 9,
+        "eventId": "evt_024",
+        "timestampLabel": "27:08",
+        "phase": "MID",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "analysisUse": "팀이 개인 영향력과 별개로 구조물 우세를 굳힌 근거"
+      },
+      {
+        "order": 10,
+        "eventId": "evt_025",
+        "timestampLabel": "28:53",
+        "phase": "MID",
+        "eventType": "DRAGON_FIGHT",
+        "isPlayerInvolved": true,
+        "summary": "드래곤 타이밍에 합류해 오브젝트 템포를 챙겼다.",
+        "analysisUse": "오브젝트 합류 일관성 근거"
+      },
+      {
+        "order": 11,
+        "eventId": "evt_026",
+        "timestampLabel": "29:41",
+        "phase": "MID",
+        "eventType": "BARON_FIGHT",
+        "isPlayerInvolved": true,
+        "summary": "바론 확보에 관여하며 경기 흐름을 다시 붙잡았다.",
+        "analysisUse": "경기 결정 분기점이자 팀 운영 보정 근거"
+      },
+      {
+        "order": 12,
+        "eventId": "evt_028",
+        "timestampLabel": "31:15",
+        "phase": "LATE",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": true,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "analysisUse": "후반 종료 동선 합류 근거"
+      },
+      {
+        "order": 13,
+        "eventId": "evt_030",
+        "timestampLabel": "31:42",
+        "phase": "LATE",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "analysisUse": "팀 주도의 마무리 전개 근거"
+      },
+      {
+        "order": 14,
+        "eventId": "evt_031",
+        "timestampLabel": "31:43",
+        "phase": "LATE",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": false,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "analysisUse": "개인 영향력보다 팀 구조물 스노우볼 근거"
+      },
+      {
+        "order": 15,
+        "eventId": "evt_033",
+        "timestampLabel": "32:00",
+        "phase": "LATE",
+        "eventType": "TOWER_TAKE",
+        "isPlayerInvolved": true,
+        "summary": "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.",
+        "analysisUse": "종결 관여 근거"
+      }
+    ]
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "꾸준한 오브젝트 합류",
+        "claudeNote": "드래곤 3회, 바론 1회 등 핵심 오브젝트 타이밍에 빠짐없이 합류하며 팀의 오브젝트 확보를 뒷받침했습니다. 서포터로서 맵 이동과 타이밍 판단이 좋았습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "탁월한 시야 장악력",
+        "claudeNote": "비전 점수 89는 32분 경기 기준 분당 약 2.8로, 서포터 역할에 충실한 시야 관리를 보여줍니다. 오브젝트 싸움 전 시야 확보가 팀 의사결정에 기여했을 것으로 판단됩니다."
+      },
+      {
+        "category": "strength",
+        "topic": "후반 안정적 클로징",
+        "claudeNote": "바론 확보 이후 데스 없이 구조물 압박에 참여하며 깔끔하게 경기를 마무리했습니다. 후반 포지셔닝과 리스크 관리가 초·중반 대비 크게 개선되었습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 라인전 생존력 부족",
+        "claudeNote": "초반에 3데스를 기록하며 라인 안정성이 떨어졌습니다. 7분 킬 직후 10초 만에 역킬을 당한 것은 킬 후 후퇴 타이밍 판단이 아쉬운 장면입니다. 세라핀은 체력이 낮은 챔피언이므로 교전 후 즉시 안전 거리 확보가 중요합니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 포지셔닝 실수로 인한 불필요한 데스",
+        "claudeNote": "21분과 26분에 핵심 구도에서 데스를 허용하며 팀 운영 흐름이 끊겼습니다. 특히 오브젝트 싸움 전후 포지셔닝에서 상대의 진입 루트를 예측하지 못한 것으로 보입니다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "weakness",
+        "topic": "낮은 킬 관여율",
+        "note": "킬 관여율 18%(34킬 중 6관여)는 세라핀의 광역 유틸리티를 고려하면 낮은 수치입니다. 팀파이트에서 스킬 적중률을 높이거나, 로밍 타이밍을 잡아 다른 라인 교전에 합류하는 빈도를 늘려볼 필요가 있습니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "weakness",
+        "topic": "팀이 크게 이긴 경기치고 개인 영향력이 지나치게 낮다"
+      }
+    ],
+    "agreementRate": 83
+  }
+}

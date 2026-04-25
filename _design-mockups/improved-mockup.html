@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>LoL Replay Coach · 경기 분석 (개선 목업)</title>
+  <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    /* =========================================================
+       DESIGN TOKENS — 통합 토큰 (index.html + admin.html 공용 의도)
+       ========================================================= */
+    :root {
+      /* Surface */
+      --bg:            #071018;
+      --bg-alt:        #0e1d27;
+      --surface-1:     rgba(255,255,255,0.03);
+      --surface-2:     rgba(255,255,255,0.05);
+      --surface-3:     rgba(255,255,255,0.08);
+      --panel:         rgba(11,24,33,0.92);
+      --panel-strong:  rgba(16,32,44,0.96);
+      --line:          rgba(162,196,210,0.20);
+      --line-strong:   rgba(207,226,234,0.36);
+
+      /* Text */
+      --text:          #eff8f7;
+      --text-muted:    #b4c7d2;     /* AA 통과: 13:1 vs --bg */
+      --text-subtle:   #8a9fab;     /* 보조 정보 전용, 큰 글자에서만 사용 */
+
+      /* Brand / State */
+      --accent:        #f0b35b;
+      --on-accent:     #11161a;
+      --mint:          #59d1b2;
+      --rose:          #ff8678;
+      --info:          #78baff;
+
+      /* Semantic tints (배경용) */
+      --tint-mint:     rgba(89,209,178,0.14);
+      --tint-rose:     rgba(255,134,120,0.14);
+      --tint-amber:    rgba(240,179,91,0.16);
+      --tint-info:     rgba(120,186,255,0.14);
+
+      /* Borders / Focus */
+      --mint-border:   rgba(89,209,178,0.42);
+      --rose-border:   rgba(255,134,120,0.42);
+      --amber-border:  rgba(240,179,91,0.46);
+      --focus-ring:    #ffd166;
+
+      /* Radii */
+      --radius-xs: 4px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-pill: 999px;
+
+      /* Spacing scale (4px 기반) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+
+      /* Typography */
+      --fs-xs:   0.75rem;
+      --fs-sm:   0.85rem;
+      --fs-base: 0.95rem;
+      --fs-md:   1.05rem;
+      --fs-lg:   1.25rem;
+      --fs-xl:   1.5rem;
+      --fs-2xl:  2rem;
+      --fs-display: 2.5rem;
+
+      /* Touch target */
+      --touch-min: 44px;
+
+      /* Shadows */
+      --shadow-sm: 0 4px 10px rgba(0,0,0,0.18);
+      --shadow-md: 0 14px 30px rgba(0,0,0,0.22);
+      --shadow-lg: 0 30px 70px rgba(0,0,0,0.30);
+    }
+
+    /* =========================================================
+       BASE
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html {
+      /* 사용자 시스템 글자크기 존중 (rem 사용) */
+      font-size: 16px;
+    }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(89,209,178,0.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(240,179,91,0.18), transparent 32%),
+        linear-gradient(155deg, var(--bg), var(--bg-alt));
+      color: var(--text);
+      font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
+                   "Noto Sans KR", "맑은 고딕", sans-serif;
+      font-size: var(--fs-base);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 미세 그리드 배경 (불필요한 fixed border 제거 → focus 가시성 확보) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at center, #000 50%, transparent 90%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =========================================================
+       A11Y UTILITIES
+       ========================================================= */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: 12px; left: 12px;
+      z-index: 100;
+      padding: 12px 18px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 700;
+      text-decoration: none;
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+    .skip-link:focus { transform: translateY(0); outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+    /* 통합 :focus-visible — 모든 인터랙티브 요소 */
+    :where(button, a, input, select, textarea, [role="tab"], summary):focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* =========================================================
+       LAYOUT
+       ========================================================= */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1380px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: var(--space-5) 0 var(--space-7);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding-bottom: var(--space-4);
+      margin-bottom: var(--space-5);
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .topbar__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-weight: 800;
+      font-size: var(--fs-md);
+      letter-spacing: -0.01em;
+    }
+    .topbar__brand-mark {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--mint));
+      display: grid; place-items: center;
+      color: var(--on-accent);
+      font-weight: 900;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar__nav {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+    .topbar__nav a {
+      min-height: var(--touch-min);
+      display: inline-flex;
+      align-items: center;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-pill);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: var(--fs-sm);
+      font-weight: 600;
+    }
+    .topbar__nav a:hover { background: var(--surface-1); color: var(--text); }
+    .topbar__nav a[aria-current="page"] { background: var(--surface-2); color: var(--text); }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      gap: var(--space-5);
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+      .sidebar-stack { position: static !important; }
+    }
+
+    .sidebar-stack {
+      display: grid;
+      gap: var(--space-4);
+      position: sticky;
+      top: var(--space-4);
+    }
+
+    /* =========================================================
+       PANEL — 공용 카드
+       ========================================================= */
+    .panel {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(20px);
+    }
+    .panel__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .panel__title {
+      font-size: var(--fs-md);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .panel__subtitle {
+      color: var(--text-muted);
+      font-size: var(--fs-sm);
+      margin: 0;
+    }
+
+    /* =========================================================
+       IDENTITY CARD (사이드바 상단)
+       ========================================================= */
+    .identity-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--tint-amber), transparent 50%), var(--panel);
+    }
+    .identity-card__avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2c4a5a, #1a2a36);
+      border: 2px solid var(--accent);
+      display: grid; place-items: center;
+      font-weight: 800;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .identity-card__name {
+      display: block;
+      font-weight: 700;
+      font-size: var(--fs-md);
+      margin-bottom: 2px;
+    }
+    .identity-card__meta {
+      display: block;
+      color: var(--text-muted);
+      font-size: var(--fs-xs);
+    }
+
+    /* =========================================================
+       SAMPLE SWITCHER
+       ========================================================= */
+    .sample-list {
+      display: grid;
+      gap: var(--space-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .sample-chip {
+      width: 100%;
+      min-height: var(--touch-min);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface-1);
+      color: var(--text);
+      font-size: var(--fs-sm);
+      text-align: left;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+    .sample-chip:hover { background: var(--surface-2); border-color: var(--line-strong); }
+    .sample-chip[aria-pressed="true"] {
+      background: var(--tint-amber);
+      border-color: var(--amber-border);
+      color: var(--text);
+    }
+    .sample-chip__icon {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-3);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      font-size: var(--fs-xs);
+      font-weight: 700;
+    }
+    .sample-chip__title { font-weight: 600; flex: 1; }
+    .sample-chip__result { font-size: var(--fs-xs); font-weight: 700; }
+    .sample-chip__result--win { color: var(--mint); }
+    .sample-chip__result--loss { color: var(--rose); }
+
+    /* Re-fetch details */
+    details.fetcher {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      background: var(--surface-1);
+    }
+    details.fetcher > summary {
+      min-height: var(--touch-min);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 600;
+      font-size: var(--fs-sm);
+      gap: var(--space-2);
+    }
+    details.fetcher > summary::after {
+      content: "▾";
+      margin-left: auto;
+      transition: transform 160ms ease;
+      color: var(--text-muted);
+    }
+    details.fetcher[open] > summary::after { transform: rotate(180deg); }
+    details.fetcher::-webkit-details-marker { display: none; }
+
+    /* =========================================================
+       FORMS — 라벨/입력 통일
+       ========================================================= */
+    .form-grid {
+      display: grid;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+    .form-row { display: grid; gap: var(--space-1); }
+    .form-row label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: none;
+    }
+    .form-row label .required {
+      color: var(--rose);
+      font-size: var(--fs-xs);
+    }
+    .form-row input,
+    .form-row select {
+      min-height: var(--touch-min);
+      padding: 0 var(--space-3);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface-1);
+      color: var(--text);
+      font: inherit;
+      font-size: var(--fs-sm);
+    }
+    .form-row input::placeholder { color: var(--text-subtle); }
+    .form-row input:hover,
+    .form-row select:hover { border-color: var(--line-strong); }
+    .form-row .form-help {
+      font-size: var(--fs-xs);
+      color: var(--text-muted);
+    }
+
+    /* =========================================================
+       BUTTONS
+       ========================================================= */
+    .btn {
+      min-height: var(--touch-min);
+      padding: 0 var(--space-4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font: inherit;
+      font-weight: 700;
+      font-size: var(--fs-sm);
+      cursor: pointer;
+      transition: transform 120ms ease, background 160ms ease;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn--primary {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+    .btn--primary:hover { background: #ffc474; }
+    .btn--ghost {
+      background: var(--surface-1);
+      color: var(--text);
+      border-color: var(--line);
+    }
+    .btn--ghost:hover { background: var(--surface-2); }
+    .btn--icon {
+      padding: 0 var(--space-3);
+      gap: var(--space-1);
+    }
+
+    /* =========================================================
+       TAB BAR — 접근성 강화 (aria-controls, tabindex 관리)
+       ========================================================= */
+    .tab-bar {
+      display: flex;
+      gap: var(--space-1);
+      padding: var(--space-1);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--panel);
+      margin-bottom: var(--space-5);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1;
+      min-width: max-content;
+      min-height: var(--touch-min);
+      padding: 0 var(--space-4);
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--text-muted);
+      font: inherit;
+      font-weight: 600;
+      font-size: var(--fs-sm);
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface-1); }
+    .tab-btn[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+    .tab-panel { display: none; }
+    .tab-panel[data-active="true"] { display: block; }
+
+    /* =========================================================
+       DETAIL HEADER (개요 탭 상단)
+       ========================================================= */
+    .detail-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-5);
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--tint-amber), transparent 40%),
+                  linear-gradient(330deg, var(--tint-mint), transparent 50%),
+                  var(--panel-strong);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--space-4);
+    }
+    .detail-hero__eyebrow {
+      display: inline-flex;
+      gap: var(--space-2);
+      align-items: center;
+      font-size: var(--fs-xs);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: var(--space-2);
+    }
+    .detail-hero__title {
+      margin: 0;
+      font-size: var(--fs-2xl);
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+    .detail-hero__title .role-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-left: var(--space-3);
+      padding: 4px 12px;
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border-radius: var(--radius-pill);
+      vertical-align: middle;
+    }
+    .detail-hero__headline {
+      margin: var(--space-3) 0 var(--space-2);
+      font-size: var(--fs-md);
+      color: var(--text);
+      max-width: 60ch;
+    }
+    .detail-hero__summary {
+      margin: 0;
+      font-size: var(--fs-sm);
+      color: var(--text-muted);
+      max-width: 60ch;
+    }
+    .detail-hero__result {
+      display: grid;
+      gap: var(--space-2);
+      justify-items: end;
+      align-content: start;
+    }
+    .winloss-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 96px;
+      min-height: 44px;
+      padding: 0 var(--space-4);
+      font-size: var(--fs-md);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      border-radius: var(--radius-pill);
+    }
+    .winloss-pill--win {
+      background: var(--tint-mint);
+      color: var(--mint);
+      border: 1px solid var(--mint-border);
+    }
+    .winloss-pill--loss {
+      background: var(--tint-rose);
+      color: var(--rose);
+      border: 1px solid var(--rose-border);
+    }
+    .duration-tag {
+      font-size: var(--fs-sm);
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 720px) {
+      .detail-hero { grid-template-columns: 1fr; }
+      .detail-hero__result { justify-items: start; }
+    }
+
+    /* =========================================================
+       METRICS — 큰 숫자 강조, 4열에서 2x2로 자동
+       ========================================================= */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+    .metric-card {
+      padding: var(--space-4);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface-1);
+      display: grid;
+      gap: var(--space-1);
+    }
+    .metric-card__label {
+      font-size: var(--fs-xs);
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+    .metric-card__value {
+      font-size: var(--fs-xl);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .metric-card__delta {
+      font-size: var(--fs-xs);
+      font-weight: 600;
+    }
+    .metric-card__delta--up { color: var(--mint); }
+    .metric-card__delta--down { color: var(--rose); }
+    .metric-card--primary {
+      background: linear-gradient(135deg, var(--tint-amber), var(--surface-1));
+      border-color: var(--amber-border);
+    }
+    .metric-card--primary .metric-card__value { font-size: var(--fs-2xl); color: var(--accent); }
+
+    /* =========================================================
+       SCORE PANEL
+       ========================================================= */
+    .score-panel {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-5);
+      align-items: center;
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-4);
+    }
+    .score-panel__ring {
+      --score: 78;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background:
+        conic-gradient(var(--mint) calc(var(--score) * 1%), var(--surface-2) 0);
+      display: grid; place-items: center;
+      position: relative;
+    }
+    .score-panel__ring::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: var(--panel-strong);
+    }
+    .score-panel__ring-text {
+      position: relative;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .score-panel__ring-text strong {
+      display: block;
+      font-size: var(--fs-2xl);
+      font-weight: 800;
+      color: var(--mint);
+    }
+    .score-panel__ring-text span {
+      display: block;
+      font-size: var(--fs-xs);
+      color: var(--text-muted);
+    }
+    .score-panel__copy h3 {
+      margin: 0 0 var(--space-2);
+      font-size: var(--fs-md);
+    }
+    .score-panel__copy p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: var(--fs-sm);
+    }
+    .score-bar-list {
+      display: grid;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    .score-bar {
+      display: grid;
+      grid-template-columns: 80px 1fr 40px;
+      gap: var(--space-3);
+      align-items: center;
+      font-size: var(--fs-sm);
+    }
+    .score-bar__label { color: var(--text-muted); font-weight: 600; }
+    .score-bar__track {
+      position: relative;
+      height: 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+    .score-bar__fill {
+      position: absolute;
+      inset: 0;
+      width: var(--w, 50%);
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--mint), var(--accent));
+    }
+    .score-bar__value { text-align: right; font-weight: 700; }
+
+    @media (max-width: 720px) {
+      .score-panel { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    }
+
+    /* =========================================================
+       INSIGHT GRID (강점/약점)
+       ========================================================= */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .insight-panel { padding: var(--space-5); border-radius: var(--radius-xl); border: 1px solid var(--line); }
+    .insight-panel--strengths {
+      background: linear-gradient(135deg, var(--tint-mint), transparent 60%), var(--panel);
+      border-color: var(--mint-border);
+    }
+    .insight-panel--weaknesses {
+      background: linear-gradient(135deg, var(--tint-rose), transparent 60%), var(--panel);
+      border-color: var(--rose-border);
+    }
+    .insight-panel h3 {
+      margin: 0 0 var(--space-3);
+      font-size: var(--fs-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .insight-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+    .insight-item {
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      background: var(--surface-1);
+      border: 1px solid var(--surface-3);
+    }
+    .insight-item h4 { margin: 0 0 4px; font-size: var(--fs-sm); font-weight: 700; }
+    .insight-item p { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+    /* =========================================================
+       UTILITY
+       ========================================================= */
+    .stack-sm { display: grid; gap: var(--space-2); }
+    .stack-md { display: grid; gap: var(--space-3); }
+    .row { display: flex; align-items: center; gap: var(--space-2); }
+    .muted { color: var(--text-muted); }
+
+    /* Live region (loading) */
+    .progress {
+      display: grid;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface-1);
+      margin-bottom: var(--space-4);
+    }
+    .progress__head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: var(--fs-sm);
+    }
+    .progress__bar {
+      height: 6px; border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+    .progress__bar > span {
+      display: block; height: 100%;
+      width: var(--p, 50%);
+      background: linear-gradient(90deg, var(--mint), var(--accent));
+      border-radius: inherit;
+      transition: width 240ms ease;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+
+  <div class="app-shell">
+    <!-- ============== TOP BAR ============== -->
+    <header class="topbar" role="banner">
+      <div class="topbar__brand">
+        <span class="topbar__brand-mark" aria-hidden="true">L</span>
+        <span>LoL Replay Coach</span>
+      </div>
+      <nav class="topbar__nav" aria-label="주요 메뉴">
+        <a href="#" aria-current="page">분석</a>
+        <a href="#">관리자</a>
+        <a href="#">도움말</a>
+      </nav>
+    </header>
+
+    <div class="workspace-grid">
+      <!-- ============== SIDEBAR ============== -->
+      <aside class="sidebar-stack" aria-label="플레이어 정보 및 샘플">
+        <!-- Identity -->
+        <section class="identity-card" aria-labelledby="identity-name">
+          <span class="identity-card__avatar" aria-hidden="true">매</span>
+          <div>
+            <strong class="identity-card__name" id="identity-name">매운맛 비스킷 #KR1</strong>
+            <span class="identity-card__meta">수집일 · 2026-04-26 · KR 서버</span>
+          </div>
+        </section>
+
+        <!-- Saved samples -->
+        <section class="panel" aria-labelledby="samples-title">
+          <div class="panel__head">
+            <h2 class="panel__title" id="samples-title">저장된 경기</h2>
+            <span class="muted" style="font-size: var(--fs-xs);">3 / 10</span>
+          </div>
+          <ul class="sample-list">
+            <li>
+              <button type="button" class="sample-chip" aria-pressed="true">
+                <span class="sample-chip__icon" aria-hidden="true">제</span>
+                <span class="sample-chip__title">제드 · 미드</span>
+                <span class="sample-chip__result sample-chip__result--win" aria-label="승리">승</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sample-chip" aria-pressed="false">
+                <span class="sample-chip__icon" aria-hidden="true">아</span>
+                <span class="sample-chip__title">아리 · 미드</span>
+                <span class="sample-chip__result sample-chip__result--loss" aria-label="패배">패</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sample-chip" aria-pressed="false">
+                <span class="sample-chip__icon" aria-hidden="true">야</span>
+                <span class="sample-chip__title">야스오 · 탑</span>
+                <span class="sample-chip__result sample-chip__result--win" aria-label="승리">승</span>
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Re-fetch -->
+        <details class="fetcher">
+          <summary>Riot ID로 다시 불러오기</summary>
+          <form class="form-grid" aria-label="Riot ID 재조회 폼">
+            <div class="form-row">
+              <label for="re-gamename">게임명 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></label>
+              <input id="re-gamename" name="gameName" type="text" value="매운맛 비스킷" required
+                     minlength="3" maxlength="16" autocomplete="username" />
+            </div>
+            <div class="form-row">
+              <label for="re-tagline">태그라인 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></label>
+              <input id="re-tagline" name="tagLine" type="text" value="KR1" required
+                     minlength="2" maxlength="5" />
+            </div>
+            <div class="form-row">
+              <label for="re-region">지역</label>
+              <select id="re-region" name="platformRegion">
+                <option value="KR" selected>한국 (KR)</option>
+                <option value="JP1">일본 (JP)</option>
+                <option value="NA1">북미 (NA)</option>
+                <option value="EUW1">유럽 서부 (EUW)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn--primary">최근 경기 불러오기</button>
+            <p class="form-help" role="status">최근 조회: 5분 전 · 캐시 사용 중</p>
+          </form>
+        </details>
+      </aside>
+
+      <!-- ============== MAIN ============== -->
+      <main class="main" id="main-content">
+        <!-- Loading example (hidden by default) -->
+        <div class="progress" role="status" aria-live="polite" hidden>
+          <div class="progress__head">
+            <span>상세 분석을 준비하고 있어요</span>
+            <strong>62%</strong>
+          </div>
+          <div class="progress__bar" aria-hidden="true"><span style="--p: 62%"></span></div>
+        </div>
+
+        <!-- Tab bar — 접근성 강화 -->
+        <div class="tab-bar" role="tablist" aria-label="분석 보기 전환">
+          <button id="tab-overview-btn" class="tab-btn" role="tab"
+                  aria-selected="true" aria-controls="tab-overview" tabindex="0">개요</button>
+          <button id="tab-analysis-btn" class="tab-btn" role="tab"
+                  aria-selected="false" aria-controls="tab-analysis" tabindex="-1">상세 분석</button>
+          <button id="tab-timeline-btn" class="tab-btn" role="tab"
+                  aria-selected="false" aria-controls="tab-timeline" tabindex="-1">타임라인</button>
+          <button id="tab-trends-btn" class="tab-btn" role="tab"
+                  aria-selected="false" aria-controls="tab-trends" tabindex="-1">최근 추세</button>
+        </div>
+
+        <!-- TAB: 개요 -->
+        <section id="tab-overview" class="tab-panel" data-active="true"
+                 role="tabpanel" aria-labelledby="tab-overview-btn" tabindex="0">
+
+          <article class="detail-hero" aria-labelledby="match-title">
+            <div>
+              <span class="detail-hero__eyebrow">
+                <span aria-hidden="true">●</span> 솔로 랭크 · 패치 14.8
+              </span>
+              <h2 class="detail-hero__title" id="match-title">
+                제드
+                <span class="role-tag" aria-label="포지션 미드">미드</span>
+              </h2>
+              <p class="detail-hero__headline">
+                초반 라인전을 빠르게 끝내고 미드 운영으로 게임을 굴렸어요.
+              </p>
+              <p class="detail-hero__summary">
+                상대 미드 라이너를 상대로 CS·KDA 모두 우위를 가져갔지만, 25분 이후 합류 타이밍이 늦어 한타에서 손해를 봤습니다.
+              </p>
+            </div>
+            <div class="detail-hero__result">
+              <span class="winloss-pill winloss-pill--win" aria-label="경기 결과 승리">승리</span>
+              <span class="duration-tag">28분 14초</span>
+            </div>
+          </article>
+
+          <!-- Primary metrics — 큰 숫자, 의미 있는 라벨 -->
+          <div class="metrics-grid" role="list" aria-label="핵심 지표 요약">
+            <div class="metric-card metric-card--primary" role="listitem">
+              <span class="metric-card__label">KDA</span>
+              <strong class="metric-card__value">8 / 2 / 7</strong>
+              <span class="metric-card__delta metric-card__delta--up">▲ 평균 대비 +2.4</span>
+            </div>
+            <div class="metric-card" role="listitem">
+              <span class="metric-card__label">분당 CS</span>
+              <strong class="metric-card__value">8.6</strong>
+              <span class="metric-card__delta metric-card__delta--up">▲ +0.9</span>
+            </div>
+            <div class="metric-card" role="listitem">
+              <span class="metric-card__label">분당 데미지</span>
+              <strong class="metric-card__value">812</strong>
+              <span class="metric-card__delta metric-card__delta--down">▼ -42</span>
+            </div>
+            <div class="metric-card" role="listitem">
+              <span class="metric-card__label">시야 점수</span>
+              <strong class="metric-card__value">21</strong>
+              <span class="metric-card__delta metric-card__delta--up">▲ +4</span>
+            </div>
+          </div>
+
+          <!-- Score panel (전체 평가) -->
+          <section class="score-panel" aria-labelledby="score-title">
+            <div class="score-panel__ring" role="img" aria-label="종합 점수 78점">
+              <div class="score-panel__ring-text">
+                <strong>78</strong>
+                <span>/ 100</span>
+              </div>
+            </div>
+            <div class="score-panel__copy">
+              <h3 id="score-title">종합 플레이 점수</h3>
+              <p>이번 경기에서 라인전·로밍은 매우 강했고, 한타 진입 타이밍은 평균 수준이었어요.</p>
+              <div class="score-bar-list">
+                <div class="score-bar">
+                  <span class="score-bar__label">라인전</span>
+                  <div class="score-bar__track" aria-hidden="true">
+                    <span class="score-bar__fill" style="--w: 88%"></span>
+                  </div>
+                  <strong class="score-bar__value">88</strong>
+                </div>
+                <div class="score-bar">
+                  <span class="score-bar__label">로밍</span>
+                  <div class="score-bar__track" aria-hidden="true">
+                    <span class="score-bar__fill" style="--w: 82%"></span>
+                  </div>
+                  <strong class="score-bar__value">82</strong>
+                </div>
+                <div class="score-bar">
+                  <span class="score-bar__label">한타</span>
+                  <div class="score-bar__track" aria-hidden="true">
+                    <span class="score-bar__fill" style="--w: 64%"></span>
+                  </div>
+                  <strong class="score-bar__value">64</strong>
+                </div>
+                <div class="score-bar">
+                  <span class="score-bar__label">시야</span>
+                  <div class="score-bar__track" aria-hidden="true">
+                    <span class="score-bar__fill" style="--w: 71%"></span>
+                  </div>
+                  <strong class="score-bar__value">71</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Strengths / Weaknesses -->
+          <div class="insight-grid">
+            <article class="insight-panel insight-panel--strengths" aria-labelledby="strengths-title">
+              <h3 id="strengths-title"><span aria-hidden="true">✓</span> 잘한 점</h3>
+              <ul class="insight-list">
+                <li class="insight-item">
+                  <h4>라인전 우위 가져오기</h4>
+                  <p>4분 이내에 CS 격차를 +12로 벌리며 상대를 라인에 묶었어요.</p>
+                </li>
+                <li class="insight-item">
+                  <h4>로밍 타이밍</h4>
+                  <p>9분 첫 로밍에서 바텀 더블 킬을 만들었고, 사이드 라인 우위로 이어졌습니다.</p>
+                </li>
+              </ul>
+            </article>
+            <article class="insight-panel insight-panel--weaknesses" aria-labelledby="weaknesses-title">
+              <h3 id="weaknesses-title"><span aria-hidden="true">!</span> 다음 판에서 고치기</h3>
+              <ul class="insight-list">
+                <li class="insight-item">
+                  <h4>한타 진입 타이밍</h4>
+                  <p>R 진입이 1.5초 늦어 두 차례 솔로킬을 놓쳤어요. R 사거리 시각화 연습이 필요해요.</p>
+                </li>
+                <li class="insight-item">
+                  <h4>오브젝트 시야</h4>
+                  <p>드래곤 30초 전 핑크 와드 미설치. 다음 판에는 오브젝트 1분 전 시야부터 잡아보세요.</p>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Other tabs (skeleton placeholders) -->
+        <section id="tab-analysis" class="tab-panel" role="tabpanel"
+                 aria-labelledby="tab-analysis-btn" tabindex="0">
+          <div class="panel">
+            <h2 class="panel__title">상세 분석</h2>
+            <p class="muted">구간별 평점, AI 비교 분석, 행동 루틴이 표시되는 영역입니다.</p>
+          </div>
+        </section>
+        <section id="tab-timeline" class="tab-panel" role="tabpanel"
+                 aria-labelledby="tab-timeline-btn" tabindex="0">
+          <div class="panel">
+            <h2 class="panel__title">타임라인</h2>
+            <p class="muted">아군/적군 행동, KDA, 시야, 빌드, 오브젝트 타임라인이 표시됩니다.</p>
+          </div>
+        </section>
+        <section id="tab-trends" class="tab-panel" role="tabpanel"
+                 aria-labelledby="tab-trends-btn" tabindex="0">
+          <div class="panel">
+            <h2 class="panel__title">최근 추세</h2>
+            <p class="muted">최근 20경기 누적 추세, 챔피언별·포지션별 분석이 표시됩니다.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       TAB ROLE — 키보드 ←/→/Home/End 지원, tabindex 관리
+       ========================================================= */
+    (function () {
+      const tablist = document.querySelector('[role="tablist"]');
+      if (!tablist) return;
+      const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+
+      function activate(tab) {
+        tabs.forEach(t => {
+          const isActive = t === tab;
+          t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          t.setAttribute('tabindex', isActive ? '0' : '-1');
+          const panel = document.getElementById(t.getAttribute('aria-controls'));
+          if (panel) panel.dataset.active = isActive ? 'true' : 'false';
+        });
+        tab.focus();
+      }
+
+      tablist.addEventListener('click', e => {
+        const tab = e.target.closest('[role="tab"]');
+        if (tab) activate(tab);
+      });
+      tablist.addEventListener('keydown', e => {
+        const idx = tabs.indexOf(document.activeElement);
+        if (idx === -1) return;
+        let next = -1;
+        if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabs.length - 1;
+        if (next !== -1) { e.preventDefault(); activate(tabs[next]); }
+      });
+    })();
+
+    /* Sample chip 토글 */
+    document.querySelectorAll('.sample-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.sample-chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+        chip.setAttribute('aria-pressed', 'true');
+      });
+    });
+  </script>
+</body>
+</html>

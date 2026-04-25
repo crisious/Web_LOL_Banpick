@@ -1,0 +1,238 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-25T20:03:17.951Z",
+  "sampleId": "sample-kr-8186280096",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-04-25T20:03:17.951Z",
+      "matchId": "KR_8186280096",
+      "player": "매운맛 비스킷#KR1",
+      "champion": "Morgana",
+      "position": "SUPPORT",
+      "result": "LOSS",
+      "durationLabel": "22:32",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8186280096_1777147397951"
+    },
+    "matchSummary": {
+      "headline": "초반 킬을 선점했으나 반복 데스로 흐름을 잃고, 오브젝트 주도권을 내준 채 22분 패배"
+    },
+    "coachSummary": {
+      "overallSummary": "2분대 킬과 드래곤 합류로 초반 템포를 잡았지만, 10분 이후 연속 3데스로 라인 주도권과 시야 압박이 무너졌습니다. 중반에는 스커미시 합류로 킬 관여를 만들었으나, 바론 구도에서 포지셔닝이 불안정해 핵심 싸움마다 먼저 쓰러지며 팀 전체 운영이 흔들렸습니다. 시야 점수 62는 준수하지만, 데스 타이밍이 오브젝트 분쟁 직전에 몰려 있어 시야를 깔아도 활용할 수 없는 상황이 반복되었습니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_01",
+        "title": "초반 킬 창출력",
+        "description": "2분 06초에 직접 킬을 만들어 레인 주도권을 선점했습니다. 모르가나의 Q 적중 후 이그나이트 연계 판단이 좋았습니다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "str_02",
+        "title": "오브젝트 타이밍 합류",
+        "description": "5분 30초 드래곤 타이밍에 적시 합류하여 팀 오브젝트 템포를 만들었습니다. 서포터로서 맵 이동 판단이 적절했습니다.",
+        "relatedEventIds": [
+          "evt_002"
+        ]
+      },
+      {
+        "id": "str_03",
+        "title": "중반 스커미시 합류와 킬 관여",
+        "description": "15분대 연속 스커미시에서 후속 합류로 어시스트 3개를 만들었습니다. 불리한 상황에서도 합류 타이밍을 놓치지 않았습니다.",
+        "relatedEventIds": [
+          "evt_008",
+          "evt_009"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_01",
+        "title": "10~14분 연속 데스로 초반 이득 반납",
+        "description": "10분 54초부터 13분 57초까지 3연속 데스가 발생했습니다. 초반 킬로 잡은 템포를 전부 되돌려주었고, 이 구간에서 상대 타워와 드래곤을 내줬습니다. 교전 진입 타이밍과 철수 판단을 점검할 필요가 있습니다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_006",
+          "evt_007",
+          "evt_005"
+        ]
+      },
+      {
+        "id": "weak_02",
+        "title": "오브젝트 분쟁 직전 포지셔닝 불안정",
+        "description": "17분 19초 오브젝트 분실 직후 17분 24초에 데스, 20분 47초 바론 분실 후 22분 11초에 다시 데스가 발생했습니다. 핵심 오브젝트 싸움에서 생존하지 못하면 후속 방어가 불가능해집니다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_012",
+          "evt_014",
+          "evt_016"
+        ]
+      },
+      {
+        "id": "weak_03",
+        "title": "킬 관여율 29%로 팀 기여도 부족",
+        "description": "팀 14킬 중 4킬에만 관여했습니다. 시야 점수 62는 양호하지만, 잦은 데스(5회)로 맵에 존재하는 시간이 줄어 실질적인 서포팅 시간이 부족했습니다.",
+        "relatedEventIds": [
+          "evt_004",
+          "evt_006",
+          "evt_007",
+          "evt_012",
+          "evt_016"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_01",
+        "text": "교전 진입 전 아군 위치를 확인하고, 단독 전진 시 바로 철수 루트를 설정한다",
+        "priority": "high"
+      },
+      {
+        "id": "chk_02",
+        "text": "오브젝트 스폰 60초 전부터 해당 구역 시야를 확보하고, 분쟁 중에는 후방 포지션을 유지한다",
+        "priority": "high"
+      },
+      {
+        "id": "chk_03",
+        "text": "데스 후 복귀 시 무리한 합류보다 시야 재설치와 웨이브 정리를 우선한다",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_04",
+        "text": "존야의 모래시계 완성 타이밍을 앞당겨 핵심 교전 생존율을 높인다",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_05",
+        "text": "10~15분 구간에서 로밍 루트를 미리 정하고, 로밍 실패 시 즉시 레인으로 복귀한다",
+        "priority": "medium"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_001",
+        "timestampLabel": "2:06",
+        "title": "초반 킬 선점",
+        "description": "모르가나가 직접 킬을 만들며 레인 주도권을 확보한 장면. 이 경기에서 가장 좋았던 순간입니다.",
+        "momentType": "highlight"
+      },
+      {
+        "eventId": "evt_002",
+        "timestampLabel": "5:30",
+        "title": "드래곤 합류 성공",
+        "description": "드래곤 타이밍에 맞춰 합류하여 팀 오브젝트를 챙긴 장면. 서포터의 맵 리딩이 빛났습니다.",
+        "momentType": "highlight"
+      },
+      {
+        "eventId": "evt_004",
+        "timestampLabel": "10:54",
+        "title": "연속 데스의 시작",
+        "description": "이 데스를 시작으로 3연속 데스가 이어지며 초반 이득이 증발했습니다. 진입 타이밍 재검토가 필요한 핵심 장면입니다.",
+        "momentType": "turning_point"
+      },
+      {
+        "eventId": "evt_014",
+        "timestampLabel": "20:47",
+        "title": "바론 주도권 상실",
+        "description": "바론을 상대에게 내주며 사실상 경기가 결정된 장면. 바론 구도 진입 전 시야와 포지셔닝 준비가 부족했습니다.",
+        "momentType": "turning_point"
+      },
+      {
+        "eventId": "evt_016",
+        "timestampLabel": "22:11",
+        "title": "마지막 데스 — 게임 종료 직전",
+        "description": "바론 버프 상태의 상대에게 데스를 내주며 방어 기회가 사라진 장면입니다.",
+        "momentType": "lowlight"
+      }
+    ],
+    "evidenceIndex": {
+      "evt_001": [
+        "str_01"
+      ],
+      "evt_002": [
+        "str_02"
+      ],
+      "evt_004": [
+        "weak_01",
+        "weak_03"
+      ],
+      "evt_005": [
+        "weak_01"
+      ],
+      "evt_006": [
+        "weak_01",
+        "weak_03"
+      ],
+      "evt_007": [
+        "weak_01",
+        "weak_03"
+      ],
+      "evt_008": [
+        "str_03"
+      ],
+      "evt_009": [
+        "str_03"
+      ],
+      "evt_011": [
+        "weak_02"
+      ],
+      "evt_012": [
+        "weak_02",
+        "weak_03"
+      ],
+      "evt_014": [
+        "weak_02"
+      ],
+      "evt_016": [
+        "weak_02",
+        "weak_03"
+      ]
+    },
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "초반 킬 창출력",
+        "note": "2분 06초에 직접 킬을 만들어 레인 주도권을 선점했습니다. 모르가나의 Q 적중 후 이그나이트 연계 판단이 좋았습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 타이밍 합류",
+        "note": "5분 30초 드래곤 타이밍에 적시 합류하여 팀 오브젝트 템포를 만들었습니다. 서포터로서 맵 이동 판단이 적절했습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "중반 스커미시 합류와 킬 관여",
+        "note": "15분대 연속 스커미시에서 후속 합류로 어시스트 3개를 만들었습니다. 불리한 상황에서도 합류 타이밍을 놓치지 않았습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "10~14분 연속 데스로 초반 이득 반납",
+        "note": "10분 54초부터 13분 57초까지 3연속 데스가 발생했습니다. 초반 킬로 잡은 템포를 전부 되돌려주었고, 이 구간에서 상대 타워와 드래곤을 내줬습니다. 교전 진입 타이밍과 철수 판단을 점검할 필요가 있습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 분쟁 직전 포지셔닝 불안정",
+        "note": "17분 19초 오브젝트 분실 직후 17분 24초에 데스, 20분 47초 바론 분실 후 22분 11초에 다시 데스가 발생했습니다. 핵심 오브젝트 싸움에서 생존하지 못하면 후속 방어가 불가능해집니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "킬 관여율 29%로 팀 기여도 부족",
+        "note": "팀 14킬 중 4킬에만 관여했습니다. 시야 점수 62는 양호하지만, 잦은 데스(5회)로 맵에 존재하는 시간이 줄어 실질적인 서포팅 시간이 부족했습니다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

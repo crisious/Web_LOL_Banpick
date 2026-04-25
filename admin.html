@@ -3,12 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LoL Draft Admin Panel</title>
+    <meta name="color-scheme" content="dark" />
+    <title>밴픽 방송 관리자 패널 · LoL Replay Coach</title>
+    <!-- Phase 4: index.html과 동일한 Pretendard 사용 -->
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <link rel="stylesheet" href="./admin.css" />
   </head>
   <body>
+    <a class="skip-link" href="#admin-main">본문으로 건너뛰기</a>
+
     <div class="admin-shell">
-      <header class="admin-hero">
+      <header class="admin-hero" role="banner">
         <div>
           <p class="eyebrow">Control Room</p>
           <h1>밴픽 방송 관리자 패널</h1>
@@ -17,20 +23,30 @@
             즉시 반영됩니다.
           </p>
         </div>
-        <a class="hero-link" href="./index.html">방송 화면 열기</a>
+        <a class="hero-link" href="./index.html">방송 화면 열기 ↗</a>
       </header>
 
-      <main class="admin-main">
-        <section class="admin-card" data-admin-live></section>
+      <main class="admin-main" id="admin-main">
+        <section class="admin-card" data-admin-live aria-labelledby="admin-live-title">
+          <h2 id="admin-live-title" class="sr-only">송출 제어</h2>
+        </section>
 
         <section class="admin-grid">
-          <section class="admin-card" data-admin-series></section>
-          <section class="admin-card" data-admin-phase></section>
+          <section class="admin-card" data-admin-series aria-labelledby="admin-series-title">
+            <h2 id="admin-series-title" class="sr-only">방송 기본 정보</h2>
+          </section>
+          <section class="admin-card" data-admin-phase aria-labelledby="admin-phase-title">
+            <h2 id="admin-phase-title" class="sr-only">현재 페이즈 편집</h2>
+          </section>
         </section>
 
         <section class="team-grid">
-          <section class="admin-card" data-team-editor="blue"></section>
-          <section class="admin-card" data-team-editor="red"></section>
+          <section class="admin-card" data-team-editor="blue" aria-labelledby="admin-team-blue-title">
+            <h2 id="admin-team-blue-title" class="sr-only">블루팀 편집기</h2>
+          </section>
+          <section class="admin-card" data-team-editor="red" aria-labelledby="admin-team-red-title">
+            <h2 id="admin-team-red-title" class="sr-only">레드팀 편집기</h2>
+          </section>
         </section>
       </main>
     </div>

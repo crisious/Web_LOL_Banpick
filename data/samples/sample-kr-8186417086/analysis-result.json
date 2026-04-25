@@ -1,0 +1,267 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "generatedAt": "2026-04-25T19:27:34.431Z",
+    "language": "ko",
+    "matchId": "KR_8186417086",
+    "playerRiotId": "매운맛 비스킷#KR1",
+    "champion": "Pantheon",
+    "position": "SUPPORT",
+    "result": "LOSS",
+    "analysisId": "ai_sample-kr-8186417086_1777145254431"
+  },
+  "matchSummary": {
+    "headline": "판테온 서포터로 높은 딜량과 시야 점수를 기록했으나, 중·후반 반복적인 데스로 바론 3회 확보의 이점을 살리지 못하고 패배한 경기."
+  },
+  "coachSummary": {
+    "overallSummary": "이번 경기에서 시야 장악과 딜 기여도는 인상적이었습니다. 다만 중반 이후 교전 진입 타이밍과 생존 판단에서 아쉬운 장면이 반복되었고, 바론을 3회나 확보하고도 오브젝트 전환으로 이어지지 못한 점이 패배의 핵심 원인입니다. 판테온의 공격적 플레이는 유지하되, 진입 후 이탈 타이밍을 의식적으로 연습하면 승률이 크게 올라갈 것입니다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "kills": 4,
+      "deaths": 3,
+      "assists": 3,
+      "summary": "초반부터 공격적으로 킬을 만들어냈지만, 3데스를 허용하며 안정적인 레인 우위를 확보하지 못했습니다. 12분대 오브젝트(evt_010) 내주면서 초반 주도권이 상대에게 넘어갔습니다."
+    },
+    {
+      "phase": "MID",
+      "kills": 5,
+      "deaths": 7,
+      "assists": 4,
+      "summary": "가장 치명적인 구간이었습니다. 16~28분 사이 7데스를 기록하며 팀 운영이 크게 흔들렸습니다. 25분 바론 확보(evt_030)로 반등 기회가 있었지만, 직후 오브젝트 손실(evt_031)과 추가 데스(evt_035, evt_038)로 이점을 날렸습니다."
+    },
+    {
+      "phase": "LATE",
+      "kills": 0,
+      "deaths": 5,
+      "assists": 3,
+      "summary": "후반 0킬 5데스로 교전 기여도가 급격히 떨어졌습니다. 31분 바론 확보(evt_041)에 관여했지만, 직후 사망(evt_043)하면서 바론 버프를 활용하지 못했습니다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_01",
+      "title": "우수한 시야 장악력",
+      "description": "39분 경기에서 시야 점수 130을 기록했습니다. 서포터로서 맵 정보 제공에 충실했으며, 이는 팀이 바론을 3회 확보하는 데 기여한 기반이 됩니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_041"
+      ]
+    },
+    {
+      "id": "str_02",
+      "title": "서포터 치고 높은 딜 기여도",
+      "description": "판테온 서포터로 27,063의 챔피언 피해량을 기록했습니다. 공격적인 교전 참여와 스킬 적중률이 뒷받침된 수치입니다.",
+      "relatedEventIds": [
+        "evt_014",
+        "evt_025",
+        "evt_035"
+      ]
+    },
+    {
+      "id": "str_03",
+      "title": "바론 오브젝트 확보 기여",
+      "description": "팀이 바론을 3회 확보하는 데 기여했으며, 특히 31분 바론 교전(evt_041)에 직접 참여해 팀의 반등 기회를 만들었습니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_041"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_01",
+      "title": "중반 연속 데스로 인한 운영 붕괴",
+      "description": "16~28분 사이 7번 사망하며 팀의 골드 격차를 벌려주었습니다. 특히 16:09~19:18 사이 4연속 데스(evt_014~evt_019)는 상대에게 완전한 맵 주도권을 넘겨준 구간입니다. 교전 진입 후 이탈 판단을 개선할 필요가 있습니다.",
+      "relatedEventIds": [
+        "evt_014",
+        "evt_015",
+        "evt_017",
+        "evt_019"
+      ]
+    },
+    {
+      "id": "wk_02",
+      "title": "바론 확보 후 전환 실패",
+      "description": "바론을 3회 확보했음에도 타워는 5개만 파괴했고, 확보 직후 오브젝트를 내주거나(evt_031) 데스를 허용(evt_043)하는 패턴이 반복되었습니다. 바론 버프 활용 시 무리한 교전보다 구조물 압박에 집중하는 전략이 필요합니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_031",
+        "evt_041",
+        "evt_043"
+      ]
+    },
+    {
+      "id": "wk_03",
+      "title": "후반 생존력 급락과 낮은 킬 관여율",
+      "description": "후반 0킬 5데스, 전체 킬 관여율 39%는 서포터로서 아쉬운 수치입니다. 판테온의 스케일링 한계를 고려해 후반에는 이니시 역할보다 필링과 시야 확보에 집중하는 전환이 필요합니다.",
+      "relatedEventIds": [
+        "evt_043",
+        "evt_038",
+        "evt_035"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_01",
+      "text": "교전 진입 전 '이탈 경로'를 먼저 확인하고 들어가기 — 판테온 W 진입 후 생존 루트가 없으면 진입하지 않는다."
+    },
+    {
+      "id": "chk_02",
+      "text": "바론 확보 후 30초간 교전 자제, 구조물 압박에 집중하기 — 바론 버프의 가치를 타워로 전환한다."
+    },
+    {
+      "id": "chk_03",
+      "text": "25분 이후 판테온의 역할을 이니시에서 필링/시야로 전환하기 — 후반 스케일링 한계를 인정하고 팀원 보호에 집중한다."
+    },
+    {
+      "id": "chk_04",
+      "text": "데스 후 즉시 같은 위치로 복귀하지 않기 — 연속 데스 패턴(16~19분)을 의식적으로 끊는다."
+    },
+    {
+      "id": "chk_05",
+      "text": "드래곤 오브젝트에 더 적극적으로 관여하기 — 상대 4드래곤 vs 아군 1드래곤 격차를 줄인다."
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_010",
+      "timestampLabel": "12:38",
+      "phase": "EARLY",
+      "title": "초반 오브젝트 손실",
+      "description": "초반 오브젝트를 상대에게 내주며 레인전 이후 주도권이 넘어간 시점입니다. 오브젝트 타이밍에 맞춘 포지셔닝이 필요했습니다."
+    },
+    {
+      "eventId": "evt_014",
+      "timestampLabel": "16:09",
+      "phase": "MID",
+      "title": "중반 연속 데스의 시작",
+      "description": "16분부터 시작된 연속 데스의 첫 장면입니다. 이후 19분까지 4연속 사망으로 이어지며 경기 흐름이 완전히 기울었습니다."
+    },
+    {
+      "eventId": "evt_030",
+      "timestampLabel": "25:21",
+      "phase": "MID",
+      "title": "첫 바론 확보 — 반등 기회",
+      "description": "25분 바론 확보로 팀에 반등 기회가 생겼지만, 직후 오브젝트 손실(evt_031)로 이점이 상쇄되었습니다."
+    },
+    {
+      "eventId": "evt_041",
+      "timestampLabel": "31:55",
+      "phase": "LATE",
+      "title": "후반 바론 확보 후 즉사",
+      "description": "바론 교전에 참여해 확보에 성공했지만, 8초 후(evt_043) 사망하며 바론 버프를 활용하지 못한 결정적 장면입니다."
+    },
+    {
+      "eventId": "evt_039",
+      "timestampLabel": "31:15",
+      "phase": "LATE",
+      "title": "드래곤 교전 참여",
+      "description": "후반 드래곤 교전에 팀이 합류했으나, 전체 경기에서 드래곤 1회 확보에 그쳐 용 영혼 경쟁에서 완패했습니다."
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_010",
+      "usedIn": [
+        "phaseSummaries.early",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_014",
+      "usedIn": [
+        "strengths.str_02",
+        "weaknesses.wk_01",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_015",
+      "usedIn": [
+        "weaknesses.wk_01"
+      ]
+    },
+    {
+      "eventId": "evt_017",
+      "usedIn": [
+        "weaknesses.wk_01"
+      ]
+    },
+    {
+      "eventId": "evt_019",
+      "usedIn": [
+        "weaknesses.wk_01"
+      ]
+    },
+    {
+      "eventId": "evt_025",
+      "usedIn": [
+        "strengths.str_02"
+      ]
+    },
+    {
+      "eventId": "evt_030",
+      "usedIn": [
+        "strengths.str_01",
+        "strengths.str_03",
+        "weaknesses.wk_02",
+        "phaseSummaries.mid",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_031",
+      "usedIn": [
+        "weaknesses.wk_02",
+        "phaseSummaries.mid",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_035",
+      "usedIn": [
+        "strengths.str_02",
+        "weaknesses.wk_03",
+        "phaseSummaries.mid"
+      ]
+    },
+    {
+      "eventId": "evt_038",
+      "usedIn": [
+        "weaknesses.wk_03",
+        "phaseSummaries.mid"
+      ]
+    },
+    {
+      "eventId": "evt_039",
+      "usedIn": [
+        "phaseSummaries.late",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_041",
+      "usedIn": [
+        "strengths.str_01",
+        "strengths.str_03",
+        "weaknesses.wk_02",
+        "phaseSummaries.late",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_043",
+      "usedIn": [
+        "weaknesses.wk_02",
+        "weaknesses.wk_03",
+        "phaseSummaries.late",
+        "keyMoments"
+      ]
+    }
+  ],
+  "schemaVersion": "1.0"
+}

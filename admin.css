@@ -13,6 +13,22 @@
   --gold: #d7b36a;
   --green: #56d4a7;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+
+  /* Phase 4: index.html과 통합된 디자인 토큰 (alias) */
+  --accent: var(--gold);          /* index.html의 강조색과 의미 일치 */
+  --mint: var(--green);
+  --rose: var(--red);
+  --info: var(--blue);
+  --on-accent: #11161a;
+
+  /* Spacing & radius scale (styles.css와 동일) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px;
+  --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 28px; --radius-pill: 999px;
+
+  /* a11y */
+  --touch-min: 44px;
+  --focus-ring: #ffd166;
 }
 
 * {
@@ -28,7 +44,10 @@ body {
     radial-gradient(circle at top right, rgba(255, 116, 103, 0.16), transparent 22%),
     linear-gradient(145deg, var(--bg), var(--bg-deep));
   color: var(--text);
-  font-family: "Trebuchet MS", "Arial Narrow", Arial, sans-serif;
+  /* Phase 4: index.html과 동일한 본문 폰트 스택 */
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
+               "Noto Sans KR", "맑은 고딕", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 body::before {
@@ -97,12 +116,15 @@ p {
   margin: 0;
 }
 
+/* Phase 4: 헤딩에서도 동일한 Pretendard 사용 (index.html과 통일) */
 h1,
 h2,
 h3,
 .summary-tile strong,
 .turn-chip {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  font-weight: 800;
 }
 
 h1 {
@@ -128,6 +150,7 @@ h1 {
 }
 
 .hero-link {
+  /* 이미 52px이라 WCAG 통과 — 폰트만 통일 */
   min-height: 52px;
   padding: 0 18px;
   border-radius: 999px;
@@ -135,6 +158,7 @@ h1 {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   text-decoration: none;
+  font-weight: 700;
 }
 
 .admin-main,
@@ -211,13 +235,16 @@ h1 {
 }
 
 .btn {
-  min-height: 42px;
+  /* Phase 4: WCAG 2.5.5 — 최소 44px 터치 타겟 */
+  min-height: var(--touch-min);
   padding: 0 16px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   cursor: pointer;
+  font: inherit;
+  font-weight: 700;
 }
 
 .btn--accent {
@@ -264,13 +291,11 @@ h1 {
   resize: vertical;
 }
 
-.field input:focus,
-.field select:focus,
-.field textarea:focus,
-.btn:focus,
-.hero-link:focus {
-  outline: 2px solid rgba(215, 179, 106, 0.52);
+/* Phase 4: 글로벌 :focus-visible — 키보드 사용자 전용 포커스 링 */
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .hint {
@@ -280,7 +305,8 @@ h1 {
 
 .live-badge,
 .turn-chip {
-  min-height: 38px;
+  /* Phase 4: 라이브 표시·턴 칩도 본문 텍스트와 같은 위계의 터치 타겟 */
+  min-height: var(--touch-min);
   padding: 0 14px;
   border-radius: 999px;
   border: 1px solid var(--line-strong);
@@ -382,5 +408,29 @@ h1 {
   .btn,
   .hero-link {
     width: 100%;
+  }
+}
+
+/* Phase 4: a11y 유틸리티 */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px; padding: 0;
+  margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; top: 12px; left: 12px; z-index: 100;
+  padding: 12px 18px; border-radius: 999px;
+  background: var(--accent); color: var(--on-accent);
+  font-weight: 700; text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 180ms ease;
+}
+.skip-link:focus { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
   }
 }

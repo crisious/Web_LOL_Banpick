@@ -381,6 +381,96 @@ function matchPatchLabel(version) {
   return patch ? `패치 ${patch}` : "패치 -";
 }
 
+/**
+ * Phase 14: 메트릭 delta 인디케이터의 핵심 계산 로직
+ *
+ * 노이즈 컷(차이가 비교값의 1% 또는 0.05 미만이면 무의미)을 적용하고
+ * 표시 여부 + 표시할 텍스트 정보를 반환. 표시 안 함이면 null.
+ *
+ * @returns {{isUp: boolean, formatted: string, label: string} | null}
+ */
+function _computeDeltaParts(current, reference, opts) {
+  if (typeof current !== "number" || typeof reference !== "number" || !isFinite(reference)) return null;
+  if (reference === 0 && current === 0) return null;
+  const diff = current - reference;
+  const absDiff = Math.abs(diff);
+  if (absDiff < Math.max(reference * 0.01, 0.05)) return null;
+  return {
+    isUp: diff > 0,
+    formatted: opts?.formatValue ? opts.formatValue(absDiff) : absDiff.toFixed(1),
+    label: opts?.label || "비교",
+  };
+}
+
+/**
+ * Phase 14: HTML 문자열 버전 — innerHTML 템플릿 안에 직접 끼워 넣을 때.
+ * 표시 안 함이면 빈 문자열 반환 (템플릿에서 `${... || ''}` 안 써도 안전).
+ */
+function metricDeltaHtml(current, reference, opts) {
+  const parts = _computeDeltaParts(current, reference, opts);
+  if (!parts) return "";
+  const arrow = parts.isUp ? "▲" : "▼";
+  const sign = parts.isUp ? "+" : "-";
+  const cls = parts.isUp ? "up" : "down";
+  const aria = `${parts.label} 대비 ${parts.isUp ? "증가" : "감소"} ${parts.formatted}`;
+  return `<span class="metric__delta metric__delta--${cls}" aria-label="${aria}">${arrow} ${sign}${parts.formatted} ${parts.label}</span>`;
+}
+
+/**
+ * Phase 11: state.recentStats가 갱신되면 개요 탭의 메트릭 delta들을 다시 그림.
+ * renderSnapshot 전체를 다시 호출하지 않고 delta만 추가/갱신해 깜빡임 방지.
+ */
+function refreshMetricDeltas() {
+  const sample = state.currentSample;
+  if (!sample) return;
+  // Phase 11: detail-metrics의 CS/분 카드 delta 갱신
+  if (dom.snapshotCsPerMin) {
+    const cs = sample.normalized?.playerStats?.csPerMinute;
+    renderMetricDelta(dom.snapshotCsPerMin, cs, state.recentStats?.overall?.avgCsPerMin, {
+      formatValue: v => v.toFixed(1),
+      label: "최근 평균",
+    });
+  }
+  // Phase 14: stat-ribbon은 innerHTML 일괄 렌더라 renderStats를 다시 호출해 delta 동기화
+  if (dom.statRibbon && typeof renderStats === "function") {
+    renderStats(sample);
+  }
+}
+
+/**
+ * Phase 11: 메트릭 카드의 평균 대비 delta 인디케이터 렌더
+ *
+ * Phase 5에서 만든 .metric__delta--up/--down CSS hook을 사용해
+ * "▲ +0.9 vs 최근 평균" 같은 비교 정보를 메트릭 카드에 추가합니다.
+ *
+ * @param {HTMLElement} valueEl - 값이 들어있는 <strong data-snapshot-*> 요소
+ * @param {number|undefined} current - 현재 경기 값
+ * @param {number|undefined} reference - 비교 대상 (보통 평균)
+ * @param {{formatValue:(n:number)=>string, label:string}} opts
+ */
+function renderMetricDelta(valueEl, current, reference, opts) {
+  if (!valueEl) return;
+  const metricCard = valueEl.closest(".metric") || valueEl.closest(".stat-card");
+  if (!metricCard) return;
+
+  // 기존 delta 노드가 있으면 항상 정리부터 (재렌더 시 중복 방지)
+  const existing = metricCard.querySelector(".metric__delta");
+  if (existing) existing.remove();
+
+  // Phase 14: 핵심 계산 로직은 _computeDeltaParts로 통합
+  const parts = _computeDeltaParts(current, reference, opts);
+  if (!parts) return;
+
+  const arrow = parts.isUp ? "▲" : "▼";
+  const sign = parts.isUp ? "+" : "-";
+  const el = document.createElement("span");
+  el.className = `metric__delta metric__delta--${parts.isUp ? "up" : "down"}`;
+  el.textContent = `${arrow} ${sign}${parts.formatted} ${parts.label}`.trim();
+  el.setAttribute("aria-label",
+    `${parts.label} 대비 ${parts.isUp ? "증가" : "감소"} ${parts.formatted}`);
+  metricCard.appendChild(el);
+}
+
 const TIER_LABELS = {
   IRON: "아이언",
   BRONZE: "브론즈",
@@ -839,6 +929,13 @@ function aggregateRecentStats(matches) {
     avgKda: 0,
     avgCsPerMin: 0,
     avgDurationSec: 0,
+    // Phase 15: stat-ribbon Damage/Vision 카드의 delta 비교용 평균
+    avgDamage: 0,
+    avgVisionScore: 0,
+    // Phase 17: 게임 시간으로 정규화한 분당 데미지 — 절대값보다 노이즈 적음
+    avgDamagePerMin: 0,
+    // Phase 18: Vision도 분당으로 일관성 있게
+    avgVisionScorePerMin: 0,
   };
 
   const championMap = new Map();
@@ -849,6 +946,15 @@ function aggregateRecentStats(matches) {
   let totalAssists = 0;
   let csPerMinSum = 0;
   let durationSum = 0;
+  // Phase 15
+  let damageSum = 0;
+  let visionSum = 0;
+  // Phase 17: 분당 데미지를 매치별로 계산 후 평균 — 게임 시간 편차 흡수
+  let dmgPerMinSum = 0;
+  let dmgPerMinCount = 0;
+  // Phase 18: 분당 시야 점수도 동일 패턴
+  let visPerMinSum = 0;
+  let visPerMinCount = 0;
 
   for (const m of safe) {
     if (m.result === "WIN") overall.wins += 1;
@@ -858,6 +964,22 @@ function aggregateRecentStats(matches) {
     totalAssists += m.assists || 0;
     csPerMinSum += Number(m.csPerMin) || 0;
     durationSum += Number(m.durationSeconds) || 0;
+    // Phase 15: 서버 summarizeMatch가 이미 이 두 필드를 매치별로 반환함
+    damageSum += Number(m.damageToChampions) || 0;
+    visionSum += Number(m.visionScore) || 0;
+    // Phase 17: 분당 데미지 (durationSeconds가 0이면 의미 없는 값이라 스킵)
+    const durSec = Number(m.durationSeconds) || 0;
+    const dmg = Number(m.damageToChampions) || 0;
+    if (durSec > 0 && dmg > 0) {
+      dmgPerMinSum += dmg / (durSec / 60);
+      dmgPerMinCount += 1;
+    }
+    // Phase 18: 분당 시야 점수 (vision은 0도 의미 있는 값이라 dmg와 가드 분리)
+    const vis = Number(m.visionScore) || 0;
+    if (durSec > 0) {
+      visPerMinSum += vis / (durSec / 60);
+      visPerMinCount += 1;
+    }
 
     const championKey = m.champion || "Unknown";
     if (!championMap.has(championKey)) {
@@ -888,6 +1010,13 @@ function aggregateRecentStats(matches) {
   overall.avgKda = computeKdaRatio(totalKills, totalDeaths, totalAssists);
   overall.avgCsPerMin = safe.length > 0 ? +(csPerMinSum / safe.length).toFixed(1) : 0;
   overall.avgDurationSec = safe.length > 0 ? Math.round(durationSum / safe.length) : 0;
+  // Phase 15: damage는 정수, vision은 정수 점수
+  overall.avgDamage = safe.length > 0 ? Math.round(damageSum / safe.length) : 0;
+  overall.avgVisionScore = safe.length > 0 ? +(visionSum / safe.length).toFixed(1) : 0;
+  // Phase 17: 분당 데미지 — 매치별 정규화 후 평균 (정수 라운드)
+  overall.avgDamagePerMin = dmgPerMinCount > 0 ? Math.round(dmgPerMinSum / dmgPerMinCount) : 0;
+  // Phase 18: 분당 시야 점수 — 소수 1자리
+  overall.avgVisionScorePerMin = visPerMinCount > 0 ? +(visPerMinSum / visPerMinCount).toFixed(1) : 0;
 
   const byChampion = Array.from(championMap.values())
     .map((c) => ({
@@ -1030,6 +1159,9 @@ async function fetchRecentStats({ force = false } = {}) {
     renderRecentAggregate();
     if (typeof renderChampionBreakdown === "function") renderChampionBreakdown();
     if (typeof renderRoleBreakdown === "function") renderRoleBreakdown();
+
+    // Phase 11: 평균 데이터가 새로 들어왔으니 개요 탭의 메트릭 delta도 갱신
+    refreshMetricDeltas();
   } catch (error) {
     state.recentStatsError = error.message || String(error);
     renderRecentStatsError(state.recentStatsError);
@@ -1426,6 +1558,11 @@ function renderHero(sample) {
   if (dom.snapshotCsPerMin) {
     const cs = sample.normalized?.playerStats?.csPerMinute;
     dom.snapshotCsPerMin.textContent = typeof cs === "number" ? cs.toFixed(2) : "—";
+    // Phase 11: 평균 대비 delta 인디케이터 (recentStats가 로드된 경우에만 표시)
+    renderMetricDelta(dom.snapshotCsPerMin, cs, state.recentStats?.overall?.avgCsPerMin, {
+      formatValue: v => v.toFixed(1),
+      label: "최근 평균",
+    });
   }
 
   // 마스터리 정보 표시
@@ -1468,36 +1605,64 @@ function renderStats(sample) {
     dom.statRibbon.innerHTML = '<p class="muted">스탯 데이터가 없습니다.</p>';
     return;
   }
+  // Phase 14: 평균 비교가 가능한 메트릭만 delta 표시 (KDA, 분당 CS).
+  // damage/vision/gold/KP는 aggregateRecentStats가 평균을 안 갖고 있어 비교 생략.
+  const recent = state.recentStats?.overall;
   const stats = [
     {
       label: "KDA",
       value: `${ps.kills ?? 0}/<span class="kda-death">${ps.deaths ?? 0}</span>/${ps.assists ?? 0}`,
       note: `배수 ${(ps.kda ?? 0).toFixed(2)}`,
+      delta: metricDeltaHtml(ps.kda, recent?.avgKda, { label: "최근 평균", formatValue: v => v.toFixed(2) }),
     },
     {
       label: "CS",
       value: formatNumber(ps.cs ?? 0),
       note: `분당 ${(ps.csPerMinute ?? 0).toFixed(2)}`,
+      delta: metricDeltaHtml(ps.csPerMinute, recent?.avgCsPerMin, { label: "최근 평균", formatValue: v => v.toFixed(1) }),
     },
     {
       label: "Gold",
       value: formatNumber(ps.goldEarned ?? 0),
       note: "누적 획득 골드",
+      delta: "",
     },
-    {
-      label: "Damage",
-      value: formatNumber(ps.damageToChampions ?? 0),
-      note: "챔피언 대상 피해",
-    },
-    {
-      label: "Vision",
-      value: formatNumber(ps.visionScore ?? 0),
-      note: "시야 점수",
-    },
+    (() => {
+      // Phase 17: 분당 데미지로 정규화해서 비교 (게임 시간 편차 흡수).
+      // 현재 경기의 분당 데미지를 계산해 recent.avgDamagePerMin과 비교.
+      const durSec = Number(sample.normalized?.matchInfo?.durationSeconds) || 0;
+      const dmg = ps.damageToChampions ?? 0;
+      const currentDpm = durSec > 0 ? dmg / (durSec / 60) : null;
+      return {
+        label: "Damage",
+        value: formatNumber(dmg),
+        note: durSec > 0 ? `분당 ${formatNumber(Math.round(currentDpm))}` : "챔피언 대상 피해",
+        delta: metricDeltaHtml(currentDpm, recent?.avgDamagePerMin, {
+          label: "분당 평균",
+          formatValue: v => formatNumber(Math.round(v)),
+        }),
+      };
+    })(),
+    (() => {
+      // Phase 18: Vision도 분당 정규화 (Phase 17과 동일 패턴)
+      const durSec = Number(sample.normalized?.matchInfo?.durationSeconds) || 0;
+      const vis = ps.visionScore ?? 0;
+      const currentVpm = durSec > 0 ? vis / (durSec / 60) : null;
+      return {
+        label: "Vision",
+        value: formatNumber(vis),
+        note: durSec > 0 ? `분당 ${currentVpm.toFixed(1)}` : "시야 점수",
+        delta: metricDeltaHtml(currentVpm, recent?.avgVisionScorePerMin, {
+          label: "분당 평균",
+          formatValue: v => v.toFixed(1),
+        }),
+      };
+    })(),
     {
       label: "KP",
       value: formatPercent(ps.killParticipation ?? 0),
       note: `팀 킬 ${tc?.teamTotalKills ?? 0}`,
+      delta: "",
     },
   ];
 
@@ -1508,6 +1673,7 @@ function renderStats(sample) {
           <span class="meta-label">${stat.label}</span>
           <strong>${stat.value}</strong>
           <span class="stat-note">${stat.note}</span>
+          ${stat.delta}
         </article>
       `,
     )
@@ -1555,11 +1721,19 @@ function renderInsightCards(host, items, kind, sample) {
       const footer = footerText ? `<p class="insight-footer">${footerText}</p>` : "";
       const evidenceText = item.evidence || linkedEvidence[0]?.summary || "";
 
+      // Phase 16: relatedEventIds 개수로 임팩트 레벨 추정
+      // 5+ = high (경기 전반에 걸친 패턴), 3-4 = medium, 1-2 = low, 0 = 칩 생략
+      const eventCount = (item.relatedEventIds || []).length;
+      const impactChip = renderInsightImpactChip(eventCount);
+
       return `
         <article class="insight-card" data-kind="${kind}">
           <div class="insight-card__header">
             <h4>${item.title}</h4>
-            <span>${kind === "strength" ? "잘한 점" : "개선 포인트"}</span>
+            <div class="insight-card__chips">
+              <span>${kind === "strength" ? "잘한 점" : "개선 포인트"}</span>
+              ${impactChip}
+            </div>
           </div>
           <p class="insight-body">${item.description}</p>
           <p class="insight-evidence">${evidenceText}</p>
@@ -1577,6 +1751,19 @@ function renderInsightCards(host, items, kind, sample) {
       `;
     })
     .join("");
+}
+
+/**
+ * Phase 16: 인사이트 임팩트 칩 — relatedEventIds 개수를 영향 범위 시그널로 사용.
+ * 의도적으로 "근거 N건"이라는 정직한 표현 + 색상 강도로 정보 전달.
+ * (priority 같은 별도 필드를 추정하지 않음 — 사용자가 본 데이터로 검증 가능)
+ */
+function renderInsightImpactChip(eventCount) {
+  if (!eventCount || eventCount < 1) return "";
+  let level = "low";
+  if (eventCount >= 5) level = "high";
+  else if (eventCount >= 3) level = "medium";
+  return `<span class="insight-impact insight-impact--${level}" aria-label="근거 이벤트 ${eventCount}건">근거 ${eventCount}건</span>`;
 }
 
 function renderChecklist(sample) {
@@ -1732,9 +1919,13 @@ function renderPlaytimeScore(sample) {
     </div>
   `).join("");
 
+  // Phase 5: conic-gradient 링에 점수(0-100%) + 색상 주입
+  // score.overall은 0-10 스케일이라 * 10 해서 퍼센트로 변환
+  const scorePct = Math.max(0, Math.min(100, score.overall * 10));
+  const scoreColor = barColor(score.overall);
   dom.scorePanel.innerHTML = `
-    <div class="score-overall">
-      <div class="score-overall-number" style="color: ${barColor(score.overall)}">${score.overall}</div>
+    <div class="score-overall" style="--score: ${scorePct}; --score-color: ${scoreColor}" role="img" aria-label="종합 점수 ${score.overall} / 10">
+      <div class="score-overall-number">${score.overall}</div>
       <div class="score-overall-label">${score.label}<span class="score-badge score-badge--${score.overall >= 8 ? "mvp" : score.overall >= 6 ? "good" : "avg"}">${score.label}</span></div>
       <div class="score-overall-sub">/ 10</div>
     </div>
@@ -3120,15 +3311,18 @@ async function init() {
 
 // ─── Tab system ─────────────────────────────────────────────────────────
 
-function switchTab(tabId) {
+function switchTab(tabId, opts = {}) {
   const dashboard = document.getElementById("main-content");
   if (!dashboard) return;
 
   // Update tab-bar buttons
+  // Phase 1: tabindex roving — 활성 탭만 0, 나머지는 -1 (WAI-ARIA Tabs Pattern)
   dashboard.querySelectorAll(".tab-btn").forEach((btn) => {
     const isActive = btn.dataset.tab === tabId;
     btn.classList.toggle("tab-btn--active", isActive);
-    btn.setAttribute("aria-selected", isActive);
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    btn.setAttribute("tabindex", isActive ? "0" : "-1");
+    if (isActive && opts.focus) btn.focus();
   });
 
   // Update tab pages
@@ -3197,6 +3391,24 @@ function initTabSystem() {
     dom.tabBar.addEventListener("click", (e) => {
       const btn = e.target.closest(".tab-btn");
       if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
+    });
+
+    // Phase 1: 키보드 네비게이션 — WAI-ARIA Tabs Pattern (←/→/Home/End)
+    dom.tabBar.addEventListener("keydown", (e) => {
+      const tabs = Array.from(dom.tabBar.querySelectorAll(".tab-btn"));
+      const currentIdx = tabs.indexOf(document.activeElement);
+      if (currentIdx === -1) return;
+      let nextIdx = -1;
+      switch (e.key) {
+        case "ArrowRight": nextIdx = (currentIdx + 1) % tabs.length; break;
+        case "ArrowLeft":  nextIdx = (currentIdx - 1 + tabs.length) % tabs.length; break;
+        case "Home":       nextIdx = 0; break;
+        case "End":        nextIdx = tabs.length - 1; break;
+        default: return;
+      }
+      e.preventDefault();
+      const nextTab = tabs[nextIdx];
+      if (nextTab && nextTab.dataset.tab) switchTab(nextTab.dataset.tab, { focus: true });
     });
   }
 
