@@ -3616,6 +3616,36 @@ body::after {
 .champion-history-progress__bar::-webkit-progress-value { background: var(--accent); border-radius: var(--radius-pill); }
 .champion-history-progress__bar::-moz-progress-bar { background: var(--accent); border-radius: var(--radius-pill); }
 
+.champion-history-table-wrap { overflow-x: auto; }
+.champion-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.champion-table th,
+.champion-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: right;
+  border-bottom: 1px solid var(--surface-2);
+}
+.champion-table th:first-child,
+.champion-table td:first-child { text-align: left; }
+.champion-table th {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  background: var(--surface-1);
+  position: sticky;
+  top: 0;
+}
+.champion-table__sort-btn {
+  background: none; border: none; color: inherit; padding: 0; cursor: pointer; font: inherit;
+}
+.champion-table__sort-btn:hover { color: var(--text); }
+.champion-table tbody tr:hover { background: var(--surface-1); }
+.champion-table__champion { display: flex; align-items: center; gap: var(--space-2); }
+.champion-table .wr-strong { color: var(--accent); font-weight: 600; }
+.champion-table .wr-weak   { color: var(--rose); }
+
 .champion-history-action-btn {
   padding: 8px 18px;
   background: var(--accent);

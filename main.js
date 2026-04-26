@@ -3747,9 +3747,108 @@ function updateChampionHistoryProgress(info) {
   }
 }
 
+const CHAMPION_TABLE_COLUMNS = [
+  { key: "champion",         label: "챔피언",       sortType: "string", thAlign: "left" },
+  { key: "count",            label: "게임수",       sortType: "number" },
+  { key: "wrPct",            label: "승률",         sortType: "number" },
+  { key: "avgKda",           label: "KDA",          sortType: "number" },
+  { key: "avgCsPerMin",      label: "CS/분",        sortType: "number" },
+  { key: "avgDamagePerMin",  label: "데미지/분",    sortType: "number" },
+  { key: "avgKp",            label: "킬관여",       sortType: "number" },
+];
+
 function renderChampionHistory() {
-  // Phase 6/7에서 채움
+  if (!state.championHistory) return;
   if (dom.championHistoryEmpty) dom.championHistoryEmpty.hidden = true;
+  if (dom.championHistoryTableWrap) dom.championHistoryTableWrap.hidden = false;
+
+  const stats = aggregateChampionHistory(state.championHistory.matches);
+  renderChampionSummary(stats);
+  renderChampionTable(stats.byChampion, state.championHistorySort.key, state.championHistorySort.dir);
+  updateChampionHistoryMeta(state.championHistory);
+}
+
+function updateChampionHistoryMeta(history) {
+  if (!dom.championHistoryMeta) return;
+  const fetched = new Date(history.fetchedAt);
+  const ageMin = Math.round((Date.now() - fetched.getTime()) / 60000);
+  const ageLabel = ageMin < 1 ? "방금 전" : ageMin < 60 ? `${ageMin}분 전` : `${Math.round(ageMin / 60)}시간 전`;
+  const expired = history.expired ? " · 만료됨" : "";
+  dom.championHistoryMeta.textContent = `${history.totalGames}경기 · 마지막 갱신 ${ageLabel}${expired}`;
+  if (dom.championHistoryAction) {
+    dom.championHistoryAction.textContent = "다시 분석";
+  }
+}
+
+function renderChampionSummary(stats) {
+  if (!dom.championHistorySummary) return;
+  dom.championHistorySummary.hidden = stats.totalGames === 0;
+  dom.championHistorySummary.innerHTML = ""; // Phase 7
+}
+
+function renderChampionTable(byChampion, sortKey, sortDir) {
+  if (!dom.championHistoryTable) return;
+  const rows = byChampion.slice().sort((a, b) => {
+    const col = CHAMPION_TABLE_COLUMNS.find((c) => c.key === sortKey);
+    const av = a[sortKey];
+    const bv = b[sortKey];
+    if (!col || col.sortType === "number") {
+      return sortDir === "desc" ? bv - av : av - bv;
+    }
+    return sortDir === "desc"
+      ? String(bv).localeCompare(String(av))
+      : String(av).localeCompare(String(bv));
+  });
+
+  const thead = dom.championHistoryTable.querySelector("thead");
+  const tbody = dom.championHistoryTable.querySelector("tbody");
+
+  thead.innerHTML = `
+    <tr>
+      ${CHAMPION_TABLE_COLUMNS.map((col) => {
+        const ariaSort = col.key === sortKey ? (sortDir === "desc" ? "descending" : "ascending") : "none";
+        const arrow = col.key === sortKey ? (sortDir === "desc" ? " ▼" : " ▲") : "";
+        return `<th scope="col" aria-sort="${ariaSort}">
+          <button type="button" class="champion-table__sort-btn" data-sort-key="${col.key}">${col.label}${arrow}</button>
+        </th>`;
+      }).join("")}
+    </tr>
+  `;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${CHAMPION_TABLE_COLUMNS.length}" class="muted">표시할 데이터가 없습니다.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows
+    .map((c) => `
+      <tr>
+        <td class="champion-table__champion">
+          ${championAvatarMarkup(c.champion, "small")}
+          <span>${championDisplayName(c.champion)}</span>
+        </td>
+        <td>${c.count}</td>
+        <td class="${c.wrPct >= 60 ? "wr-strong" : c.wrPct < 50 ? "wr-weak" : ""}">${c.wrPct.toFixed(1)}%</td>
+        <td>${c.avgKda.toFixed(2)}</td>
+        <td>${c.avgCsPerMin.toFixed(1)}</td>
+        <td>${c.avgDamagePerMin}</td>
+        <td>${c.avgKp}%</td>
+      </tr>
+    `)
+    .join("");
+
+  thead.querySelectorAll("[data-sort-key]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.sortKey;
+      if (state.championHistorySort.key === key) {
+        state.championHistorySort.dir = state.championHistorySort.dir === "desc" ? "asc" : "desc";
+      } else {
+        state.championHistorySort.key = key;
+        state.championHistorySort.dir = key === "champion" ? "asc" : "desc";
+      }
+      renderChampionTable(byChampion, state.championHistorySort.key, state.championHistorySort.dir);
+    });
+  });
 }
 
 init();
