@@ -1,5 +1,15 @@
 # Web_LOL_Banpick · 디자인/접근성 통합 패치
 
+## iter.11 — 챔피언 탭
+
+**날짜**: 2026-04-27
+**범위**: server.js (+SSE 엔드포인트), main.js (+SSE 클라이언트, +집계 함수, +렌더), index.html (+5번째 탭), styles.css (+champion-table)
+**스펙**: docs/superpowers/specs/2026-04-27-champions-tab-design.md
+
+현재 시즌(S16) 솔랭/자랭 풀 히스토리를 한 번에 분석하는 5번째 탭 `tab-champions`를 추가했다. SSE 진행률 + AbortController 취소 + localStorage 24h 캐시. 챔피언별 7컬럼(챔피언/게임수/승률/KDA/CS·분/데미지·분/킬관여) 정렬 가능 표 + 4분할 요약 카드. 디자인 불변식 모두 준수: index.html 구조 보존 + main.js 셀렉터 보존 + 신규 CSS 토큰 0.
+
+---
+
 **날짜**: 2026-04-26
 **범위**: 프로덕션 코드 6개 파일 + 신규 디자인 목업 3개 (`_design-mockups/`로 정리)
 **검증**: axe-core WCAG 2.1 AA 5/5 PASS · 0 violations

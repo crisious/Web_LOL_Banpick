@@ -9,6 +9,7 @@
 ### Riot ID 로그인 + 최근 경기 리스트
 - Riot ID(gameName + tagLine + region) 입력으로 시작
 - 최근 10게임 요약을 즉시 표시 (챔피언, 역할, 승패, KDA, CS/분, 시간, 큐타입, 패치)
+- 챔피언 탭: 현재 시즌(S16) 솔랭/자랭 풀 히스토리 분석 → 챔피언별 7컬럼 정렬 가능 표 + 진행률/취소/24시간 캐시
 - "이전 경기 10개 더 보기" 버튼으로 10개 단위 페이지네이션 (API 요청 간 10초 rate-limit)
 - localStorage로 계정 기억 — 새로고침 시 자동 로그인
 - 랭크 카드: 한글 티어 + 솔로/자유 큐 라벨, Master/GM/Challenger는 디비전 미표시, 솔로 없으면 자유랭크로 fallback, 조회 실패/미랭크 분리
@@ -104,6 +105,10 @@
 ├── design-tokens.md    # 디자인 시스템 토큰 스냅샷 (color / radius / space / font-size)
 ├── CHANGELOG.md        # iter.10 디자인/접근성 통합 패치 (24 페이즈 상세 내역)
 ├── PLAN.md             # design-critique → 후속 작업 매트릭스 (Phase 20~24)
+├── docs/
+│   └── superpowers/
+│       ├── specs/      # 기능 스펙 (예: 2026-04-27-champions-tab-design.md)
+│       └── plans/      # 구현 플랜 (Phase 단위 task 분해)
 ├── _design-mockups/    # 디자인 레퍼런스 목업 (improved-mockup / improved-full / improved-admin)
 ├── scripts/
 │   └── design-audit.js # styles.css 토큰 커버리지 / 하드코딩 literal / breakpoint 감사 CLI
@@ -123,6 +128,7 @@
 - **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
 - **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
 - **최근 UI 정리** (iter.10 — 디자인/접근성 통합 패치, **24 페이즈**): `index.html`/`admin.html` 두 페이지가 토큰·폰트·접근성을 공유하도록 통합. axe-core WCAG 2.1 AA 5/5 PASS · 위반 0건. WAI-ARIA Tabs Pattern(←/→/Home/End + tabindex 로빙), 44px 터치 타겟(`--touch-min`), 글로벌 `:focus-visible`(`--focus-ring` 13:1), Pretendard 통일, 명시적 `<label for>` 매칭. 비주얼: 160×160 conic-gradient 점수 링(`.score-states` 변형 갤러리), pill 탭바, amber+mint 듀얼 그라디언트 헤더, stat-ribbon delta 시스템(KDA·CS·Damage·Vision 평균 대비 ▲▼ — Damage/Vision은 분당 정규화), 인사이트 카드 임팩트 칩("근거 N건" mint/rose 듀얼 톤), `.role-tag` 알약 칩, info 톤 trend-callout(히어로와 의미 분리), SVG 차트 `<title>`/`<desc>` a11y. **자체 design-critique 후속 폴리싱(Phase 21~24)** 포함 — [PLAN.md](PLAN.md)에 finding 매트릭스, [CHANGELOG.md](CHANGELOG.md)에 24 페이즈 상세 내역
+- iter.11 (2026-04-27 ~): 챔피언 탭 추가 — `POST /api/champion-history` SSE + `fetch+ReadableStream` SSE 클라이언트 + localStorage 24h 캐시 + AbortController 취소. 7컬럼 정렬 가능 표 + 4분할 요약 카드. [docs/superpowers/specs/2026-04-27-champions-tab-design.md](docs/superpowers/specs/2026-04-27-champions-tab-design.md)
 - iter.9: tab-trends에 최근 20경기 누적 분석 3개 패널(recent-aggregate / champion-breakdown / role-breakdown) 추가, 세션 캐시 + 새로고침 버튼. iter.8: 사이드바 슬림화, Overview compact detail-header, 10게임 OP.GG row format, 탭 전환 skeleton. iter.7: 상태색 알파 토큰 9종, Georgia 제거, 760px 통합, `--wr` fallback. 그 이전: `--tint-*`, `--shadow-hover`, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
 - 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
 
