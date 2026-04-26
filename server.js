@@ -9,6 +9,9 @@ const { spawn } = require("child_process");
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
 const port = Number(process.env.PORT || 8123);
+// Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
+// S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
+const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000;
 const manifestPath = path.join(root, "data", "samples", "manifest.json");
 
 // ─── Simple in-memory rate limiter ───────────────────────────────────────────
@@ -1665,6 +1668,40 @@ async function buildAnalysis(normalized, sampleId) {
 
   console.log(`[AI] Analysis complete for ${sampleId} — primary: ${primary.analysisMeta.sourceType}`);
   return primary;
+}
+
+// Riot 한도 100req/2min → 1.2초 간격 sleep. handleChampionHistory의 매치 페치 루프에서 사용.
+function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+function writeSseHeaders(res) {
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+  });
+}
+
+function writeSseEvent(res, event, data) {
+  res.write(`event: ${event}\n`);
+  res.write(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+async function getCurrentSeasonRankedMatchIds(cluster, headers, puuid, queueId, onProgress) {
+  const ids = [];
+  let start = 0;
+  const count = 100;
+  while (true) {
+    const url = `https://${cluster}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?queue=${queueId}&startTime=${SEASON_START_EPOCH}&start=${start}&count=${count}`;
+    const batch = await requestJson(url, headers);
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    ids.push(...batch);
+    if (typeof onProgress === "function") onProgress({ queueId, fetched: ids.length });
+    if (batch.length < count) break;
+    start += count;
+    await sleep(1200);
+  }
+  return ids;
 }
 
 function requestJson(urlString, headers = {}) {
