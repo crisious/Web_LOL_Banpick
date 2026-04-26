@@ -3665,7 +3665,8 @@ function updateChampionHistoryProgress(info) {
   if (info.phase === "account") {
     showChampionHistoryProgress("매치 ID 조회 중…", 0, 0);
   } else if (info.phase === "ids") {
-    showChampionHistoryProgress(`매치 ID 수집 중 (큐 ${info.queueId})`, info.fetched, 0);
+    const queueLabel = info.queueId === 420 ? "솔랭" : info.queueId === 440 ? "자랭" : `큐 ${info.queueId}`;
+    showChampionHistoryProgress(`매치 ID 수집 중 (${queueLabel})`, info.fetched, 0);
   } else if (info.phase === "ids-done") {
     showChampionHistoryProgress("매치 상세 분석 중", 0, info.total);
   } else if (info.phase === "details") {
