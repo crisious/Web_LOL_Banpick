@@ -102,7 +102,8 @@
 │           ├── comparison-result.json    # AI 비교 결과 (있는 경우)
 │           └── sample-*-notes.md
 ├── design-tokens.md    # 디자인 시스템 토큰 스냅샷 (color / radius / space / font-size)
-├── CHANGELOG.md        # iter.10 디자인/접근성 통합 패치 (18 페이즈 상세 내역)
+├── CHANGELOG.md        # iter.10 디자인/접근성 통합 패치 (24 페이즈 상세 내역)
+├── PLAN.md             # design-critique → 후속 작업 매트릭스 (Phase 20~24)
 ├── _design-mockups/    # 디자인 레퍼런스 목업 (improved-mockup / improved-full / improved-admin)
 ├── scripts/
 │   └── design-audit.js # styles.css 토큰 커버리지 / 하드코딩 literal / breakpoint 감사 CLI
@@ -121,7 +122,7 @@
 - **Radius**: `--radius-xs/sm/md/lg/xl` + `--radius-pill` / `--radius-circle`
 - **Space**: `--space-1` ~ `--space-6` (4–22px, gap 통일)
 - **Font-size**: `--fs-xs` ~ `--fs-3xl` + `--fs-display` / `--fs-hero` (10단계)
-- **최근 UI 정리** (iter.10 — 디자인/접근성 통합 패치, 18 페이즈): `index.html`/`admin.html` 두 페이지가 토큰·폰트·접근성을 공유하도록 통합. axe-core WCAG 2.1 AA 5/5 PASS · 위반 0건. WAI-ARIA Tabs Pattern(←/→/Home/End + tabindex 로빙), 44px 터치 타겟(`--touch-min`), 글로벌 `:focus-visible`(`--focus-ring` 13:1), Pretendard 통일, 명시적 `<label for>` 매칭. 비주얼: 160×160 conic-gradient 점수 링, pill 탭바, amber+mint 듀얼 그라디언트 헤더, stat-ribbon delta 시스템(KDA·CS·Damage·Vision 평균 대비 ▲▼). 자세한 내역은 [CHANGELOG.md](CHANGELOG.md)
+- **최근 UI 정리** (iter.10 — 디자인/접근성 통합 패치, **24 페이즈**): `index.html`/`admin.html` 두 페이지가 토큰·폰트·접근성을 공유하도록 통합. axe-core WCAG 2.1 AA 5/5 PASS · 위반 0건. WAI-ARIA Tabs Pattern(←/→/Home/End + tabindex 로빙), 44px 터치 타겟(`--touch-min`), 글로벌 `:focus-visible`(`--focus-ring` 13:1), Pretendard 통일, 명시적 `<label for>` 매칭. 비주얼: 160×160 conic-gradient 점수 링(`.score-states` 변형 갤러리), pill 탭바, amber+mint 듀얼 그라디언트 헤더, stat-ribbon delta 시스템(KDA·CS·Damage·Vision 평균 대비 ▲▼ — Damage/Vision은 분당 정규화), 인사이트 카드 임팩트 칩("근거 N건" mint/rose 듀얼 톤), `.role-tag` 알약 칩, info 톤 trend-callout(히어로와 의미 분리), SVG 차트 `<title>`/`<desc>` a11y. **자체 design-critique 후속 폴리싱(Phase 21~24)** 포함 — [PLAN.md](PLAN.md)에 finding 매트릭스, [CHANGELOG.md](CHANGELOG.md)에 24 페이즈 상세 내역
 - iter.9: tab-trends에 최근 20경기 누적 분석 3개 패널(recent-aggregate / champion-breakdown / role-breakdown) 추가, 세션 캐시 + 새로고침 버튼. iter.8: 사이드바 슬림화, Overview compact detail-header, 10게임 OP.GG row format, 탭 전환 skeleton. iter.7: 상태색 알파 토큰 9종, Georgia 제거, 760px 통합, `--wr` fallback. 그 이전: `--tint-*`, `--shadow-hover`, skeleton/shimmer, 좁은 모바일 대응, reduced-motion 대응
 - 상세 표와 미토큰화 예외는 [design-tokens.md](design-tokens.md) 참조
 
