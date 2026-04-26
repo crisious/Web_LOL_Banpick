@@ -1877,6 +1877,10 @@ function summarizeMatch(match, puuid) {
   const dur = match.info.gameDuration || 1;
   const cs = (participant.totalMinionsKilled || 0) + (participant.neutralMinionsKilled || 0);
 
+  const teamTotalKills = match.info.participants
+    .filter((p) => p.teamId === participant.teamId)
+    .reduce((sum, p) => sum + (p.kills || 0), 0);
+
   const summary = {
     matchId: match.metadata.matchId,
     queueId: match.info.queueId,
@@ -1894,6 +1898,7 @@ function summarizeMatch(match, puuid) {
     visionScore: participant.visionScore || 0,
     goldEarned: participant.goldEarned || 0,
     damageToChampions: participant.totalDamageDealtToChampions || 0,
+    killParticipation: +(((participant.kills + participant.assists) / Math.max(1, teamTotalKills))).toFixed(2),
     timestamp: match.info.gameCreation,
     items: [participant.item0, participant.item1, participant.item2, participant.item3, participant.item4, participant.item5, participant.item6],
     summonerSpells: [participant.summoner1Id, participant.summoner2Id],
@@ -2022,6 +2027,104 @@ async function handleRecentMatches(req, res) {
       ok: false,
       error: error.message,
     });
+  }
+}
+
+async function handleChampionHistory(req, res) {
+  const ip = req.socket.remoteAddress || "unknown";
+  if (!rateLimit(`championHistory:${ip}`, 60000)) {
+    sendJson(res, 429, { ok: false, error: "60초 후 다시 시도해주세요." });
+    return;
+  }
+
+  let body;
+  try {
+    body = await parseBody(req);
+  } catch (error) {
+    sendJson(res, 400, { ok: false, error: error.message || "invalid body" });
+    return;
+  }
+
+  const apiKey = resolveApiKey(body.riotApiKey);
+  if (!apiKey) {
+    sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다." });
+    return;
+  }
+
+  const gameName = String(body.gameName || "").trim();
+  const tagLine = String(body.tagLine || "").trim();
+  const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
+  if (!gameName || !tagLine) {
+    sendJson(res, 400, { ok: false, error: "gameName and tagLine are required." });
+    return;
+  }
+  const riotIdError = validateRiotId(gameName, tagLine);
+  if (riotIdError) {
+    sendJson(res, 400, { ok: false, error: riotIdError });
+    return;
+  }
+
+  const cluster = regionalCluster(platformRegion);
+  const headers = {
+    "X-Riot-Token": apiKey,
+    "User-Agent": "codex-local-sample-server",
+    Accept: "application/json",
+  };
+
+  writeSseHeaders(res);
+  let aborted = false;
+  req.on("close", () => { aborted = true; });
+
+  try {
+    const account = await requestJson(
+      `https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`,
+      headers,
+    );
+    if (aborted) { res.end(); return; }
+    writeSseEvent(res, "progress", { phase: "account", puuid: account.puuid });
+
+    const queueIds = [420, 440];
+    const allIds = [];
+    for (const queueId of queueIds) {
+      if (aborted) { res.end(); return; }
+      const ids = await getCurrentSeasonRankedMatchIds(cluster, headers, account.puuid, queueId, (info) => {
+        writeSseEvent(res, "progress", { phase: "ids", queueId, fetched: info.fetched });
+      });
+      allIds.push(...ids);
+    }
+    const uniqueIds = Array.from(new Set(allIds));
+    writeSseEvent(res, "progress", { phase: "ids-done", total: uniqueIds.length });
+
+    const matches = [];
+    for (let i = 0; i < uniqueIds.length; i += 1) {
+      if (aborted) { res.end(); return; }
+      const id = uniqueIds[i];
+      try {
+        const match = await requestJson(
+          `https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(id)}`,
+          headers,
+        );
+        const summary = summarizeMatch(match, account.puuid);
+        if (summary && (summary.queueId === 420 || summary.queueId === 440)) {
+          matches.push(summary);
+        }
+      } catch (error) {
+        // 개별 매치 실패는 부분 누락으로 처리, 전체 중단하지 않음
+        writeSseEvent(res, "progress", { phase: "match-error", matchId: id, message: error.message });
+      }
+      writeSseEvent(res, "progress", { phase: "details", current: i + 1, total: uniqueIds.length });
+      if (i < uniqueIds.length - 1) await sleep(1200);
+    }
+
+    writeSseEvent(res, "done", {
+      matches,
+      totalGames: matches.length,
+      fetchedAt: new Date().toISOString(),
+    });
+    res.end();
+  } catch (error) {
+    writeSseEvent(res, "error", { error: error.message || String(error) });
+    res.end();
   }
 }
 
@@ -2191,6 +2294,11 @@ async function handleApi(req, res, url) {
 
   if (req.method === "POST" && url.pathname === "/api/recent-matches") {
     await handleRecentMatches(req, res);
+    return true;
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/champion-history") {
+    await handleChampionHistory(req, res);
     return true;
   }
 
