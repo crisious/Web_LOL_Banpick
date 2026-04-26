@@ -451,12 +451,12 @@ git commit -m "feat(js): add fetchChampionHistory SSE client + 24h localStorage 
               <header class="panel--champions__head">
                 <h2 id="champion-history-title">챔피언별 시즌 분석</h2>
                 <p class="panel--champions__meta muted" data-champion-history-meta>현재 시즌 솔랭/자랭 (1~3분 소요)</p>
-                <button type="button" class="btn btn--secondary" data-champion-history-action>분석 시작</button>
+                <button type="button" class="champion-history-action-btn" data-champion-history-action>분석 시작</button>
               </header>
               <div class="champion-history-progress" data-champion-history-progress hidden>
                 <div class="champion-history-progress__row">
                   <span data-champion-history-progress-label>대기 중…</span>
-                  <button type="button" class="btn btn--ghost" data-champion-history-cancel>취소</button>
+                  <button type="button" class="champion-history-cancel-btn" data-champion-history-cancel>취소</button>
                 </div>
                 <progress class="champion-history-progress__bar" data-champion-history-progress-bar value="0" max="100"></progress>
               </div>
@@ -588,7 +588,7 @@ initChampionsTab();
 .champion-history-empty {
   padding: var(--space-5);
   text-align: center;
-  color: var(--text-muted);
+  color: var(--muted);
   background: var(--surface-1);
   border-radius: var(--radius-md);
 }
@@ -1105,7 +1105,7 @@ function renderChampionTable(byChampion, sortKey, sortDir) {
 .champion-table td:first-child { text-align: left; }
 .champion-table th {
   font-size: var(--fs-sm);
-  color: var(--text-muted);
+  color: var(--muted);
   background: var(--surface-1);
   position: sticky;
   top: 0;
@@ -1215,9 +1215,9 @@ function renderChampionSummary(stats) {
   border-radius: var(--radius-md);
   border: 1px solid var(--surface-2);
 }
-.champion-history-summary__label { font-size: var(--fs-sm); color: var(--text-muted); }
+.champion-history-summary__label { font-size: var(--fs-sm); color: var(--muted); }
 .champion-history-summary__value { font-size: var(--fs-2xl); font-variant-numeric: tabular-nums; }
-.champion-history-summary__note  { font-size: var(--fs-xs); color: var(--text-subtle); }
+.champion-history-summary__note  { font-size: var(--fs-xs); color: var(--muted); }
 ```
 
 - [ ] **Step 3: Manual smoke**
