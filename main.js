@@ -371,7 +371,13 @@ function compactPatchLabel(version) {
   const text = String(version || "");
   const parts = text.split(".");
   if (parts.length >= 2) {
-    return `${parts[0]}.${parts[1]}`;
+    // Riot's gameVersion stores the League season ordinal (S16 = 2026),
+    // but public patch notes use the calendar-year prefix (Patch 26.X).
+    // Add 10 to map season → year for display only; itemCdnVersion still
+    // uses the raw value because Data Dragon URLs are keyed by season.
+    const major = Number(parts[0]);
+    const displayMajor = Number.isFinite(major) ? major + 10 : parts[0];
+    return `${displayMajor}.${parts[1]}`;
   }
   return text;
 }
