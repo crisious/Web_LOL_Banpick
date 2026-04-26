@@ -3635,7 +3635,11 @@ function initTabSystem() {
 
 function initChampionsTab() {
   if (!dom.championHistoryAction) return;
-  dom.championHistoryAction.addEventListener("click", () => startChampionHistoryFetch(false));
+  dom.championHistoryAction.addEventListener("click", () => {
+    // 사전 결과(캐시 hit이든 만료든)가 있으면 사용자가 명시적으로 다시 분석을 요청한 것 → force re-fetch
+    const force = Boolean(state.championHistory);
+    startChampionHistoryFetch(force);
+  });
   dom.championHistoryCancel?.addEventListener("click", () => {
     state.championHistoryAbort?.abort();
   });
