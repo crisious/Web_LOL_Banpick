@@ -1140,6 +1140,77 @@ function aggregateRecentStats(matches) {
   return { overall, byChampion, byRole };
 }
 
+function aggregateChampionHistory(matches) {
+  const safe = Array.isArray(matches) ? matches : [];
+  const championMap = new Map();
+  let totalWins = 0;
+  let totalLosses = 0;
+
+  for (const m of safe) {
+    if (m.result === "WIN") totalWins += 1;
+    else if (m.result === "LOSS") totalLosses += 1;
+
+    const key = m.champion || "Unknown";
+    if (!championMap.has(key)) {
+      championMap.set(key, {
+        champion: key,
+        count: 0,
+        wins: 0,
+        kills: 0,
+        deaths: 0,
+        assists: 0,
+        csPerMinSum: 0,
+        dmgPerMinSum: 0,
+        dmgPerMinCount: 0,
+        kpSum: 0,
+      });
+    }
+    const c = championMap.get(key);
+    c.count += 1;
+    if (m.result === "WIN") c.wins += 1;
+    c.kills += m.kills || 0;
+    c.deaths += m.deaths || 0;
+    c.assists += m.assists || 0;
+    c.csPerMinSum += Number(m.csPerMin) || 0;
+    const durSec = Number(m.durationSeconds) || 0;
+    const dmg = Number(m.damageToChampions) || 0;
+    if (durSec > 0 && dmg > 0) {
+      c.dmgPerMinSum += dmg / (durSec / 60);
+      c.dmgPerMinCount += 1;
+    }
+    c.kpSum += Number(m.killParticipation) || 0;
+  }
+
+  const totalGames = safe.length;
+  const decided = totalWins + totalLosses;
+  const wrPct = decided > 0 ? Math.round((totalWins / decided) * 100) : 0;
+
+  const byChampion = Array.from(championMap.values()).map((c) => ({
+    champion: c.champion,
+    count: c.count,
+    wins: c.wins,
+    wrPct: c.count > 0 ? +(c.wins / c.count * 100).toFixed(1) : 0,
+    avgKda: computeKdaRatio(c.kills, c.deaths, c.assists),
+    avgCsPerMin: c.count > 0 ? +(c.csPerMinSum / c.count).toFixed(1) : 0,
+    avgDamagePerMin: c.dmgPerMinCount > 0 ? Math.round(c.dmgPerMinSum / c.dmgPerMinCount) : 0,
+    avgKp: c.count > 0 ? Math.round(c.kpSum / c.count * 100) : 0,
+  }));
+
+  // 모스트 / 베스트 (3경기 이상만 베스트 후보)
+  const mostPlayed = byChampion.slice().sort((a, b) => b.count - a.count)[0] || null;
+  const bestWr = byChampion.filter((c) => c.count >= 3).sort((a, b) => b.wrPct - a.wrPct || b.count - a.count)[0] || null;
+
+  return {
+    totalGames,
+    wins: totalWins,
+    losses: totalLosses,
+    wrPct,
+    mostPlayed,
+    bestWr,
+    byChampion,
+  };
+}
+
 function computeKdaRatio(kills, deaths, assists) {
   if (deaths === 0) return +((kills + assists) || 0).toFixed(2);
   return +(((kills + assists) / deaths)).toFixed(2);
