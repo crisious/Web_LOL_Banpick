@@ -3782,8 +3782,34 @@ function updateChampionHistoryMeta(history) {
 
 function renderChampionSummary(stats) {
   if (!dom.championHistorySummary) return;
-  dom.championHistorySummary.hidden = stats.totalGames === 0;
-  dom.championHistorySummary.innerHTML = ""; // Phase 7
+  if (stats.totalGames === 0) {
+    dom.championHistorySummary.hidden = true;
+    return;
+  }
+  dom.championHistorySummary.hidden = false;
+  const cards = [
+    { label: "총 경기", value: stats.totalGames, note: `${stats.wins}승 ${stats.losses}패` },
+    { label: "평균 승률", value: `${stats.wrPct}%`, note: stats.wrPct >= 50 ? "양호" : "개선 여지" },
+    {
+      label: "가장 많이 쓴",
+      value: stats.mostPlayed ? championDisplayName(stats.mostPlayed.champion) : "—",
+      note: stats.mostPlayed ? `${stats.mostPlayed.count}경기` : "",
+    },
+    {
+      label: "가장 잘하는 (3+ 게임)",
+      value: stats.bestWr ? championDisplayName(stats.bestWr.champion) : "—",
+      note: stats.bestWr ? `${stats.bestWr.wrPct.toFixed(1)}% (${stats.bestWr.count}경기)` : "표본 부족",
+    },
+  ];
+  dom.championHistorySummary.innerHTML = cards
+    .map((c) => `
+      <article class="champion-history-summary__card">
+        <span class="champion-history-summary__label">${c.label}</span>
+        <strong class="champion-history-summary__value">${c.value}</strong>
+        <span class="champion-history-summary__note">${c.note}</span>
+      </article>
+    `)
+    .join("");
 }
 
 function renderChampionTable(byChampion, sortKey, sortDir) {

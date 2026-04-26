@@ -3593,6 +3593,24 @@ body::after {
 .panel--champions__head h2 { margin: 0; font-size: var(--fs-xl); }
 .panel--champions__meta { margin: 0; flex: 1; }
 
+.champion-history-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+.champion-history-summary__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--surface-1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-2);
+}
+.champion-history-summary__label { font-size: var(--fs-sm); color: var(--muted); }
+.champion-history-summary__value { font-size: var(--fs-2xl); font-variant-numeric: tabular-nums; }
+.champion-history-summary__note  { font-size: var(--fs-xs); color: var(--muted); }
+
 .champion-history-empty {
   padding: var(--space-5);
   text-align: center;
