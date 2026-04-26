@@ -12,14 +12,17 @@
 
 기존 `panel--champion-breakdown`(iter.9)은 최근 20경기 기반 top-5 + footer 1줄로 가벼운 스냅샷을 제공한다. 하지만 op.gg 챔피언 탭이 보여주는 "내가 어떤 챔피언으로 얼마나 잘하는지"의 시즌 단위 그림은 20경기로는 표현이 부족하다 — 챔피언당 1~3경기에 그쳐 통계적 의미가 약하다.
 
-본 이터레이션은 **솔랭/자랭의 가용한 모든 매치 히스토리**를 끝까지 페이지네이션으로 가져와 챔피언별 풀 누적 통계를 보여주는 신규 탭 `tab-champions`를 추가한다. 비싼 작업이라 사용자 명시적 트리거 + 진행률 표시 + localStorage 캐시 + 취소가 필수다.
+본 이터레이션은 **현재 시즌(S16 = 2026)의 솔랭/자랭 매치 히스토리**를 끝까지 페이지네이션으로 가져와 챔피언별 시즌 누적 통계를 보여주는 신규 탭 `tab-champions`를 추가한다. 비싼 작업이라 사용자 명시적 트리거 + 진행률 표시 + localStorage 캐시 + 취소가 필수다.
 
 핵심 결정:
 
-- 풀 히스토리 (브레인스토밍 Q1-C) + 솔랭/자랭만 (Q3-A) + 5번째 탭 (Q2-B)
+- **현재 시즌만** (Q1-C에서 축소): Riot `match-v5/ids` 의 `startTime=<S16 시작 epoch>` 파라미터로 필터, 시즌 경계 이전 매치는 페치하지 않음
+- 솔랭/자랭만 (Q3-A) + 5번째 탭 (Q2-B)
 - 신규 서버 엔드포인트 1개 (`POST /api/champion-history`) — SSE 스트림으로 진행률 보고
 - 24시간 localStorage 캐시 (Riot 개발 키 수명과 동기)
-- 행 클릭 드릴다운, 큐 필터 토글, 챔피언별 AI 코멘트는 본 MVP 외 (후속)
+- 행 클릭 드릴다운, 큐 필터 토글, 챔피언별 AI 코멘트, **시즌 셀렉터**는 본 MVP 외 (후속)
+
+**시즌 축소 효과**: 풀 히스토리(전 시즌 포함, 추정 500~2000경기)에서 현 시즌 4개월 누적(추정 50~250경기)으로 줄어 페치 시간이 5~10분 → 1~3분 수준으로 단축. UX 부담과 Riot API 한도 압박이 모두 완화.
 
 ---
 
@@ -28,7 +31,7 @@
 ### In scope
 
 1. **신규 서버 엔드포인트** — `POST /api/champion-history`, SSE(`text/event-stream`) 응답으로 `progress`/`partial`/`done`/`error` 이벤트 스트리밍
-2. **풀 히스토리 사위프 로직** — 솔랭(420) + 자랭(440) `match-v5/ids` 큐별 페이지네이션 (`count=100`, `start` 증가)을 `hasMore=false`까지 반복, 각 매치 detail 페치 후 `summarizeMatch` 적용
+2. **현재 시즌 사위프 로직** — 솔랭(420) + 자랭(440) `match-v5/ids` 큐별 페이지네이션 (`startTime=<SEASON_START_EPOCH>`, `count=100`, `start` 증가)을 응답이 빌 때까지 반복, 각 매치 detail 페치 후 `summarizeMatch` 적용
 3. **Riot API 페이서** — 100req/2min 한도를 자동 준수하는 토큰 버킷 (간단한 sleep 기반)
 4. **큐 필터링** — `info.queueId === 420 || 440`만 채택 (이중 안전장치)
 5. **챔피언 누적 집계** — 순수 함수 `aggregateChampionHistory(matches)` → `{ totalGames, wrPct, mostPlayed, bestWr, byChampion[] }`
@@ -46,7 +49,7 @@
 - **행 클릭 드릴다운** (챔피언별 매치 목록 모달) — 후속
 - **챔피언별 AI 코칭 코멘트** (Claude/Codex 호출) — 후속, 비용 검토 필요
 - **큐 토글 UI** (전체/솔/자/일반/ARAM) — 후속, 본 MVP는 솔+자 고정
-- **시즌 셀렉터** — 후속
+- **시즌 셀렉터** — 후속. MVP는 `SEASON_START_EPOCH` 상수로 현 시즌만 고정. 시즌 경계 갱신 시 상수 1회 변경 필요
 - **포지션 분포 컬럼**, **골드/min**, **시야/min**, **솔로킬**, **아이템 빌드 분포** — 후속
 - **계정별 독립 캐시 다중 보존** — 단일 활성 계정만, 계정 전환 시 invalidate
 - **서버측 영구 캐시** — localStorage만, 서버는 매번 풀 페치
@@ -65,11 +68,11 @@
   │   { gameName, tagLine, region }   │
   │                                   ├─→ account-v1 by-riot-id ──→ puuid
   │                                   │
-  │                                   ├─→ ids?queue=420&start=0&count=100 ──→ 매치 ID 100개
-  │  ◀── event: progress              │  (큐별 hasMore=false까지 반복)
+  │                                   ├─→ ids?queue=420&startTime=<S16>&start=0&count=100 ──→ 매치 ID
+  │  ◀── event: progress              │  (큐별 응답이 빌 때까지 start += 100 반복)
   │      { phase: "ids", queueId: 420, count: 100 }
   │                                   │
-  │                                   ├─→ ids?queue=440&start=0&count=100 ──→ 매치 ID
+  │                                   ├─→ ids?queue=440&startTime=<S16>&start=0&count=100 ──→ 매치 ID
   │                                   │
   │                                   ├─→ 각 matchId마다 match-v5/<id>
   │  ◀── event: progress              │  (Riot 100req/2min 한도 자동 페이싱)
@@ -132,7 +135,7 @@ data: { error: "...", partial?: [...matches] }
 
 | 상태 | UI |
 | --- | --- |
-| 미진입 | 빈 패널 + "솔랭/자랭 풀 히스토리를 분석합니다 (5~10분 소요)" + [분석 시작] 버튼 |
+| 미진입 | 빈 패널 + "현재 시즌 솔랭/자랭을 분석합니다 (1~3분 소요)" + [분석 시작] 버튼 |
 | 페치 중 | 헤더 + 진행 상태 + 빈 표 |
 | 캐시 hit | 헤더(갱신 시각 표시) + 요약 카드 + 표 |
 | 캐시 miss + 자동 페치 안 함 | "마지막 갱신: 25시간 전 (만료) — [다시 분석]" |
@@ -146,7 +149,7 @@ data: { error: "...", partial?: [...matches] }
 ## 5. 표 컬럼 정의
 
 | # | 컬럼 | 정렬 키 | 표시 형식 | 색 처리 |
-| --- | --- |---| --- | --- |
+| --- | --- | --- | --- | --- |
 | 1 | 챔피언 | `champion` (사전순) | 아바타 32px + 한글명 | — |
 | 2 | 게임수 | `count` | 정수, **기본 정렬 desc** | — |
 | 3 | 승률 | `wrPct` | `XX.X%` + 소형 막대 | 50% 미만 rose, 60%+ accent, 그 사이 mint |
@@ -168,13 +171,14 @@ data: { error: "...", partial?: [...matches] }
 `POST /api/champion-history`
 
 **Request body**:
+
 ```json
 { "gameName": "...", "tagLine": "...", "region": "kr" }
 ```
 
 **Response**: `Content-Type: text/event-stream`
 
-```
+```text
 event: progress
 data: {"phase":"ids","queueId":420,"count":100}
 
@@ -188,13 +192,25 @@ data: {"matches":[...],"totalGames":280,"fetchedAt":"2026-04-27T..."}
 **Rate limit**: `championHistory:<ip>`, 60초 1회 (recent-matches와 별도 버킷)
 
 **구현 단계**:
+
 1. `account-v1` puuid 조회 (기존 헬퍼 재사용)
-2. 큐별로 `ids?queue=420&start=0&count=100` → `start` 증가하며 응답 길이 < count까지 반복 (`getAllRankedMatchIds`)
-3. 매치 ID 중복 제거(자랭+솔랭 중복은 없을 것이지만 안전)
+2. 큐별로 `ids?queue=420&startTime=<SEASON_START_EPOCH>&start=0&count=100` → `start += 100` 반복, 응답이 빈 배열이면 종료 (`getCurrentSeasonRankedMatchIds`)
+3. 매치 ID 중복 제거 (자랭+솔랭 중복은 없을 것이지만 안전)
 4. `match-v5/<id>` 각각 페치 — Riot 100req/2min 한도 페이서 적용
 5. `summarizeMatch` 적용 후 SSE `done` 이벤트로 일괄 전송 (큰 단일 응답이지만 압축 + 클라이언트는 1회 파싱이라 OK)
 
+**시즌 시작 상수**:
+
+```javascript
+// server.js 상단 — Riot 공식 패치노트 기준 시즌 시작 시각.
+// 시즌 경계가 바뀌면 (≈매년 1월) 이 값 1회 갱신.
+const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000; // S16 split 1: 2026-01-09 00:00 UTC (TBD: Riot 패치노트로 정확한 일자 확인 후 확정)
+```
+
+**참고**: Riot match-v5 데이터 보존 기간은 랭크 매치 기준 충분히 길어, 2026-01-09부터 페치 시점까지 누락 없이 가져올 수 있다. 만약 보존 정책이 변경되어 일부 누락되면 그건 시즌 시작 시각이 아니라 "보존 한도 시점"이 실질적 lower bound가 되며, 이는 부분 결과 분기로 처리.
+
 **페이서 (간단)**:
+
 ```javascript
 // 100req / 120sec → 1.2sec 간격
 async function pacedFetch(urls, fn) {
@@ -234,6 +250,7 @@ async function pacedFetch(urls, fn) {
 ### 7.2 main.js
 
 신규 함수:
+
 - `aggregateChampionHistory(matches) → stats` — 순수 함수
 - `fetchChampionHistory({ gameName, tagLine, region, signal, onProgress }) → Promise<matches>` — SSE 클라이언트
 - `renderChampionHistory(stats)` — 요약 카드 + 표
@@ -338,7 +355,8 @@ async function pacedFetch(urls, fn) {
 ## 12. 알려진 위험 / 가정
 
 - **Riot 100req/2min 한도**: 1.2초 간격 sleep으로 단순 준수. 풀 페치 5~10분 동안 사용자가 다른 액션을 해도 서버 작업은 계속 진행 (SSE 끊기지 않음)
-- **24시간 만료 dev key**: 풀 페치 도중 만료되면 부분 결과 + 에러. 사용자에게 .env 갱신 안내
+- **24시간 만료 dev key**: 페치 도중 만료되면 부분 결과 + 에러. 사용자에게 .env 갱신 안내
+- **시즌 경계 갱신 누락**: `SEASON_START_EPOCH`가 새 시즌 시작 후 갱신되지 않으면 이전 시즌 매치까지 같이 페치되어 노이즈. 매년 1월 시즌 시작 후 1회 상수 업데이트 + README 업데이트 필요. 자동화는 후속(시즌 셀렉터 도입 시)
 - **localStorage 5MB 한도**: 280경기 매치 요약은 압축 시 작지만, 1000경기+면 한도 접근 가능. 우선 raw JSON으로 저장, 향후 필요 시 압축
 - **SSE EventSource는 POST 미지원** — `fetch + ReadableStream`으로 구현 (EventSource는 GET만)
 - **모바일 표 가로 스크롤** — 7열 좁아 스크롤 거의 필수. 추후 카드 뷰 전환 검토 (out of scope)
