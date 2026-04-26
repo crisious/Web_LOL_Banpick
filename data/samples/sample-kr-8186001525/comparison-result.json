@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-25T20:27:55.322Z",
+  "sampleId": "sample-kr-8186001525",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "analysisDate": "2026-04-26",
+      "matchId": "KR_8186001525",
+      "champion": "DrMundo",
+      "position": "JUNGLE",
+      "result": "WIN",
+      "durationLabel": "7:34",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8186001525_1777148875322",
+      "generatedAt": "2026-04-25T20:27:55.322Z"
+    },
+    "matchSummary": {
+      "headline": "7분 34초 만에 끝난 초단기 승리로, 닥터 문도가 무사망 플레이를 유지하며 오브젝트 합류에 기여했다."
+    },
+    "coachSummary": {
+      "overallSummary": "매우 짧은 경기였기 때문에 정글러로서 보여줄 수 있는 장면이 제한적이었습니다. 사망 없이 안정적으로 운영한 점은 좋았으나, 팀 총 8킬 중 1어시스트(킬 관여 13%)는 갱킹 빈도와 맵 영향력 측면에서 아쉬움이 남습니다. 짧은 경기에서도 초반 스커미시와 오브젝트 합류를 적극적으로 노려 팀 기여도를 높이는 연습이 필요합니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_01",
+        "title": "무사망 안정 운영",
+        "description": "전체 경기 동안 단 한 번도 사망하지 않았다. 닥터 문도의 체력 관리 능력을 활용해 위험한 상황을 피하고 안전하게 파밍과 오브젝트 합류를 병행했다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002"
+        ]
+      },
+      {
+        "id": "str_02",
+        "title": "오브젝트 타이밍 합류",
+        "description": "7분 13초 드래곤 파이트에 적시에 합류하여 팀의 첫 드래곤 확보에 기여했다. 정글러로서 오브젝트 타이밍 인지가 잘 되어 있다.",
+        "relatedEventIds": [
+          "evt_002"
+        ]
+      },
+      {
+        "id": "str_03",
+        "title": "안정적 정글 파밍 효율",
+        "description": "7분 34초 동안 48CS(분당 6.34)를 기록하며 정글 자원을 효율적으로 수급했다. 초반 닥터 문도의 느린 클리어 속도를 감안하면 양호한 수치다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_01",
+        "title": "낮은 킬 관여율 (13%)",
+        "description": "팀 총 8킬 중 1어시스트에만 관여했다. 정글러는 초반 맵 영향력이 핵심인데, 나머지 7킬에 관여하지 못한 것은 갱킹 타이밍이나 동선 최적화에 개선 여지가 있다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "weak_02",
+        "title": "극히 낮은 챔피언 피해량 (477)",
+        "description": "7분간 챔피언에게 가한 피해가 477에 그쳤다. 교전 합류 시 더 적극적으로 딜을 넣거나, 갱킹 시도를 늘려 피해 기여도를 높일 필요가 있다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002"
+        ]
+      },
+      {
+        "id": "weak_03",
+        "title": "시야 점수 개선 필요 (7)",
+        "description": "정글러로서 시야 점수 7은 짧은 경기임을 감안해도 다소 낮다. 제어 와드 구매와 상대 정글 시야 장악을 더 의식적으로 수행하면 맵 리딩에 큰 도움이 된다.",
+        "relatedEventIds": [
+          "evt_002"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_01",
+        "text": "초반 풀클리어 후 갱킹 가능한 라인을 반드시 1회 이상 방문한다."
+      },
+      {
+        "id": "chk_02",
+        "text": "정글 동선 중 제어 와드를 최소 1개 이상 구매하여 상대 정글 입구에 배치한다."
+      },
+      {
+        "id": "chk_03",
+        "text": "교전 합류 시 문도 Q(감염된 식칼)를 적극 활용해 슬로우와 피해를 동시에 제공한다."
+      },
+      {
+        "id": "chk_04",
+        "text": "오브젝트 스폰 30초 전에 해당 사이드 정글 클리어를 마치고 포지셔닝한다."
+      }
+    ],
+    "keyMoments": [
+      {
+        "momentId": "km_01",
+        "timestampLabel": "6:24",
+        "phase": "EARLY",
+        "title": "교전 후속 합류",
+        "description": "팀 교전이 발생한 지점에 뒤늦게 합류하여 킬 관여를 만들었다. 합류 자체는 좋았으나 더 빠르게 도착했다면 추가 킬로 이어질 수 있었다.",
+        "relatedEventIds": [
+          "evt_001"
+        ],
+        "sentiment": "neutral"
+      },
+      {
+        "momentId": "km_02",
+        "timestampLabel": "7:13",
+        "phase": "EARLY",
+        "title": "드래곤 확보 합류",
+        "description": "드래곤 타이밍에 맞춰 합류하여 팀의 첫 드래곤을 확보했다. 정글러로서 핵심 오브젝트를 챙긴 좋은 판단이다.",
+        "relatedEventIds": [
+          "evt_002"
+        ],
+        "sentiment": "positive"
+      },
+      {
+        "momentId": "km_03",
+        "timestampLabel": "0:00–6:00",
+        "phase": "EARLY",
+        "title": "초반 파밍 구간",
+        "description": "약 6분간 48CS를 쌓으며 안전하게 파밍했다. 사망 없이 자원을 확보한 점은 긍정적이나, 이 구간에서 갱킹 시도가 없었던 점은 팀 기여 측면에서 아쉽다.",
+        "relatedEventIds": [],
+        "sentiment": "neutral"
+      },
+      {
+        "momentId": "km_04",
+        "timestampLabel": "7:34",
+        "phase": "EARLY",
+        "title": "경기 조기 종료",
+        "description": "팀이 압도적 우위를 점하며 7분 34초 만에 경기가 종료되었다. 팀 전체가 강한 흐름을 만들었으며, 정글러는 사망 없이 안정적으로 게임을 마무리했다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002"
+        ],
+        "sentiment": "positive"
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "usedIn": [
+          "str_01",
+          "str_03",
+          "weak_01",
+          "weak_02",
+          "km_01",
+          "km_03"
+        ]
+      },
+      {
+        "eventId": "evt_002",
+        "usedIn": [
+          "str_01",
+          "str_02",
+          "weak_02",
+          "weak_03",
+          "km_02",
+          "km_04"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "무사망 안정 운영",
+        "note": "전체 경기 동안 단 한 번도 사망하지 않았다. 닥터 문도의 체력 관리 능력을 활용해 위험한 상황을 피하고 안전하게 파밍과 오브젝트 합류를 병행했다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 타이밍 합류",
+        "note": "7분 13초 드래곤 파이트에 적시에 합류하여 팀의 첫 드래곤 확보에 기여했다. 정글러로서 오브젝트 타이밍 인지가 잘 되어 있다."
+      },
+      {
+        "category": "strength",
+        "topic": "안정적 정글 파밍 효율",
+        "note": "7분 34초 동안 48CS(분당 6.34)를 기록하며 정글 자원을 효율적으로 수급했다. 초반 닥터 문도의 느린 클리어 속도를 감안하면 양호한 수치다."
+      },
+      {
+        "category": "weakness",
+        "topic": "낮은 킬 관여율 (13%)",
+        "note": "팀 총 8킬 중 1어시스트에만 관여했다. 정글러는 초반 맵 영향력이 핵심인데, 나머지 7킬에 관여하지 못한 것은 갱킹 타이밍이나 동선 최적화에 개선 여지가 있다."
+      },
+      {
+        "category": "weakness",
+        "topic": "극히 낮은 챔피언 피해량 (477)",
+        "note": "7분간 챔피언에게 가한 피해가 477에 그쳤다. 교전 합류 시 더 적극적으로 딜을 넣거나, 갱킹 시도를 늘려 피해 기여도를 높일 필요가 있다."
+      },
+      {
+        "category": "weakness",
+        "topic": "시야 점수 개선 필요 (7)",
+        "note": "정글러로서 시야 점수 7은 짧은 경기임을 감안해도 다소 낮다. 제어 와드 구매와 상대 정글 시야 장악을 더 의식적으로 수행하면 맵 리딩에 큰 도움이 된다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

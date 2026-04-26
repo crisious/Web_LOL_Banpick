@@ -1,6 +1,42 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8185718837",
+      "matchId": "KR_8185718837",
+      "label": "sample-kr-8185718837 · SUPPORT WIN",
+      "champion": "Braum",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-25",
+      "theme": "중반 연속 데스로 흐름이 흔들렸지만, 후반 바론 확보와 구조물 압박으로 역전 승리를 이끌어낸 브라움 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8185718837/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8185718837/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8185718837/sample-kr-8185718837-notes.md"
+    },
+    {
+      "id": "sample-kr-8186001525",
+      "matchId": "KR_8186001525",
+      "label": "sample-kr-8186001525 · JUNGLE WIN",
+      "champion": "DrMundo",
+      "publicAlias": "핑거샷#KR1",
+      "collectedDate": "2026-04-25",
+      "theme": "7분 34초 만에 끝난 초단기 승리로, 닥터 문도가 무사망 플레이를 유지하며 오브젝트 합류에 기여했다.",
+      "normalizedPath": "/data/samples/sample-kr-8186001525/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8186001525/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8186001525/sample-kr-8186001525-notes.md"
+    },
+    {
+      "id": "sample-kr-8186355876",
+      "matchId": "KR_8186355876",
+      "label": "sample-kr-8186355876 · SUPPORT LOSS",
+      "champion": "Braum",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-25",
+      "theme": "브라움 서포터로 초반 라인전에서 반복 데스를 허용하며 주도권을 내준 채 22분 패배한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8186355876/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8186355876/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8186355876/sample-kr-8186355876-notes.md"
+    },
+    {
       "id": "sample-kr-8186280096",
       "matchId": "KR_8186280096",
       "label": "sample-kr-8186280096 · SUPPORT LOSS",

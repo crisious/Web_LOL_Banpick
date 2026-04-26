@@ -1678,10 +1678,15 @@ body::after {
 
 .score-panel {
   display: grid;
-  /* Phase 5: 링이 들어갈 자리 확보 (140px → 160px) */
+  /* Phase 5: 링이 들어갈 자리 확보 (140px → 160px)
+     Phase 21: 히어로와의 시각 경합 해소 위해 panel 자체에 약한 보더만 적용 */
   grid-template-columns: 160px 1fr;
   gap: var(--space-6);
   align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);  /* panel-strong 대신 약한 surface */
 }
 
 @media (max-width: 720px) {
@@ -3223,15 +3228,14 @@ body::after {
   font-variant-numeric: tabular-nums;
 }
 
-/* Phase 5: 주요(primary) 메트릭 강조 — 첫 카드를 amber tint로 */
-.detail-metrics .metric--primary,
-.detail-metrics .metric:first-child {
+/* Phase 5/22: 주요(primary) 메트릭 강조 — 명시 클래스만 사용
+   (Phase 22에서 :first-child 의존 제거 — 렌더 순서 변경 시 의도치 않은 카드 강조 방지) */
+.detail-metrics .metric--primary {
   background: linear-gradient(135deg, var(--tint-amber), var(--surface-1));
   border-color: var(--amber-border);
 }
 
-.detail-metrics .metric--primary strong,
-.detail-metrics .metric:first-child strong {
+.detail-metrics .metric--primary strong {
   color: var(--accent);
 }
 
@@ -3383,8 +3387,16 @@ body::after {
   font-size: var(--fs-md);
   font-weight: 700;
   color: var(--text);
-  padding: var(--space-2) 0;
+  padding: var(--space-3) var(--space-3);
+  margin: calc(var(--space-3) * -1);
+  border-radius: var(--radius-md);
   list-style: none;
+  /* Phase 22: 발견성 — hover 시 명시적 배경 변화 */
+  transition: background 160ms ease;
+}
+
+.panel--fetcher > summary:hover {
+  background: var(--surface-2);
 }
 
 .panel--fetcher > summary::-webkit-details-marker {
@@ -3392,9 +3404,12 @@ body::after {
 }
 
 .panel--fetcher > summary::before {
-  content: "▸ ";
+  /* Phase 22: 화살표 사이즈 강화 + 색 대비 */
+  content: "▸";
   display: inline-block;
-  color: var(--muted);
+  margin-right: var(--space-2);
+  color: var(--accent);
+  font-size: var(--fs-md);
   transition: transform 180ms ease;
 }
 

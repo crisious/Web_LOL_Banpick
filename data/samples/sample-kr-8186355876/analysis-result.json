@@ -1,0 +1,246 @@
+{
+  "analysisMeta": {
+    "matchId": "KR_8186355876",
+    "riotId": "매운맛 비스킷#KR1",
+    "champion": "Braum",
+    "position": "SUPPORT",
+    "result": "LOSS",
+    "durationLabel": "22:06",
+    "analysisDate": "2026-04-26",
+    "schemaVersion": "1.0",
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8186355876_1777148773380",
+    "generatedAt": "2026-04-25T20:26:13.380Z"
+  },
+  "matchSummary": {
+    "headline": "브라움 서포터로 초반 라인전에서 반복 데스를 허용하며 주도권을 내준 채 22분 패배한 경기."
+  },
+  "coachSummary": {
+    "overallSummary": "이번 경기는 초반부터 데스가 누적되면서 오브젝트 주도권을 한 번도 잡지 못한 구조였습니다. 브라움은 보호형 서포터인 만큼 무리한 전방 진입보다 원거리 딜러와의 거리를 유지하며 반응형 플레이를 해야 하는데, 2분 16초부터 시작된 연쇄 데스가 라인 주도권을 완전히 넘겨주었습니다. 다만 시야 점수 66점은 22분 경기에서 분당 3.0에 해당하며, 와드 관리 습관 자체는 좋은 편입니다. 다음 경기에서는 교전 진입 타이밍과 생존을 최우선으로 두고, 죽지 않는 서포팅에 집중해 보시길 권합니다."
+  },
+  "phaseSummaries": [],
+  "strengths": [
+    {
+      "id": "str_01",
+      "title": "꾸준한 시야 장악 습관",
+      "detail": "22분 경기에서 시야 점수 66을 기록했습니다. 분당 3.0 수준으로, 어려운 경기 상황에서도 와딩 루틴을 포기하지 않은 점은 서포터로서 좋은 기본기입니다.",
+      "relatedEventIds": []
+    },
+    {
+      "id": "str_02",
+      "title": "초반 교전 참여 의지",
+      "detail": "열세 상황에서도 어시스트 3회를 기록하며 라인전 교전에 적극 참여했습니다. 브라움의 패시브 스택을 쌓기 위한 접근 자체는 올바른 판단이었습니다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_002",
+        "evt_007"
+      ]
+    },
+    {
+      "id": "str_03",
+      "title": "빠른 경기 종료 수용",
+      "detail": "대세가 기운 상황에서 불필요하게 경기를 질질 끌지 않았습니다. 22분에 깔끔하게 마무리된 것은 멘탈 관리 측면에서 긍정적입니다.",
+      "relatedEventIds": [
+        "evt_018"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "weak_01",
+      "title": "초반 반복 데스로 인한 스노우볼 허용",
+      "detail": "2분 16초 첫 데스 이후 14분까지 5데스를 기록했습니다. 브라움은 레벨 1~3 교전력이 약한 편이므로, 상대 서포터의 교전 패턴을 파악한 뒤 반응형으로 움직여야 합니다. 첫 데스 이후 플레이 스타일을 수비적으로 전환하지 못한 점이 가장 큰 아쉬움입니다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_002",
+        "evt_007",
+        "evt_010",
+        "evt_011"
+      ]
+    },
+    {
+      "id": "weak_02",
+      "title": "오브젝트 컨트롤 부재",
+      "detail": "팀 전체가 드래곤 0회, 바론 0회를 기록했고 상대는 드래곤 3회를 확보했습니다. 서포터로서 드래곤 타이머에 맞춘 사전 와딩과 합류 타이밍 조율이 필요합니다.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_006",
+        "evt_008",
+        "evt_012",
+        "evt_014",
+        "evt_018"
+      ]
+    },
+    {
+      "id": "weak_03",
+      "title": "중반 고립 포지셔닝",
+      "detail": "중반 3데스 구간에서 어시스트가 0회로, 팀과 분리된 위치에서 잡힌 정황이 강합니다. 브라움은 원거리 딜러 옆에서 방패를 올려야 가치가 극대화되므로, 혼자 와딩을 나가거나 분리되는 상황을 줄여야 합니다.",
+      "relatedEventIds": [
+        "evt_013",
+        "evt_015",
+        "evt_017"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_01",
+      "text": "첫 데스 발생 시 '30초 수비 모드'를 의식적으로 실행한다. 타워 앞에서만 CS를 보조하고 불필요한 트레이딩을 자제한다.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_02",
+      "text": "드래곤 스폰 90초 전부터 리버 입구에 컨트롤 와드를 설치하고, 정글러와 핑으로 합류 타이밍을 맞춘다.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_03",
+      "text": "중반 이후 와딩은 반드시 아군 1명 이상과 동행하거나, 상대 위치가 미니맵에 확인된 상태에서만 나간다.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_04",
+      "text": "브라움 E(불굴의 방패)를 교전 시작 즉시 사용하지 말고, 상대 핵심 스킬을 확인한 뒤 반응적으로 올린다.",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_05",
+      "text": "탭 키로 상대 서포터의 소환사 주문 쿨타임을 추적하고, 상대 점멸이 없는 구간에서만 공격적으로 진입한다.",
+      "priority": "MEDIUM"
+    }
+  ],
+  "keyMoments": [
+    {
+      "eventId": "evt_001",
+      "timestampLabel": "2:16",
+      "title": "첫 데스 – 라인 주도권 상실",
+      "description": "2분 16초에 발생한 첫 데스로 경험치와 라인 압력에서 밀리기 시작했습니다. 이 시점에서 수비적 전환이 이루어졌다면 이후 데스 체인을 끊을 수 있었습니다."
+    },
+    {
+      "eventId": "evt_004",
+      "timestampLabel": "7:37",
+      "title": "첫 오브젝트 헌납",
+      "description": "라인 열세가 오브젝트 손실로 이어진 첫 번째 전환점입니다. 이미 2데스 상태에서 오브젝트 합류보다 라인 수비를 택해야 했을 수 있습니다."
+    },
+    {
+      "eventId": "evt_012",
+      "timestampLabel": "13:54",
+      "title": "초반 마지막 오브젝트 손실",
+      "description": "5데스가 쌓인 시점에서 추가 오브젝트를 내주며 골드 격차가 회복 불가 수준으로 벌어졌습니다."
+    },
+    {
+      "eventId": "evt_013",
+      "timestampLabel": "16:20",
+      "title": "중반 첫 데스 – 고립 사망",
+      "description": "중반 전환 직후 어시스트 없이 사망한 장면으로, 팀과 분리된 포지셔닝이 드러나는 핵심 장면입니다."
+    },
+    {
+      "eventId": "evt_016",
+      "timestampLabel": "18:41",
+      "title": "유일한 타워 확보",
+      "description": "어려운 경기에서도 팀이 타워 1개를 확보한 장면입니다. 이런 소규모 성과를 더 자주 만들기 위해 팀 합류 타이밍을 개선할 필요가 있습니다."
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "usedIn": [
+        "str_02",
+        "weak_01",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_002",
+      "usedIn": [
+        "str_02",
+        "weak_01"
+      ]
+    },
+    {
+      "eventId": "evt_004",
+      "usedIn": [
+        "weak_02",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_006",
+      "usedIn": [
+        "weak_02"
+      ]
+    },
+    {
+      "eventId": "evt_007",
+      "usedIn": [
+        "str_02",
+        "weak_01"
+      ]
+    },
+    {
+      "eventId": "evt_008",
+      "usedIn": [
+        "weak_02"
+      ]
+    },
+    {
+      "eventId": "evt_010",
+      "usedIn": [
+        "weak_01"
+      ]
+    },
+    {
+      "eventId": "evt_011",
+      "usedIn": [
+        "weak_01"
+      ]
+    },
+    {
+      "eventId": "evt_012",
+      "usedIn": [
+        "weak_02",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_013",
+      "usedIn": [
+        "weak_03",
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_014",
+      "usedIn": [
+        "weak_02"
+      ]
+    },
+    {
+      "eventId": "evt_015",
+      "usedIn": [
+        "weak_03"
+      ]
+    },
+    {
+      "eventId": "evt_016",
+      "usedIn": [
+        "keyMoments"
+      ]
+    },
+    {
+      "eventId": "evt_017",
+      "usedIn": [
+        "weak_03"
+      ]
+    },
+    {
+      "eventId": "evt_018",
+      "usedIn": [
+        "str_03",
+        "weak_02"
+      ]
+    }
+  ],
+  "schemaVersion": "1.0"
+}

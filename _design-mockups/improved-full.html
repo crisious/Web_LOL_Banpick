@@ -155,6 +155,13 @@
 
     /* Score panel */
     .score-panel { display:grid; grid-template-columns:auto 1fr; gap:var(--space-5); align-items:center; padding:var(--space-5); border:1px solid var(--line); border-radius:var(--radius-xl); background:var(--panel); box-shadow:var(--shadow-sm); margin-bottom:var(--space-4); }
+    /* Phase 23: 점수대별 색 변형 — 디자이너가 다른 점수에서의 시각도 검증 가능 */
+    .score-states { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:var(--space-3); padding:var(--space-4); border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--surface-1); margin-bottom:var(--space-4); }
+    .score-state { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); padding:var(--space-3); }
+    .score-state__ring { --score:50; --ring-color:var(--mint); width:80px; height:80px; border-radius:50%; background:conic-gradient(var(--ring-color) calc(var(--score) * 1%), var(--surface-2) 0); display:grid; place-items:center; position:relative; }
+    .score-state__ring::before { content:""; position:absolute; inset:6px; border-radius:50%; background:var(--panel-strong); }
+    .score-state__ring strong { position:relative; font-size:var(--fs-lg); font-weight:800; color:var(--ring-color); }
+    .score-state__label { font-size:var(--fs-xs); color:var(--text-muted); font-weight:600; text-align:center; }
     .score-panel__ring { --score:78; width:120px; height:120px; border-radius:50%; background:conic-gradient(var(--mint) calc(var(--score) * 1%), var(--surface-2) 0); display:grid; place-items:center; position:relative; }
     .score-panel__ring::before { content:""; position:absolute; inset:8px; border-radius:50%; background:var(--panel-strong); }
     .score-panel__ring-text { position:relative; text-align:center; line-height:1.1; }
@@ -175,9 +182,13 @@
     .insight-panel { padding:var(--space-5); border-radius:var(--radius-xl); border:1px solid var(--line); }
     .insight-panel--strengths { background:linear-gradient(135deg,var(--tint-mint),transparent 60%),var(--panel); border-color:var(--mint-border); }
     .insight-panel--weaknesses { background:linear-gradient(135deg,var(--tint-rose),transparent 60%),var(--panel); border-color:var(--rose-border); }
+    /* Phase 23: 프로덕션 styles.css와 동일한 ::before 자동 prefix 사용 (마크업 통일) */
+    .insight-panel--strengths h3::before { content:"✓ "; color:var(--mint); font-weight:800; }
+    .insight-panel--weaknesses h3::before { content:"! "; color:var(--rose); font-weight:800; }
     .insight-panel h3 { margin:0 0 var(--space-3); font-size:var(--fs-md); display:flex; align-items:center; gap:var(--space-2); }
     .insight-list { list-style:none; margin:0; padding:0; display:grid; gap:var(--space-3); }
-    .insight-item { padding:var(--space-3); border-radius:var(--radius-md); background:var(--surface-1); border:1px solid var(--surface-3); }
+    /* Phase 24: 중첩 박스 무게 줄이기 — 보더 제거하고 배경만으로 분리 */
+    .insight-item { padding:var(--space-3); border-radius:var(--radius-md); background:var(--surface-1); }
     .insight-item h4 { margin:0 0 4px; font-size:var(--fs-sm); font-weight:700; }
     .insight-item p { margin:0; font-size:var(--fs-sm); color:var(--text-muted); }
 
@@ -228,7 +239,11 @@
     .kda-chart { display:grid; grid-template-columns:1fr; gap:var(--space-2); padding:var(--space-4); border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--surface-1); margin-bottom:var(--space-4); }
     .kda-svg { width:100%; height:160px; }
 
-    .build-timeline { display:flex; gap:var(--space-2); padding:var(--space-4); border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--surface-1); overflow-x:auto; scrollbar-width:thin; }
+    /* Phase 22: 데스크톱은 nowrap + 자연스러운 가로 레이아웃, 모바일에서만 가로 스크롤 */
+    .build-timeline { display:flex; gap:var(--space-2); padding:var(--space-4); border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--surface-1); flex-wrap:wrap; }
+    @media (max-width: 720px) {
+      .build-timeline { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin; }
+    }
     .build-item { min-width:80px; flex:0 0 auto; display:grid; gap:var(--space-1); justify-items:center; padding:var(--space-2); border-radius:var(--radius-md); background:var(--surface-2); }
     .build-item__icon { width:48px; height:48px; border-radius:var(--radius-sm); background:linear-gradient(135deg,var(--surface-3),var(--surface-2)); display:grid; place-items:center; font-size:var(--fs-md); }
     .build-item__time { font-size:var(--fs-xs); color:var(--text-muted); font-variant-numeric:tabular-nums; }
@@ -243,7 +258,8 @@
     .obj-team--enemy { color:var(--rose); }
 
     /* === TRENDS TAB === */
-    .trend-callout { padding:var(--space-5); border-radius:var(--radius-xl); border:1px solid var(--amber-border); background:linear-gradient(135deg,var(--tint-amber),transparent 60%),var(--panel); margin-bottom:var(--space-4); }
+    /* Phase 21: 히어로(amber)와 의미 분리 — 추세 = 시간 기반 정보 → info 톤 */
+    .trend-callout { padding:var(--space-5); border-radius:var(--radius-xl); border:1px solid var(--info-border); background:linear-gradient(135deg,var(--tint-info),transparent 60%),var(--panel); margin-bottom:var(--space-4); }
     .trend-callout h3 { margin:0 0 var(--space-2); font-size:var(--fs-lg); }
     .trend-callout p { margin:0; color:var(--text-muted); }
 
@@ -381,14 +397,14 @@
 
           <div class="insight-grid">
             <article class="insight-panel insight-panel--strengths" aria-labelledby="strengths-title">
-              <h3 id="strengths-title"><span aria-hidden="true">✓</span> 잘한 점</h3>
+              <h3 id="strengths-title">잘한 점</h3>
               <ul class="insight-list">
                 <li class="insight-item"><h4>라인전 우위 가져오기</h4><p>4분 이내에 CS 격차를 +12로 벌리며 상대를 라인에 묶었어요.</p></li>
                 <li class="insight-item"><h4>로밍 타이밍</h4><p>9분 첫 로밍에서 바텀 더블 킬을 만들었고, 사이드 라인 우위로 이어졌습니다.</p></li>
               </ul>
             </article>
             <article class="insight-panel insight-panel--weaknesses" aria-labelledby="weaknesses-title">
-              <h3 id="weaknesses-title"><span aria-hidden="true">!</span> 다음 판에서 고치기</h3>
+              <h3 id="weaknesses-title">다음 판에서 고치기</h3>
               <ul class="insight-list">
                 <li class="insight-item"><h4>한타 진입 타이밍</h4><p>R 진입이 1.5초 늦어 두 차례 솔로킬을 놓쳤어요.</p></li>
                 <li class="insight-item"><h4>오브젝트 시야</h4><p>드래곤 30초 전 핑크 와드 미설치. 1분 전 시야부터 잡아보세요.</p></li>
@@ -487,7 +503,9 @@
           <section class="panel">
             <div class="panel__head"><h2 class="panel__title">KDA 변화 타임라인</h2></div>
             <div class="kda-chart">
-              <svg class="kda-svg" viewBox="0 0 600 160" preserveAspectRatio="none" role="img" aria-label="KDA 변화 그래프">
+              <svg class="kda-svg" viewBox="0 0 600 160" preserveAspectRatio="none" role="img" aria-labelledby="kda-chart-title kda-chart-desc">
+                <title id="kda-chart-title">KDA 변화 그래프</title>
+                <desc id="kda-chart-desc">0분부터 28분까지 KDA가 점진적으로 상승. 9분 첫 킬, 16분 더블킬, 22분 바론 한타에서 가속.</desc>
                 <defs>
                   <linearGradient id="kdaGrad" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stop-color="rgba(89,209,178,0.4)"/>
@@ -536,6 +554,26 @@
             <h3>요즘 폼이 좋아지고 있어요</h3>
             <p>최근 10경기 기준 승률은 60%로 직전 10경기(40%) 대비 +20%p 상승했습니다. 미드 라인 픽 비중이 70%로 안정적인 풀이 자리잡았습니다.</p>
           </article>
+
+          <!-- Phase 23: 점수대별 링 색 변형 — 디자이너 검증용 -->
+          <div class="score-states" aria-label="점수대별 링 색 변형 예시">
+            <div class="score-state">
+              <div class="score-state__ring" style="--score:88; --ring-color:var(--mint);"><strong>88</strong></div>
+              <span class="score-state__label">우수 (80+)<br>mint</span>
+            </div>
+            <div class="score-state">
+              <div class="score-state__ring" style="--score:72; --ring-color:var(--mint);"><strong>72</strong></div>
+              <span class="score-state__label">양호 (70-79)<br>mint</span>
+            </div>
+            <div class="score-state">
+              <div class="score-state__ring" style="--score:58; --ring-color:var(--accent);"><strong>58</strong></div>
+              <span class="score-state__label">평균 (50-69)<br>amber</span>
+            </div>
+            <div class="score-state">
+              <div class="score-state__ring" style="--score:38; --ring-color:var(--rose);"><strong>38</strong></div>
+              <span class="score-state__label">개선 필요 (50미만)<br>rose</span>
+            </div>
+          </div>
 
           <div class="trend-stats">
             <div class="trend-stat"><span class="trend-stat__label">평균 KDA</span><strong class="trend-stat__value">3.4</strong></div>
