@@ -3589,8 +3589,90 @@ function setChampionHistoryEmpty(message) {
 }
 
 async function startChampionHistoryFetch(force) {
-  // Phase 4에서 채움 - Phase 3에서는 placeholder
-  console.log("startChampionHistoryFetch", { force });
+  if (state.championHistoryLoading) return;
+  if (!state.account) {
+    setChampionHistoryEmpty("먼저 Riot ID로 로그인해주세요.");
+    return;
+  }
+
+  const puuid = state.account.puuid;
+  if (!force) {
+    const cached = loadChampionHistoryFromCache(puuid);
+    if (cached && !cached.expired) {
+      state.championHistory = cached;
+      renderChampionHistory();
+      return;
+    }
+  }
+
+  state.championHistoryLoading = true;
+  state.championHistoryAbort = new AbortController();
+  showChampionHistoryProgress("계정 조회 중…", 0, 0);
+  if (dom.championHistoryAction) dom.championHistoryAction.disabled = true;
+  if (dom.championHistoryEmpty) dom.championHistoryEmpty.hidden = true;
+
+  try {
+    const result = await fetchChampionHistory({
+      gameName: state.account.gameName,
+      tagLine: state.account.tagLine,
+      platformRegion: state.account.platformRegion,
+      riotApiKey: state.account.riotApiKey || undefined,
+      signal: state.championHistoryAbort.signal,
+      onProgress: (info) => updateChampionHistoryProgress(info),
+    });
+
+    state.championHistory = { ...result, expired: false };
+    saveChampionHistoryToCache(puuid, state.championHistory);
+    renderChampionHistory();
+  } catch (error) {
+    if (error.name === "AbortError") {
+      setChampionHistoryEmpty("분석이 취소되었습니다.");
+    } else {
+      setChampionHistoryEmpty(`분석 실패: ${error.message}`);
+    }
+  } finally {
+    state.championHistoryLoading = false;
+    state.championHistoryAbort = null;
+    hideChampionHistoryProgress();
+    if (dom.championHistoryAction) dom.championHistoryAction.disabled = false;
+  }
+}
+
+function showChampionHistoryProgress(label, current, total) {
+  if (!dom.championHistoryProgress) return;
+  dom.championHistoryProgress.hidden = false;
+  if (dom.championHistoryProgressLabel) {
+    dom.championHistoryProgressLabel.textContent = total > 0
+      ? `${label} (${current}/${total})`
+      : label;
+  }
+  if (dom.championHistoryProgressBar) {
+    if (total > 0) {
+      dom.championHistoryProgressBar.value = current;
+      dom.championHistoryProgressBar.max = total;
+    } else {
+      dom.championHistoryProgressBar.removeAttribute("value");
+    }
+  }
+}
+
+function hideChampionHistoryProgress() {
+  if (dom.championHistoryProgress) dom.championHistoryProgress.hidden = true;
+}
+
+function updateChampionHistoryProgress(info) {
+  if (!info || !info.phase) return;
+  if (info.phase === "account") {
+    showChampionHistoryProgress("매치 ID 조회 중…", 0, 0);
+  } else if (info.phase === "ids") {
+    showChampionHistoryProgress(`매치 ID 수집 중 (큐 ${info.queueId})`, info.fetched, 0);
+  } else if (info.phase === "ids-done") {
+    showChampionHistoryProgress("매치 상세 분석 중", 0, info.total);
+  } else if (info.phase === "details") {
+    showChampionHistoryProgress("매치 상세 분석 중", info.current, info.total);
+  } else if (info.phase === "match-error") {
+    // 부분 실패는 침묵 — 마지막에 매치 누락 N건으로 표기
+  }
 }
 
 function renderChampionHistory() {

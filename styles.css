@@ -3601,6 +3601,21 @@ body::after {
   border-radius: var(--radius-md);
 }
 
+.champion-history-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--surface-1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-2);
+}
+.champion-history-progress__row { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.champion-history-progress__bar { width: 100%; height: 8px; }
+.champion-history-progress__bar::-webkit-progress-bar { background: var(--surface-2); border-radius: var(--radius-pill); }
+.champion-history-progress__bar::-webkit-progress-value { background: var(--accent); border-radius: var(--radius-pill); }
+.champion-history-progress__bar::-moz-progress-bar { background: var(--accent); border-radius: var(--radius-pill); }
+
 .champion-history-action-btn {
   padding: 8px 18px;
   background: var(--accent);
