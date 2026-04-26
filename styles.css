@@ -3601,6 +3601,32 @@ body::after {
   border-radius: var(--radius-md);
 }
 
+.champion-history-action-btn {
+  padding: 8px 18px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 200ms;
+}
+.champion-history-action-btn:hover { opacity: 0.9; }
+.champion-history-action-btn:disabled { opacity: 0.56; cursor: not-allowed; }
+
+.champion-history-cancel-btn {
+  padding: 6px 14px;
+  background: var(--surface-3);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background 200ms;
+}
+.champion-history-cancel-btn:hover { background: var(--surface-2); }
+
 .panel--recent-aggregate__status {
   font-size: var(--fs-sm);
   color: var(--muted);
