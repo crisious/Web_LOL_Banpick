@@ -3657,9 +3657,6 @@ function onChampionsTabEnter() {
   }
   if (state.championHistory) {
     renderChampionHistory();
-    if (state.championHistory.expired && dom.championHistoryAction) {
-      dom.championHistoryAction.textContent = "다시 분석 (만료됨)";
-    }
   } else {
     setChampionHistoryEmpty("아직 분석을 실행하지 않았습니다. 위의 [분석 시작]을 눌러주세요.");
   }
@@ -3693,6 +3690,7 @@ async function startChampionHistoryFetch(force) {
 
   state.championHistoryLoading = true;
   state.championHistoryAbort = new AbortController();
+  const accountKeyAtStart = currentAccountKey();
   showChampionHistoryProgress("계정 조회 중…", 0, 0);
   if (dom.championHistoryAction) dom.championHistoryAction.disabled = true;
   if (dom.championHistoryEmpty) dom.championHistoryEmpty.hidden = true;
@@ -3712,8 +3710,13 @@ async function startChampionHistoryFetch(force) {
       onProgress,
     });
 
+    if (currentAccountKey() !== accountKeyAtStart) {
+      // 페치 도중 계정이 바뀌었음 — 결과는 옛 계정의 것이니 폐기
+      return;
+    }
+
     state.championHistory = { ...result, expired: false, matchErrors };
-    state.championHistoryAccount = currentAccountKey();
+    state.championHistoryAccount = accountKeyAtStart;
     saveChampionHistoryToCache(puuid, state.championHistory);
     renderChampionHistory();
   } catch (error) {
@@ -3797,7 +3800,9 @@ function updateChampionHistoryMeta(history) {
   const expired = history.expired ? " · 만료됨" : "";
   const errors = history.matchErrors > 0 ? ` · 누락 ${history.matchErrors}건` : "";
   dom.championHistoryMeta.textContent = `${history.totalGames}경기 · 마지막 갱신 ${ageLabel}${expired}${errors}`;
-  if (dom.championHistoryAction) dom.championHistoryAction.textContent = "다시 분석";
+  if (dom.championHistoryAction) {
+    dom.championHistoryAction.textContent = history.expired ? "다시 분석 (만료됨)" : "다시 분석";
+  }
 }
 
 function renderChampionSummary(stats) {
