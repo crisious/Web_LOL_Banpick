@@ -367,6 +367,81 @@ function compactQueueLabel(queueLabel) {
   return map[queueLabel] || queueLabel;
 }
 
+const CHAMPION_HISTORY_CACHE_PREFIX = "lol-coach-champion-history";
+const CHAMPION_HISTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+function loadChampionHistoryFromCache(puuid) {
+  if (!puuid) return null;
+  try {
+    const raw = localStorage.getItem(`${CHAMPION_HISTORY_CACHE_PREFIX}:${puuid}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.fetchedAt) return null;
+    const age = Date.now() - new Date(parsed.fetchedAt).getTime();
+    if (!Number.isFinite(age) || age > CHAMPION_HISTORY_CACHE_TTL_MS) {
+      return { ...parsed, expired: true };
+    }
+    return { ...parsed, expired: false };
+  } catch {
+    return null;
+  }
+}
+
+function saveChampionHistoryToCache(puuid, payload) {
+  if (!puuid || !payload) return;
+  try {
+    localStorage.setItem(`${CHAMPION_HISTORY_CACHE_PREFIX}:${puuid}`, JSON.stringify(payload));
+  } catch {
+    // localStorage quota / private mode — 캐시 실패는 무시 (다음 페치는 정상 동작)
+  }
+}
+
+async function fetchChampionHistory({ gameName, tagLine, platformRegion, riotApiKey, signal, onProgress }) {
+  const response = await fetch("/api/champion-history", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ gameName, tagLine, platformRegion, riotApiKey }),
+    signal,
+  });
+
+  if (!response.ok) {
+    let errorBody = "";
+    try { errorBody = (await response.json()).error || ""; } catch {}
+    throw new Error(errorBody || `HTTP ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let result = null;
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const blocks = buffer.split("\n\n");
+    buffer = blocks.pop() || "";
+    for (const block of blocks) {
+      const lines = block.split("\n");
+      let event = "";
+      let data = "";
+      for (const line of lines) {
+        if (line.startsWith("event: ")) event = line.slice(7).trim();
+        else if (line.startsWith("data: ")) data += line.slice(6);
+      }
+      if (!event) continue;
+      let payload = null;
+      try { payload = data ? JSON.parse(data) : null; } catch { payload = { error: "invalid json" }; }
+      if (event === "progress" && typeof onProgress === "function") onProgress(payload);
+      else if (event === "done") result = payload;
+      else if (event === "error") throw new Error(payload?.error || "fetch failed");
+    }
+  }
+
+  if (!result) throw new Error("스트림이 done 이벤트 없이 종료됨");
+  return result;
+}
+
 function compactPatchLabel(version) {
   const text = String(version || "");
   const parts = text.split(".");
