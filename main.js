@@ -76,6 +76,17 @@ const dom = {
   championBreakdownFooter: document.querySelector("[data-champion-breakdown-footer]"),
   roleBreakdown: document.querySelector("[data-role-breakdown]"),
   roleBreakdownList: document.querySelector("[data-role-breakdown-list]"),
+  championHistoryPanel: document.querySelector("[data-champion-history]"),
+  championHistoryMeta: document.querySelector("[data-champion-history-meta]"),
+  championHistoryAction: document.querySelector("[data-champion-history-action]"),
+  championHistoryProgress: document.querySelector("[data-champion-history-progress]"),
+  championHistoryProgressLabel: document.querySelector("[data-champion-history-progress-label]"),
+  championHistoryProgressBar: document.querySelector("[data-champion-history-progress-bar]"),
+  championHistoryCancel: document.querySelector("[data-champion-history-cancel]"),
+  championHistorySummary: document.querySelector("[data-champion-history-summary]"),
+  championHistoryEmpty: document.querySelector("[data-champion-history-empty]"),
+  championHistoryTableWrap: document.querySelector("[data-champion-history-table-wrap]"),
+  championHistoryTable: document.querySelector("[data-champion-history-table]"),
 };
 
 const state = {
@@ -102,6 +113,11 @@ const state = {
   recentStatsAccount: null,
   recentStatsLoading: false,
   recentStatsError: null,
+  championHistory: null,
+  championHistoryAccount: null,
+  championHistoryLoading: false,
+  championHistoryAbort: null,
+  championHistorySort: { key: "count", dir: "desc" },
 };
 
 const REPORT_STRIP_LIMIT = 6;
@@ -3387,6 +3403,7 @@ async function init() {
 
   applyPendingUi();
   initTabSystem();
+  initChampionsTab();
   bindDualTimelineEvents();
 }
 
@@ -3429,6 +3446,8 @@ function switchTab(tabId, opts = {}) {
     // keeping the skeleton up for the full fetch duration. Deliberate trade-off.
     maybeFetchRecentStats();
   }
+
+  if (tabId === "tab-champions") onChampionsTabEnter();
 
   dashboard.dataset.activeTab = tabId;
   localStorage.setItem("lol-coach-active-tab", tabId);
@@ -3530,6 +3549,53 @@ function initTabSystem() {
       fetchRecentStats({ force: true });
     });
   }
+}
+
+function initChampionsTab() {
+  if (!dom.championHistoryAction) return;
+  dom.championHistoryAction.addEventListener("click", () => startChampionHistoryFetch(false));
+  dom.championHistoryCancel?.addEventListener("click", () => {
+    state.championHistoryAbort?.abort();
+  });
+}
+
+function onChampionsTabEnter() {
+  // 탭 진입 시 캐시 우선, 없으면 빈 상태 유지 (자동 페치 X)
+  if (state.championHistory) {
+    renderChampionHistory();
+    return;
+  }
+  const puuid = state.account?.puuid;
+  if (!puuid) {
+    setChampionHistoryEmpty("먼저 Riot ID로 로그인해주세요.");
+    return;
+  }
+  const cached = loadChampionHistoryFromCache(puuid);
+  if (cached) {
+    state.championHistory = cached;
+    renderChampionHistory();
+  } else {
+    setChampionHistoryEmpty("아직 분석을 실행하지 않았습니다. 위의 [분석 시작]을 눌러주세요.");
+  }
+}
+
+function setChampionHistoryEmpty(message) {
+  if (dom.championHistoryEmpty) {
+    dom.championHistoryEmpty.querySelector("p").textContent = message;
+    dom.championHistoryEmpty.hidden = false;
+  }
+  if (dom.championHistorySummary) dom.championHistorySummary.hidden = true;
+  if (dom.championHistoryTableWrap) dom.championHistoryTableWrap.hidden = true;
+}
+
+async function startChampionHistoryFetch(force) {
+  // Phase 4에서 채움 - Phase 3에서는 placeholder
+  console.log("startChampionHistoryFetch", { force });
+}
+
+function renderChampionHistory() {
+  // Phase 6/7에서 채움
+  if (dom.championHistoryEmpty) dom.championHistoryEmpty.hidden = true;
 }
 
 init();

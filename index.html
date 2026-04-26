@@ -113,6 +113,7 @@
             <button id="tab-analysis-btn" class="tab-btn" data-tab="tab-analysis" role="tab" aria-selected="false" aria-controls="tab-analysis" tabindex="-1">분석</button>
             <button id="tab-timeline-btn" class="tab-btn" data-tab="tab-timeline" role="tab" aria-selected="false" aria-controls="tab-timeline" tabindex="-1">타임라인</button>
             <button id="tab-trends-btn" class="tab-btn" data-tab="tab-trends" role="tab" aria-selected="false" aria-controls="tab-trends" tabindex="-1">추세</button>
+            <button id="tab-champions-btn" class="tab-btn" data-tab="tab-champions" role="tab" aria-selected="false" aria-controls="tab-champions" tabindex="-1">챔피언</button>
           </div>
 
           <!-- TAB: 개요 -->
@@ -352,6 +353,34 @@
           </section>
 
           </div><!-- /tab-trends -->
+
+          <!-- TAB: 챔피언 -->
+          <div class="tab-page" id="tab-champions" role="tabpanel" aria-labelledby="tab-champions-btn" tabindex="0" hidden>
+            <section class="panel panel--champions" data-champion-history aria-labelledby="champion-history-title">
+              <header class="panel--champions__head">
+                <h2 id="champion-history-title">챔피언별 시즌 분석</h2>
+                <p class="panel--champions__meta muted" data-champion-history-meta>현재 시즌 솔랭/자랭 (1~3분 소요)</p>
+                <button type="button" class="btn btn--secondary" data-champion-history-action>분석 시작</button>
+              </header>
+              <div class="champion-history-progress" data-champion-history-progress hidden>
+                <div class="champion-history-progress__row">
+                  <span data-champion-history-progress-label>대기 중…</span>
+                  <button type="button" class="btn btn--ghost" data-champion-history-cancel>취소</button>
+                </div>
+                <progress class="champion-history-progress__bar" data-champion-history-progress-bar value="0" max="100"></progress>
+              </div>
+              <div class="champion-history-summary" data-champion-history-summary hidden></div>
+              <div class="champion-history-empty" data-champion-history-empty>
+                <p>아직 분석을 실행하지 않았습니다. 위의 [분석 시작]을 눌러주세요.</p>
+              </div>
+              <div class="champion-history-table-wrap" data-champion-history-table-wrap hidden>
+                <table class="champion-table" data-champion-history-table>
+                  <thead></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </main>
       </div>
     </div>

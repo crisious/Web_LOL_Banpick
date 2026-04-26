@@ -3588,6 +3588,19 @@ body::after {
   font-size: var(--fs-xs);
 }
 
+.panel--champions { display: flex; flex-direction: column; gap: var(--space-4); }
+.panel--champions__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.panel--champions__head h2 { margin: 0; font-size: var(--fs-xl); }
+.panel--champions__meta { margin: 0; flex: 1; }
+
+.champion-history-empty {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--muted);
+  background: var(--surface-1);
+  border-radius: var(--radius-md);
+}
+
 .panel--recent-aggregate__status {
   font-size: var(--fs-sm);
   color: var(--muted);
