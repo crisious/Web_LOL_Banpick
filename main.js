@@ -1273,6 +1273,15 @@ function invalidateRecentStatsIfAccountChanged() {
   }
 }
 
+function invalidateChampionHistoryIfAccountChanged() {
+  if (!state.championHistory) return;
+  if (state.championHistoryAccount !== currentAccountKey()) {
+    state.championHistory = null;
+    state.championHistoryAccount = null;
+    state.championHistorySort = { key: "count", dir: "desc" };
+  }
+}
+
 async function fetchRecentStats({ force = false } = {}) {
   if (!state.account) {
     renderRecentStatsEmpty("계정을 먼저 설정하세요");
@@ -3013,6 +3022,7 @@ async function handleLogin(event) {
       championMastery: result.championMastery || [],
     };
     invalidateRecentStatsIfAccountChanged();
+    invalidateChampionHistoryIfAccountChanged();
     state.recentMatches = result.matches || [];
     state.recentMatchesHasMore = Boolean(result.hasMore);
     if (remember) saveAccount(account);
@@ -3435,6 +3445,7 @@ async function init() {
       localStorage.removeItem("lol-coach-account");
       state.account = null;
       invalidateRecentStatsIfAccountChanged();
+      invalidateChampionHistoryIfAccountChanged();
       state.recentMatches = [];
       state.recentMatchesHasMore = false;
       setView("LOGGED_OUT");
@@ -3631,20 +3642,24 @@ function initChampionsTab() {
 }
 
 function onChampionsTabEnter() {
-  // 탭 진입 시 캐시 우선, 없으면 빈 상태 유지 (자동 페치 X)
-  if (state.championHistory) {
-    renderChampionHistory();
-    return;
-  }
+  if (state.championHistoryLoading) return; // 페치 중에는 그대로
   const puuid = state.account?.puuid;
   if (!puuid) {
     setChampionHistoryEmpty("먼저 Riot ID로 로그인해주세요.");
     return;
   }
-  const cached = loadChampionHistoryFromCache(puuid);
-  if (cached) {
-    state.championHistory = cached;
+  if (!state.championHistory) {
+    const cached = loadChampionHistoryFromCache(puuid);
+    if (cached) {
+      state.championHistory = cached;
+      state.championHistoryAccount = currentAccountKey();
+    }
+  }
+  if (state.championHistory) {
     renderChampionHistory();
+    if (state.championHistory.expired && dom.championHistoryAction) {
+      dom.championHistoryAction.textContent = "다시 분석 (만료됨)";
+    }
   } else {
     setChampionHistoryEmpty("아직 분석을 실행하지 않았습니다. 위의 [분석 시작]을 눌러주세요.");
   }
@@ -3683,16 +3698,22 @@ async function startChampionHistoryFetch(force) {
   if (dom.championHistoryEmpty) dom.championHistoryEmpty.hidden = true;
 
   try {
+    let matchErrors = 0;
+    const onProgress = (info) => {
+      if (info && info.phase === "match-error") matchErrors += 1;
+      updateChampionHistoryProgress(info);
+    };
     const result = await fetchChampionHistory({
       gameName: state.account.gameName,
       tagLine: state.account.tagLine,
       platformRegion: state.account.platformRegion,
       riotApiKey: state.account.riotApiKey || undefined,
       signal: state.championHistoryAbort.signal,
-      onProgress: (info) => updateChampionHistoryProgress(info),
+      onProgress,
     });
 
-    state.championHistory = { ...result, expired: false };
+    state.championHistory = { ...result, expired: false, matchErrors };
+    state.championHistoryAccount = currentAccountKey();
     saveChampionHistoryToCache(puuid, state.championHistory);
     renderChampionHistory();
   } catch (error) {
@@ -3774,10 +3795,9 @@ function updateChampionHistoryMeta(history) {
   const ageMin = Math.round((Date.now() - fetched.getTime()) / 60000);
   const ageLabel = ageMin < 1 ? "방금 전" : ageMin < 60 ? `${ageMin}분 전` : `${Math.round(ageMin / 60)}시간 전`;
   const expired = history.expired ? " · 만료됨" : "";
-  dom.championHistoryMeta.textContent = `${history.totalGames}경기 · 마지막 갱신 ${ageLabel}${expired}`;
-  if (dom.championHistoryAction) {
-    dom.championHistoryAction.textContent = "다시 분석";
-  }
+  const errors = history.matchErrors > 0 ? ` · 누락 ${history.matchErrors}건` : "";
+  dom.championHistoryMeta.textContent = `${history.totalGames}경기 · 마지막 갱신 ${ageLabel}${expired}${errors}`;
+  if (dom.championHistoryAction) dom.championHistoryAction.textContent = "다시 분석";
 }
 
 function renderChampionSummary(stats) {
