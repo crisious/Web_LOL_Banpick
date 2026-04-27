@@ -50,8 +50,10 @@
 | `--rose-bg-soft` | `rgba(255, 134, 120, 0.1)` | LOSS 배지 / 약점 카드 / 부정 추세 배경 (0.08→0.10 consolidation) |
 | `--rose-bg-medium` | `rgba(255, 134, 120, 0.28)` | LOSS 계열 강조 border |
 | `--amber-bg-soft` | `rgba(240, 179, 91, 0.08)` | 추세 패널 상단 / 액티브 세그먼트 배경 |
-| `--amber-bg-deep` | `rgba(240, 179, 91, 0.18)` | body radial-gradient / sample-chip 배경 |
+| `--amber-bg-deep` | `rgba(240, 179, 91, 0.18)` | body radial-gradient (top-right) / sample-chip 배경 |
+| `--mint-bg-deep` | `rgba(89, 209, 178, 0.18)` | body radial-gradient (top-left). --amber-bg-deep와 대칭 |
 | `--amber-bg-strong` | `rgba(240, 179, 91, 0.3)` | rank-badge gold border |
+| `--grid-line` | `rgba(255, 255, 255, 0.025)` | body::before 그리드 오버레이 라인 색 (수평/수직) |
 | `--rank-iron` | `#8b7355` | 아이언 티어 텍스트 색 |
 | `--rank-bronze` | `#cd7f32` | 브론즈 티어 텍스트 색 |
 | `--rank-silver` | `#c0c0c0` | 실버 티어 텍스트 색 |
@@ -63,15 +65,14 @@
 
 **미토큰화 색상** (남은 하드코딩, 모두 2회 이하 사용 — 후속 이터레이션 후보, 이슈 #18)
 
-- `rgba(255, 255, 255, 0.025)` / `rgba(255, 255, 255, 0.035)` — 바디 그리드 오버레이 (단일 사용)
-- `rgba(89, 209, 178, 0.24)` / `rgba(89, 209, 178, 0.25)` / `rgba(89, 209, 178, 0.18)` — 기타 mint 단독 사용 alpha
-- `rgba(255, 134, 120, 0.25)` / `rgba(255, 134, 120, 0.42)` — 기타 rose 단독 사용 alpha
 - `rgba(255, 156, 143, 0.24)` / `rgba(255, 156, 143, 0.12)` — **#ff9c8f orphan rose 변형** (candidate-head LOSS). 기본 `--rose`와 다른 RGB — 통일 여부는 후속 이터레이션에서 결정
 
 수용된 단독 사용 (대체 불가 — 토큰화 안 함):
 
 - `rgba(240, 179, 91, 0.25)` — `.dual-tl-event[data-importance="5"]` box-shadow spot-glow. 0.30으로 끌어올리면 +20% 강도 변화, 단독 강조 의도와 다름
 - `rgba(240, 179, 91, 0.4)` — `.checklist-priority` border. 핵심 UI 보더, 0.34(`--amber-border`)로 끌어내리면 -15% 가시성 저하
+- `rgba(89, 209, 178, 0.42)` / `rgba(255, 134, 120, 0.42)` — detail-progress complete/error 보더. mint-border/rose-border(0.34)보다 상위, 단독 강조 의도
+- `rgba(255, 255, 255, 0.035)` — phase-card 기본 배경. grid-line 0.025와 별개 surface alpha
 
 ## 2. 타이포
 
@@ -284,10 +285,10 @@ body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰
 
 ## 8. 배경 장식 (바디 레벨)
 
-- radial-gradient 민트 (top-left, 0.18 alpha, 28%)
-- radial-gradient 앰버 (top-right, 0.18 alpha, 30%)
+- radial-gradient 민트 (top-left, `--mint-bg-deep`, 28%) — iteration 13 토큰화
+- radial-gradient 앰버 (top-right, `--amber-bg-deep`, 30%)
 - linear-gradient 145deg `--bg` → `--bg-alt`
-- `body::before` — 36px 그리드 오버레이, 중앙 페이드 마스크
+- `body::before` — 36px 그리드 오버레이 (`--grid-line`), 중앙 페이드 마스크 — iteration 13 토큰화
 - `body::after` — 24px 인셋 얇은 보더 (프레이밍)
 
 ## 9. 접근성 · 유틸
@@ -322,7 +323,7 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 15. ~~**match-summary-card 계층 약함**~~ — **완료** (iteration 6). 좌측 3px 결과색 엣지 바 + `--tint-mint/rose` 배경 + hover 시 `--shadow-hover` + 1px lift 추가.
 16. ~~**탭바 sticky 시 경계 불명확**~~ — **완료** (iteration 6). `.tab-bar::after` 12px fade shadow로 스크롤 경계 시각화.
 17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
-18. **잔여 edge-case alpha (iteration 7에서 이월)** — ~~#ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요)~~ 보류(designer 판단), ~~gradient 페이드아웃 0.03 (comparison-card) — **완료** (iteration 11). `--mint-bg-trace` / `--rose-bg-trace` 신규 토큰화.~~, ~~rank-badge hex 8종(#8b7355 iron / #cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum / #50c878 emerald / #b9f2ff diamond / #9d4dbb master / #ef4444 grandmaster) — **완료** (iteration 10). `--rank-iron/bronze/silver/platinum/emerald/diamond/master/grandmaster` 8토큰으로 토큰화. challenger `#f0b35b` → `var(--accent)` 수렴.~~, ~~amber 0.10 (running step) — **완료** (iteration 11). `--amber-bg-soft`(0.08)로 consolidation.~~, ~~info 0.36/0.10 (LOADING_DETAIL fetch-status) — **완료** (iteration 11). `--info-border`(0.38) / `--info-soft`(0.08)로 consolidation.~~, ~~single-use amber alpha (0.15/0.32/0.38 + dual-tl-phase 0.04 트리오) — **완료** (iteration 12). 기존 토큰 consolidation + `--amber-bg-trace` 신규 1토큰으로 trace 패밀리 완성.~~ 잔여 보류 항목: #ff9c8f orphan rose (RGB 다름, 별도 판단), comparison-card border 0.25 mint/rose (0.25→0.28 consolidation 별도 평가), 수용된 단독 amber 2종 (0.25 box-shadow / 0.40 border — 토큰화 안 함, §1 참조).
+18. ~~**잔여 edge-case alpha (iteration 7에서 이월)**~~ — ~~#ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요)~~ 보류(designer 판단), ~~gradient 페이드아웃 0.03 (comparison-card) — **완료** (iteration 11). `--mint-bg-trace` / `--rose-bg-trace` 신규 토큰화.~~, ~~rank-badge hex 8종(#8b7355 iron / #cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum / #50c878 emerald / #b9f2ff diamond / #9d4dbb master / #ef4444 grandmaster) — **완료** (iteration 10). `--rank-iron/bronze/silver/platinum/emerald/diamond/master/grandmaster` 8토큰으로 토큰화. challenger `#f0b35b` → `var(--accent)` 수렴.~~, ~~amber 0.10 (running step) — **완료** (iteration 11). `--amber-bg-soft`(0.08)로 consolidation.~~, ~~info 0.36/0.10 (LOADING_DETAIL fetch-status) — **완료** (iteration 11). `--info-border`(0.38) / `--info-soft`(0.08)로 consolidation.~~, ~~single-use amber alpha (0.15/0.32/0.38 + dual-tl-phase 0.04 트리오) — **완료** (iteration 12). 기존 토큰 consolidation + `--amber-bg-trace` 신규 1토큰으로 trace 패밀리 완성.~~, ~~mint 0.18/0.24/0.25 + rose 0.25 + white 0.025 (5종 raw value) — **완료** (iteration 13). `--mint-bg-deep` / `--grid-line` 신규 2토큰 + `--mint-bg-medium` / `--rose-bg-medium` 기존 토큰 흡수 (0.25→0.28 consolidation). champion-hero-banner/comparison-card/candidate-head WIN border 정리.~~ 잔여 보류 항목: #ff9c8f orphan rose (RGB 다름, designer 판단 필요). 수용 단독 사용 (토큰화 안 함): mint/rose 0.42 (detail-progress border), white 0.035 (phase-card), amber 0.25 box-shadow / 0.40 border — §1 수용된 단독 사용 참조.
 19. ~~**Layout / IA — 사이드바 비대, topbar 노이즈, Overview 삼중 텍스트, 10게임 카드 밀도, 탭 blank flash**~~ — **완료** (iteration 8). 사이드바 3단 슬림화(identity-card + sample-switcher + details intake), topbar 제거, detail-header + detail-metrics 병합, 10게임 OP.GG row format, 첫 진입 탭 skeleton placeholder. JS `data-*` 셀렉터 대부분 보존 (삭제: sampleId, heroMatch, themeCopy, heroPills, sectionNav, overallSummary, gameFlowSummary, snapshotResult, snapshotConfidence).
 20. ~~**다중 경기 누적 분석 뷰 — 최근 N경기 챔피언·포지션 브레이크다운**~~ — **완료** (iteration 9). tab-trends에 panel--recent-aggregate + panel--champion-breakdown + panel--role-breakdown 3개 신규 패널 추가. 기존 /api/recent-matches 재사용, 서버 변경 없음. aggregateRecentStats 순수 함수로 집계. 탭 진입 시 lazy fetch + 세션 캐시 + 새로고침 버튼. 계정 전환 시 자동 invalidate.
 

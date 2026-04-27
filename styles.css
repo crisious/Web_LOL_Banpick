@@ -44,7 +44,9 @@
   --rose-bg-medium: rgba(255, 134, 120, 0.28);
   --amber-bg-soft: rgba(240, 179, 91, 0.08);
   --amber-bg-deep: rgba(240, 179, 91, 0.18);
+  --mint-bg-deep: rgba(89, 209, 178, 0.18);
   --amber-bg-strong: rgba(240, 179, 91, 0.3);
+  --grid-line: rgba(255, 255, 255, 0.025);
   /* Rank tier colors — iteration 10 */
   --rank-iron: #8b7355;
   --rank-bronze: #cd7f32;
@@ -91,7 +93,7 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(89, 209, 178, 0.18), transparent 28%),
+    radial-gradient(circle at top left, var(--mint-bg-deep), transparent 28%),
     radial-gradient(circle at top right, var(--amber-bg-deep), transparent 30%),
     linear-gradient(145deg, var(--bg), var(--bg-alt));
   color: var(--text);
@@ -104,8 +106,8 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 36px 36px;
   mask-image: radial-gradient(circle at center, black 48%, transparent 88%);
   pointer-events: none;
@@ -381,12 +383,12 @@ body::after {
 }
 
 .champion-hero-banner__result[data-result="WIN"] {
-  background: rgba(89, 209, 178, 0.25);
+  background: var(--mint-bg-medium);
   color: var(--mint);
 }
 
 .champion-hero-banner__result[data-result="LOSS"] {
-  background: rgba(255, 134, 120, 0.25);
+  background: var(--rose-bg-medium);
   color: var(--rose);
 }
 
@@ -3008,12 +3010,12 @@ body::after {
 
 .comparison-card[data-source="claude"] {
   background: linear-gradient(135deg, var(--mint-bg-soft), var(--mint-bg-trace));
-  border-color: rgba(89, 209, 178, 0.25);
+  border-color: var(--mint-bg-medium);
 }
 
 .comparison-card[data-source="codex"] {
   background: linear-gradient(135deg, var(--rose-bg-soft), var(--rose-bg-trace));
-  border-color: rgba(255, 134, 120, 0.25);
+  border-color: var(--rose-bg-medium);
 }
 
 .comparison-card h4 {
@@ -4120,7 +4122,7 @@ body::after {
 
 .candidate-head__tag--result[data-result="WIN"] {
   color: var(--mint);
-  border-color: rgba(89, 209, 178, 0.24);
+  border-color: var(--mint-bg-medium);
   background: var(--mint-bg-soft);
 }
 
