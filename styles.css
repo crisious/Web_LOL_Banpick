@@ -4127,9 +4127,9 @@ body::after {
 }
 
 .candidate-head__tag--result[data-result="LOSS"] {
-  color: #ff9c8f;
-  border-color: rgba(255, 156, 143, 0.24);
-  background: rgba(255, 156, 143, 0.12);
+  color: var(--rose);
+  border-color: var(--rose-bg-medium);
+  background: var(--rose-bg-soft);
 }
 
 .champion-avatar {
