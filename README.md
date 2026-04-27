@@ -137,6 +137,7 @@
 - `node scripts/design-audit.js --scope <scope> --format markdown` — 로컬 감사 CLI. `styles.css`의 color/radius/spacing/font-size/breakpoint 상태를 집계하고, 하드코딩 literal과 미정의 custom property를 잡아줌. `main.js`, `index.html`도 함께 읽어 런타임 CSS 변수 여부를 구분함
 - `/design-audit [스코프]` — `design-auditor` 에이전트가 위 감사 결과를 바탕으로 [styles.css](styles.css)를 스코프별(radius/colors/fontsize/gap/breakpoint/all)로 이터레이티브 개선. `index.html` 구조와 `main.js` 속성 셀렉터는 변경하지 않음
 - `/design-apply [diff]` — claude.ai Project에서 받은 CSS 제안을 안전하게 반영
+- `/design-bundle [--js]` — claude.ai Project에 업로드할 컨텍스트 번들 생성 (`styles.css`, `design-tokens.md`, `index.html` + 옵션으로 `main.js`, README, git ref). 산출물은 `test-artifacts/design-bundle/<timestamp>/`
 
 ### QA Smoke Automation
 
