@@ -32,6 +32,10 @@
   --amber-border: rgba(240, 179, 91, 0.34);
   --shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.28);
   /* State color alpha scale — iteration 7 (token cleanup) */
+  /* Gradient fadeout tier — iteration 11 / amber trace added iteration 12 */
+  --mint-bg-trace: rgba(89, 209, 178, 0.03);
+  --amber-bg-trace: rgba(240, 179, 91, 0.03);
+  --rose-bg-trace: rgba(255, 134, 120, 0.03);
   --mint-bg-weak: rgba(89, 209, 178, 0.06);
   --mint-bg-soft: rgba(89, 209, 178, 0.1);
   --mint-bg-medium: rgba(89, 209, 178, 0.28);
@@ -41,6 +45,15 @@
   --amber-bg-soft: rgba(240, 179, 91, 0.08);
   --amber-bg-deep: rgba(240, 179, 91, 0.18);
   --amber-bg-strong: rgba(240, 179, 91, 0.3);
+  /* Rank tier colors — iteration 10 */
+  --rank-iron: #8b7355;
+  --rank-bronze: #cd7f32;
+  --rank-silver: #c0c0c0;
+  --rank-platinum: #2cc5b8;
+  --rank-emerald: #50c878;
+  --rank-diamond: #b9f2ff;
+  --rank-master: #9d4dbb;
+  --rank-grandmaster: #ef4444;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -545,7 +558,7 @@ body::after {
 .sample-chip:hover,
 .sample-chip[data-active='true'] {
   transform: translateY(-2px);
-  border-color: rgba(240, 179, 91, 0.38);
+  border-color: var(--amber-border);
   background: var(--amber-soft);
   box-shadow: var(--shadow-hover);
 }
@@ -743,7 +756,7 @@ body::after {
 .detail-progress__step[data-step-state="running"] {
   color: var(--accent);
   border-color: var(--amber-border);
-  background: rgba(240, 179, 91, 0.1);
+  background: var(--amber-bg-soft);
 }
 
 .detail-progress__step[data-step-state="running"] .detail-progress__dot {
@@ -851,9 +864,9 @@ body::after {
   border-right: 1px dashed var(--line);
 }
 
-.dual-tl-phase--early { background: rgba(89, 209, 178, 0.04); }
-.dual-tl-phase--mid   { background: rgba(240, 179, 91, 0.04); }
-.dual-tl-phase--late  { background: rgba(255, 134, 120, 0.04); }
+.dual-tl-phase--early { background: var(--mint-bg-trace); }
+.dual-tl-phase--mid   { background: var(--amber-bg-trace); }
+.dual-tl-phase--late  { background: var(--rose-bg-trace); }
 
 .dual-tl-phase-label {
   position: absolute;
@@ -2135,8 +2148,8 @@ body::after {
   opacity: 0.72;
 }
 [data-view="LOADING_DETAIL"] .fetch-status {
-  border-color: rgba(120, 186, 255, 0.36);
-  background: rgba(120, 186, 255, 0.1);
+  border-color: var(--info-border);
+  background: var(--info-soft);
 }
 
 [data-view="DETAIL_VIEW"] .login-overlay { display: none; }
@@ -2851,16 +2864,16 @@ body::after {
   border: 1px solid var(--line);
 }
 
-.rank-badge--iron { color: #8b7355; }
-.rank-badge--bronze { color: #cd7f32; }
-.rank-badge--silver { color: #c0c0c0; }
+.rank-badge--iron { color: var(--rank-iron); }
+.rank-badge--bronze { color: var(--rank-bronze); }
+.rank-badge--silver { color: var(--rank-silver); }
 .rank-badge--gold { color: var(--accent); border-color: var(--amber-bg-strong); }
-.rank-badge--platinum { color: #2cc5b8; }
-.rank-badge--emerald { color: #50c878; }
-.rank-badge--diamond { color: #b9f2ff; }
-.rank-badge--master { color: #9d4dbb; }
-.rank-badge--grandmaster { color: #ef4444; }
-.rank-badge--challenger { color: #f0b35b; background: rgba(240, 179, 91, 0.15); }
+.rank-badge--platinum { color: var(--rank-platinum); }
+.rank-badge--emerald { color: var(--rank-emerald); }
+.rank-badge--diamond { color: var(--rank-diamond); }
+.rank-badge--master { color: var(--rank-master); }
+.rank-badge--grandmaster { color: var(--rank-grandmaster); }
+.rank-badge--challenger { color: var(--accent); background: var(--tint-amber); }
 .rank-badge--unavailable { color: var(--rose); border-color: var(--rose-bg-medium); background: var(--rose-bg-soft); }
 
 .level-badge {
@@ -2994,12 +3007,12 @@ body::after {
 }
 
 .comparison-card[data-source="claude"] {
-  background: linear-gradient(135deg, var(--mint-bg-soft), rgba(89, 209, 178, 0.03));
+  background: linear-gradient(135deg, var(--mint-bg-soft), var(--mint-bg-trace));
   border-color: rgba(89, 209, 178, 0.25);
 }
 
 .comparison-card[data-source="codex"] {
-  background: linear-gradient(135deg, var(--rose-bg-soft), rgba(255, 134, 120, 0.03));
+  background: linear-gradient(135deg, var(--rose-bg-soft), var(--rose-bg-trace));
   border-color: rgba(255, 134, 120, 0.25);
 }
 
@@ -4128,7 +4141,7 @@ body::after {
   border: 1px solid var(--line);
   background:
     var(--champion-art, linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))),
-    radial-gradient(circle at top left, rgba(240, 179, 91, 0.32), transparent 58%),
+    radial-gradient(circle at top left, var(--amber-bg-strong), transparent 58%),
     linear-gradient(180deg, var(--mint-bg-soft), var(--surface-2));
   background-size: cover, auto, auto;
   background-position: var(--champion-art-position, center top), center, center;
