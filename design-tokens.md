@@ -62,8 +62,9 @@
 | `--rank-diamond` | `#b9f2ff` | 다이아몬드 티어 텍스트 색 |
 | `--rank-master` | `#9d4dbb` | 마스터 티어 텍스트 색 |
 | `--rank-grandmaster` | `#ef4444` | 그랜드마스터 티어 텍스트 색 |
+| `--focus-ring` | `#ffd166` | 키보드 포커스 outline 색 (본문 배경 대비 13:1, a11y) |
 
-**미토큰화 색상** — 없음. iteration 14에서 `#ff9c8f` orphan 통일로 모든 후속 후보 처리 완료.
+**미토큰화 색상** — 없음 (의도적 단독 사용 5건은 아래 '수용된 단독 사용' 표 참조). iteration 14에서 `#ff9c8f` orphan 통일로 모든 후속 후보 처리 완료.
 
 수용된 단독 사용 (대체 불가 — 토큰화 안 함):
 
@@ -71,6 +72,7 @@
 - `rgba(240, 179, 91, 0.4)` — `.checklist-priority` border. 핵심 UI 보더, 0.34(`--amber-border`)로 끌어내리면 -15% 가시성 저하
 - `rgba(89, 209, 178, 0.42)` / `rgba(255, 134, 120, 0.42)` — detail-progress complete/error 보더. mint-border/rose-border(0.34)보다 상위, 단독 강조 의도
 - `rgba(255, 255, 255, 0.035)` — phase-card 기본 배경. grid-line 0.025와 별개 surface alpha
+- `#f8c56d` — `.fetch-form button` linear-gradient highlight stop. `--accent` 대비 +8/+18/+18 RGB로 의도적 밝은 amber, 단독 사용.
 
 ## 2. 타이포
 
@@ -94,10 +96,9 @@
 | `--fs-display` | `1.8rem` | 1.8 | 헤드라인 (detail h2) |
 | `--fs-hero` | `3.2rem` | 3.2 | 대형 지표 (e.g. 승률) |
 
-**미토큰화 (clamp 기반 반응형)**
-- 섹션 제목: `clamp(1.2rem, 1.6vw, 1.55rem)` — 뷰포트 스케일링 전용
-- topbar 제목: `clamp(1.2rem, 2vw, 1.75rem)`
-- 헤드라인 (detail hero): `clamp(1.7rem, 2.6vw, 2.4rem)`
+**미토큰화 (clamp 기반 반응형)** — iteration 18에서 dead clamp 5건 모두 소멸 (§10 항목 21 완료).
+
+styles.css 전체에 `clamp()` 호출 0건. live code 기준 font-size 토큰 coverage = 100%, audit fontSize responsive exceptions = 0.
 
 **토큰화 시 시각 변화 (consolidation)**
 - `0.58~0.72rem` (마이크로 라벨 7종) → `0.7rem` 통일: 가장 작은 글자는 살짝 커지고, `0.72rem` 쓰던 곳은 동일
@@ -293,7 +294,10 @@ body element font-size는 전체 rem 단위의 앵커 역할을 하므로 토큰
 
 - `.skip-link` — 포커스 시 드러나는 스킵 링크 (`pill + accent`)
 - `.sr-only` — 시각적으로만 숨김
-- **전역 `:focus-visible`** — `2px solid var(--accent)` + `2px` offset (iteration 4 추가)
+- **a11y 토큰** (Phase 1 통합, [styles.css:83-84](styles.css#L83-L84))
+  - `--focus-ring: #ffd166` — focus outline 색 (대비 13:1, §1 표 참조)
+  - `--touch-min: 44px` — WCAG 2.5.5 최소 터치 타겟
+- **전역 `:focus-visible`** — `3px solid var(--focus-ring)` + `2px` offset + `var(--radius-sm)` (iteration 4 추가, Phase 9에서 `--focus-ring` 토큰으로 단일 진실원화)
 - **`prefers-reduced-motion`** — 모션 억제 블록 (iteration 4 추가, §5 참조). 신규 `shimmer` / `spin` 애니메이션도 자동 억제 (`*` 전역 규칙으로 커버)
 - **스켈레톤 유틸** (iteration 6 추가): `.skeleton` + `.skeleton--line/--block/--card` + `@keyframes shimmer` (1.4s infinite). 로딩 플레이스홀더 재사용 가능
 - **로딩 인디케이터** (iteration 6): `[data-view="LOADING_DETAIL"] .fetch-status::before` 회전 스피너 (info 색, 0.8s linear)
@@ -321,9 +325,10 @@ claude.ai에 "이 항목 개선해줘"로 던지면 좋은 후보:
 15. ~~**match-summary-card 계층 약함**~~ — **완료** (iteration 6). 좌측 3px 결과색 엣지 바 + `--tint-mint/rose` 배경 + hover 시 `--shadow-hover` + 1px lift 추가.
 16. ~~**탭바 sticky 시 경계 불명확**~~ — **완료** (iteration 6). `.tab-bar::after` 12px fade shadow로 스크롤 경계 시각화.
 17. ~~**로딩 상태가 opacity 0.72뿐**~~ — **완료** (iteration 6). `.skeleton` 유틸 클래스 패밀리 추가 + `@keyframes shimmer/spin`, LOADING_DETAIL `.fetch-status::before` 회전 스피너.
-18. ~~**잔여 edge-case alpha (iteration 7에서 이월)**~~ — ~~#ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요)~~ 보류(designer 판단), ~~gradient 페이드아웃 0.03 (comparison-card) — **완료** (iteration 11). `--mint-bg-trace` / `--rose-bg-trace` 신규 토큰화.~~, ~~rank-badge hex 8종(#8b7355 iron / #cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum / #50c878 emerald / #b9f2ff diamond / #9d4dbb master / #ef4444 grandmaster) — **완료** (iteration 10). `--rank-iron/bronze/silver/platinum/emerald/diamond/master/grandmaster` 8토큰으로 토큰화. challenger `#f0b35b` → `var(--accent)` 수렴.~~, ~~amber 0.10 (running step) — **완료** (iteration 11). `--amber-bg-soft`(0.08)로 consolidation.~~, ~~info 0.36/0.10 (LOADING_DETAIL fetch-status) — **완료** (iteration 11). `--info-border`(0.38) / `--info-soft`(0.08)로 consolidation.~~, ~~single-use amber alpha (0.15/0.32/0.38 + dual-tl-phase 0.04 트리오) — **완료** (iteration 12). 기존 토큰 consolidation + `--amber-bg-trace` 신규 1토큰으로 trace 패밀리 완성.~~, ~~mint 0.18/0.24/0.25 + rose 0.25 + white 0.025 (5종 raw value) — **완료** (iteration 13). `--mint-bg-deep` / `--grid-line` 신규 2토큰 + `--mint-bg-medium` / `--rose-bg-medium` 기존 토큰 흡수 (0.25→0.28 consolidation). champion-hero-banner/comparison-card/candidate-head WIN border 정리.~~ **iteration 14**: `#ff9c8f` orphan rose (candidate-head LOSS) → 표준 `var(--rose)` / `--rose-bg-medium` / `--rose-bg-soft`로 통일. WIN-LOSS 사이드 톤 대칭 회복, RGB 단일화. 후속 후보 모두 처리 완료. 수용 단독 사용 (의도적 비-토큰): mint/rose 0.42 (detail-progress border), white 0.035 (phase-card), amber 0.25 box-shadow / 0.40 border — §1 수용된 단독 사용 참조.
+18. ~~**잔여 edge-case alpha (iteration 7에서 이월)**~~ — ~~#ff9c8f orphan rose 변형(candidate-head LOSS, RGB 다름 → 통일 판단 필요)~~ 보류(designer 판단), ~~gradient 페이드아웃 0.03 (comparison-card) — **완료** (iteration 11). `--mint-bg-trace` / `--rose-bg-trace` 신규 토큰화.~~, ~~rank-badge hex 8종(#8b7355 iron / #cd7f32 bronze / #c0c0c0 silver / #2cc5b8 platinum / #50c878 emerald / #b9f2ff diamond / #9d4dbb master / #ef4444 grandmaster) — **완료** (iteration 10). `--rank-iron/bronze/silver/platinum/emerald/diamond/master/grandmaster` 8토큰으로 토큰화. challenger `#f0b35b` → `var(--accent)` 수렴.~~, ~~amber 0.10 (running step) — **완료** (iteration 11). `--amber-bg-soft`(0.08)로 consolidation.~~, ~~info 0.36/0.10 (LOADING_DETAIL fetch-status) — **완료** (iteration 11). `--info-border`(0.38) / `--info-soft`(0.08)로 consolidation.~~, ~~single-use amber alpha (0.15/0.32/0.38 + dual-tl-phase 0.04 트리오) — **완료** (iteration 12). 기존 토큰 consolidation + `--amber-bg-trace` 신규 1토큰으로 trace 패밀리 완성.~~, ~~mint 0.18/0.24/0.25 + rose 0.25 + white 0.025 (5종 raw value) — **완료** (iteration 13). `--mint-bg-deep` / `--grid-line` 신규 2토큰 + `--mint-bg-medium` / `--rose-bg-medium` 기존 토큰 흡수 (0.25→0.28 consolidation). champion-hero-banner/comparison-card/candidate-head WIN border 정리.~~ **iteration 14**: `#ff9c8f` orphan rose (candidate-head LOSS) → 표준 `var(--rose)` / `--rose-bg-medium` / `--rose-bg-soft`로 통일. WIN-LOSS 사이드 톤 대칭 회복, RGB 단일화. 후속 후보 모두 처리 완료. 수용 단독 사용 (의도적 비-토큰): mint/rose 0.42 (detail-progress border), white 0.035 (phase-card), amber 0.25 box-shadow / 0.40 border — §1 수용된 단독 사용 참조. **iteration 16**: `#e8eef2` → `var(--text)` 통합 (color-mix 22% stop, RGB 차 ±2 이내), `#f8c56d` 단독 사용 등재.
 19. ~~**Layout / IA — 사이드바 비대, topbar 노이즈, Overview 삼중 텍스트, 10게임 카드 밀도, 탭 blank flash**~~ — **완료** (iteration 8). 사이드바 3단 슬림화(identity-card + sample-switcher + details intake), topbar 제거, detail-header + detail-metrics 병합, 10게임 OP.GG row format, 첫 진입 탭 skeleton placeholder. JS `data-*` 셀렉터 대부분 보존 (삭제: sampleId, heroMatch, themeCopy, heroPills, sectionNav, overallSummary, gameFlowSummary, snapshotResult, snapshotConfidence).
 20. ~~**다중 경기 누적 분석 뷰 — 최근 N경기 챔피언·포지션 브레이크다운**~~ — **완료** (iteration 9). tab-trends에 panel--recent-aggregate + panel--champion-breakdown + panel--role-breakdown 3개 신규 패널 추가. 기존 /api/recent-matches 재사용, 서버 변경 없음. aggregateRecentStats 순수 함수로 집계. 탭 진입 시 lazy fetch + 세션 캐시 + 새로고침 버튼. 계정 전환 시 자동 invalidate.
+21. ~~**iteration 8 dead-CSS 잔재 정리**~~ — **완료** (iteration 18). DOM 제거됐던 `.topbar` 4종 / `.hero-panel` / `.hero-copy` (h1·h2·.eyebrow) / `.hero-lede` / `.hero-pills` / `.hero-pill` / `.hero-meta` / `.panel--headline h2` / `[data-view="MATCH_LIST"|"LOADING_DETAIL"] .topbar` 모두 삭제. 단일 dead 블록 14개 통째 삭제 + 라이브 셀렉터 그룹 12곳에서 dead 항목만 제거. styles.css 4345 → 4213 라인 (-132). fontSize responsive exceptions 5 → 0 (clamp 잔존 0건). [index.html](index.html) / [main.js](main.js) 변경 없음 (속성 셀렉터 보존).
 
 ## 11. claude.ai 사용 팁
 
