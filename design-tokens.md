@@ -73,6 +73,11 @@
 - `rgba(89, 209, 178, 0.42)` / `rgba(255, 134, 120, 0.42)` — detail-progress complete/error 보더. mint-border/rose-border(0.34)보다 상위, 단독 강조 의도
 - `rgba(255, 255, 255, 0.035)` — phase-card 기본 배경. grid-line 0.025와 별개 surface alpha
 - `#f8c56d` — `.fetch-form button` linear-gradient highlight stop. `--accent` 대비 +8/+18/+18 RGB로 의도적 밝은 amber, 단독 사용.
+- `rgba(0, 0, 0, 0.6)` — `.champion-hero-banner__name` text-shadow. 영웅명 가독성용 dark drop, single-use overlay alpha (iteration 19 등재)
+- `rgba(0, 0, 0, 0.5)` — `.tier-emblem` text-shadow. 티어 글자 가독성, single-use (iteration 19 등재)
+- `rgba(0, 0, 0, 0.3)` — `.tier-emblem` linear-gradient stop. 원형 emblem의 깊이감, single-use (iteration 19 등재)
+- `#fff` — `.tier-emblem` text color. dark gradient 위 강제 흰색, single-use (iteration 19 등재)
+- `rgba(12, 19, 32, 0.42)` — `.fetch-status` 배경. `--bg`(#071018)와 다른 dark navy mid-alpha, single-use (iteration 19 등재)
 
 ## 2. 타이포
 
