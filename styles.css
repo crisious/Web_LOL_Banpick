@@ -1477,6 +1477,122 @@ body::after {
   max-width: 36ch;
 }
 
+/* Track H: section-heading--with-meta는 우측 슬롯에 메타 위젯(예: data-quality-pill)
+   을 띄우기 위한 변형. 좌측 main + 우측 meta로 양 끝 정렬. */
+.section-heading--with-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.section-heading__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-heading__meta {
+  flex: 0 0 auto;
+}
+
+/* Track H: AI 출력 스키마 위반 카운트 시각화. analysisMeta.schemaViolations가
+   존재할 때만 노출. 토큰 재사용으로 신규 컬러 0. */
+.data-quality-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: default;
+}
+
+.data-quality-pill[data-tone="ok"] {
+  background: var(--mint-bg-soft);
+  border-color: var(--mint-border);
+  color: var(--mint);
+}
+
+.data-quality-pill[data-tone="warn"] {
+  background: var(--amber-bg-soft);
+  border-color: var(--amber-border);
+  color: var(--accent);
+}
+
+.data-quality-pill[data-tone="bad"] {
+  background: var(--rose-bg-soft);
+  border-color: var(--rose-border);
+  color: var(--rose);
+}
+
+.data-quality-pill--expandable {
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  border: 0;
+}
+
+.data-quality-pill--expandable > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid currentColor;
+  background: inherit;
+  list-style: none;
+}
+
+.data-quality-pill--expandable > summary::-webkit-details-marker {
+  display: none;
+}
+
+.data-quality-pill--expandable[data-tone="warn"] > summary {
+  background: var(--amber-bg-soft);
+  border-color: var(--amber-border);
+}
+
+.data-quality-pill--expandable[data-tone="bad"] > summary {
+  background: var(--rose-bg-soft);
+  border-color: var(--rose-border);
+}
+
+.data-quality-pill__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-2));
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  list-style: none;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hover);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text);
+  min-width: 200px;
+  z-index: 5;
+}
+
+.data-quality-pill__list li {
+  padding: var(--space-1) 0;
+}
+
+.data-quality-pill__list code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
 .phase-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

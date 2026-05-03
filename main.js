@@ -21,6 +21,7 @@ const dom = {
   checklist: document.querySelector("[data-checklist]"),
   keyMoments: document.querySelector("[data-key-moments]"),
   evidence: document.querySelector("[data-evidence]"),
+  evidenceQuality: document.querySelector("[data-evidence-quality]"),
   sampleSwitcher: document.querySelector("[data-sample-switcher]"),
   reportStrip: document.querySelector("[data-report-strip]"),
   trendHeadline: document.querySelector("[data-trend-headline]"),
@@ -2085,6 +2086,9 @@ function renderEvidence(sample) {
       .sort((a, b) => (order.get(a.eventId) ?? 0) - (order.get(b.eventId) ?? 0));
   }
 
+  // Track H: schemaViolations 가시화. 베이스라인 샘플(필드 미존재)은 비노출.
+  renderEvidenceQuality(sample);
+
   if (evidenceEntries.length === 0) {
     dom.evidence.innerHTML = '<p class="muted">근거 이벤트 데이터가 없습니다.</p>';
     return;
@@ -2106,6 +2110,52 @@ function renderEvidence(sample) {
       `,
     )
     .join("");
+}
+
+// Track H: analysisMeta.schemaViolations를 ".data-quality-pill"로 노출.
+// - 필드 미존재(베이스라인 샘플): 슬롯 비움
+// - 0건: mint "스키마 0건"
+// - 1~2건: amber "스키마 N건" + details/summary로 패턴 키
+// - 3+건: rose "스키마 N건 ⚠"
+function renderEvidenceQuality(sample) {
+  if (!dom.evidenceQuality) return;
+  const meta = sample?.analysis?.analysisMeta;
+  const violations = meta && Array.isArray(meta.schemaViolations) ? meta.schemaViolations : null;
+  if (!violations) {
+    dom.evidenceQuality.innerHTML = "";
+    return;
+  }
+  const count = violations.length;
+  let tone = "ok";
+  if (count >= 3) tone = "bad";
+  else if (count >= 1) tone = "warn";
+
+  const label = count === 0 ? "스키마 0건" : `스키마 ${count}건`;
+  const ariaLabel = count === 0
+    ? "AI 출력 스키마 위반 없음"
+    : `AI 출력 스키마 위반 ${count}건: ${violations.join(", ")}`;
+
+  if (count === 0) {
+    dom.evidenceQuality.innerHTML = `
+      <span class="data-quality-pill" data-tone="${tone}" aria-label="${ariaLabel}">
+        <span class="data-quality-pill__icon" aria-hidden="true">✓</span>
+        <span class="data-quality-pill__label">${label}</span>
+      </span>
+    `;
+    return;
+  }
+  const itemsHtml = violations
+    .map((key) => `<li><code>${key}</code></li>`)
+    .join("");
+  dom.evidenceQuality.innerHTML = `
+    <details class="data-quality-pill data-quality-pill--expandable" data-tone="${tone}">
+      <summary aria-label="${ariaLabel}">
+        <span class="data-quality-pill__icon" aria-hidden="true">${tone === "bad" ? "⚠" : "△"}</span>
+        <span class="data-quality-pill__label">${label}</span>
+      </summary>
+      <ul class="data-quality-pill__list">${itemsHtml}</ul>
+    </details>
+  `;
 }
 
 function renderPlaytimeScore(sample) {
