@@ -1,139 +1,111 @@
-# 작업 계획 — Phase 26+
+# 작업 계획 — Phase 30+
 
-**기준 시점**: 2026-05-03
-**상위 컨텍스트**: Phase 25 트랙 B/A2/C [aa2deca / 28797a0] 완료. progress.md "다음 추천 작업" 1·2·3·4번 모두 처리됨 (5번 RSO OAuth는 외부 의존 DEFER 유지). 새로 도출된 작업으로 후속 페이즈 정리.
-
----
-
-## 0. Phase 25 후 발견 사항
-
-세 트랙을 작업하며 드러난 정합성 갭과 잠재 회귀 위험:
-
-| # | 갭 | 영향 |
-| --- | --- | --- |
-| 1 | progress.md "26 샘플" 주장 vs 실제 manifest 2건 | 신규 기여자/AI 컨텍스트가 잘못된 전제로 작업 |
-| 2 | `/Users/a1234/...` macOS 경로 14개 .md 파일에 잔존 | win32 환경에서 깨짐, 협업 혼란 |
-| 3 | `validateAnalysisOutput` 회귀 테스트 부재 | 스키마 변경 시 라이브 호출 없이 검증 불가 |
-| 4 | `analysisMeta.schemaViolations` 데이터 → UI 미노출 | Phase 25 Track C 측정 가시성 0 (콘솔 + JSON 파일만) |
-| 5 | sample-001/002 삭제 흔적 — 정리 사유/시점 미기록 | 베이스라인 회복 불가, runbook과 불일치 |
+**기준 시점**: 2026-05-04
+**상위 컨텍스트**: Phase 25~29 + 라이브 검증 완료. progress.md "다음 추천 작업" 1·2·3·4번 처리, 5번(RSO OAuth)은 외부 의존 DEFER 유지. 본 문서는 stable-state 회고 + 잔여 하나의 open issue + 후속 후보 목록.
 
 ---
 
-## 1. 다음 트랙 후보 (4개)
+## 0. Phase 25~29 누적 회고
 
-### 트랙 G — 스키마 검증 회귀 테스트 (P1)
+| Phase | 트랙 | 결과 | 주요 변경 |
+| --- | --- | --- | --- |
+| 25 | B/A2/C | DONE | Riot 키 만료 UX + 탭 전환 가속 + AI 스키마 측정 도입 |
+| 26 | G/H/N | DONE | validateAnalysisOutput 회귀 테스트 + schemaViolations UI pill + 문서 정합성 |
+| 27 | Q/R | DONE | npm test runner + buildLlmPayload 회귀 |
+| 28 | S/T | DONE | utils 함수 테스트 (delta NaN 버그 수정) + aggregateRecentStats 회귀 |
+| 29 | U/V | DONE | CHANGELOG 백필 + riotErrorPayload 회귀 |
 
-**문제**: Phase 25 Track C에서 `validateAnalysisOutput` + 정규화 분기가 핵심 안전장치가 됐지만 라이브 AI 호출 없이는 회귀 검증 불가.
-
-**해결**:
-
-- `test-artifacts/schema/`에 fixture 4개 — `valid.json`, `invalid-string-summary.json`, `invalid-object-phases.json`, `invalid-missing-arrays.json`
-- `test-artifacts/schema/schema-tests.mjs` — `aggregate-tests.mjs` 패턴 재사용. server.js에서 `validateAnalysisOutput` 함수 소스를 동적 추출해 fixture별로 `throws / not throws` 단언
-- 합쳐서 `buildAnalysis`의 정규화 분기도 fixture 기반으로 검증 → `schemaViolations` 배열 정확성 보장
-- 기대 출력: 4 PASS / 0 FAIL, exit code 0
-
-**대상**: `test-artifacts/schema/` 신규 폴더 (test-artifacts/champions-tab과 동일 패턴)
-
-**노력**: ~1.5h (fixture 작성 + 추출 + 단언 6~8개)
-
-**수용 기준**:
-
-- node 환경에서 `node test-artifacts/schema/schema-tests.mjs` 단독 실행 시 전 PASS
-- 각 fixture가 어떤 위반 패턴을 검증하는지 파일 헤더에 1줄 주석
-- server.js 변경 없이 작동 (소스 추출 기반)
-
-### 트랙 H — schemaViolations UI 노출 (P1)
-
-**문제**: Track C 측정 데이터(`analysisMeta.schemaViolations`)가 JSON 파일과 서버 콘솔에만 존재해 데이터 품질 검토 시 매번 파일을 열어야 함.
-
-**해결**:
-
-- 신규 컴포넌트 `.data-quality-pill` (sample-switcher 카드 우측 상단 또는 evidence-ledger 헤더)
-- 0건이면 mint pill "✓ 스키마 0", 1~2건이면 amber "△ 스키마 N", 3+건이면 rose "⚠ 스키마 N"
-- 클릭하면 details/summary로 위반 패턴 키 전체 노출 (예: `type.matchSummary.string · count.keyMoments<2`)
-- 토큰 재사용: `--mint-bg-soft` / `--amber-bg-soft` / `--rose-bg-soft` + 기존 border 토큰
-
-**대상**: [main.js](main.js) `renderEvidence` 또는 `renderSampleSwitcher` 끝에 데이터 추출 + 마크업 추가, [styles.css](styles.css) 신규 컴포넌트, [index.html](index.html) 변경 0 (동적 마크업)
-
-**노력**: ~1h
-
-**수용 기준**:
-
-- 신규 토큰 0
-- main.js 셀렉터 인터페이스 호환 (기존 `[data-*]` 변경 없음)
-- `analysisMeta.schemaViolations` 미존재(베이스라인 샘플) 시 pill 자체 비노출 (조건부 렌더)
-
-### 트랙 N — 문서 정합성 정리 (P2)
-
-**문제**: 발견 항목 #1, #2 — 14개 .md 파일에 macOS 경로 + 6+곳 stale 샘플 수치.
-
-**해결**:
-
-- progress.md: "26건" → 현재 정확한 수치(2건), 계정 커버리지/포지션 갱신, "최신 샘플 수집일" 업데이트
-- `/Users/a1234/...` 절대경로 → 상대 markdown 링크 (`[normalized-match-schema.md](normalized-match-schema.md)`)
-- `sample-data-cleanup-plan.md` 끝부분에 "2026-05-03 정리 완료: sample-001/002 + 메인계정 10건 + 보조 3건 모두 archive" 한 줄 + 사유
-- README.md / 기타 14개 문서를 1회 grep & replace로 절대경로 정리
-
-**대상**: 14개 .md 파일
-
-**노력**: ~45분 (수정량은 적지만 14개 파일 분산)
-
-**수용 기준**:
-
-- `grep -r "/Users/a1234"` 결과 0건
-- progress.md "샘플 데이터 상태" 섹션이 manifest.json과 일치
-- 모든 absolute path 링크가 상대경로 또는 markdown 링크로 전환
-
-### 트랙 P — 샘플 백필 / 마이그레이션 (P3)
-
-**문제**: 발견 항목 #5 — sample-001/002 + 과거 메인계정 샘플 흔적 부재. Track G fixture 작성 시 "유효한 분석 JSON" 베이스가 라이브 생성 분 2건뿐.
-
-**해결**: 2가지 옵션 검토.
-
-- **P-A**: `data/samples/_archive/`에 가벼운 샘플 1건만 백업 보관 (분석 결과만, raw 제외 → ~20KB) — 회귀용 정기 fixture 후보
-- **P-B**: 백필 없음. fixture는 라이브 분 2건 + 테스트용 hand-crafted JSON으로만 구성
-
-**권장**: **P-B**가 단순. 라이브 샘플은 manifest에 등재된 것만 유지, fixture는 트랙 G 안에서 self-contained로.
-
-**노력**: 옵션 선택 결정만 (실행 0)
+**테스트**: `npm test` → 122 passed / 0 failed across 6 test file(s)
 
 ---
 
-## 2. 권장 실행 순서
+## 1. 라이브 검증 결과 (2026-05-04)
 
-```text
-G (스키마 회귀 테스트, 1.5h)  ──→  Phase 25 Track C 안전망 정착
-H (UI 노출, 1h)              ──→  측정 가시화로 데이터 품질 검토 가속
-N (문서 정합성, 45분)         ──→  협업 컨텍스트 정리
-P (샘플 백필 결정)            ──→  P-B로 결정 → 실행 0
-```
+### Track D — Phase 25 Track C 효과 측정 (PASS N=3)
 
-**총 예상**: 3.25h (G + H + N). 셋 다 외부 의존 없이 자동 실행 가능.
+| sampleId | 매치 형태 | sourceType | violations |
+| --- | --- | --- | --- |
+| 8193501785 | Thresh SUP WIN, 28:39, 0/6/22 | claude_ai | 0 |
+| 8193453153 | Ezreal SUP WIN, 34:39, 6/4/9 | claude_ai | 0 |
+| 8194679229 | Rell SUP LOSS, 39:55, 2/16/24 | claude_ai | 0 |
+
+3/3 = 0 위반. Phase 26 수용 기준 ("위반 0건 또는 정규화 호출 절반 이하") 명확히 초과 달성. Claude는 OUTPUT_SCHEMA_EXAMPLE 추가 이후 일관되게 스키마 준수 출력 생성. 서버측 정규화 안전망은 미발화 — 다른 모델 / 프롬프트 변경 시 안전판으로 유지.
+
+### Track E — Riot 키 만료 UX (정적 검증 + 라이브 happy-path 200 확인)
+
+라이브 환경 Riot 키가 유효해 401/403 트리거는 불가했으나:
+
+- happy-path: `/api/recent-matches` HTTP 200 정상
+- 정적 검증: Track V 25 케이스로 `riotErrorPayload`의 401/403/429/500/null 분기 모두 PASS
+- 프런트 wiring: 5개 catch 사이트에 `maybeHandleRiotKeyError(error)` 호출 확인 (커밋 `aa2deca`)
+
+만료 시점에 한 번 라이브 트리거되면 시각 검증 가능. 현 시점은 코드 무결성만 검증.
+
+### 부수 발견 — AUGMENTED_PATH win32 호환 (FIXED `d7d9f13`)
+
+라이브 검증 도중 발견:
+
+- 기존: `process.env.PATH` + `:` (unix separator) + `/opt/homebrew/bin` + `${HOME}/.local/bin` 하드코딩
+- win32 영향: PATH 마지막 항목이 깨지고 codex/claude CLI 발견 실패 가능
+- 수정: `path.delimiter` 사용 + `USERPROFILE\\.local\\bin` + `USERPROFILE\\.codex\\.sandbox-bin` + `EXTRA_CLI_PATH` env 후크
 
 ---
 
-## 3. 명시적 SKIP / DEFER
+## 2. 알려진 open issue
 
-| 항목 | 결정 | 이유 |
-| --- | --- | --- |
-| Track D (라이브 위반 카운트 측정) | DEFER | Riot 키 유효 + 새 매치 필요 — 사용자 트리거 시 |
-| Track E (배너 수동 QA) | DEFER | 라이브 환경 의존 |
-| Track F (RSO OAuth) | DEFER | Riot 프로덕션 승인 필요 |
-| CSS iteration 20+ | DEFER | iter.19에서 closing chapter (PLAN Phase 25 §0) |
-| 본문 폰트 16px 전환 | DEFER | 전 사이트 시각 변화 — A/B 후행 |
-| admin.html 정리 | SKIP | 주 작업 흐름 아님 |
-| schemaVersion v2 도입 | DEFER | v1 안정화가 우선 (트랙 G로 견고화) |
+### Codex CLI win32 실행 실패 (KNOWN)
+
+라이브 검증에서 3/3 케이스 모두 `[AI] Codex failed: codex exited 1` 로그 발생. 원인 추정:
+
+- PATH 아님 — `d7d9f13` 수정 후에도 동일 실패. 즉, 발견은 됐지만 실행 자체가 즉시 1로 종료
+- 가능성: codex CLI 인증/세션 상태 부재, win32 sandbox 모드 비호환, `-s read-only` 플래그 미지원, stdin EOF 후 즉시 종료
+
+영향:
+
+- AI Comparison(claude vs codex agreementRate) 기능 win32에서 작동 불가
+- Track C 검증은 Claude 단독 cohort로 완료 — 측정 의의는 유지
+- 사용자 경험 저하 없음 (서버측 fallback이 정상 작동, primary=claude_ai로 분석 성공)
+
+다음 액션 후보:
+
+- A. 진단 페이즈 (Phase 30): 단독 codex CLI 실행 + stderr 캡처 + 인증 상태 확인
+- B. 에이전트 분리: Windows 환경에서 Codex 비활성화 옵션 (`AGENT_DISABLE_CODEX=1` env) 추가 → 깨끗한 fallback
+- C. DEFER: macOS 환경에서는 작동하므로 우선순위 낮음 (Track C 측정 유지)
+
+권장: **B** — 30분 작업, win32 사용자 경험 정리 + 측정 데이터 노이즈 제거
+
+---
+
+## 3. 후속 후보 백로그
+
+### 우선순위 P2 (요청 시 실행)
+
+- **Phase 30 — Codex win32 cleanup**: 위 권장안 B 실행 (env hook + 서버 로그에서 missing CLI 명시 노출)
+- **Phase 31 — `summarizeMatch` 회귀 테스트**: server.js의 raw-match → summary 추출 함수. Riot 응답 형태 변화 회귀 차단
+- **Phase 32 — `buildKeyMoments` / `buildActionChecklist` 테스트**: 현재 fallback 안전망의 출력 품질을 fixture로 고정
+
+### 우선순위 P3 (검토 후 결정)
+
+- **N개 매치 누적 추세**: 현재는 sample 1건당 분석. 시즌별/패치별 비교 뷰
+- **Codex 대체 에이전트 검토**: GPT-4o-mini 등 다른 레드팀 에이전트로 교체 가능성
+- **Riot RSO OAuth**: progress.md 5번 — 프로덕션 승인 필요, 별도 트리거 시
+
+### 우선순위 P4 (DEFER)
+
+- CSS iteration 20+ — 후보 없음
+- 본문 폰트 16px — 전 사이트 시각 변화
+- admin.html 리팩토링 — 주 작업 흐름 아님
+- schemaVersion v2 — v1 안정화 우선
 
 ---
 
 ## 4. 다음 액션
 
-이 계획 검토 후 결정:
+라이브 검증을 통해 PLAN Phase 26의 Track D/E 모두 처리됨. 현 시점 자동 진행 가능한 후보:
 
-- **A**: 트랙 G 단독 — 안전망 우선, 측정 후행
-- **B**: 트랙 G + H 묶음 — 안전망 + 가시화 한 번에
-- **C**: 세 트랙(G + H + N) 순차 자동 실행 (총 3.25h)
-- **D**: 트랙 N만 — 문서 hygiene 즉시 정리
-- **E**: 계획 자체 수정 (트랙 추가/제외/우선순위 조정)
+- **A**: Phase 30 (Codex win32 cleanup) — env hook 추가 + 로그 정돈, 30분
+- **B**: Phase 31 (summarizeMatch 테스트) — 함수 추출 + fixture, 1h
+- **C**: 두 트랙 묶음 — 1.5h
+- **D**: 현재 stable — 외부 트리거 대기 (새 feature, 새 회귀, RSO 승인 등)
 
-권장: **C** (세 트랙 모두 자동 실행) — 모두 외부 의존 없이 완결되고 누적 효과 큼.
+권장: **D** — 항목별 ROI가 떨어지는 시점. 새로운 사용자 시나리오/요구가 생길 때까지 stable로 둠.
