@@ -1423,7 +1423,10 @@ function runCli(args, stdinText, timeoutMs) {
     proc.on("close", (code) => {
       clearTimeout(timer);
       if (code !== 0) {
-        settle(reject, new Error(`${args[0]} exited ${code}: ${stderr.slice(0, 300)}`));
+        // Phase 30: 일부 CLI(특히 codex)는 stderr는 비워두고 stdout JSONL에
+        // turn.failed 형태로 에러를 출력. 빈 stderr면 stdout tail도 포함.
+        const tail = stderr.trim() || stdout.trim().slice(-300);
+        settle(reject, new Error(`${args[0]} exited ${code}: ${tail.slice(0, 300)}`));
         return;
       }
       settle(resolve, stdout);
@@ -1624,9 +1627,20 @@ function buildComparison(claudeResult, codexResult, sampleId) {
 async function buildAnalysis(normalized, sampleId) {
   const payload = buildLlmPayload(normalized);
 
+  // Phase 30: AGENT_DISABLE_CODEX=1 환경변수로 Codex 비활성 (.env 또는 export).
+  // 노후 CLI / 모델 미호환 / 인증 부재 등으로 Codex가 매번 실패하는 환경에서는
+  // 이 hook을 켜 깨끗한 single-agent 모드로 운용. Track C 측정은 Claude 단독으로
+  // 유지되며 fallback 체인은 Claude 실패 시 rule-based로 직행.
+  const codexDisabled = String(process.env.AGENT_DISABLE_CODEX || "").trim() === "1";
+  if (codexDisabled) {
+    console.log(`[AI] Codex disabled via AGENT_DISABLE_CODEX=1 — Claude only for ${sampleId}`);
+  }
+
   const [claudeSettled, codexSettled] = await Promise.allSettled([
     callClaudeAgent(payload),
-    callCodexAgent(payload),
+    codexDisabled
+      ? Promise.reject(new Error("disabled via AGENT_DISABLE_CODEX"))
+      : callCodexAgent(payload),
   ]);
 
   const claudeOk = claudeSettled.status === "fulfilled";
