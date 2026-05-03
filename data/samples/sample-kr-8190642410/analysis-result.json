@@ -1,0 +1,348 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "language": "ko",
+    "analysisMode": "coaching",
+    "generatedAt": "2026-04-28T03:56:24.633Z",
+    "matchId": "KR_8190642410",
+    "participantId": 5,
+    "riotId": "매운맛 비스킷#KR1",
+    "champion": "Pantheon",
+    "position": "SUPPORT",
+    "result": "WIN",
+    "analysisId": "ai_sample-kr-8190642410_1777348584633"
+  },
+  "matchSummary": {
+    "headline": "40분 혈전 끝에 오브젝트 우위(드래곤 4·바론 2)로 승리했지만, 13데스가 보여주듯 중반 생존 동선은 계속해서 흔들렸다."
+  },
+  "coachSummary": {
+    "overallSummary": "서포터 판테온으로 51%의 킬관여와 비전 점수 135를 기록하며 팀의 시야·이니시 축을 잘 잡아줬다. 다만 18~27분 구간에 단독 데스가 반복되며 한타 이전 포지션 리스크가 누적됐고, 그럼에도 드래곤·바론 합류 타이밍을 놓치지 않아 오브젝트 템포로 경기를 닫아낸 점이 결정적이었다. 다음 게임에서는 한타 직전 진입 거리를 한 칸 더 보수적으로 잡고, 데스 이후 리셋 동선만 정돈하면 같은 운영으로 더 안정적인 캐리 라인을 만들 수 있다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "1/4/6 라인으로 데스가 다소 누적됐지만 어시스트 6개를 챙기며 초반 갱·로밍 관여는 살아 있었다. 다만 이른 데스가 4회로 라인 안정성보다 적극성에 무게가 실린 흐름이었다."
+    },
+    {
+      "phase": "MID",
+      "summary": "4/6/9의 격전 구간으로 18:19, 20:10, 21:57, 23:39, 25:27, 26:49 등 단독 데스가 반복됐다. 그럼에도 22:33 드래곤·25:54 바론 교전에 빠짐없이 합류해 오브젝트로 손실을 메웠다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "3/3/5 균형 잡힌 후반 지표로, 35:22 드래곤·38:03 바론 확보에 직접 관여해 오브젝트 우위를 굳혔다. 39:19 마지막 데스가 있었지만 이미 굳혀둔 구조물 차이가 승리를 마무리했다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "오브젝트 합류 타이밍 일관성",
+      "description": "드래곤 4·바론 2를 모두 챙기는 과정에서 22:33, 27:00대 드래곤과 25:54 바론, 35:22 드래곤, 38:03 바론까지 핵심 오브젝트 교전에 빠짐없이 합류했다. 서포터로서 한타 이전 시야·이니시 축을 일정하게 잡아준 결과다.",
+      "relatedEventIds": [
+        "evt_027",
+        "evt_035",
+        "evt_040",
+        "evt_051",
+        "evt_054"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "높은 시야 점수와 킬관여",
+      "description": "40분 경기에서 비전 점수 135, 킬관여 51%(8K/20A)를 기록했다. 데스가 누적된 구간에도 어시스트 20을 만들어낸 것은 시야와 이니시 영향력이 팀 한타 진입에 꾸준히 기여했음을 보여준다.",
+      "relatedEventIds": [
+        "evt_027",
+        "evt_035",
+        "evt_040",
+        "evt_054"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "후반 클로즈아웃 집중력",
+      "description": "후반 3K/3D/5A로 균형을 회복하며 35:22 드래곤·38:03 바론 확보에 직접 관여했고, 이를 발판으로 타워 11개 차이를 만들며 경기를 닫았다. 데스 이후에도 다음 오브젝트 타이밍에 다시 붙는 회복력이 돋보였다.",
+      "relatedEventIds": [
+        "evt_051",
+        "evt_054"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 단독 포지션 리스크",
+      "description": "18:19~26:49 사이에만 6번의 데스가 발생했다. 한타 진입 직전 시야 박는 동선이 한 발씩 깊어지며 적 진영 안쪽에서 단독으로 끊기는 패턴이 반복됐다. 진입 거리를 한 칸 짧게 가져갈 필요가 있다.",
+      "relatedEventIds": [
+        "evt_022",
+        "evt_024",
+        "evt_026",
+        "evt_029",
+        "evt_033",
+        "evt_037"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 직후 생존 동선",
+      "description": "오브젝트 교전 직후·직전에 데스가 반복됐다(22:33 드래곤 인근 21:57·23:39 데스, 35:22 드래곤 직후 35:59 데스). 이니시 이후 빠지는 루트와 와드 회수 타이밍을 분리해 한 박자 늦게 회수하는 습관이 필요하다.",
+      "relatedEventIds": [
+        "evt_026",
+        "evt_029",
+        "evt_045",
+        "evt_052",
+        "evt_056"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "오브젝트 셋업 실패 대응",
+      "description": "16:33 오브젝트 셋업 실패 이후 18:19·20:10 데스로 손실이 이어졌다. 셋업이 깨졌을 때 즉시 라인 정리·귀환으로 전환하지 못하고 무리해서 시야를 다시 잡으려다 추가 손해가 발생했다.",
+      "relatedEventIds": [
+        "evt_015",
+        "evt_022",
+        "evt_024"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_1",
+      "title": "한타 진입 거리 한 칸 보수",
+      "description": "판테온 E 진입 전, 적 군중제어기 2개 이상이 빠진 시점에만 W 점프를 사용하고, 그 외에는 라인 한 발 뒤에서 시야 박는 위치를 잡는다.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_2",
+      "title": "오브젝트 직후 30초 리셋 루트 고정",
+      "description": "드래곤·바론 처치 직후 30초는 시야 회수 대신 본진 또는 와드 충전 루트로 빠진다. 욕심내서 적 정글 와드 박지 않기.",
+      "priority": "HIGH"
+    },
+    {
+      "id": "chk_3",
+      "title": "셋업 실패 시 즉시 라인 콜",
+      "description": "오브젝트 셋업이 깨졌다고 판단되면 핑으로 ‘리셋·라인’ 콜을 먼저 치고, 시야 재설치는 다음 웨이브 정리 이후로 미룬다.",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_4",
+      "title": "데스 후 복귀 동선 점검",
+      "description": "부활 후 첫 30초 동안은 합류 위치를 적 시야 밖 우회 루트로 잡아, 같은 자리에서 두 번 끊기는 패턴을 끊는다.",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "chk_5",
+      "title": "비전 스코어 유지 + CS 보강",
+      "description": "현재 시야(135)는 충분하므로, 라인 미는 타이밍에 적 정글 캠프 1~2개를 정리해 분당 CS 1.39를 1.7대까지 끌어올린다.",
+      "priority": "LOW"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "16:33",
+      "phase": "MID",
+      "title": "오브젝트 셋업 실패",
+      "description": "중요 오브젝트 셋업이 깨지며 이후 데스 연쇄의 시작점이 됐다. 셋업 실패 시 즉시 리셋 콜이 필요하다.",
+      "relatedEventIds": [
+        "evt_015"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "22:33",
+      "phase": "MID",
+      "title": "드래곤 합류로 템포 회복",
+      "description": "21:57 데스 직후임에도 드래곤 교전에 합류해 오브젝트 템포를 다시 가져왔다. 이번 경기 흐름을 잡는 분기점.",
+      "relatedEventIds": [
+        "evt_026",
+        "evt_027"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "25:54",
+      "phase": "MID",
+      "title": "바론 확보로 골드 격차 반전",
+      "description": "25:27 데스 직후 바론 교전에서 팀이 바론을 확보하며 운영 우위를 회복했다.",
+      "relatedEventIds": [
+        "evt_033",
+        "evt_035"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "35:22",
+      "phase": "LATE",
+      "title": "후반 드래곤 직접 관여",
+      "description": "35:22 드래곤 교전에 직접 관여해 4번째 드래곤을 챙기며 후반 한타 주도권을 가져갔다.",
+      "relatedEventIds": [
+        "evt_051"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "38:03",
+      "phase": "LATE",
+      "title": "바론으로 경기 클로즈아웃",
+      "description": "38:03 바론 확보에 직접 관여해 타워 11개 차이를 만들며 경기를 닫는 결정적 포인트가 됐다.",
+      "relatedEventIds": [
+        "evt_054"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_015",
+      "timestampLabel": "16:33",
+      "phase": "MID",
+      "eventType": "OBJECTIVE_SETUP_FAIL",
+      "usedIn": [
+        "weaknesses:wk_3",
+        "keyMoments:km_1"
+      ]
+    },
+    {
+      "eventId": "evt_022",
+      "timestampLabel": "18:19",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1",
+        "weaknesses:wk_3"
+      ]
+    },
+    {
+      "eventId": "evt_024",
+      "timestampLabel": "20:10",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1",
+        "weaknesses:wk_3"
+      ]
+    },
+    {
+      "eventId": "evt_026",
+      "timestampLabel": "21:57",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1",
+        "weaknesses:wk_2",
+        "keyMoments:km_2"
+      ]
+    },
+    {
+      "eventId": "evt_027",
+      "timestampLabel": "22:33",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2",
+        "keyMoments:km_2"
+      ]
+    },
+    {
+      "eventId": "evt_029",
+      "timestampLabel": "23:39",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1",
+        "weaknesses:wk_2"
+      ]
+    },
+    {
+      "eventId": "evt_033",
+      "timestampLabel": "25:27",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1",
+        "keyMoments:km_3"
+      ]
+    },
+    {
+      "eventId": "evt_035",
+      "timestampLabel": "25:54",
+      "phase": "MID",
+      "eventType": "BARON_FIGHT",
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2",
+        "keyMoments:km_3"
+      ]
+    },
+    {
+      "eventId": "evt_037",
+      "timestampLabel": "26:49",
+      "phase": "MID",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_1"
+      ]
+    },
+    {
+      "eventId": "evt_040",
+      "timestampLabel": "29:03",
+      "phase": "MID",
+      "eventType": "DRAGON_FIGHT",
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2"
+      ]
+    },
+    {
+      "eventId": "evt_045",
+      "timestampLabel": "31:07",
+      "phase": "LATE",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_2"
+      ]
+    },
+    {
+      "eventId": "evt_051",
+      "timestampLabel": "35:22",
+      "phase": "LATE",
+      "eventType": "DRAGON_FIGHT",
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_3",
+        "keyMoments:km_4"
+      ]
+    },
+    {
+      "eventId": "evt_052",
+      "timestampLabel": "35:59",
+      "phase": "LATE",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_2"
+      ]
+    },
+    {
+      "eventId": "evt_054",
+      "timestampLabel": "38:03",
+      "phase": "LATE",
+      "eventType": "BARON_FIGHT",
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2",
+        "strengths:str_3",
+        "keyMoments:km_5"
+      ]
+    },
+    {
+      "eventId": "evt_056",
+      "timestampLabel": "39:19",
+      "phase": "LATE",
+      "eventType": "PLAYER_DEATH",
+      "usedIn": [
+        "weaknesses:wk_2"
+      ]
+    }
+  ],
+  "schemaVersion": "1.0"
+}

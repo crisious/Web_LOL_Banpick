@@ -1,0 +1,371 @@
+{
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "schemaVersion": "1.0",
+    "language": "ko",
+    "analysisMode": "coaching",
+    "matchId": "KR_8190721866",
+    "participantId": 5,
+    "riotId": "매운맛 비스킷#KR1",
+    "champion": "Thresh",
+    "position": "SUPPORT",
+    "generatedAt": "2026-04-28T03:44:46.644Z",
+    "analysisId": "ai_sample-kr-8190721866_1777347886644"
+  },
+  "matchSummary": {
+    "headline": "쓰레쉬로 KDA 3.38, 시야점수 109를 기록하며 오브젝트 템포와 후반 구조물 운영으로 승리한 경기."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 7분대 데스로 라인 템포가 흔들렸지만 시야점수 109와 킬관여 61%로 팀 합류와 시야 장악은 견고했다. 다만 중반 18~28분 구간에서 데스 5회가 집중되며 바론과 오브젝트 셋업이 한 박자씩 밀렸고, 그럼에도 후반 드래곤 합류와 34분대 연속 타워 압박으로 승리 조건을 구조물로 전환해 경기를 마무리했다. 다음 경기에서는 중반 시야 선행과 포지셔닝 정리만 다듬으면 더 안정적인 캐리형 서포터가 될 수 있다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "label": "EARLY",
+      "headline": "라인 템포는 흔들렸지만 관여는 유지",
+      "detail": "7:50 선데스(evt_002)와 8:34 오브젝트 셋업 실패(evt_004)로 초반 주도권을 내줬지만 1킬 3어시로 합류 빈도는 유지했다. 라인 단계에서 갱 호응 동선과 와드 타이밍을 한 박자 빠르게 가져갈 여지가 있다."
+    },
+    {
+      "phase": "MID",
+      "label": "MID",
+      "headline": "오브젝트 직후 생존이 가장 큰 과제",
+      "detail": "18:32, 22:07, 24:14, 26:12, 28:53로 데스 5회가 중반에 몰렸고 26:00 오브젝트 셋업 실패와 26:47 바론 헌납이 이어졌다. 다만 14어시로 합류 자체는 적극적이었던 만큼 진입 후 빠지는 타이밍과 백라인 거리감 조절이 핵심 개선점이다."
+    },
+    {
+      "phase": "LATE",
+      "label": "LATE",
+      "headline": "드래곤 합류와 연속 타워 마무리",
+      "detail": "31:10 드래곤 합류(evt_039)에 이어 31:25 데스(evt_040)로 한 차례 흔들렸지만, 34:29~34:41 연속 타워 압박(evt_049~evt_051)으로 승리 조건을 구조물로 깔끔하게 전환했다. 후반 진입 각도와 갈고리 셋업이 결정적이었다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "오브젝트 템포 합류",
+      "detail": "드래곤·타워 구도에 꾸준히 합류하며 어시스트 26회와 킬관여 61%를 만들어냈다. 특히 후반 드래곤 합류와 연속 타워 압박이 승리 조건을 구조물로 전환했다.",
+      "relatedEventIds": [
+        "evt_016",
+        "evt_039",
+        "evt_049",
+        "evt_050",
+        "evt_051"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "시야 장악과 정보 우위",
+      "detail": "시야점수 109는 서포트 기준으로 매우 높은 수치로, 34분 경기 길이를 고려해도 분당 시야 기여가 꾸준했다. 시야 기반 합류가 팀의 오브젝트 시도를 뒷받침했다.",
+      "relatedEventIds": [
+        "evt_016",
+        "evt_039"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "후반 구조물 마무리",
+      "detail": "34:29~34:41에 타워 3개를 연속으로 압박해 경기를 깔끔하게 종결했다. 챔프 16렙·완성된 아이템 빌드와 함께 진입 각도가 정확했다.",
+      "relatedEventIds": [
+        "evt_049",
+        "evt_050",
+        "evt_051"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 데스 누적",
+      "detail": "18:32~28:53 사이 데스 5회가 집중되며 운영 안정감이 흔들렸다. 진입 후 빠지는 타이밍과 사거리 관리가 핵심 과제다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_019",
+        "evt_025",
+        "evt_027",
+        "evt_032"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 셋업 시야 선행 부족",
+      "detail": "8:34, 26:00 셋업 실패와 26:47 바론 헌납이 이어졌다. 셋업 30~45초 전 시야 선행과 갈고리 견제선을 더 일찍 깔 필요가 있다.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_026",
+        "evt_028"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "포지셔닝 리스크",
+      "detail": "7:50 초반 선데스와 31:25 후반 데스처럼 진입 후 거리 조절 실패가 반복됐다. 갈고리 사용 후 백스텝 라인을 미리 정해두는 습관이 필요하다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_040"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "chk_1",
+      "title": "오브젝트 45초 전 시야 선행",
+      "detail": "드래곤·바론 셋업 45초 전부터 핑크와드와 와드 동선을 시작해 상대 진입로를 먼저 차단한다.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_026",
+        "evt_028"
+      ]
+    },
+    {
+      "id": "chk_2",
+      "title": "갈고리 사용 후 백스텝 라인 사전 지정",
+      "detail": "진입 스킬을 쓰기 전 후퇴 위치를 미리 정해 진입-후퇴 동선을 한 세트로 만든다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_012",
+        "evt_040"
+      ]
+    },
+    {
+      "id": "chk_3",
+      "title": "중반 합류 시 사거리 정리",
+      "detail": "18~28분 구간 데스가 집중된 만큼 합류 시 두 번째 줄에서 점멸 거리만큼 띄워 진입한다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_025",
+        "evt_027",
+        "evt_032"
+      ]
+    },
+    {
+      "id": "chk_4",
+      "title": "바론 구도 우선 시야 우위 확보",
+      "detail": "바론 구도에서 셋업 시야가 부족하면 오브젝트 시도 대신 시야 교체와 운영을 먼저 가져간다.",
+      "relatedEventIds": [
+        "evt_026",
+        "evt_028"
+      ]
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "key_1",
+      "timestampLabel": "7:50",
+      "phase": "EARLY",
+      "title": "초반 선데스로 라인 템포 흔들림",
+      "detail": "바텀 라인 단계에서 먼저 끊기며 주도권을 내줬다. 갱 호응 라인과 부쉬 시야 우선 점검이 필요하다.",
+      "relatedEventIds": [
+        "evt_002"
+      ]
+    },
+    {
+      "id": "key_2",
+      "timestampLabel": "20:41",
+      "phase": "MID",
+      "title": "드래곤 합류로 오브젝트 챙김",
+      "detail": "중반 드래곤 타이밍에 합류해 팀의 오브젝트 템포를 챙겼다. 시야 장악이 합류 결정에 기여했다.",
+      "relatedEventIds": [
+        "evt_016"
+      ]
+    },
+    {
+      "id": "key_3",
+      "timestampLabel": "26:47",
+      "phase": "MID",
+      "title": "바론 구도 헌납",
+      "detail": "26:00 셋업 실패가 26:12 데스와 26:47 바론 헌납으로 이어졌다. 셋업 시야 부족이 연쇄 실점의 원인이었다.",
+      "relatedEventIds": [
+        "evt_026",
+        "evt_027",
+        "evt_028"
+      ]
+    },
+    {
+      "id": "key_4",
+      "timestampLabel": "31:10",
+      "phase": "LATE",
+      "title": "후반 드래곤 합류",
+      "detail": "드래곤 구도에 합류해 후반 운영의 시작점을 만들었다. 직후 31:25 데스가 있었지만 큰 손실로 이어지지 않았다.",
+      "relatedEventIds": [
+        "evt_039",
+        "evt_040"
+      ]
+    },
+    {
+      "id": "key_5",
+      "timestampLabel": "34:29~34:41",
+      "phase": "LATE",
+      "title": "연속 타워 압박으로 경기 종결",
+      "detail": "12초 안에 타워 3개를 연속 압박하며 승리 조건을 구조물로 전환해 경기를 마무리했다.",
+      "relatedEventIds": [
+        "evt_049",
+        "evt_050",
+        "evt_051"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_002",
+      "timestampLabel": "7:50",
+      "phase": "EARLY",
+      "importance": 4,
+      "usedIn": [
+        "weaknesses:wk_3",
+        "keyMoments:key_1",
+        "actionChecklist:chk_2"
+      ]
+    },
+    {
+      "eventId": "evt_004",
+      "timestampLabel": "8:34",
+      "phase": "EARLY",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_2",
+        "actionChecklist:chk_1"
+      ]
+    },
+    {
+      "eventId": "evt_012",
+      "timestampLabel": "18:32",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_1",
+        "actionChecklist:chk_2"
+      ]
+    },
+    {
+      "eventId": "evt_016",
+      "timestampLabel": "20:41",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2",
+        "keyMoments:key_2"
+      ]
+    },
+    {
+      "eventId": "evt_019",
+      "timestampLabel": "22:07",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_1",
+        "actionChecklist:chk_3"
+      ]
+    },
+    {
+      "eventId": "evt_025",
+      "timestampLabel": "24:14",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_1",
+        "actionChecklist:chk_3"
+      ]
+    },
+    {
+      "eventId": "evt_026",
+      "timestampLabel": "26:00",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_2",
+        "keyMoments:key_3",
+        "actionChecklist:chk_1",
+        "actionChecklist:chk_4"
+      ]
+    },
+    {
+      "eventId": "evt_027",
+      "timestampLabel": "26:12",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_1",
+        "keyMoments:key_3",
+        "actionChecklist:chk_3"
+      ]
+    },
+    {
+      "eventId": "evt_028",
+      "timestampLabel": "26:47",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_2",
+        "keyMoments:key_3",
+        "actionChecklist:chk_1",
+        "actionChecklist:chk_4"
+      ]
+    },
+    {
+      "eventId": "evt_032",
+      "timestampLabel": "28:53",
+      "phase": "MID",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_1",
+        "actionChecklist:chk_3"
+      ]
+    },
+    {
+      "eventId": "evt_039",
+      "timestampLabel": "31:10",
+      "phase": "LATE",
+      "importance": 5,
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_2",
+        "keyMoments:key_4"
+      ]
+    },
+    {
+      "eventId": "evt_040",
+      "timestampLabel": "31:25",
+      "phase": "LATE",
+      "importance": 5,
+      "usedIn": [
+        "weaknesses:wk_3",
+        "keyMoments:key_4",
+        "actionChecklist:chk_2"
+      ]
+    },
+    {
+      "eventId": "evt_049",
+      "timestampLabel": "34:29",
+      "phase": "LATE",
+      "importance": 5,
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_3",
+        "keyMoments:key_5"
+      ]
+    },
+    {
+      "eventId": "evt_050",
+      "timestampLabel": "34:40",
+      "phase": "LATE",
+      "importance": 5,
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_3",
+        "keyMoments:key_5"
+      ]
+    },
+    {
+      "eventId": "evt_051",
+      "timestampLabel": "34:41",
+      "phase": "LATE",
+      "importance": 5,
+      "usedIn": [
+        "strengths:str_1",
+        "strengths:str_3",
+        "keyMoments:key_5"
+      ]
+    }
+  ],
+  "schemaVersion": "1.0"
+}

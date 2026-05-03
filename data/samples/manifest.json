@@ -1,3 +1,28 @@
 {
-  "samples": []
+  "samples": [
+    {
+      "id": "sample-kr-8190642410",
+      "matchId": "KR_8190642410",
+      "label": "sample-kr-8190642410 · SUPPORT WIN",
+      "champion": "Pantheon",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-28",
+      "theme": "40분 혈전 끝에 오브젝트 우위(드래곤 4·바론 2)로 승리했지만, 13데스가 보여주듯 중반 생존 동선은 계속해서 흔들렸다.",
+      "normalizedPath": "/data/samples/sample-kr-8190642410/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8190642410/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8190642410/sample-kr-8190642410-notes.md"
+    },
+    {
+      "id": "sample-kr-8190721866",
+      "matchId": "KR_8190721866",
+      "label": "sample-kr-8190721866 · SUPPORT WIN",
+      "champion": "Thresh",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-04-28",
+      "theme": "쓰레쉬로 KDA 3.38, 시야점수 109를 기록하며 오브젝트 템포와 후반 구조물 운영으로 승리한 경기.",
+      "normalizedPath": "/data/samples/sample-kr-8190721866/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8190721866/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8190721866/sample-kr-8190721866-notes.md"
+    }
+  ]
 }
