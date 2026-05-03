@@ -1386,12 +1386,20 @@ function buildLlmPayload(normalized) {
 // ─── CLI subprocess helper ────────────────────────────────────────────────────
 
 // subprocess에서 CLI를 찾을 수 있도록 PATH 보강 (node 프로세스는 shell PATH 미상속 가능)
+// path.delimiter로 cross-platform 안전 (unix `:`, win32 `;`)
 const AUGMENTED_PATH = [
   process.env.PATH,
-  "/opt/homebrew/bin",
-  "/usr/local/bin",
-  `${process.env.HOME}/.local/bin`,
-].filter(Boolean).join(":");
+  // unix-only 표준 위치
+  process.platform !== "win32" && "/opt/homebrew/bin",
+  process.platform !== "win32" && "/usr/local/bin",
+  // 사용자 home의 .local/bin — claude/codex CLI는 보통 여기로 설치됨
+  process.env.HOME && `${process.env.HOME}/.local/bin`,
+  process.env.USERPROFILE && `${process.env.USERPROFILE}\\.local\\bin`,
+  // codex CLI sandbox 변종 (win32) — Windows 설치 시 기본 위치
+  process.env.USERPROFILE && `${process.env.USERPROFILE}\\.codex\\.sandbox-bin`,
+  // 옵션: .env의 EXTRA_CLI_PATH로 추가 경로 지정 가능 (path.delimiter 구분)
+  process.env.EXTRA_CLI_PATH,
+].filter(Boolean).join(path.delimiter);
 
 function runCli(args, stdinText, timeoutMs) {
   return new Promise((resolve, reject) => {
