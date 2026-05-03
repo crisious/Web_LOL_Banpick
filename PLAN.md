@@ -71,23 +71,46 @@
 
 ## 3. 후속 후보 백로그
 
-### 우선순위 P2 (요청 시 실행)
+각 항목은 **트리거**(언제 우선순위가 올라가는가)와 **노력**(예상 시간) 기록.
+"즉시 진행 가능"이 아니라 "이런 신호가 보이면 진행"으로 대기.
 
-- **Phase 31 — `summarizeMatch` 회귀 테스트**: server.js의 raw-match → summary 추출 함수. Riot 응답 형태 변화 회귀 차단
-- **Phase 32 — `buildKeyMoments` / `buildActionChecklist` 테스트**: 현재 fallback 안전망의 출력 품질을 fixture로 고정
+### Tier A — 회귀 차단 보강 (외부 변화 시 우선)
 
-### 우선순위 P3 (검토 후 결정)
+- **Phase 31: `summarizeMatch` 회귀 테스트** (~1h)
+  - 트리거: Riot Match-V5 응답 스키마 변경 / 새 challenge 필드 추가 / participant 구조 변경
+  - 가치: 서버 단의 raw → summary 추출 깨지면 모든 후속 분석이 손상
+- **Phase 32: `buildKeyMoments` / `buildActionChecklist` fixture** (~1h)
+  - 트리거: AI 양쪽 실패 케이스가 실제 발생 (서버 콘솔 `rule-based fallback` 로그)
+  - 가치: fallback 안전망의 출력 품질을 회귀 차단 — 현재는 fallback 발화 시 결과 불확실
 
-- **N개 매치 누적 추세**: 현재는 sample 1건당 분석. 시즌별/패치별 비교 뷰
-- **Codex 대체 에이전트 검토**: GPT-4o-mini 등 다른 레드팀 에이전트로 교체 가능성
-- **Riot RSO OAuth**: progress.md 5번 — 프로덕션 승인 필요, 별도 트리거 시
+### Tier B — 새 사용자 시나리오에서만 의미
 
-### 우선순위 P4 (DEFER)
+- **N개 매치 누적 추세 뷰**
+  - 트리거: 사용자가 "최근 패치 들어 KDA가 떨어진다" 같은 시계열 질문을 함
+  - 노력: 큼 (~반나절) — 현재 tab-trends는 단일 매치 비교만
+- **Codex 대체 에이전트 검토** (GPT-4o-mini, Gemini, 등)
+  - 트리거: 사용자가 Codex CLI 업그레이드가 어렵거나 비용 측면에서 다른 모델 선호
+  - 노력: 중간 (~3h) — `callCodexAgent` 추상화 + 새 어댑터
+- **Riot RSO OAuth**
+  - 트리거: Riot Games 프로덕션 승인 (외부 의존)
+  - 노력: 큼 — 별도 페이즈
 
-- CSS iteration 20+ — 후보 없음
-- 본문 폰트 16px — 전 사이트 시각 변화
-- admin.html 리팩토링 — 주 작업 흐름 아님
-- schemaVersion v2 — v1 안정화 우선
+### Tier C — DEFER (의도적 비-진행)
+
+- CSS iteration 20+ — design-tokens.md §10 항목 1~21 모두 완료, 더 정리할 후보 없음
+- 본문 폰트 16px 전환 — 전 사이트 영향, A/B 검토 비용 > 이익
+- admin.html / draft-state.js 리팩토링 — 현재 메인 작업 흐름이 아님 (progress.md 명시)
+- schemaVersion v2 — v1 안정화 우선, 분석 JSON 구조 변경 신호 없음
+
+### 닫힘 (참고용 history)
+
+이전 PLAN 사이클에서 후보였으나 처리 완료:
+
+- Track D — Phase 25 Track C 효과 측정 → 라이브 N=4 모두 0 violations PASS
+- Track E — Riot 키 만료 UX → Track V 25 케이스 + happy-path 200 정적 검증
+- Codex win32 진단 + cleanup → Phase 30 (`AGENT_DISABLE_CODEX=1`)
+- AUGMENTED_PATH win32 호환 → Phase 30 부수 fix
+- progress.md `다음 추천 작업` 1·2·3·4번 → Phase 25에서 모두 처리
 
 ---
 
