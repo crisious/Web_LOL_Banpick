@@ -1,0 +1,267 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-03T16:09:28.027Z",
+  "sampleId": "sample-kr-8192043774",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8192043774_1777824568026",
+      "generatedAt": "2026-05-03T16:09:28.026Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "밀리오로 23분 만에 승리, 시야 점수 57과 킬 관여 54%로 후속 합류는 좋았지만 6데스 누적이 아쉬운 경기"
+    },
+    "coachSummary": {
+      "overallSummary": "초반 라인전과 동선에서 3데스를 내주며 흔들렸지만, 중반부터 후속 합류와 보호기로 팀 교전 13어시스트를 만들며 드래곤 2개·타워 7개로 승리 조건을 구조물 압박으로 전환했다. 다만 오브젝트 직후 위치 선정에서 데스가 반복돼 운영 안정감을 더 다듬을 여지가 있다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "5:40 드래곤 합류로 오브젝트 템포는 챙겼지만 8:08, 11:21, 13:49 세 차례 선제 데스로 라인전 안정감이 흔들렸다."
+      },
+      {
+        "phase": "MID",
+        "summary": "15분대 연속 후속 합류와 16:58 타워 압박으로 운영 주도권을 가져왔으나, 15:09·17:42·21:48 핵심 교전에서 데스를 누적하며 18:42 오브젝트 손실로 이어졌다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "23:26에 경기가 종료돼 후반 국면이 형성되기 전 구조물 차이로 승리를 마무리했다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "교전 후속 합류로 만든 높은 킬 관여",
+        "description": "15:08~16:41 사이 4회 연속 후속 합류로 어시스트 13개와 킬 관여 54%를 기록하며 팀 교전의 마무리 축으로 기능했다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_014",
+          "evt_015",
+          "evt_016"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "오브젝트 타이밍 합류 일관성",
+        "description": "5:40, 13:10 드래곤 타이밍에 빠짐없이 합류해 팀의 드래곤 2개 확보와 오브젝트 템포 우위를 뒷받침했다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_007"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "구조물 전환으로 승리 조건 마무리",
+        "description": "16:58 타워 압박 관여로 팀 타워 7개 vs 적 1개의 격차를 만들며 승리 조건을 구조물 차이로 깔끔하게 전환했다.",
+        "relatedEventIds": [
+          "evt_017"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "초반 라인전 선제 데스 누적",
+        "description": "8:08, 11:21, 13:49에 걸쳐 초반 3데스를 내주며 서포터 골드·시야 템포가 늦어졌고 라인전 안정감이 흔들렸다.",
+        "relatedEventIds": [
+          "evt_003",
+          "evt_005",
+          "evt_008"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "교전 직후 위치 선정 리스크",
+        "description": "15:09 합류 직후, 17:42 핵심 구도에서 데스가 반복돼 보호기 사거리에서 한 발 더 나가는 위치가 잡히고 있다.",
+        "relatedEventIds": [
+          "evt_013",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "오브젝트 직후 후속 위험 관리",
+        "description": "21:48 데스 직후 18:42 오브젝트 손실 흐름까지 이어져 오브젝트 마무리 후 빠지는 타이밍이 늦다.",
+        "relatedEventIds": [
+          "evt_026",
+          "evt_021"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "초반 6분 전까지 라인 푸시 상태에서는 부쉬 시야 1개를 우선 박고 한 칸 뒤에서 W 사거리만 유지하기",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "교전 진입 시 R(우르르 단결) 사거리 안에서 자신을 후열 카밀라인에 위치시키고, 첫 스킬은 아군 보호용으로 남겨두기",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "오브젝트 종료 직후 5초 동안은 추격 대신 와드 회수·재시야 박기 우선 루틴 적용",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 후 리스폰 시 즉시 제어와드 1개 구매 루틴화로 시야 점수 57 → 70대 목표",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "8:08",
+        "title": "초반 첫 데스로 흔들린 라인전",
+        "description": "교전에서 먼저 끊기며 봇 라인 골드·경험치 템포가 무너지는 출발점이 됐다.",
+        "relatedEventIds": [
+          "evt_003"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "15:08~16:41",
+        "title": "연속 후속 합류로 만든 운영 주도권",
+        "description": "1분 30초 동안 4회 후속 합류로 팀 교전 마무리를 책임지며 어시스트가 폭발적으로 누적됐다.",
+        "relatedEventIds": [
+          "evt_012",
+          "evt_014",
+          "evt_015",
+          "evt_016"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "16:58",
+        "title": "타워 압박으로 승리 조건 고정",
+        "description": "교전 우위를 즉시 타워로 전환해 구조물 7-1 격차의 발판을 마련했다.",
+        "relatedEventIds": [
+          "evt_017"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "17:42",
+        "title": "핵심 구도 데스로 흔들린 운영 안정감",
+        "description": "유리한 흐름 속 핵심 구도에서 데스가 나오며 18:42 오브젝트 손실로 연결됐다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_021"
+        ]
+      },
+      {
+        "id": "km_5",
+        "timestampLabel": "21:48",
+        "title": "마지막 데스, 그러나 구조물 차이로 마무리",
+        "description": "후반 진입 직전 데스가 났지만 누적된 구조물·오브젝트 우위로 23:26에 경기를 마무리했다.",
+        "relatedEventIds": [
+          "evt_026"
+        ]
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "shortNote": "5:40 드래곤 합류 - 오브젝트 템포 확보"
+      },
+      {
+        "eventId": "evt_003",
+        "shortNote": "8:08 초반 데스 - 라인전 흔들림 시작"
+      },
+      {
+        "eventId": "evt_005",
+        "shortNote": "11:21 초반 데스 - 데스 누적"
+      },
+      {
+        "eventId": "evt_007",
+        "shortNote": "13:10 드래곤 합류 - 오브젝트 일관성"
+      },
+      {
+        "eventId": "evt_008",
+        "shortNote": "13:49 초반 데스 - 라인전 마지막 흔들림"
+      },
+      {
+        "eventId": "evt_012",
+        "shortNote": "15:08 후속 합류 - 어시스트 시작"
+      },
+      {
+        "eventId": "evt_013",
+        "shortNote": "15:09 합류 직후 데스 - 위치 리스크"
+      },
+      {
+        "eventId": "evt_014",
+        "shortNote": "15:14 후속 합류 - 연속 관여"
+      },
+      {
+        "eventId": "evt_015",
+        "shortNote": "16:40 후속 합류 - 교전 마무리"
+      },
+      {
+        "eventId": "evt_016",
+        "shortNote": "16:41 후속 합류 - 킬 관여 폭발"
+      },
+      {
+        "eventId": "evt_017",
+        "shortNote": "16:58 타워 압박 - 승리 조건 전환"
+      },
+      {
+        "eventId": "evt_019",
+        "shortNote": "17:42 핵심 구도 데스 - 운영 안정감 흔들림"
+      },
+      {
+        "eventId": "evt_021",
+        "shortNote": "18:42 오브젝트 손실 - 후속 위험 관리 부재"
+      },
+      {
+        "eventId": "evt_026",
+        "shortNote": "21:48 데스 - 오브젝트 직후 빠지는 타이밍 지연"
+      }
+    ]
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "교전 후속 합류로 만든 높은 킬 관여",
+        "note": "15:08~16:41 사이 4회 연속 후속 합류로 어시스트 13개와 킬 관여 54%를 기록하며 팀 교전의 마무리 축으로 기능했다."
+      },
+      {
+        "category": "strength",
+        "topic": "오브젝트 타이밍 합류 일관성",
+        "note": "5:40, 13:10 드래곤 타이밍에 빠짐없이 합류해 팀의 드래곤 2개 확보와 오브젝트 템포 우위를 뒷받침했다."
+      },
+      {
+        "category": "strength",
+        "topic": "구조물 전환으로 승리 조건 마무리",
+        "note": "16:58 타워 압박 관여로 팀 타워 7개 vs 적 1개의 격차를 만들며 승리 조건을 구조물 차이로 깔끔하게 전환했다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 라인전 선제 데스 누적",
+        "note": "8:08, 11:21, 13:49에 걸쳐 초반 3데스를 내주며 서포터 골드·시야 템포가 늦어졌고 라인전 안정감이 흔들렸다."
+      },
+      {
+        "category": "weakness",
+        "topic": "교전 직후 위치 선정 리스크",
+        "note": "15:09 합류 직후, 17:42 핵심 구도에서 데스가 반복돼 보호기 사거리에서 한 발 더 나가는 위치가 잡히고 있다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 직후 후속 위험 관리",
+        "note": "21:48 데스 직후 18:42 오브젝트 손실 흐름까지 이어져 오브젝트 마무리 후 빠지는 타이밍이 늦다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

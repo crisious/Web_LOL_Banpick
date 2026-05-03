@@ -1,6 +1,18 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8192043774",
+      "matchId": "KR_8192043774",
+      "label": "sample-kr-8192043774 · SUPPORT WIN",
+      "champion": "Milio",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-03",
+      "theme": "밀리오로 23분 만에 승리, 시야 점수 57과 킬 관여 54%로 후속 합류는 좋았지만 6데스 누적이 아쉬운 경기",
+      "normalizedPath": "/data/samples/sample-kr-8192043774/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8192043774/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8192043774/sample-kr-8192043774-notes.md"
+    },
+    {
       "id": "sample-kr-8194679229",
       "matchId": "KR_8194679229",
       "label": "sample-kr-8194679229 · SUPPORT LOSS",
