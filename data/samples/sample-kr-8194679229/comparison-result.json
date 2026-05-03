@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-03T15:45:43.813Z",
+  "sampleId": "sample-kr-8194679229",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8194679229_1777823143813",
+      "generatedAt": "2026-05-03T15:45:43.813Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "렐로 시야 점수 93을 쌓으며 오브젝트 템포에 기여했지만, 중반 연쇄 데스로 운영 안정감을 잃은 39분 55초 패배입니다."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 2킬 4데스로 흔들리며 시작했지만 시야 점수 93과 어시스트 24로 팀 오브젝트 합류에는 꾸준히 기여했습니다. 다만 중반 7데스, 후반 5데스로 사망이 누적되면서 한타 이후 포지션 회복과 진입 타이밍 판단에서 손해가 컸고, 결국 바론을 내주고 타워 차이가 7대 9로 벌어지며 패배로 이어졌습니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "12분대 오브젝트 셋업 실패(evt_012)와 함께 4데스를 기록하며 라인전 안정감이 흔들렸지만, 2킬 4어시스트로 합류력은 살아 있었습니다."
+      },
+      {
+        "phase": "MID",
+        "summary": "15:33부터 27:33까지 7번의 데스가 집중되었고, 두 번의 드래곤 한타(evt_019, evt_035)에는 합류했지만 한타 직후 포지션 정리에서 반복적으로 잘려 운영이 무너졌습니다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "31:14 타워 압박에 관여했으나(evt_042), 32분 이후 세 차례 데스(evt_045, evt_048, evt_052)로 결정적인 한타에서 생존 라인을 만들지 못했습니다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "오브젝트 템포 합류력",
+        "description": "20:27과 27:25 드래곤 한타, 33:34 후반 드래곤 구도까지 핵심 오브젝트 타이밍에 일관되게 합류해 팀이 드래곤 3마리를 챙기는 발판이 되었습니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_035",
+          "evt_047"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "높은 시야 기여도",
+        "description": "서포터로서 시야 점수 93을 쌓고 제어 와드를 포함한 시야 아이템(2055/3364)을 적극 활용하며 오브젝트 셋업에 필요한 정보 우위를 만들어냈습니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_035"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "꾸준한 한타 합류와 어시스트",
+        "description": "킬 관여율 49%와 어시스트 24개를 기록하며 16번의 데스에도 불구하고 팀 한타 진입 자체는 회피하지 않고 이니시 역할을 수행했습니다.",
+        "relatedEventIds": [
+          "evt_042",
+          "evt_047"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "중반 연쇄 데스 누적",
+        "description": "15:33부터 27:33 사이 단 12분 동안 6회 데스가 집중되어 미드 구간에서만 7데스를 기록했고, 적 골드와 시야 우위를 동시에 헌납했습니다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_016",
+          "evt_017",
+          "evt_021",
+          "evt_027",
+          "evt_031",
+          "evt_036"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "오브젝트 직후 포지션 회복 실패",
+        "description": "20:27 드래곤 직후 20:48 데스(evt_021), 27:25 드래곤 직후 27:33 데스(evt_036)처럼 한타 종료 직후 정리 단계에서 반복적으로 잘려 추가 손해가 누적되었습니다.",
+        "relatedEventIds": [
+          "evt_021",
+          "evt_036"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "후반 결정적 구도 진입 타이밍",
+        "description": "32:03, 33:38, 35:21 세 차례 후반 데스로 바론 한타와 드래곤 한타에서 이니시 라인을 안정적으로 만들지 못했고, 적이 바론과 타워 9개를 가져가는 흐름을 막지 못했습니다.",
+        "relatedEventIds": [
+          "evt_045",
+          "evt_048",
+          "evt_052"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "한타 종료 후 5초간 추격 대신 후방 점멸·궁 쿨다운을 확인하고 아군 진형 뒤로 한 칸 빠지는 루틴을 만든다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_2",
+        "text": "미드 구간 진입 전 미니맵에서 적 정글·미드 위치 2명 이상이 보일 때만 W 이니시를 사용하고, 그렇지 않으면 시야부터 정리한다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_3",
+        "text": "바론·드래곤 시작 30초 전 제어 와드 2개를 강 입구와 둥지 뒤편에 배치해 후반 한타 이니시 각도를 미리 확보한다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 누적 시 다음 한타까지 골드 격차를 확인하고, 1500골드 이상 뒤처지면 사이드보다 아군 정글 시야와 함께 움직인다.",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "12:48",
+        "title": "초반 오브젝트 셋업 실패",
+        "description": "초반 오브젝트 셋업 단계에서 흐름을 내주며 미드 구간 운영의 시작점이 흔들렸습니다.",
+        "relatedEventIds": [
+          "evt_012"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "20:27 ~ 20:48",
+        "title": "드래곤 직후 후속 데스",
+        "description": "드래곤 한타 합류 직후 21초 만에 잘리며 오브젝트 이득의 절반을 다시 돌려준 장면입니다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_021"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "27:25 ~ 27:33",
+        "title": "두 번째 드래곤 직후 정리 실패",
+        "description": "두 번째 드래곤 한타 직후 8초 만에 데스로 이어져 같은 패턴이 반복되었음을 보여줍니다.",
+        "relatedEventIds": [
+          "evt_035",
+          "evt_036"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "31:14",
+        "title": "후반 타워 압박 관여",
+        "description": "후반 타워 철거에 관여하며 승리 조건을 구조물로 전환하려 시도한 의미 있는 장면입니다.",
+        "relatedEventIds": [
+          "evt_042"
+        ]
+      },
+      {
+        "id": "km_5",
+        "timestampLabel": "33:34 ~ 33:38",
+        "title": "후반 드래곤 한타 직후 데스",
+        "description": "후반 드래곤 구도 직후 4초 만에 잘리며 적이 바론·타워 추가 압박을 가져가는 결정적 분기점이 되었습니다.",
+        "relatedEventIds": [
+          "evt_047",
+          "evt_048"
+        ]
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_012",
+        "shortNote": "12:48 초반 오브젝트 셋업 실패"
+      },
+      {
+        "eventId": "evt_014",
+        "shortNote": "15:33 중반 첫 데스"
+      },
+      {
+        "eventId": "evt_016",
+        "shortNote": "17:00 중반 데스"
+      },
+      {
+        "eventId": "evt_017",
+        "shortNote": "19:16 중반 데스"
+      },
+      {
+        "eventId": "evt_019",
+        "shortNote": "20:27 드래곤 한타 합류"
+      },
+      {
+        "eventId": "evt_021",
+        "shortNote": "20:48 드래곤 직후 데스"
+      },
+      {
+        "eventId": "evt_027",
+        "shortNote": "23:19 중반 데스"
+      },
+      {
+        "eventId": "evt_031",
+        "shortNote": "24:25 중반 데스"
+      },
+      {
+        "eventId": "evt_035",
+        "shortNote": "27:25 두 번째 드래곤 한타"
+      },
+      {
+        "eventId": "evt_036",
+        "shortNote": "27:33 드래곤 직후 데스"
+      },
+      {
+        "eventId": "evt_042",
+        "shortNote": "31:14 후반 타워 압박"
+      },
+      {
+        "eventId": "evt_045",
+        "shortNote": "32:03 후반 데스"
+      },
+      {
+        "eventId": "evt_047",
+        "shortNote": "33:34 후반 드래곤 한타"
+      },
+      {
+        "eventId": "evt_048",
+        "shortNote": "33:38 드래곤 직후 데스"
+      },
+      {
+        "eventId": "evt_052",
+        "shortNote": "35:21 후반 결정적 데스"
+      }
+    ]
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "오브젝트 템포 합류력",
+        "note": "20:27과 27:25 드래곤 한타, 33:34 후반 드래곤 구도까지 핵심 오브젝트 타이밍에 일관되게 합류해 팀이 드래곤 3마리를 챙기는 발판이 되었습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "높은 시야 기여도",
+        "note": "서포터로서 시야 점수 93을 쌓고 제어 와드를 포함한 시야 아이템(2055/3364)을 적극 활용하며 오브젝트 셋업에 필요한 정보 우위를 만들어냈습니다."
+      },
+      {
+        "category": "strength",
+        "topic": "꾸준한 한타 합류와 어시스트",
+        "note": "킬 관여율 49%와 어시스트 24개를 기록하며 16번의 데스에도 불구하고 팀 한타 진입 자체는 회피하지 않고 이니시 역할을 수행했습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 연쇄 데스 누적",
+        "note": "15:33부터 27:33 사이 단 12분 동안 6회 데스가 집중되어 미드 구간에서만 7데스를 기록했고, 적 골드와 시야 우위를 동시에 헌납했습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 직후 포지션 회복 실패",
+        "note": "20:27 드래곤 직후 20:48 데스(evt_021), 27:25 드래곤 직후 27:33 데스(evt_036)처럼 한타 종료 직후 정리 단계에서 반복적으로 잘려 추가 손해가 누적되었습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "후반 결정적 구도 진입 타이밍",
+        "note": "32:03, 33:38, 35:21 세 차례 후반 데스로 바론 한타와 드래곤 한타에서 이니시 라인을 안정적으로 만들지 못했고, 적이 바론과 타워 9개를 가져가는 흐름을 막지 못했습니다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

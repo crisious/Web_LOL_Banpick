@@ -1,6 +1,30 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8194679229",
+      "matchId": "KR_8194679229",
+      "label": "sample-kr-8194679229 · SUPPORT LOSS",
+      "champion": "Rell",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-03",
+      "theme": "렐로 시야 점수 93을 쌓으며 오브젝트 템포에 기여했지만, 중반 연쇄 데스로 운영 안정감을 잃은 39분 55초 패배입니다.",
+      "normalizedPath": "/data/samples/sample-kr-8194679229/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8194679229/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8194679229/sample-kr-8194679229-notes.md"
+    },
+    {
+      "id": "sample-kr-8193453153",
+      "matchId": "KR_8193453153",
+      "label": "sample-kr-8193453153 · SUPPORT WIN",
+      "champion": "Ezreal",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-03",
+      "theme": "이즈리얼 서포터로 오브젝트 템포를 주도하며 34분 경기를 승리로 마무리했다.",
+      "normalizedPath": "/data/samples/sample-kr-8193453153/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8193453153/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8193453153/sample-kr-8193453153-notes.md"
+    },
+    {
       "id": "sample-kr-8193501785",
       "matchId": "KR_8193501785",
       "label": "sample-kr-8193501785 · SUPPORT WIN",

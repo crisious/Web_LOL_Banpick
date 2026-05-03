@@ -1,0 +1,219 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8193453153_1777823003818",
+    "generatedAt": "2026-05-03T15:43:23.818Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "이즈리얼 서포터로 오브젝트 템포를 주도하며 34분 경기를 승리로 마무리했다."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 한 번의 데스 이후 교전 합류로 분위기를 되살렸고, 중반 누적된 데스를 바론과 드래곤 주도권으로 상쇄한 뒤 후반에는 무실점으로 구조물 압박을 마무리하며 승리를 굳혔다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "9:56 데스로 템포가 흔들렸으나 11:18 직접 킬과 드래곤 합류로 2/1/1의 안정적 라인을 만들었다."
+    },
+    {
+      "phase": "MID",
+      "summary": "16:58·20:52·22:10 세 차례 데스가 누적됐지만 18:11 드래곤과 24:52 바론 관여로 4/3/5를 기록하며 손해를 회복했다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "30:42 이후 데스 없이 어시스트 3회와 바론·타워 관여로 구조물 승리 조건을 깔끔하게 닫았다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "오브젝트 합류 일관성",
+      "description": "12:13, 18:11, 24:04, 30:42 드래곤과 24:52, 31:32 바론 타이밍에 빠짐없이 합류해 팀 드래곤 4·바론 2 확보의 기반을 만들었다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_011",
+        "evt_018",
+        "evt_022",
+        "evt_030",
+        "evt_032"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "후반 무실점 마무리",
+      "description": "후반 16분 동안 0데스 3어시스트로 포지셔닝을 정돈하며 구조물 압박 국면에서 위험을 차단했다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_032",
+        "evt_034"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "구조물 전환 능력",
+      "description": "31:14, 32:42, 32:53로 이어지는 타워 압박 흐름에 합류해 바론 이후 골드 우위를 즉시 구조물로 환전했다.",
+      "relatedEventIds": [
+        "evt_031",
+        "evt_033",
+        "evt_034"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 포지셔닝 리스크",
+      "description": "16:58, 20:52, 22:10에 약 5분 사이 3데스가 집중되며 중반 운영 안정감이 흔들렸다.",
+      "relatedEventIds": [
+        "evt_008",
+        "evt_016",
+        "evt_017"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "초반 선제 끊김",
+      "description": "9:56 첫 교전에서 먼저 끊기며 라인 템포와 시야 장악 타이밍을 한 박자 늦췄다.",
+      "relatedEventIds": [
+        "evt_002"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "킬 관여율 정체",
+      "description": "팀 33킬 대비 킬 관여 45%에 그쳐 중반 사이드 운영 시 합류 동선이 짧아진 구간이 있었다.",
+      "relatedEventIds": [
+        "evt_008",
+        "evt_016"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "16~22분 구도에서는 비전 와드를 먼저 박고 사거리 800 밖에서 스킬을 사용하는 습관을 들인다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "9~10분 첫 오브젝트 직전에는 강 시야부터 정리해 선제 끊김을 예방한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "팀 교전 신호가 뜨면 사이드 푸시를 끊고 텔레포트·이동기 동선을 우선 확보해 관여율을 50% 이상으로 끌어올린다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "중반 데스 직후 리스폰 시 즉시 핑크와드 1개를 구매해 시야 공백을 메운다.",
+      "linkedWeaknessId": "wk_1"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "11:18",
+      "title": "초반 반전 킬",
+      "description": "9:56 데스 직후 약 1분 만에 킬을 가져오며 라인 템포를 회복했다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_004"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "22:10",
+      "title": "중반 데스 누적 정점",
+      "description": "16:58·20:52에 이은 세 번째 데스로 운영 흐름이 가장 흔들린 구간이었다.",
+      "relatedEventIds": [
+        "evt_008",
+        "evt_016",
+        "evt_017"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "24:52",
+      "title": "바론 확보 반전",
+      "description": "데스 누적 직후 첫 바론을 챙기며 골드·시야 주도권을 되가져왔다.",
+      "relatedEventIds": [
+        "evt_018",
+        "evt_022"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "31:32",
+      "title": "두 번째 바론과 클로즈아웃",
+      "description": "두 번째 바론에 이어 32:42·32:53 연속 타워 철거로 승리 조건을 굳혔다.",
+      "relatedEventIds": [
+        "evt_032",
+        "evt_033",
+        "evt_034"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_002",
+      "shortNote": "9:56 초반 선제 데스"
+    },
+    {
+      "eventId": "evt_004",
+      "shortNote": "11:18 회복 킬"
+    },
+    {
+      "eventId": "evt_005",
+      "shortNote": "12:13 첫 드래곤 합류"
+    },
+    {
+      "eventId": "evt_008",
+      "shortNote": "16:58 중반 데스"
+    },
+    {
+      "eventId": "evt_011",
+      "shortNote": "18:11 드래곤 합류"
+    },
+    {
+      "eventId": "evt_016",
+      "shortNote": "20:52 데스"
+    },
+    {
+      "eventId": "evt_017",
+      "shortNote": "22:10 데스"
+    },
+    {
+      "eventId": "evt_018",
+      "shortNote": "24:04 드래곤 합류"
+    },
+    {
+      "eventId": "evt_022",
+      "shortNote": "24:52 첫 바론 관여"
+    },
+    {
+      "eventId": "evt_030",
+      "shortNote": "30:42 후반 드래곤"
+    },
+    {
+      "eventId": "evt_031",
+      "shortNote": "31:14 타워 압박"
+    },
+    {
+      "eventId": "evt_032",
+      "shortNote": "31:32 두 번째 바론"
+    },
+    {
+      "eventId": "evt_033",
+      "shortNote": "32:42 타워"
+    },
+    {
+      "eventId": "evt_034",
+      "shortNote": "32:53 타워 철거"
+    }
+  ]
+}
