@@ -1,5 +1,93 @@
 # Web_LOL_Banpick · 디자인/접근성 통합 패치
 
+## Phase 28 — Track S/T 테스트 커버리지 확장 (2026-05-03)
+
+PLAN.md Phase 28(자체 추가). main.js 순수 함수 4개 회귀 테스트 + 발견된 버그 1건 수정.
+
+### 트랙 S — utils 함수 테스트 + delta NaN guard 수정
+
+**파일**: [main.js](main.js), [test-artifacts/main/utils-tests.mjs](test-artifacts/main/utils-tests.mjs)
+
+`compactPatchLabel` (S16 → 26.X 매핑), `_computeDeltaParts` (delta 노이즈 컷),
+`championDisplayName` (CamelCase 분리) 30 케이스. 테스트 작성 도중 발견된 버그
+1건: `_computeDeltaParts`가 `!isFinite(reference)`만 검사하고 `current`는 검사
+하지 않아 `(NaN, 5)` 입력 시 metric pill에 "NaN" 텍스트가 노출될 수 있었음.
+`!isFinite(current)` 가드 1줄 추가로 수정. 테스트가 자동 회귀 차단.
+
+### 트랙 T — aggregateRecentStats 테스트
+
+**파일**: [test-artifacts/main/recent-stats-tests.mjs](test-artifacts/main/recent-stats-tests.mjs)
+
+tab-trends "최근 20경기 누적" 데이터 가공 + stat-ribbon delta 베이스라인 생성
+함수의 29 케이스. 빈 입력/null/non-array 가드, 챔피언/역할 그룹화 + 정렬,
+avgDamage/avgVisionScore (Phase 15), 분당 정규화 (Phase 17/18), duration=0 제외.
+
+### 검증 합계
+
+`npm test` → **97 passed, 0 failed across 5 test file(s)**
+
+---
+
+## Phase 27 — Track Q/R 테스트 인프라 + buildLlmPayload 커버리지 (2026-05-03)
+
+PLAN.md Phase 27(자체 추가). 테스트 실행 ergonomics + AI 프롬프트 입력 가공
+함수 회귀 테스트.
+
+### 트랙 Q — package.json + npm test runner
+
+**파일**: [package.json](package.json), [test-artifacts/run-tests.mjs](test-artifacts/run-tests.mjs), [README.md](README.md)
+
+`npm install` 불필요. zero-dep runner가 `test-artifacts/**/*-tests.mjs`를 자동
+발견 → 각 파일 spawn → "N passed, N failed" footer 파싱 → 합계 출력. 실패 시
+exit 1. 새 테스트 추가는 파일 생성만으로 등록됨 (runner 수정 불필요).
+
+### 트랙 R — buildLlmPayload 회귀 테스트
+
+**파일**: [test-artifacts/server/llm-payload-tests.mjs](test-artifacts/server/llm-payload-tests.mjs)
+
+AI 프롬프트로 들어가는 핵심 가공 함수의 18 케이스. importance < 3 필터,
+최대 15개 cap, timestamp 오름차순 정렬, timelineEvents 7개 필드만 유지
+(rawRef/laneHint/puuid 제거), outputContract 안정성, phaseContext 4 필드 추출,
+playerContext 2 필드만 유지.
+
+---
+
+## Phase 26 — Track G/H/N 테스트 + UI + 문서 정리 (2026-05-03)
+
+PLAN.md Phase 26(자체 추가). Phase 25 후 발견된 5개 갭(stale 문서, 회귀 테스트
+부재, schemaViolations 미노출 등) 정리.
+
+### 트랙 G — validateAnalysisOutput 회귀 테스트
+
+**파일**: [test-artifacts/schema/schema-tests.mjs](test-artifacts/schema/schema-tests.mjs)
+
+라이브 호출 없이도 스키마 검증 게이트 회귀 차단. 9 케이스 — valid fixture +
+8 위반 패턴(missing schemaVersion / matchSummary as string / coachSummary missing
+overallSummary / 빈 배열 4종 / keyMoments < 2). `aggregate-tests.mjs` 패턴 재사용
+(소스 텍스트 추출 + new Function 평가, server.js 변경 0).
+
+### 트랙 H — schemaViolations UI 노출
+
+**파일**: [index.html](index.html), [main.js](main.js), [styles.css](styles.css)
+
+`analysisMeta.schemaViolations` 데이터를 evidence 섹션 헤더 우측 pill로 가시화.
+0건 mint "스키마 0건", 1~2건 amber details/summary 펼침, 3+건 rose ⚠. 베이스
+라인 샘플(필드 미존재) 자동 비노출. 신규 토큰 0 (mint/amber/rose alpha 패밀리
+재사용), `[data-*]` 셀렉터 0 변경.
+
+### 트랙 N — 문서 정합성 정리
+
+**파일**: 21개 .md (root 18 + docs/superpowers/plans 3) + PLAN.md
+
+`/Users/a1234/Documents/Web_LOL_Banpick/` macOS 절대경로 모두 제거. root-level은
+상대 markdown 링크, `docs/superpowers/plans/`는 `../../../` 변환. 130+개 `cd
+/Users/a1234/...` 셸 스니펫은 `cd <repo-root>` 플레이스홀더로 통일.
+[progress.md](progress.md) 샘플 수치 정정 (26 → 2), CLI PATH 섹션에 win32 변종
+추가. [sample-data-cleanup-plan.md](sample-data-cleanup-plan.md) 끝부분에
+"정리 결과 (2026-05-03 갱신, Track N)" 한 단락.
+
+---
+
 ## Phase 25 — Track B/A2/C 일괄 (2026-05-03)
 
 PLAN.md Phase 25+ 3-track 묶음을 순차 실행. 토큰 리팩토링 아크 종료(iter.4~19) 이후
