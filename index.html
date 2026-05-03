@@ -10,6 +10,16 @@
   <body data-view="LOGGED_OUT">
     <a class="skip-link" href="#main-content">본문 분석 영역으로 건너뛰기</a>
 
+    <div class="riot-key-banner" data-riot-key-banner role="alert" aria-live="assertive" hidden>
+      <div class="riot-key-banner__body">
+        <strong class="riot-key-banner__title">Riot API 키 갱신이 필요합니다</strong>
+        <p class="riot-key-banner__message" data-riot-key-banner-message></p>
+        <p class="riot-key-banner__note">저장된 샘플과 챔피언 탭 캐시는 그대로 열람할 수 있습니다.</p>
+        <a class="riot-key-banner__link" href="https://developer.riotgames.com/" target="_blank" rel="noopener noreferrer">Riot Developer Portal에서 키 발급 →</a>
+      </div>
+      <button type="button" class="riot-key-banner__dismiss" data-riot-key-banner-dismiss aria-label="배너 닫기">×</button>
+    </div>
+
     <section class="login-overlay" data-login-overlay role="region" aria-labelledby="login-title">
       <div class="login-card">
         <h1 class="login-title" id="login-title">LoL Replay Coach</h1>

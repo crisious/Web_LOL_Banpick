@@ -421,9 +421,12 @@ async function fetchChampionHistory({ gameName, tagLine, platformRegion, riotApi
   });
 
   if (!response.ok) {
-    let errorBody = "";
-    try { errorBody = (await response.json()).error || ""; } catch {}
-    throw new Error(errorBody || `HTTP ${response.status}`);
+    let payload = null;
+    try { payload = await response.json(); } catch {}
+    const error = new Error((payload && payload.error) || `HTTP ${response.status}`);
+    if (payload && typeof payload.code === "string") error.code = payload.code;
+    if (payload && typeof payload.hint === "string") error.hint = payload.hint;
+    throw error;
   }
 
   const reader = response.body.getReader();
@@ -450,7 +453,12 @@ async function fetchChampionHistory({ gameName, tagLine, platformRegion, riotApi
       try { payload = data ? JSON.parse(data) : null; } catch { payload = { error: "invalid json" }; }
       if (event === "progress" && typeof onProgress === "function") onProgress(payload);
       else if (event === "done") result = payload;
-      else if (event === "error") throw new Error(payload?.error || "fetch failed");
+      else if (event === "error") {
+        const sseError = new Error(payload?.error || "fetch failed");
+        if (payload?.code) sseError.code = payload.code;
+        if (payload?.hint) sseError.hint = payload.hint;
+        throw sseError;
+      }
     }
   }
 
@@ -1313,7 +1321,10 @@ async function fetchRecentStats({ force = false } = {}) {
     });
     const data = await res.json();
     if (!res.ok || data.ok === false) {
-      throw new Error(data?.error || `요청 실패 (HTTP ${res.status})`);
+      const error = new Error(data?.error || `요청 실패 (HTTP ${res.status})`);
+      if (data?.code) error.code = data.code;
+      if (data?.hint) error.hint = data.hint;
+      throw error;
     }
 
     const matches = Array.isArray(data.matches) ? data.matches : [];
@@ -1340,6 +1351,7 @@ async function fetchRecentStats({ force = false } = {}) {
     // Phase 11: 평균 데이터가 새로 들어왔으니 개요 탭의 메트릭 delta도 갱신
     refreshMetricDeltas();
   } catch (error) {
+    maybeHandleRiotKeyError(error);
     state.recentStatsError = error.message || String(error);
     renderRecentStatsError(state.recentStatsError);
   } finally {
@@ -1588,9 +1600,43 @@ async function fetchJson(path, options) {
   const response = await fetch(path, options);
   const payload = await response.json();
   if (!response.ok) {
-    throw new Error(payload.error || `${path} 요청 실패`);
+    const error = new Error(payload.error || `${path} 요청 실패`);
+    if (payload && typeof payload.code === "string") error.code = payload.code;
+    if (payload && typeof payload.hint === "string") error.hint = payload.hint;
+    throw error;
+  }
+  // 200 OK여도 ok=false + code 케이스 (현재는 미사용이지만 방어적)
+  if (payload && payload.ok === false && payload.code) {
+    const error = new Error(payload.error || `${path} 요청 실패`);
+    error.code = payload.code;
+    if (typeof payload.hint === "string") error.hint = payload.hint;
+    throw error;
   }
   return payload;
+}
+
+// Track B: Riot 키 만료 배너. fetchJson 에러의 code === "RIOT_KEY_EXPIRED" 시 표시.
+function showRiotKeyBanner(error) {
+  const banner = document.querySelector("[data-riot-key-banner]");
+  if (!banner) return;
+  const hint = error?.hint
+    || "developer.riotgames.com에서 새 키를 발급한 뒤 .env의 RIOT_API_KEY를 갱신하고 서버를 재시작하세요.";
+  const message = banner.querySelector("[data-riot-key-banner-message]");
+  if (message) message.textContent = hint;
+  banner.hidden = false;
+}
+
+function dismissRiotKeyBanner() {
+  const banner = document.querySelector("[data-riot-key-banner]");
+  if (banner) banner.hidden = true;
+}
+
+function maybeHandleRiotKeyError(error) {
+  if (error && error.code === "RIOT_KEY_EXPIRED") {
+    showRiotKeyBanner(error);
+    return true;
+  }
+  return false;
 }
 
 async function loadManifest() {
@@ -2779,9 +2825,26 @@ function renderSample(sample) {
   renderWardTimeline(sample);
   renderBuildTimeline(sample);
   renderSampleSwitcher();
+
+  // Track A2: renderSample이 동기적으로 채우는 탭은 첫 진입 시 스켈레톤 200ms
+  // 인공 지연을 건너뛴다. tab-trends / tab-champions는 lazy fetch이므로 그대로
+  // 스켈레톤을 노출 (switchTab의 dataset.renderedOnce 가드가 처리).
+  ["tab-overview", "tab-analysis", "tab-timeline"].forEach((id) => {
+    const page = document.getElementById(id);
+    if (page) page.dataset.renderedOnce = "true";
+  });
 }
 
 async function selectSample(sampleId) {
+  // Track A2: 같은 샘플을 재선택하면 네트워크 호출과 25+ 렌더 함수를 건너뛴다.
+  // 가드는 currentSample이 실제로 같은 sampleId로 렌더 완료된 상태일 때만 작동
+  // (load 중인 동시 호출에서 오작동 방지).
+  if (state.currentSample && state.currentSample.sampleId === sampleId) {
+    const match = sampleMatchSummary(state.currentSample);
+    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
+    return;
+  }
+
   state.currentSampleId = sampleId;
   dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
 
@@ -2919,6 +2982,7 @@ async function handleRecentMatchesSubmit(event) {
     applyPendingUi();
     dom.fetchStatus.textContent = `${result.riotId} 최근 경기 ${result.matches.length}건을 불러왔습니다. fit 점수가 높은 순서대로 정렬했습니다.`;
   } catch (error) {
+    maybeHandleRiotKeyError(error);
     dom.fetchStatus.innerHTML = `최근 경기 조회 실패: ${formatRetryMessage(error)} <button class="retry-btn" data-retry-recent>다시 시도</button>`;
   } finally {
     state.isRecentMatchesPending = false;
@@ -2962,6 +3026,7 @@ async function handleGenerateSample(matchId) {
     dom.fetchStatus.textContent = `${result.sampleId} 생성 완료 · ${result.analysis.matchSummary.champion} ${result.analysis.matchSummary.role} ${result.analysis.matchSummary.result}`;
     return result;
   } catch (error) {
+    maybeHandleRiotKeyError(error);
     dom.fetchStatus.textContent = `샘플 생성 실패: ${formatRetryMessage(error)}`;
     throw error;
   } finally {
@@ -3031,6 +3096,7 @@ async function handleLogin(event) {
     setView("MATCH_LIST");
     prefetchAndAnalyzeAll();  // fire-and-forget: 기존 프리페치 + 미분석 자동 생성
   } catch (error) {
+    maybeHandleRiotKeyError(error);
     dom.loginStatus.textContent = `조회 실패: ${formatRetryMessage(error)}`;
     setView("LOGGED_OUT");
   } finally {
@@ -3264,6 +3330,7 @@ async function loadMoreRecentMatches() {
     renderMatchList();
     prefetchAndAnalyzeAll();
   } catch (error) {
+    maybeHandleRiotKeyError(error);
     state.recentMatchesHasMore = true;
     renderMatchListFooter();
     alert(`이전 경기 불러오기 실패: ${formatRetryMessage(error)}`);
@@ -3394,6 +3461,10 @@ async function init() {
   // 이벤트 리스너 등록
   dom.loginForm.addEventListener("submit", handleLogin);
   dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
+
+  // Track B: Riot 키 배너 닫기 버튼
+  document.querySelector("[data-riot-key-banner-dismiss]")
+    ?.addEventListener("click", dismissRiotKeyBanner);
 
   dom.sampleSwitcher.addEventListener("click", (event) => {
     const button = event.target.closest("[data-sample-button]");
@@ -3727,6 +3798,7 @@ async function startChampionHistoryFetch(force) {
     if (error.name === "AbortError") {
       setChampionHistoryEmpty("분석이 취소되었습니다.");
     } else {
+      maybeHandleRiotKeyError(error);
       setChampionHistoryEmpty(`분석 실패: ${error.message}`);
     }
   } finally {

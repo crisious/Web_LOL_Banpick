@@ -1,5 +1,72 @@
 # Web_LOL_Banpick · 디자인/접근성 통합 패치
 
+## Phase 25 — Track B/A2/C 일괄 (2026-05-03)
+
+PLAN.md Phase 25+ 3-track 묶음을 순차 실행. 토큰 리팩토링 아크 종료(iter.4~19) 이후
+첫 feature/ops 페이즈. 모든 트랙이 독립적이라 순서 변경에도 무관.
+
+### 트랙 B — Riot 개발 키 만료 UX
+
+**파일**: [server.js](server.js), [main.js](main.js), [index.html](index.html), [styles.css](styles.css)
+
+Riot 개발 키 24h 만료 시 모호한 500 에러로 멈추던 UX를 정리. 서버 `requestJson`이
+이제 `riotStatus`/`riotBody`를 에러에 첨부하고, 신규 `riotErrorPayload(error)`
+헬퍼가 401/403을 `{ ok:false, code:"RIOT_KEY_EXPIRED", error, hint }`로 normalize.
+`/api/recent-matches`, `/api/generate-sample`, `/api/champion-history` (SSE) 세
+엔드포인트 catch가 모두 동일 헬퍼 사용.
+
+프런트는 `fetchJson`이 에러에 `code`/`hint`를 부착하도록 확장하고, 신규
+`maybeHandleRiotKeyError(error)`가 `code === "RIOT_KEY_EXPIRED"` 시 sticky 배너를
+노출. 5개 catch 사이트(loadStats / handleRecentMatchesSubmit / handleGenerateSample /
+handleLogin / loadMoreRecentMatches + champion-history) 모두 호출. 배너는
+`role="alert"` + `aria-live="assertive"`, X 버튼 dismiss, 토큰 재사용으로 신규 컬러
+0건 (`--tint-rose` / `--rose-border` / `--shadow-hover`만 사용).
+
+### 트랙 A2 — 탭 전환 가속
+
+**파일**: [main.js](main.js)
+
+`switchTab`의 200ms 인공 스켈레톤이 `tab-analysis` / `tab-timeline`(이미 sync
+렌더 완료)에도 적용되며 첫 클릭이 0.5~0.8s 지연되던 문제. `renderSample` 끝에서
+sync로 채워지는 3개 탭(`tab-overview`, `tab-analysis`, `tab-timeline`)에
+`dataset.renderedOnce = "true"`를 즉시 마킹. lazy fetch가 일어나는
+`tab-trends`/`tab-champions`는 기존 스켈레톤 동작 유지.
+
+추가로 `selectSample` 진입부에 동일 sampleId 가드를 넣어 사이드바/매치카드 재클릭
+시 네트워크 호출과 25+ 렌더 함수 재실행을 건너뛴다. 가드는
+`state.currentSample.sampleId === sampleId`로만 작동해 동시 load 중 오작동 방지.
+
+### 트랙 C — AI 프롬프트 스키마 준수율
+
+**파일**: [server.js](server.js), [llm-prompt-input-format.md](llm-prompt-input-format.md)
+
+server.js 정규화 레이어가 비대해진 원인 = AI(특히 Codex) 스키마 일탈 빈번. 두
+프롬프트에 신규 `OUTPUT_SCHEMA_EXAMPLE` 미니 JSON 블록을 삽입해 타입(객체 vs 배열,
+string vs object) 위반을 직접 시연. 텍스트 설명("배열 3개")만으로는 안 잡히던
+케이스를 차단.
+
+`buildAnalysis`에 위반 카운터 추가. 정규화 분기가 fire되면 `violations.push(...)`로
+패턴 키 누적 (예: `type.matchSummary.string`, `type.phaseSummaries.object`,
+`count.keyMoments<2`). 결과는 `analysisMeta.schemaViolations`(배열) +
+`schemaViolationCount`(숫자)로 분석 JSON에 기록 + 콘솔 로그에도 노출. 후속 회귀
+추적 + 모델 변경 시 영향 측정 가능.
+
+기존 정규화 레이어는 안전망으로 유지 (제거하지 않음 — 프롬프트 개선에도 위반은
+0이 안 되는 것이 정상).
+
+**측정 코호트**: 신규 샘플 2건(`sample-kr-8190642410`, `sample-kr-8190721866`)은
+Track C 적용 *전*에 생성됨 → 베이스라인. 이후 생성되는 샘플의 `schemaViolations`
+배열로 개선 효과 측정.
+
+### 검증 회귀
+
+- index.html 구조: 신규 banner div만 추가, 기존 [data-*] 속성 0 변경
+- main.js 셀렉터: 새 함수만 추가, 기존 fetchJson 인터페이스 호환 (error.code는 옵셔널)
+- styles.css: +84L (.riot-key-banner 컴포넌트), 기존 토큰만 사용
+- server.js: requestJson 시그니처 호환, riotErrorPayload는 신규 helper
+
+---
+
 ## iter.11 — 챔피언 탭
 
 **날짜**: 2026-04-27

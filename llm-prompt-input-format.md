@@ -1,11 +1,27 @@
 # LLM 프롬프트 입력 포맷 문서
 
 작성일: 2026-04-10
+업데이트: 2026-05-03 (Track C — 출력 스키마 예제 + 위반 카운터)
 
 관련 문서:
 - [정규화 경기 데이터 스키마 문서](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)
 - [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
 - [정규화 매핑 규칙 상세서](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)
+
+> **2026-05-03 업데이트 (Track C)**: 라이브 프롬프트는 [server.js](server.js)
+> `OUTPUT_SCHEMA_EXAMPLE` / `CLAUDE_COACHING_PROMPT` / `CODEX_REDTEAM_PROMPT`에
+> 정의되어 있다. 본 문서의 텍스트 묘사 외에, 이제 미니 JSON 예제를 두 프롬프트에
+> 직접 삽입해 타입(객체 vs 배열) 위반을 줄인다. 서버측 정규화가 fire되면
+> `analysisMeta.schemaViolations` 배열에 패턴 키가 push되어 manifest에서 회귀 추적
+> 가능. 위반 패턴 키 목록:
+>
+> - `missing.schemaVersion`
+> - `missing.analysisMeta`
+> - `missing.matchSummary` / `type.matchSummary.string` / `missing.matchSummary.headline`
+> - `missing.coachSummary` / `type.coachSummary.string` / `missing.coachSummary.overallSummary`
+> - `type.phaseSummaries.object`
+> - `count.keyMoments<2`
+> - `count.actionChecklist<1`
 
 ## 1. 문서 목적
 

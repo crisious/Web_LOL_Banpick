@@ -1,168 +1,121 @@
-# 작업 계획 — 디자인 비평 후속 (Phase 20+)
+# 작업 계획 — Phase 25+
 
-**기준 문서**: `improved-full.html` 비평 (2026-04-26)
-**범위**: 9개 finding을 4개 실행 페이즈로 그룹핑, 우선순위·노력·영향도로 분류
-
----
-
-## 분류 매트릭스
-
-| # | Finding | 영향도 | 노력 | 우선순위 | 페이즈 |
-|---|---|---|---|---|---|
-| 1 | 히어로 ↔ 점수 링 시각 경합 | 🔴 High | M | P1 | 21 |
-| 2 | trend-callout amber 톤 중복 | 🟡 Med | S | P1 | 21 |
-| 3 | 빌드 오더 데스크톱 가로 스크롤 | 🟢 Low | S | P2 | 22 |
-| 4 | 사이드바 fetcher 발견성 (`details` 접힘) | 🟡 Med | S | P2 | 22 |
-| 5 | 메트릭 카드 위계 명시화 (`.metric--primary` 직접 부여) | 🟢 Low | XS | P2 | 22 |
-| 6 | SVG 차트 a11y (title/desc/table fallback) | 🟡 Med | M | P3 | 23 |
-| 7 | Score ring 색상 변형 예시 (목업) | 🟢 Low | S | P3 | 23 |
-| 8 | Strengths/Weaknesses 아이콘 통일성 (main.js ::before) | 🟢 Low | XS | P3 | 23 |
-| 9 | insight-item 중첩 박스 무게감 / 본문 폰트 16px 검토 | 🟡 Med | M | P4 | 24 |
-
-**노력 단위**: XS=10분 / S=30분 / M=1시간 / L=반나절
+**기준 시점**: 2026-05-03
+**상위 컨텍스트**: [CHANGELOG.md](CHANGELOG.md) Phase 1~24 + iter.11(챔피언 탭) 완료 / [design-tokens.md](design-tokens.md) §10 항목 1~21 완료 / styles.css iteration 4~19 토큰 정리 아크 종료.
 
 ---
 
-## Phase 21 — 시각 경합 해소 (High-impact 2건 묶음)
+## 0. 토큰 리팩토링 아크 종료 선언
 
-### 21a. 히어로와 점수 링 무게 분리
+iter.4~19에 걸친 CSS 토큰 정리는 사실상 마무리 단계. 잔여 하드코딩은 모두 의도적 예외로 등재됨:
 
-**문제**: 두 개의 강한 시각 요소(amber-mint 듀얼 그라디언트 히어로 + conic-gradient 점수 링)가 같은 시선 무게를 가져 사용자가 어디부터 봐야 할지 0.5초 망설임.
+| 카테고리 | 잔여 | 상태 |
+| --- | --- | --- |
+| `font-size` 비-토큰 | 3건 (body 16/15/14px responsive) | [design-tokens.md §2 "Responsive body base 예외"](design-tokens.md) |
+| `border-radius` 비-토큰 | 2건 (`5px 0 0 5px` / `10px 0 0 10px` 비대칭 쇼트핸드) | [design-tokens.md §4 "보존 대상"](design-tokens.md) |
+| `gap` 비-토큰 | 6건 (1-2px 극한 타이트) | [design-tokens.md §3 "Outlier 보류"](design-tokens.md) |
+| 컬러 비-토큰 단독 사용 | 10종 | [design-tokens.md §1 "수용된 단독 사용"](design-tokens.md) |
 
-**옵션 A (권장)**: 점수 링을 narrow 변형으로 만들어 메트릭 카드 4개와 같은 행에 5번째 카드로 배치. 링은 64×64로 축소하고 텍스트는 카드 라벨 옆에.
+styles.css 라인 수는 iter.18 기준 4345→4213(-132)로 dead-CSS도 정리됨.
 
-**옵션 B**: 점수 링 크기 유지하되 panel 배경을 약화해 히어로의 amber 그라디언트가 "유일한 특별 영역"이 되도록.
+**결론**: iteration 20을 더 돌릴 만한 명확 후보 없음. 추가 토큰 작업은 새 컴포넌트가 들어올 때까지 보류.
 
-**대상 파일**: `improved-full.html` (목업), 검증 후 `styles.css`
+---
+
+## 1. 다음 트랙 후보 (3개)
+
+기준: progress.md "다음 추천 작업" + 최근 회귀 위험 + 사용자 임팩트.
+
+### 트랙 A — 탭 전환 초기 로딩 지연 최적화 (UX 폴리싱)
+
+**문제**: Overview는 즉시 그려지지만 Progress / Mastery / AI Comparison / Champions 탭 첫 진입 시 200ms 스켈레톤 + 본격 렌더가 합쳐져 첫 탭 전환에 0.5~0.8s 지연 체감. iter.6에서 깐 `data-rendered-once` 캐시는 작동하나 "처음 그 탭으로 가는 순간"의 비용은 여전.
+
+**해결 방향**:
+
+- 옵션 A1 — 탭 prefetch 렌더: 사용자가 Overview에 머무는 동안 idle 시점에 Progress·Mastery 탭의 DOM을 미리 그리되 `display:none`으로 숨김. 첫 탭 클릭은 단순 visibility toggle.
+- 옵션 A2 — 데이터 셰이핑 사전 계산: 무거운 집계(visionScore/min, KDA delta, mastery 정렬)를 sample load 직후 1회 계산해 `state.precomputed.*`에 캐시.
+
+**대상**: [main.js](main.js) `switchTab` / `renderProgressTab` / `renderMasteryTab` / `state` 캐시.
+**노력**: 옵션 A2가 더 적음(~1.5h). A1은 DOM 비용까지 절약하지만 마크업 영향 큼(~3h).
+**권장**: **A2 먼저** → 측정 후 필요시 A1.
 
 **수용 기준**:
-- 히어로 → 메트릭 → (필요시) 점수 → 인사이트 순으로 시선 흐름이 명확
-- axe 5/5 PASS 유지
-- 점수 링의 정보성(78점)을 잃지 않음
 
-### 21b. trend-callout amber → info 톤 차별화
+- Overview→Progress 전환 시 사용자 인지 지연 < 100ms
+- 셀렉터 회귀 없음 (`[data-view]` / `[data-result]` / `[data-score-category]` 보존)
+- 회귀 axe 0 violations
 
-**문제**: 최근 추세 탭 상단의 callout이 히어로와 동일한 amber 그라디언트를 써서 "또 다른 특별 영역"이 됨. 히어로의 "현재 경기 결과" 시그널이 약화됨.
+### 트랙 B — Riot 개발 키 만료 UX 개선
 
-**해결**: trend-callout 배경을 `linear-gradient(135deg, var(--tint-info), transparent 60%)` + `border-color: var(--info-border)` (`--info` = 푸른 톤)으로 변경. 추세 = 시간 기반 정보라는 의미와 일치.
+**문제**: Riot 개발 키 24h 유효. 만료 시 현재는 `/api/recent-matches` / `/api/generate-sample` 응답이 401/403 + 모호한 에러 메시지로 사용자 멈춤. progress.md "현재 남은 블로커"로 명시됨.
 
-**대상 파일**: `improved-full.html` 또는 `styles.css` (`.trend-callout` 규칙)
+**해결 방향**:
+
+- 서버: 401/403 응답을 `{ error: "RIOT_KEY_EXPIRED", hint: "...", devOnly: true }` 구조로 normalize
+- 프런트: 해당 코드 감지 시 토스트가 아니라 sticky 배너로 "Riot 개발 키가 만료된 것 같습니다. `.env` 갱신 후 서버 재시작" + Riot Developer Portal 링크 표시
+- 캐시된 샘플(저장된 분석)은 여전히 열람 가능함을 안내
+
+**대상**: [server.js](server.js) `/api/recent-matches` & `/api/generate-sample` 에러 핸들링, [main.js](main.js) `fetchRecentMatches` / `generateSample` catch 처리, [styles.css](styles.css) 신규 `.riot-key-banner` 컴포넌트(`--tint-rose` 재사용).
+**노력**: ~1h.
+**권장**: **B 단독으로 빠르게 처리** — 라이브 데모/스크린레코딩 직전 항상 아쉬웠던 부분.
 
 **수용 기준**:
-- trend-callout이 히어로와 시각적으로 구분됨
-- info 톤 색 대비 본문 배경 기준 ≥ 4.5:1 (이미 9.36:1로 확인됨)
+
+- 키 만료 상태에서도 페이지가 멈추지 않고 안내 배너만 노출
+- 저장된 샘플 전환 / 챔피언 탭 모두 정상 작동
+- 키 갱신 후 배너 자동 dismiss
+
+### 트랙 C — AI 프롬프트 스키마 준수율 개선
+
+**문제**: server.js의 응답 정규화 레이어(matchSummary string→객체, phaseSummaries object→array 등)가 비대해진 이유 = AI(특히 Codex)의 스키마 일탈이 빈번. 서버측 보정이 깨지면 프런트가 빈 카드를 그림.
+
+**해결 방향**:
+
+- 단계 1: 스키마 위반 패턴 5개를 sample-kr-8190642410 / 8190721866의 raw 응답에서 grep해 빈도 카운트
+- 단계 2: 시스템 프롬프트에 명시적 "출력은 정확히 이 JSON 키만, 누락/이름변경/중첩 금지" 한 줄 + few-shot 1개 추가
+- 단계 3: `validateAnalysisOutput`에 위반 카운터를 붙여 manifest에 `analysisMeta.schemaViolations: N` 기록 → 후속 회귀 추적
+
+**대상**: server.js `buildLlmPayload` / `callClaudeAgent` / `callCodexAgent` / `validateAnalysisOutput`, [llm-prompt-input-format.md](llm-prompt-input-format.md) 갱신.
+**노력**: ~2h(grep + 프롬프트 1회 수정 + 측정).
+**권장**: **신규 샘플 2건이 마침 들어와 있어 측정 코호트로 사용 가능**.
+
+**수용 기준**:
+
+- 새 샘플 3건 더 생성 후 위반 0건 또는 정규화 호출 절반 이하
+- 기존 정규화 레이어는 안전망으로 유지 (제거하지 않음)
 
 ---
 
-## Phase 22 — 사용성 마찰점 정리 (3건 묶음)
+## 2. 권장 실행 순서
 
-### 22a. 빌드 오더 데스크톱 가로 스크롤 제거
-
-**문제**: 6개 빌드 아이템(80px × 6 + gap = ~580px)이 데스크톱에선 한 줄에 들어가는데도 `overflow-x: auto`로 스크롤바가 노출됨.
-
-**해결**: `.build-timeline { flex-wrap: nowrap; overflow-x: visible; }` + 모바일 (<720px) 미디어 쿼리에서만 `overflow-x: auto; flex-wrap: nowrap;` 유지.
-
-**대상**: `_design-mockups/improved-full.html` 인라인 스타일 + 향후 프로덕션 css가 추가되면 동일 적용.
-
-### 22b. 사이드바 fetcher details 발견성
-
-**문제**: "Riot ID로 다시 불러오기"가 `<details>` 안에 접혀 있어 첫 사용자가 발견 어려움.
-
-**해결**: 두 가지 옵션을 평가:
-- **A**: 첫 방문 시(localStorage 기반) `<details open>`로 시작
-- **B**: summary 옆에 마이크로카피 "(클릭해 펼치기)" 또는 `▾` 아이콘을 항상 보이게 (이미 `::after`로 화살표 있음 — 사이즈/대비 강화 수준)
-
-**권장**: B — 변경 범위가 작고 기존 사용자에게도 도움. `summary::after`의 화살표를 더 명확하게 만들고 hover 시 배경 색 추가.
-
-**대상 파일**: `styles.css` (`details.fetcher > summary::after` 규칙)
-
-### 22c. 메트릭 카드 첫 카드 강조의 명시화
-
-**문제**: 현재는 `.detail-metrics .metric:first-child`로 자동 강조되지만, main.js 렌더 순서가 바뀌면 의도치 않은 카드가 강조될 위험.
-
-**해결**: main.js의 메트릭 렌더 부분에서 KDA·CS 같은 핵심 카드에 `class="metric metric--primary"`를 명시 부여. CSS는 이미 둘 다 지원(`.metric--primary, .metric:first-child`).
-
-**대상 파일**: `main.js` (`renderSnapshot` 또는 stat-ribbon 관련 렌더 함수)
-
----
-
-## Phase 23 — 접근성 + 일관성 폴리싱 (3건 묶음)
-
-### 23a. SVG KDA 차트 a11y 개선
-
-**문제**: `<svg role="img" aria-label="KDA 변화 그래프">`만 있고 데이터 테이블 fallback 없음. 스크린리더 사용자는 트렌드를 알 수 없음.
-
-**해결**: 두 단계 접근:
-- **단계 1**: SVG 안에 `<title>KDA 변화 그래프</title>` + `<desc>0분부터 28분까지 KDA가 0에서 8로 점진 상승, 9분 첫 킬과 16분 더블킬에서 가속</desc>` 추가
-- **단계 2** (선택): 시각적으로 숨긴 `<table class="sr-only">`로 시간별 KDA 데이터 제공
-
-**대상 파일**: `_design-mockups/improved-full.html` (목업) + 프로덕션에 SVG 차트 코드가 들어가면 동일 패턴 적용.
-
-### 23b. Score ring 색상 변형 예시 (목업 보강)
-
-**문제**: 현재 목업의 score-overall 링은 항상 mint(78점)로만 표시됨. 실제 main.js는 `barColor()`로 점수에 따라 색이 변하지만, 디자이너가 다른 점수대 시각 검증 불가.
-
-**해결**: `_design-mockups/improved-full.html`에 점수 변형 섹션 추가 — 60점(amber), 45점(rose) 변형 예시를 그림자 박스로 보여주기. 또는 별도 `score-states.html` 파일.
-
-### 23c. Strengths/Weaknesses 아이콘 통일성
-
-**문제**: 목업(`improved-full.html`)에서는 인사이트 헤딩에 `<span aria-hidden="true">✓</span>`를 inline으로 넣고, 프로덕션 `styles.css`에서는 `.panel--strengths .section-heading h3::before { content: "✓ " }`로 자동 prefix. 두 방식 결과는 같지만 일관성 없음.
-
-**해결**: 목업도 ::before 방식으로 통일하거나, 프로덕션 main.js에서 inline 방식을 선택. 권장: ::before 자동 prefix 유지(마크업 깔끔).
-
-**대상**: `_design-mockups/improved-full.html`의 `<h3 id="strengths-title"><span>✓</span>` → `<h3 id="strengths-title">` 로 단순화 (CSS의 ::before가 처리).
-
----
-
-## Phase 24 — 본문 타이포 / 시각 무게 미세 조정 (1건)
-
-### 24. insight-item 중첩 박스 + 본문 폰트 사이즈 검토
-
-**문제**:
-- insight-panel (var(--space-5) padding) > insight-item (var(--space-3) padding + 보더) 중첩이 무겁게 느껴짐
-- 본문 `--fs-base: 0.95rem`(15.2px @ 16px root) → 16px(`1rem`)로 올릴지 검토. 한국어는 영문보다 약간 큰 글자가 가독성 좋음.
-
-**해결 (실험적)**:
-- 옵션 A: insight-item 보더 제거, 배경만으로 분리(panel 안에서 더 가벼움)
-- 옵션 B: `--fs-base`를 1rem으로 올리고 다른 fs 토큰들은 비례 유지 (파급 효과 큼 — 별도 페이즈 권장)
-
-**권장**: 옵션 A만 먼저 진행. 옵션 B는 별도 검증(전체 사이트 시각 변화) 필요해 후속 페이즈로.
-
-**대상 파일**: `styles.css` (`.insight-item` 규칙)
-
----
-
-## 실행 순서 권장
-
-```
-Phase 21 (High-impact)  ──┐
-                          ├── 시각 임팩트 → 즉시 개선 체감
-Phase 22 (Friction)    ──┘
-
-Phase 23 (Polish a11y) ──┐
-                          ├── 후속 마무리, 회귀 위험 낮음
-Phase 24 (Typo)        ──┘
+```text
+B (Riot key UX, 1h)        ──→  즉시 사용성 개선, 회귀 위험 최소
+A2 (delta 사전 계산, 1.5h) ──→  탭 전환 체감 속도 향상
+C (프롬프트 준수율, 2h)    ──→  데이터 품질 + 분석 안정성
 ```
 
-**총 예상 노력**: P1 1.5h, P2 1h, P3 1.5h, P4 30분 → 합 ~4.5h
+**총 예상**: 4.5h. 셋 다 독립적이므로 순서 변경 가능.
 
 ---
 
-## 명시적 SKIP / DEFER 결정
+## 3. 명시적 SKIP / DEFER
 
 | 항목 | 결정 | 이유 |
-|---|---|---|
-| 메트릭 카드 hover/click → 추세 deep-link | DEFER | 인터랙션 폴리싱 — 디자인 비평 범위 밖, 별도 UX 작업 |
-| 본문 폰트 16px 전환 | DEFER (Phase 24 옵션 B) | 전체 사이트 영향 큼, A/B 시각 검토 필요 |
-| 인사이트 본문에 우선순위(P1/P2/P3) 데이터 필드 | SKIP | 데이터 부재 — 추정 기반은 Phase 16 "근거 N건"으로 충분 |
-| admin 미사용 토큰(`--gold`/`--green`) 정리 | DEFER | 리스크 대비 가치 낮음 — alias 시스템이 이미 작동 중 |
+| --- | --- | --- |
+| CSS iteration 20 (토큰 추가 정리) | DEFER | §0 결론 — 후보 없음. 신규 컴포넌트 도입 시 재개 |
+| Riot RSO OAuth 전환 | DEFER | Riot 프로덕션 승인 필요(외부 의존성), MVP 범위 밖 |
+| admin.html / draft-state.js 라인 정리 | SKIP | 현재 주 작업 흐름 아님(progress.md 명시) |
+| 본문 폰트 16px 전환(이전 Phase 24 옵션 B) | DEFER | 전 사이트 시각 변화 큼, A/B 검토 후행 |
+| 미커밋 신규 샘플 2건(`sample-kr-8190642410/8190721866`) | 처리 필요 | 트랙 C에서 코호트로 활용 후 manifest 검수 + 커밋 |
 
 ---
 
-## 다음 액션
+## 4. 다음 액션
 
-이 계획을 검토 후 결정:
-- **A**: P1만 먼저 (가장 임팩트 큰 Phase 21 — 시각 경합 해소 + trend 톤 차별화) → 실행
-- **B**: P1 + P2 묶어서 (사용성 마찰점까지 한 번에) → 실행
-- **C**: 4개 페이즈 순차 자동 실행 → 시작
-- **D**: 계획 자체 수정 (특정 항목 우선순위 조정 / 추가 / 제외)
+이 계획 검토 후 결정:
+
+- **A**: 트랙 B(Riot 키 UX)부터 즉시 실행 → 1h 마무리 후 다음 트랙 검토
+- **B**: 트랙 C(AI 프롬프트) 우선 — 신규 샘플 측정 코호트가 신선할 때 처리
+- **C**: 트랙 A2(delta 사전 계산) 우선 — UX 임팩트 가장 직접적
+- **D**: 세 트랙 순차 자동 실행 (B → A2 → C)
+- **E**: 계획 자체 수정 (트랙 추가/제외/우선순위 조정)
