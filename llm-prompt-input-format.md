@@ -4,9 +4,9 @@
 업데이트: 2026-05-03 (Track C — 출력 스키마 예제 + 위반 카운터)
 
 관련 문서:
-- [정규화 경기 데이터 스키마 문서](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)
-- [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
-- [정규화 매핑 규칙 상세서](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)
+- [정규화 경기 데이터 스키마 문서](normalized-match-schema.md)
+- [분석 JSON 스키마](analysis-json-schema.md)
+- [정규화 매핑 규칙 상세서](normalization-mapping-rules.md)
 
 > **2026-05-03 업데이트 (Track C)**: 라이브 프롬프트는 [server.js](server.js)
 > `OUTPUT_SCHEMA_EXAMPLE` / `CLAUDE_COACHING_PROMPT` / `CODEX_REDTEAM_PROMPT`에

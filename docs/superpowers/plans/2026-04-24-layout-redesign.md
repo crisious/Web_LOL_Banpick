@@ -44,7 +44,7 @@
 - [ ] **Step 0.1: design-audit baseline capture**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 mkdir -p test-artifacts/design-audit test-artifacts/layout-redesign
 node scripts/design-audit.js --scope all --format markdown --top 20 --output test-artifacts/design-audit/iter8-baseline.md
 ```
@@ -54,8 +54,8 @@ Expected: file created with Colors coverage around 88.0%, Breakpoints `max-width
 - [ ] **Step 0.2: data-* attribute baseline snapshot**
 
 ```bash
-grep -rn 'data-[a-z-]\+' /Users/a1234/Documents/Web_LOL_Banpick/index.html /Users/a1234/Documents/Web_LOL_Banpick/main.js > /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/pre-attributes.txt
-wc -l /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/pre-attributes.txt
+grep -rn 'data-[a-z-]\+' ../../../index.html ../../../main.js > ../../../test-artifacts/layout-redesign/pre-attributes.txt
+wc -l ../../../test-artifacts/layout-redesign/pre-attributes.txt
 ```
 
 Expected: non-zero line count (~300+ lines containing `data-` attributes across the 2 files).
@@ -63,8 +63,8 @@ Expected: non-zero line count (~300+ lines containing `data-` attributes across 
 - [ ] **Step 0.3: add test-artifacts/layout-redesign/ to .gitignore if absent**
 
 ```bash
-grep -q "test-artifacts/layout-redesign/" /Users/a1234/Documents/Web_LOL_Banpick/.gitignore || echo "test-artifacts/layout-redesign/" >> /Users/a1234/Documents/Web_LOL_Banpick/.gitignore
-cat /Users/a1234/Documents/Web_LOL_Banpick/.gitignore
+grep -q "test-artifacts/layout-redesign/" ../../../.gitignore || echo "test-artifacts/layout-redesign/" >> ../../../.gitignore
+cat ../../../.gitignore
 ```
 
 Expected: `.gitignore` includes both `test-artifacts/design-audit/` and `test-artifacts/layout-redesign/`.
@@ -72,7 +72,7 @@ Expected: `.gitignore` includes both `test-artifacts/design-audit/` and `test-ar
 - [ ] **Step 0.4: verify git status clean except for .gitignore**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git status --short
 ```
 
@@ -95,7 +95,7 @@ Expected: only `M .gitignore` (if the layout-redesign line was added). No baseli
 - [ ] **Step 1.1: Find insertion location in styles.css**
 
 ```bash
-grep -n "^@media (max-width: 1180px)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "^@media (max-width: 1180px)" ../../../styles.css
 ```
 
 Expected: one line, around L2970-2985. Insert new styles **just above** this line (so they're still in the default desktop rules block).
@@ -375,7 +375,7 @@ Add this block right before the first `@media (max-width: 1180px) {` line. Use p
 
 - [ ] **Step 1.3: Add responsive rules for match-row wrap at ≤760px**
 
-Inside the existing `@media (max-width: 760px)` block, add these rules. Find the block with `grep -n "@media (max-width: 760px)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css` (expected 1 line after iter.7's merge). Insert near the end of the block, just before the closing `}`:
+Inside the existing `@media (max-width: 760px)` block, add these rules. Find the block with `grep -n "@media (max-width: 760px)" ../../../styles.css` (expected 1 line after iter.7's merge). Insert near the end of the block, just before the closing `}`:
 
 ```css
   /* iteration 8: match-row + detail-header responsive */
@@ -408,7 +408,7 @@ Inside the existing `@media (max-width: 760px)` block, add these rules. Find the
 - [ ] **Step 1.4: Run design-audit to confirm no regression**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node scripts/design-audit.js --scope colors --format text --top 2
 ```
 
@@ -425,7 +425,7 @@ Expected: still no missing custom property references.
 - [ ] **Step 1.5: Commit 1**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add styles.css
 git commit -m "$(cat <<'EOF'
 feat(styles): add base styles for .identity-card, .match-row, .detail-header
@@ -447,7 +447,7 @@ EOF
 - [ ] **Step 1.6: Verify commit**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD
 ```
 
@@ -470,7 +470,7 @@ Expected: 2 commits (spec commit from earlier + Commit 1 just made).
 Find the `<div class="match-list-grid" data-match-list-grid></div>` line (around L54 in the current file):
 
 ```bash
-grep -n "match-list-grid" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n "match-list-grid" ../../../index.html
 ```
 
 Expected: 1 line. Use Edit to change:
@@ -485,7 +485,7 @@ The `data-match-list-grid` attribute is preserved (JS still queries by it). Only
 Find the function at L2108:
 
 ```bash
-grep -n "function renderCandidates" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -n "function renderCandidates" ../../../main.js
 ```
 
 Expected: 1 line, around L2108. Read the function body (L2108-2139) to understand context.
@@ -566,7 +566,7 @@ Note: we drop `candidate-card--button`, `candidate-head`, `candidate-meta--prima
 The new template uses a third argument `championAvatarMarkup(match.champion, "medium", "match-row__icon")` to add an extra class. Check the current signature:
 
 ```bash
-grep -n "function championAvatarMarkup" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -n "function championAvatarMarkup" ../../../main.js
 ```
 
 Read the function to check if it accepts a third parameter for class names. If it does not, use the 2-arg call `championAvatarMarkup(match.champion, "medium")` and wrap the output in a `<span class="match-row__icon">...</span>` tag:
@@ -582,7 +582,7 @@ Use whichever form works without changing `championAvatarMarkup` itself (out of 
 Start the server and open the app:
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -598,7 +598,7 @@ Expected: `1` (the new class is present in the served HTML).
 Check whether the class is still referenced:
 
 ```bash
-grep -c "candidate-card--button" /Users/a1234/Documents/Web_LOL_Banpick/main.js /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -c "candidate-card--button" ../../../main.js ../../../index.html
 ```
 
 Expected: `main.js: 0, index.html: 0`.
@@ -606,7 +606,7 @@ Expected: `main.js: 0, index.html: 0`.
 Then remove the CSS rule. Find all `.candidate-card--button` selectors:
 
 ```bash
-grep -n "candidate-card--button" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "candidate-card--button" ../../../styles.css
 ```
 
 Expected: 2-3 lines in `styles.css`. For each, delete the full rule block (selector + body). Leave `.candidate-card` (base) rules intact since other selectors may extend it.
@@ -614,7 +614,7 @@ Expected: 2-3 lines in `styles.css`. For each, delete the full rule block (selec
 Re-run:
 
 ```bash
-grep -c "candidate-card--button" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -c "candidate-card--button" ../../../styles.css
 ```
 
 Expected: `0`.
@@ -622,7 +622,7 @@ Expected: `0`.
 - [ ] **Step 2.6: Commit 2**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js styles.css
 git commit -m "$(cat <<'EOF'
 refactor(html,js,styles): replace candidate-card with match-row in 10-match list
@@ -645,10 +645,10 @@ EOF
 - [ ] **Step 2.7: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -3
-grep -c "match-row" /Users/a1234/Documents/Web_LOL_Banpick/main.js
-grep -c "candidate-card--button" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -c "match-row" ../../../main.js
+grep -c "candidate-card--button" ../../../styles.css
 ```
 
 Expected: 3 commits, `match-row` count ≥ 8 in main.js (template + styles + class names), `candidate-card--button` count 0 in styles.css.
@@ -670,7 +670,7 @@ Expected: 3 commits, `match-row` count ≥ 8 in main.js (template + styles + cla
 Find the region in `index.html`:
 
 ```bash
-grep -n "panel--headline\|panel--snapshot" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n "panel--headline\|panel--snapshot" ../../../index.html
 ```
 
 Expected: 2 lines indicating the two panels around L181 and L189.
@@ -790,7 +790,7 @@ Read lines ~179-232 to see the current content. Replace the entire `<section cla
 Find the dom object in main.js:
 
 ```bash
-grep -n "^const dom\|^  sampleId\|overallSummary\|gameFlowSummary\|snapshotResult\|snapshotConfidence\|snapshotChampionIcon\|quickSummary\|detailHeader" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head -30
+grep -n "^const dom\|^  sampleId\|overallSummary\|gameFlowSummary\|snapshotResult\|snapshotConfidence\|snapshotChampionIcon\|quickSummary\|detailHeader" ../../../main.js | head -30
 ```
 
 In the `const dom = { ... }` object (around L40-90), make these edits (use Edit per line):
@@ -805,7 +805,7 @@ In the `const dom = { ... }` object (around L40-90), make these edits (use Edit 
 **Keep but note they may be null** (if `snapshotChampionIcon` was referring to the one inside the deleted panel — it's still used elsewhere, verify):
 
 ```bash
-grep -n "data-snapshot-champion-icon" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n "data-snapshot-champion-icon" ../../../index.html
 ```
 
 Expected: should be 0 after Step 3.1 (deleted from snapshot-grid). The `dom.snapshotChampionIcon = document.querySelector(...)` will return null. renderHero currently uses it (L1080). We'll update renderHero in Step 3.4.
@@ -855,7 +855,7 @@ Verified path: `playerStats.csPerMinute` is already used at main.js:1157 inside 
 - [ ] **Step 3.4: Clean up dead CSS rules (optional, safe)**
 
 ```bash
-grep -c "panel--headline\|panel--snapshot\|snapshot-grid\|snapshot-item\|snapshot-footnote\|section-heading--compact\|summary-copy\|summary-detail" /Users/a1234/Documents/Web_LOL_Banpick/index.html /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "panel--headline\|panel--snapshot\|snapshot-grid\|snapshot-item\|snapshot-footnote\|section-heading--compact\|summary-copy\|summary-detail" ../../../index.html ../../../main.js
 ```
 
 Expected: all 0 in both files (after Step 3.1 and 3.3).
@@ -863,7 +863,7 @@ Expected: all 0 in both files (after Step 3.1 and 3.3).
 If all 0, these CSS classes are dead. Find their rule blocks:
 
 ```bash
-grep -n "^\.panel--headline\|^\.panel--snapshot\|^\.snapshot-grid\|^\.snapshot-item\|^\.snapshot-footnote\|^\.summary-copy\|^\.summary-detail\|^\.section-heading--compact" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "^\.panel--headline\|^\.panel--snapshot\|^\.snapshot-grid\|^\.snapshot-item\|^\.snapshot-footnote\|^\.summary-copy\|^\.summary-detail\|^\.section-heading--compact" ../../../styles.css
 ```
 
 For each match, delete the whole rule block (selector + body + closing `}`). If a rule block groups multiple selectors (e.g., `.panel--headline, .panel--snapshot, .other {`), only remove the dead ones, keep the rest. **Be conservative** — if unsure, leave the rule (dead CSS is not harmful, just bloat). Optional cleanup; can be deferred to a later iteration.
@@ -871,7 +871,7 @@ For each match, delete the whole rule block (selector + body + closing `}`). If 
 - [ ] **Step 3.5: Test in browser**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -886,7 +886,7 @@ Manual browser check recommended: load http://127.0.0.1:8123, log in or use save
 - [ ] **Step 3.6: Commit 3**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js styles.css
 git commit -m "$(cat <<'EOF'
 refactor(html,js,styles): merge headline+snapshot into compact detail-header
@@ -913,10 +913,10 @@ EOF
 - [ ] **Step 3.7: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -4
-grep -c "detail-header" /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c "panel--headline\|panel--snapshot" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -c "detail-header" ../../../index.html
+grep -c "panel--headline\|panel--snapshot" ../../../index.html
 ```
 
 Expected: 4 commits, `detail-header` count ≥ 3 in index.html, `panel--headline|panel--snapshot` count 0 in index.html.
@@ -938,7 +938,7 @@ Expected: 4 commits, `detail-header` count ≥ 3 in index.html, `panel--headline
 Find the `<aside class="sidebar-stack" ...>` block in index.html:
 
 ```bash
-grep -n "sidebar-stack" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n "sidebar-stack" ../../../index.html
 ```
 
 Expected: 1 line, around L67.
@@ -1179,7 +1179,7 @@ Find the `styles.css` location after `.match-row` rules (added in Task 1). Befor
 Also check existing `.hero-panel`, `.hero-copy`, `.hero-meta`, `.hero-pills`, `.panel--nav`, `.section-nav`, `.section-link` styles — confirm they are now unused:
 
 ```bash
-grep -c "hero-panel\|hero-copy\|hero-meta\|hero-pills\|panel--nav\|section-nav\|section-link\|tab-link" /Users/a1234/Documents/Web_LOL_Banpick/index.html /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "hero-panel\|hero-copy\|hero-meta\|hero-pills\|panel--nav\|section-nav\|section-link\|tab-link" ../../../index.html ../../../main.js
 ```
 
 Expected: 0 in index.html, 0 in main.js (after Steps 4.1-4.4).
@@ -1187,7 +1187,7 @@ Expected: 0 in index.html, 0 in main.js (after Steps 4.1-4.4).
 Finding the dead CSS rule blocks is extensive — defer full cleanup to Task 7 (docs iteration closes) or Task 9 (final sweep). In this commit, at minimum remove `.section-nav` and `.section-link` rules (they are clearly specific to the deleted nav panel):
 
 ```bash
-grep -n "^\.section-nav\|^\.section-link\|^\.tab-link" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "^\.section-nav\|^\.section-link\|^\.tab-link" ../../../styles.css
 ```
 
 Delete the rule blocks for these selectors. Keep `.hero-*` / `.panel--nav` rules as dead code for now — safer.
@@ -1195,7 +1195,7 @@ Delete the rule blocks for these selectors. Keep `.hero-*` / `.panel--nav` rules
 - [ ] **Step 4.6: Manual browser check**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -1210,7 +1210,7 @@ Manually: sidebar should show 3 blocks (identity-card / panel--samples / collaps
 - [ ] **Step 4.7: Commit 4**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js styles.css
 git commit -m "$(cat <<'EOF'
 refactor(html,js,styles): slim sidebar — identity-card, no nav, <details> intake
@@ -1237,10 +1237,10 @@ EOF
 - [ ] **Step 4.8: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -5
-grep -c "identity-card\|panel--fetcher" /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c "hero-panel\|section-nav\|panel--nav" /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -c "identity-card\|panel--fetcher" ../../../index.html
+grep -c "hero-panel\|section-nav\|panel--nav" ../../../index.html
 ```
 
 Expected: 5 commits, `identity-card|panel--fetcher` count ≥ 2 in index.html, old sidebar classes count 0 in index.html.
@@ -1262,7 +1262,7 @@ Expected: 5 commits, `identity-card|panel--fetcher` count ≥ 2 in index.html, o
 Find it:
 
 ```bash
-grep -n '<header class="topbar"' /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n '<header class="topbar"' ../../../index.html
 ```
 
 Expected: 1 line, around L58.
@@ -1288,7 +1288,7 @@ Read L58-64 to see full block. Use Edit:
 Find remaining `<p class="eyebrow">` lines in index.html:
 
 ```bash
-grep -n 'class="eyebrow"' /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -n 'class="eyebrow"' ../../../index.html
 ```
 
 Expected: multiple matches. For each match, evaluate the context:
@@ -1348,7 +1348,7 @@ Perform each edit in isolation — don't use replace_all (each eyebrow text is d
 - [ ] **Step 5.3: Verify eyebrow cleanup**
 
 ```bash
-grep -c 'class="eyebrow"' /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -c 'class="eyebrow"' ../../../index.html
 ```
 
 Expected: either 0, or a small number (e.g., ≤3) if some eyebrows inside `.meta-card` / identity-card / metric were missed. The `data-hero-player` strong in identity-card may have a nested `.meta-label` which is NOT `.eyebrow` — verify by reading the file.
@@ -1358,7 +1358,7 @@ Target: ≤3 eyebrows remaining (in cases where eyebrow is genuinely inside a ca
 - [ ] **Step 5.4: Manual browser check**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -1373,7 +1373,7 @@ Manually: load the page, log in, go to detail. Overview/분석/타임라인/추�
 - [ ] **Step 5.5: Commit 5**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html
 git commit -m "$(cat <<'EOF'
 refactor(html): hide dashboard topbar, strip section-level eyebrows
@@ -1395,10 +1395,10 @@ EOF
 - [ ] **Step 5.6: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -6
-grep -c '<header class="topbar"' /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c 'class="eyebrow"' /Users/a1234/Documents/Web_LOL_Banpick/index.html
+grep -c '<header class="topbar"' ../../../index.html
+grep -c 'class="eyebrow"' ../../../index.html
 ```
 
 Expected: 6 commits, 0 topbar in HTML, ≤3 eyebrows in HTML.
@@ -1417,7 +1417,7 @@ Expected: 6 commits, 0 topbar in HTML, ≤3 eyebrows in HTML.
 - [ ] **Step 6.1: Verify existing skeleton utility**
 
 ```bash
-grep -n "^\.skeleton" /Users/a1234/Documents/Web_LOL_Banpick/styles.css | head -10
+grep -n "^\.skeleton" ../../../styles.css | head -10
 ```
 
 Expected: existing `.skeleton`, `.skeleton--line`, `.skeleton--block`, `.skeleton--card` rules from iter.6. These are reusable.
@@ -1427,7 +1427,7 @@ Expected: existing `.skeleton`, `.skeleton--line`, `.skeleton--block`, `.skeleto
 Find `switchTab` at L2801 (line may have shifted due to earlier tasks):
 
 ```bash
-grep -n "^function switchTab" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -n "^function switchTab" ../../../main.js
 ```
 
 Replace the function body with this enhanced version. **Important**: preserve the tab-bar classList and tab-page classList updates from the current implementation.
@@ -1514,7 +1514,7 @@ function hideTabSkeleton(tabPage) {
 - [ ] **Step 6.3: Verify no JS errors in runtime**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node -c main.js || echo "syntax error"
 ```
 
@@ -1523,7 +1523,7 @@ Expected: no syntax error. `node -c` validates JS syntax without executing. If i
 Actually `node -c` may fail on browser JS. Better: use a simple syntax check with `node --check`:
 
 ```bash
-node --check /Users/a1234/Documents/Web_LOL_Banpick/main.js || echo "SYNTAX ERROR"
+node --check ../../../main.js || echo "SYNTAX ERROR"
 ```
 
 Expected: no `SYNTAX ERROR`. If it prints something, there's a syntax issue — review the edit.
@@ -1543,7 +1543,7 @@ Also test `prefers-reduced-motion: reduce` by enabling the OS-level reduced moti
 - [ ] **Step 6.5: Commit 6**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add main.js styles.css
 git commit -m "$(cat <<'EOF'
 feat(js): add tab skeleton placeholder during first transition
@@ -1568,9 +1568,9 @@ EOF
 - [ ] **Step 6.6: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -7
-grep -c "showTabSkeleton\|hideTabSkeleton" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "showTabSkeleton\|hideTabSkeleton" ../../../main.js
 ```
 
 Expected: 7 commits, skeleton helper function count ≥ 2.
@@ -1586,7 +1586,7 @@ Expected: 7 commits, skeleton helper function count ≥ 2.
 
 - [ ] **Step 7.1: Update design-tokens.md — add component patterns**
 
-Read the current design-tokens.md to find a suitable insertion location. After §7 (Tab component) and before §8 or similar. Use `grep -n "^## " /Users/a1234/Documents/Web_LOL_Banpick/design-tokens.md` to find section headers.
+Read the current design-tokens.md to find a suitable insertion location. After §7 (Tab component) and before §8 or similar. Use `grep -n "^## " ../../../design-tokens.md` to find section headers.
 
 Add a new section (or append to the existing section on components):
 
@@ -1637,7 +1637,7 @@ Add a new closed item at the end of §10 (after #18):
 Find the "최근 UI 정리" bullet. Append iter.8 summary:
 
 ```bash
-grep -n "최근 UI 정리" /Users/a1234/Documents/Web_LOL_Banpick/README.md
+grep -n "최근 UI 정리" ../../../README.md
 ```
 
 Replace the existing bullet with:
@@ -1649,7 +1649,7 @@ Replace the existing bullet with:
 - [ ] **Step 7.5: Commit 7**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add design-tokens.md README.md .gitignore
 git commit -m "$(cat <<'EOF'
 docs: update design-tokens.md + README for iteration 8
@@ -1670,7 +1670,7 @@ EOF
 - [ ] **Step 7.6: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -8
 git status --short
 ```
@@ -1690,14 +1690,14 @@ Expected: 8 commits, clean working tree.
 - [ ] **Step 8.1: Post-change audit**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node scripts/design-audit.js --scope all --format markdown --top 20 --output test-artifacts/design-audit/iter8-post.md
 ```
 
 - [ ] **Step 8.2: Diff vs baseline**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 diff -u test-artifacts/design-audit/iter8-baseline.md test-artifacts/design-audit/iter8-post.md | head -80
 ```
 
@@ -1712,9 +1712,9 @@ Expected changes (acceptance):
 - [ ] **Step 8.3: data-* attribute diff**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
-grep -rn 'data-[a-z-]\+' /Users/a1234/Documents/Web_LOL_Banpick/index.html /Users/a1234/Documents/Web_LOL_Banpick/main.js > /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/post-attributes.txt
-wc -l /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/pre-attributes.txt /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/post-attributes.txt
+cd <repo-root>
+grep -rn 'data-[a-z-]\+' ../../../index.html ../../../main.js > ../../../test-artifacts/layout-redesign/post-attributes.txt
+wc -l ../../../test-artifacts/layout-redesign/pre-attributes.txt ../../../test-artifacts/layout-redesign/post-attributes.txt
 ```
 
 Compute the difference. Expected: **post count ≤ pre count + 5** (a few additions like `data-detail-header`, `data-quick-summary`, `data-snapshot-cs-per-min`, `data-identity-card`, `data-fetcher-details` offset the removals like `data-sample-id`, `data-hero-match`, `data-theme-copy`, `data-hero-pills`, `data-section-nav`, `data-tab-target` × 4, `data-overall-summary`, `data-game-flow-summary`, `data-snapshot-result`, `data-snapshot-confidence`, `data-snapshot-champion-icon` (possibly removed from snapshot-grid but re-added on identity-card)).
@@ -1726,7 +1726,7 @@ Refine the acceptance rule: the **removed** attributes should match the list in 
 - [ ] **Step 8.4: Server smoke test**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -1772,7 +1772,7 @@ In browser devtools, verify:
 - [ ] **Step 8.7: Write verification summary**
 
 ```bash
-cat > /Users/a1234/Documents/Web_LOL_Banpick/test-artifacts/layout-redesign/iter8-verification.md <<'EOF'
+cat > ../../../test-artifacts/layout-redesign/iter8-verification.md <<'EOF'
 # Iteration 8 Verification Summary
 
 ## Coverage (from design-audit --scope all)
@@ -1818,7 +1818,7 @@ Fill in the bracketed values. This file is gitignored; it's a local checklist.
 - [ ] **Step 9.1: Git state summary**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD
 git status
 git show --stat HEAD

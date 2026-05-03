@@ -3,8 +3,8 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [의사결정 문서](/Users/a1234/Documents/Web_LOL_Banpick/decision-replay-processing.md)
-- [MVP PRD](/Users/a1234/Documents/Web_LOL_Banpick/prd-mvp-replay-analysis.md)
+- [의사결정 문서](decision-replay-processing.md)
+- [MVP PRD](prd-mvp-replay-analysis.md)
 
 ## 1. 문서 목적
 

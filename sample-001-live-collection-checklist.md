@@ -3,9 +3,9 @@
 작성일: 2026-04-11
 
 관련 문서:
-- [샘플 1건 생성용 실행 계획서](/Users/a1234/Documents/Web_LOL_Banpick/sample-001-execution-plan.md)
-- [정규화 구현 체크리스트](/Users/a1234/Documents/Web_LOL_Banpick/normalization-implementation-checklist.md)
-- [샘플 수집-정규화-분석 운영 절차서](/Users/a1234/Documents/Web_LOL_Banpick/sample-data-ops-runbook.md)
+- [샘플 1건 생성용 실행 계획서](sample-001-execution-plan.md)
+- [정규화 구현 체크리스트](normalization-implementation-checklist.md)
+- [샘플 수집-정규화-분석 운영 절차서](sample-data-ops-runbook.md)
 
 ## 1. 문서 목적
 

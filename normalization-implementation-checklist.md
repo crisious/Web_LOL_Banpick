@@ -3,9 +3,9 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [정규화 경기 데이터 스키마 문서](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)
-- [정규화 매핑 규칙 상세서](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)
-- [Riot API 호출 설계서](/Users/a1234/Documents/Web_LOL_Banpick/riot-api-call-spec.md)
+- [정규화 경기 데이터 스키마 문서](normalized-match-schema.md)
+- [정규화 매핑 규칙 상세서](normalization-mapping-rules.md)
+- [Riot API 호출 설계서](riot-api-call-spec.md)
 
 ## 1. 문서 목적
 

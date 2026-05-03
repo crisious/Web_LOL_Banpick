@@ -3,8 +3,8 @@
 작성일: 2026-04-11
 
 관련 문서:
-- [Riot API 샘플 경기 데이터 수집 계획서](/Users/a1234/Documents/Web_LOL_Banpick/plan-riot-api-sample-data.md)
-- [샘플 1건 생성용 실행 계획서](/Users/a1234/Documents/Web_LOL_Banpick/sample-001-execution-plan.md)
+- [Riot API 샘플 경기 데이터 수집 계획서](plan-riot-api-sample-data.md)
+- [샘플 1건 생성용 실행 계획서](sample-001-execution-plan.md)
 
 ## 1. 문서 목적
 

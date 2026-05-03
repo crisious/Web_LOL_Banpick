@@ -82,7 +82,7 @@ test-artifacts/design-audit/
 - [ ] **Step 1.1: `:root` 블록의 정확한 삽입 위치 확인**
 
 ```bash
-grep -n "\-\-shadow-hover" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "\-\-shadow-hover" ../../../styles.css
 ```
 
 Expected: `--shadow-hover` 선언 라인 번호 출력. 이 선언 **바로 다음 줄**에 새 토큰 블록을 삽입한다. (design-tokens.md §1 테이블의 마지막 기존 토큰이 `--shadow-hover`이므로 그 직후가 시각적/논리적으로 합당한 자리.)
@@ -148,7 +148,7 @@ EOF
 **사전 확인**:
 
 ```bash
-grep -n "rgba(89, 209, 178, 0\.0[68])\|rgba(89, 209, 178, 0\.1)\|rgba(89, 209, 178, 0\.12)\|rgba(89, 209, 178, 0\.28)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(89, 209, 178, 0\.0[68])\|rgba(89, 209, 178, 0\.1)\|rgba(89, 209, 178, 0\.12)\|rgba(89, 209, 178, 0\.28)" ../../../styles.css
 ```
 
 Expected: 아래 라인들이 출력되어야 한다 (순서 가능).
@@ -215,7 +215,7 @@ replace_all: true
 - [ ] **Step 2.6: mint raw 잔여 확인**
 
 ```bash
-grep -n "rgba(89, 209, 178" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(89, 209, 178" ../../../styles.css
 ```
 
 Expected: 아래 라인만 남아야 함 (토큰 선언 및 edge case):
@@ -253,7 +253,7 @@ Expected: 아래 라인만 남아야 함 (토큰 선언 및 edge case):
 **사전 확인**:
 
 ```bash
-grep -n "rgba(255, 134, 120, 0\.08)\|rgba(255, 134, 120, 0\.1)\|rgba(255, 134, 120, 0\.28)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(255, 134, 120, 0\.08)\|rgba(255, 134, 120, 0\.1)\|rgba(255, 134, 120, 0\.28)" ../../../styles.css
 ```
 
 Expected: `0.08` × 3, `0.1` × 3, `0.28` × 3, 총 9 라인.
@@ -288,7 +288,7 @@ replace_all: true
 - [ ] **Step 3.4: rose raw 잔여 확인**
 
 ```bash
-grep -n "rgba(255, 134, 120" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(255, 134, 120" ../../../styles.css
 ```
 
 Expected: 남아 있어야 할 것들:
@@ -324,7 +324,7 @@ Expected: 남아 있어야 할 것들:
 **사전 확인**:
 
 ```bash
-grep -n "rgba(240, 179, 91, 0\.08)\|rgba(240, 179, 91, 0\.18)\|rgba(240, 179, 91, 0\.3)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(240, 179, 91, 0\.08)\|rgba(240, 179, 91, 0\.18)\|rgba(240, 179, 91, 0\.3)" ../../../styles.css
 ```
 
 Expected: `0.08` × 4, `0.18` × 2, `0.3` × 2, 총 8 라인.
@@ -359,7 +359,7 @@ replace_all: true
 - [ ] **Step 4.4: amber raw 잔여 확인**
 
 ```bash
-grep -n "rgba(240, 179, 91" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "rgba(240, 179, 91" ../../../styles.css
 ```
 
 Expected: 남아야 할 것들:
@@ -448,7 +448,7 @@ EOF
 - [ ] **Step 6.1: Georgia 선언 위치 재확인**
 
 ```bash
-grep -n "font-family: Georgia" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "font-family: Georgia" ../../../styles.css
 ```
 
 Expected: 6개 라인 출력. 각 라인의 전체 내용이 `  font-family: Georgia, "Times New Roman", serif;` (2-space 들여쓰기).
@@ -467,7 +467,7 @@ replace_all: true
 - [ ] **Step 6.3: Georgia 0개 확인**
 
 ```bash
-grep -c "Georgia" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -c "Georgia" ../../../styles.css
 ```
 
 Expected: `0`
@@ -498,7 +498,7 @@ Expected: `0`
 - [ ] **Step 7.1: 양쪽 블록 경계 확인**
 
 ```bash
-grep -n "@media (max-width: 760px)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "@media (max-width: 760px)" ../../../styles.css
 ```
 
 Expected: 2개 라인 (위치는 이전 Task들의 변경에 따라 약간 이동했을 수 있음).
@@ -518,7 +518,7 @@ Read styles.css (두 번째 @media 라인부터 100~150 줄)
 첫 번째 블록에서 선언된 셀렉터 목록과 두 번째 블록의 셀렉터를 비교:
 
 ```bash
-awk '/@media \(max-width: 760px\)/{c++; print "--- BLOCK " c " ---"} c{print}' /Users/a1234/Documents/Web_LOL_Banpick/styles.css | grep -E "^[.#]" | sort | uniq -c | sort -rn | head -20
+awk '/@media \(max-width: 760px\)/{c++; print "--- BLOCK " c " ---"} c{print}' ../../../styles.css | grep -E "^[.#]" | sort | uniq -c | sort -rn | head -20
 ```
 
 Expected: 모든 셀렉터가 count 1. count 2 이상이 나오면 양쪽에 같은 셀렉터가 존재 → 병합 후 우선순위 수동 조정 필요. 현재로서는 dual-track 블록이 tab-bar/tab-btn 전용이므로 충돌 없을 것으로 예상.
@@ -544,7 +544,7 @@ Expected: 모든 셀렉터가 count 1. count 2 이상이 나오면 양쪽에 같
 - [ ] **Step 7.5: 760px 1개 확인**
 
 ```bash
-grep -c "@media (max-width: 760px)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -c "@media (max-width: 760px)" ../../../styles.css
 ```
 
 Expected: `1`
@@ -572,7 +572,7 @@ Expected: `max-width: 760px` x**1** (기존 x2).
 - [ ] **Step 8.1: 현재 선언 위치 찾기**
 
 ```bash
-grep -n "calc(var(--wr)" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "calc(var(--wr)" ../../../styles.css
 ```
 
 Expected: 2개 라인 (`.winrate-ring` conic-gradient 내부의 mint / rose stop).
@@ -589,7 +589,7 @@ replace_all: true
 - [ ] **Step 8.3: 치환 확인**
 
 ```bash
-grep -n "calc(var(--wr" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -n "calc(var(--wr" ../../../styles.css
 ```
 
 Expected: 2개 라인 모두 `calc(var(--wr, 0) * 1%)` 로 변경됨. `--wr)` 없는 참조는 없어야 함.
@@ -836,7 +836,7 @@ powershell -ExecutionPolicy Bypass -File scripts/qa-smoke.ps1
 - [ ] **Step 11.4: Georgia 완전 제거 확인**
 
 ```bash
-grep -rn "Georgia" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -rn "Georgia" ../../../styles.css
 ```
 
 Expected: 출력 없음 (exit code 1).

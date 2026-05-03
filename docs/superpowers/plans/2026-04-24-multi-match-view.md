@@ -82,7 +82,7 @@ Response (`matches` array items):
 - [ ] **Step 0.1: Capture baseline audit**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 mkdir -p test-artifacts/design-audit
 node scripts/design-audit.js --scope all --format markdown --top 20 --output test-artifacts/design-audit/iter9-baseline.md
 ```
@@ -92,7 +92,7 @@ Expected: file created. Confirm it contains `Token coverage: 88.5%` (Colors — 
 - [ ] **Step 0.2: Confirm .gitignore covers artifacts**
 
 ```bash
-grep -qE "^test-artifacts/design-audit/$" /Users/a1234/Documents/Web_LOL_Banpick/.gitignore && echo "OK" || echo "missing — add test-artifacts/design-audit/ to .gitignore"
+grep -qE "^test-artifacts/design-audit/$" ../../../.gitignore && echo "OK" || echo "missing — add test-artifacts/design-audit/ to .gitignore"
 ```
 
 Expected: `OK` (added in iter.7). If missing, add it.
@@ -100,7 +100,7 @@ Expected: `OK` (added in iter.7). If missing, add it.
 - [ ] **Step 0.3: Verify git status clean or only known data/samples noise**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git status --short
 ```
 
@@ -123,7 +123,7 @@ Expected: empty or only untracked/modified `data/samples/*` noise (unrelated env
 The function is pure-data utility. Put it near other helpers like `sampleMatchSummary` (around L904) or near `buildTrendSnapshot` (which you can locate with grep).
 
 ```bash
-grep -n "^function sampleMatchSummary\|^function buildTrendSnapshot\|^function buildCompactHeadline" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head -5
+grep -n "^function sampleMatchSummary\|^function buildTrendSnapshot\|^function buildCompactHeadline" ../../../main.js | head -5
 ```
 
 Choose a location just after `buildTrendSnapshot` (it's thematically similar — also accumulates). Read a few lines around it to confirm the surrounding style.
@@ -227,7 +227,7 @@ function computeKdaRatio(kills, deaths, assists) {
 Note: `computeKdaRatio` is a new helper. If one already exists (search first), reuse it:
 
 ```bash
-grep -n "function computeKdaRatio\|function kdaRatio\|kda.*ratio\|kdaValue" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head
+grep -n "function computeKdaRatio\|function kdaRatio\|kda.*ratio\|kdaValue" ../../../main.js | head
 ```
 
 If a similar helper exists (e.g., already named `kdaRatio`), use that name instead and skip adding `computeKdaRatio`.
@@ -235,7 +235,7 @@ If a similar helper exists (e.g., already named `kdaRatio`), use that name inste
 - [ ] **Step 1.3: Syntax check**
 
 ```bash
-node --check /Users/a1234/Documents/Web_LOL_Banpick/main.js
+node --check ../../../main.js
 ```
 
 Expected: silent.
@@ -245,7 +245,7 @@ Expected: silent.
 Start server and test via browser devtools console:
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js &
 SERVER_PID=$!
 sleep 2
@@ -297,7 +297,7 @@ wait 2>/dev/null
 - [ ] **Step 1.5: Commit 1**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add main.js
 git commit -m "$(cat <<'EOF'
 feat(js): add aggregateRecentStats pure function
@@ -319,9 +319,9 @@ EOF
 - [ ] **Step 1.6: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -3
-grep -n "^function aggregateRecentStats" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -n "^function aggregateRecentStats" ../../../main.js
 ```
 
 Expected: 2 commits on branch (spec + Task 1), aggregateRecentStats defined at a concrete line.
@@ -339,7 +339,7 @@ Expected: 2 commits on branch (spec + Task 1), aggregateRecentStats defined at a
 - [ ] **Step 2.1: Find insertion location**
 
 ```bash
-grep -n "^/\* ── iteration 8" /Users/a1234/Documents/Web_LOL_Banpick/styles.css | head -1
+grep -n "^/\* ── iteration 8" ../../../styles.css | head -1
 ```
 
 Locate the iter.8 section. Insert new styles immediately after the iter.8 components block (before `@media (max-width: 1180px)`).
@@ -557,7 +557,7 @@ Find the iter.8 mobile rules (inside `@media (max-width: 760px)`) and append the
 - [ ] **Step 2.4: Audit check**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node scripts/design-audit.js --scope colors --format text --top 2
 ```
 
@@ -566,7 +566,7 @@ Expected: coverage ≥ 88.5% (new styles use only existing tokens).
 - [ ] **Step 2.5: Commit 2**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add styles.css
 git commit -m "$(cat <<'EOF'
 feat(styles): add base styles for .wr-bar, .breakdown-row, panel--recent-aggregate
@@ -591,7 +591,7 @@ EOF
 
 ```bash
 git log --oneline origin/main..HEAD | head -3
-grep -c "^\.wr-bar\|^\.breakdown-row\|^\.refresh-btn\|^\.panel--recent-aggregate" /Users/a1234/Documents/Web_LOL_Banpick/styles.css
+grep -c "^\.wr-bar\|^\.breakdown-row\|^\.refresh-btn\|^\.panel--recent-aggregate" ../../../styles.css
 ```
 
 Expected: 3 commits, style selector count ≥ 4.
@@ -612,7 +612,7 @@ Expected: 3 commits, style selector count ≥ 4.
 Find the tab-trends section:
 
 ```bash
-grep -n "id=\"tab-trends\"\|panel--trends\|panel--reports" /Users/a1234/Documents/Web_LOL_Banpick/index.html | head
+grep -n "id=\"tab-trends\"\|panel--trends\|panel--reports" ../../../index.html | head
 ```
 
 Locate the position after `<section class="panel panel--trends" ...>...</section>` and before `<section class="panel panel--reports" ...>`. Insert:
@@ -674,7 +674,7 @@ Use Edit with surrounding context so insertion is precise.
 Find the `state` object initialization:
 
 ```bash
-grep -n "^const state\|^let state\|^state = {" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head
+grep -n "^const state\|^let state\|^state = {" ../../../main.js | head
 ```
 
 Add these fields inside the initial state (or if state is built incrementally, add them with defaults):
@@ -842,7 +842,7 @@ function formatDurationSeconds(totalSeconds) {
 Check if `formatDurationSeconds` or similar already exists:
 
 ```bash
-grep -n "function.*[Dd]uration" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head -10
+grep -n "function.*[Dd]uration" ../../../main.js | head -10
 ```
 
 If a helper like `formatDuration`, `durationLabel` already exists with the same m:ss format, reuse it (use the existing name, don't add a duplicate).
@@ -888,14 +888,14 @@ Find `initTabSystem` (around L2808 after iter.8). Append:
 - [ ] **Step 3.8: Syntax check + server smoke test**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node --check main.js
 ```
 
 Expected: silent.
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js > /tmp/server.log 2>&1 &
 SERVER_PID=$!
 sleep 2
@@ -910,7 +910,7 @@ Expected: both counts ≥ 1.
 - [ ] **Step 3.9: Commit 3**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js
 git commit -m "$(cat <<'EOF'
 feat(html,js): add panel--recent-aggregate with lazy fetch on tab-trends enter
@@ -938,10 +938,10 @@ EOF
 - [ ] **Step 3.10: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -4
-grep -c "panel--recent-aggregate\|data-refresh-stats" /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c "fetchRecentStats\|renderRecentAggregate\|maybeFetchRecentStats" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "panel--recent-aggregate\|data-refresh-stats" ../../../index.html
+grep -c "fetchRecentStats\|renderRecentAggregate\|maybeFetchRecentStats" ../../../main.js
 ```
 
 Expected: 4 commits, index.html counts ≥ 2, main.js function refs ≥ 5.
@@ -1028,7 +1028,7 @@ function renderChampionBreakdown() {
 Verify `championAvatarMarkup` supports `"small"` size:
 
 ```bash
-grep -nA 2 "function championAvatarMarkup" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -nA 2 "function championAvatarMarkup" ../../../main.js
 ```
 
 Expected: signature `championAvatarMarkup(name, size = "medium")` — accepts any string. The CSS class becomes `champion-avatar--small`. If no `.champion-avatar--small` rule exists, the avatar still renders (just inherits default sizing). Acceptable.
@@ -1036,7 +1036,7 @@ Expected: signature `championAvatarMarkup(name, size = "medium")` — accepts an
 - [ ] **Step 4.4: Syntax check + smoke**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node --check main.js
 node server.js > /tmp/server.log 2>&1 &
 SERVER_PID=$!
@@ -1051,7 +1051,7 @@ Expected: syntax silent, count ≥ 1.
 - [ ] **Step 4.5: Commit 4**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js
 git commit -m "$(cat <<'EOF'
 feat(html,js): add panel--champion-breakdown with top-5 + rest footer
@@ -1075,8 +1075,8 @@ EOF
 
 ```bash
 git log --oneline origin/main..HEAD | head -5
-grep -c "panel--champion-breakdown\|data-champion-breakdown" /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c "renderChampionBreakdown\|CHAMPION_BREAKDOWN_TOP_N" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "panel--champion-breakdown\|data-champion-breakdown" ../../../index.html
+grep -c "renderChampionBreakdown\|CHAMPION_BREAKDOWN_TOP_N" ../../../main.js
 ```
 
 Expected: 5 commits, index.html ≥ 2, main.js ≥ 2.
@@ -1155,7 +1155,7 @@ Note: role `UNKNOWN` is the catch-all from `aggregateRecentStats` for empty `rol
 - [ ] **Step 5.4: Syntax check + smoke**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node --check main.js
 node server.js > /tmp/server.log 2>&1 &
 SERVER_PID=$!
@@ -1170,7 +1170,7 @@ Expected: syntax silent, count ≥ 1.
 - [ ] **Step 5.5: Commit 5**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add index.html main.js
 git commit -m "$(cat <<'EOF'
 feat(html,js): add panel--role-breakdown
@@ -1193,8 +1193,8 @@ EOF
 
 ```bash
 git log --oneline origin/main..HEAD | head -6
-grep -c "panel--role-breakdown\|data-role-breakdown" /Users/a1234/Documents/Web_LOL_Banpick/index.html
-grep -c "renderRoleBreakdown\|ROLE_INITIAL" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "panel--role-breakdown\|data-role-breakdown" ../../../index.html
+grep -c "renderRoleBreakdown\|ROLE_INITIAL" ../../../main.js
 ```
 
 Expected: 6 commits, index.html ≥ 2, main.js ≥ 2.
@@ -1214,7 +1214,7 @@ Expected: 6 commits, index.html ≥ 2, main.js ≥ 2.
 Identify the places where `state.account` is set or replaced:
 
 ```bash
-grep -nE "state\.account\s*=|state\.account\s*=\{" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head
+grep -nE "state\.account\s*=|state\.account\s*=\{" ../../../main.js | head
 ```
 
 Common paths:
@@ -1243,7 +1243,7 @@ In practice, the simplest approach is to add the call inside:
 - The `restoreAccountFromStorage` function (at the end)
 
 ```bash
-grep -n "^function handleLogin\|^function logIn\|^function restoreAccount\|localStorage.*account" /Users/a1234/Documents/Web_LOL_Banpick/main.js | head
+grep -n "^function handleLogin\|^function logIn\|^function restoreAccount\|localStorage.*account" ../../../main.js | head
 ```
 
 Identify the specific function names; then Edit to add `invalidateRecentStatsIfAccountChanged();` as the last statement of each.
@@ -1272,7 +1272,7 @@ Replace the old `renderRecentStatsError` with this version (use Edit).
 - [ ] **Step 6.3: Syntax check**
 
 ```bash
-node --check /Users/a1234/Documents/Web_LOL_Banpick/main.js
+node --check ../../../main.js
 ```
 
 Expected: silent.
@@ -1280,7 +1280,7 @@ Expected: silent.
 - [ ] **Step 6.4: Commit 6**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add main.js
 git commit -m "$(cat <<'EOF'
 feat(js): invalidate recentStats on account change + friendlier errors
@@ -1303,9 +1303,9 @@ EOF
 - [ ] **Step 6.5: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -7
-grep -c "invalidateRecentStatsIfAccountChanged" /Users/a1234/Documents/Web_LOL_Banpick/main.js
+grep -c "invalidateRecentStatsIfAccountChanged" ../../../main.js
 ```
 
 Expected: 7 commits, invalidate helper count ≥ 2 (definition + at least 1 call).
@@ -1324,7 +1324,7 @@ Expected: 7 commits, invalidate helper count ≥ 2 (definition + at least 1 call
 Find the iter.8 section inserted previously. Insert a new section below it:
 
 ```bash
-grep -n "iteration 8 신규 컴포넌트\|## iteration" /Users/a1234/Documents/Web_LOL_Banpick/design-tokens.md
+grep -n "iteration 8 신규 컴포넌트\|## iteration" ../../../design-tokens.md
 ```
 
 Add:
@@ -1367,7 +1367,7 @@ Append item #20 at the end of §10:
 - [ ] **Step 7.3: Update README.md**
 
 ```bash
-grep -n "최근 UI 정리" /Users/a1234/Documents/Web_LOL_Banpick/README.md
+grep -n "최근 UI 정리" ../../../README.md
 ```
 
 Replace the bullet to prepend iter.9:
@@ -1387,7 +1387,7 @@ Replace the bullet to prepend iter.9:
 - [ ] **Step 7.4: Commit 7**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git add design-tokens.md README.md
 git commit -m "$(cat <<'EOF'
 docs: update design-tokens.md + README for iteration 9
@@ -1405,7 +1405,7 @@ EOF
 - [ ] **Step 7.5: Verify**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD | head -8
 git status --short
 ```
@@ -1423,14 +1423,14 @@ Expected: 8 commits, clean working tree.
 - [ ] **Step 8.1: Post audit**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node scripts/design-audit.js --scope all --format markdown --top 20 --output test-artifacts/design-audit/iter9-post.md
 ```
 
 - [ ] **Step 8.2: Audit diff**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 diff -u test-artifacts/design-audit/iter9-baseline.md test-artifacts/design-audit/iter9-post.md | head -60
 ```
 
@@ -1443,8 +1443,8 @@ Expected:
 - [ ] **Step 8.3: Data-* attribute count delta**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
-grep -rn 'data-[a-z-]\+' /Users/a1234/Documents/Web_LOL_Banpick/index.html /Users/a1234/Documents/Web_LOL_Banpick/main.js | wc -l
+cd <repo-root>
+grep -rn 'data-[a-z-]\+' ../../../index.html ../../../main.js | wc -l
 ```
 
 Compare with the baseline at start of this branch. Expected: net increase around +10 (~13 new data-* added: data-recent-aggregate, data-refresh-stats, data-overall-*, data-recent-aggregate-status, data-champion-breakdown*, data-role-breakdown*, data-wr-fill). No unexpected removals.
@@ -1452,7 +1452,7 @@ Compare with the baseline at start of this branch. Expected: net increase around
 - [ ] **Step 8.4: Server smoke test**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 node server.js > /tmp/server.log 2>&1 &
 SERVER_PID=$!
 sleep 2
@@ -1507,7 +1507,7 @@ Low-noise: if any test account has 0 recent matches (hard to produce in practice
 - [ ] **Step 9.1: Summary commit list**
 
 ```bash
-cd /Users/a1234/Documents/Web_LOL_Banpick
+cd <repo-root>
 git log --oneline origin/main..HEAD
 ```
 

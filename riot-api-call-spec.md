@@ -3,9 +3,9 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [Riot API 샘플 경기 데이터 수집 계획서](/Users/a1234/Documents/Web_LOL_Banpick/plan-riot-api-sample-data.md)
-- [샘플 경기 선정 기준 문서](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md)
-- [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
+- [Riot API 샘플 경기 데이터 수집 계획서](plan-riot-api-sample-data.md)
+- [샘플 경기 선정 기준 문서](sample-match-selection-criteria.md)
+- [분석 JSON 스키마](analysis-json-schema.md)
 
 ## 1. 문서 목적
 
@@ -458,7 +458,7 @@ POST /api/sample-match/fetch
 
 ## 15. 샘플 선정 로직 연결
 
-후보 경기 선정은 [sample-match-selection-criteria.md](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md)를 따른다.
+후보 경기 선정은 [sample-match-selection-criteria.md](sample-match-selection-criteria.md)를 따른다.
 
 ### 기본 로직
 

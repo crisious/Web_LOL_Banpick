@@ -3,7 +3,7 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [의사결정 문서](/Users/a1234/Documents/Web_LOL_Banpick/decision-replay-processing.md)
+- [의사결정 문서](decision-replay-processing.md)
 
 ## 1. 제품 개요
 

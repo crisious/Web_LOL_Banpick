@@ -3,11 +3,11 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [Riot API 샘플 경기 데이터 수집 계획서](/Users/a1234/Documents/Web_LOL_Banpick/plan-riot-api-sample-data.md)
-- [샘플 경기 선정 기준 문서](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md)
-- [샘플 수집-정규화-분석 운영 절차서](/Users/a1234/Documents/Web_LOL_Banpick/sample-data-ops-runbook.md)
-- [정규화 구현 체크리스트](/Users/a1234/Documents/Web_LOL_Banpick/normalization-implementation-checklist.md)
-- [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
+- [Riot API 샘플 경기 데이터 수집 계획서](plan-riot-api-sample-data.md)
+- [샘플 경기 선정 기준 문서](sample-match-selection-criteria.md)
+- [샘플 수집-정규화-분석 운영 절차서](sample-data-ops-runbook.md)
+- [정규화 구현 체크리스트](normalization-implementation-checklist.md)
+- [분석 JSON 스키마](analysis-json-schema.md)
 
 ## 1. 문서 목적
 
@@ -138,7 +138,7 @@ data/samples/sample-001/
 
 ### 작업
 
-- [sample-match-selection-criteria.md](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md) 기준으로 각 경기 평가
+- [sample-match-selection-criteria.md](sample-match-selection-criteria.md) 기준으로 각 경기 평가
 - 필수 조건 미달 경기 제거
 - 점수표로 상위 2경기 선별
 
@@ -189,9 +189,9 @@ data/samples/sample-001/
 
 ### 기준 문서
 
-- [normalized-match-schema.md](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)
-- [normalization-mapping-rules.md](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)
-- [normalization-implementation-checklist.md](/Users/a1234/Documents/Web_LOL_Banpick/normalization-implementation-checklist.md)
+- [normalized-match-schema.md](normalized-match-schema.md)
+- [normalization-mapping-rules.md](normalization-mapping-rules.md)
+- [normalization-implementation-checklist.md](normalization-implementation-checklist.md)
 
 ### 산출물
 
@@ -214,8 +214,8 @@ data/samples/sample-001/
 
 ### 기준 문서
 
-- [llm-prompt-input-format.md](/Users/a1234/Documents/Web_LOL_Banpick/llm-prompt-input-format.md)
-- [analysis-json-schema.md](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
+- [llm-prompt-input-format.md](llm-prompt-input-format.md)
+- [analysis-json-schema.md](analysis-json-schema.md)
 
 ### 산출물
 

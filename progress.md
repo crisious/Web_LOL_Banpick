@@ -35,11 +35,10 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 
 ## 샘플 데이터 상태
 
-- 총 26건 저장 (레거시 rule-based 2건 + KR AI 분석 24건).
-- 계정 커버리지: `매운맛 비스킷#KR1` (대부분), `핑거샷#KR1`, `완두콩#oOoO`.
-- 포지션 커버리지: SUPPORT 중심 + JUNGLE / MID / TOP 일부 포함.
-- 챔피언 다양성: DrMundo, Nasus, Galio, Malphite, Rell, Nautilus, Braum, Senna, Thresh, Lulu, Morgana, Pantheon, Seraphine, Graves, Xerath 등.
-- 최신 샘플 수집일: 2026-04-18 (sample-kr-8048864259, sample-kr-8173098718).
+- 현재 manifest 등재 2건 (Pantheon SUPPORT WIN · Thresh SUPPORT WIN, 모두 `매운맛 비스킷#KR1`).
+- 최신 샘플 수집일: 2026-04-28 (sample-kr-8190642410, sample-kr-8190721866).
+- 과거 샘플(sample-001/002 + KR 26건)은 [sample-data-cleanup-plan.md](sample-data-cleanup-plan.md) 기준으로 정리됨 — 라이브 데이터 흐름 검증은 새 매치 생성 시점부터 재축적.
+- Phase 25 Track C 도입 이후 신규 샘플은 `analysisMeta.schemaViolations` 필드 자동 기록 (베이스라인 2건은 미포함).
 
 ### 샘플 디렉터리 구조
 
@@ -235,9 +234,9 @@ Claude 실패, Codex 성공 → primary = Codex
 ### CLI PATH 참고
 
 - Node subprocess는 shell PATH를 상속하지 않음
-- `AUGMENTED_PATH`로 `/opt/homebrew/bin`, `/usr/local/bin`, `$HOME/.local/bin` 추가
-- Claude: `/Users/a1234/.local/bin/claude`
-- Codex: `/opt/homebrew/bin/codex`
+- `AUGMENTED_PATH`로 `/opt/homebrew/bin`, `/usr/local/bin`, `$HOME/.local/bin` 추가 (macOS 기준)
+- Claude: `$HOME/.local/bin/claude` (또는 win32: `%LOCALAPPDATA%\\AnthropicClaude\\claude.exe`)
+- Codex: `/opt/homebrew/bin/codex` (또는 win32: `%LOCALAPPDATA%\\CodexTools\\codex.exe`)
 
 ### 타이밍 참고 (실측)
 

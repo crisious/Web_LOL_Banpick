@@ -3,9 +3,9 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [Riot API 호출 설계서](/Users/a1234/Documents/Web_LOL_Banpick/riot-api-call-spec.md)
-- [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
-- [MVP PRD](/Users/a1234/Documents/Web_LOL_Banpick/prd-mvp-replay-analysis.md)
+- [Riot API 호출 설계서](riot-api-call-spec.md)
+- [분석 JSON 스키마](analysis-json-schema.md)
+- [MVP PRD](prd-mvp-replay-analysis.md)
 
 ## 1. 문서 목적
 

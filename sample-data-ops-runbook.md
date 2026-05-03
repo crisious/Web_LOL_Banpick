@@ -3,11 +3,11 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [Riot API 샘플 경기 데이터 수집 계획서](/Users/a1234/Documents/Web_LOL_Banpick/plan-riot-api-sample-data.md)
-- [샘플 경기 선정 기준 문서](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md)
-- [정규화 경기 데이터 스키마 문서](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)
-- [정규화 매핑 규칙 상세서](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)
-- [분석 JSON 스키마](/Users/a1234/Documents/Web_LOL_Banpick/analysis-json-schema.md)
+- [Riot API 샘플 경기 데이터 수집 계획서](plan-riot-api-sample-data.md)
+- [샘플 경기 선정 기준 문서](sample-match-selection-criteria.md)
+- [정규화 경기 데이터 스키마 문서](normalized-match-schema.md)
+- [정규화 매핑 규칙 상세서](normalization-mapping-rules.md)
+- [분석 JSON 스키마](analysis-json-schema.md)
 
 ## 1. 문서 목적
 
@@ -134,7 +134,7 @@ data/
 
 ### Step 6. 점수표 평가
 
-[sample-match-selection-criteria.md](/Users/a1234/Documents/Web_LOL_Banpick/sample-match-selection-criteria.md)의 기준으로 점수화한다.
+[sample-match-selection-criteria.md](sample-match-selection-criteria.md)의 기준으로 점수화한다.
 
 평가 항목:
 
@@ -188,7 +188,7 @@ data/
 
 ### Step 9. 정규화 생성
 
-[normalized-match-schema.md](/Users/a1234/Documents/Web_LOL_Banpick/normalized-match-schema.md)와 [normalization-mapping-rules.md](/Users/a1234/Documents/Web_LOL_Banpick/normalization-mapping-rules.md)를 따라 `normalized-match.json` 생성
+[normalized-match-schema.md](normalized-match-schema.md)와 [normalization-mapping-rules.md](normalization-mapping-rules.md)를 따라 `normalized-match.json` 생성
 
 출력:
 

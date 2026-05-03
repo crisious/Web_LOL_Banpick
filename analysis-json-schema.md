@@ -3,10 +3,10 @@
 작성일: 2026-04-10
 
 관련 문서:
-- [의사결정 문서](/Users/a1234/Documents/Web_LOL_Banpick/decision-replay-processing.md)
-- [MVP PRD](/Users/a1234/Documents/Web_LOL_Banpick/prd-mvp-replay-analysis.md)
-- [와이어프레임 문서](/Users/a1234/Documents/Web_LOL_Banpick/wireframes-mvp-replay-analysis.md)
-- [개발 작업 티켓](/Users/a1234/Documents/Web_LOL_Banpick/tickets-mvp-replay-analysis.md)
+- [의사결정 문서](decision-replay-processing.md)
+- [MVP PRD](prd-mvp-replay-analysis.md)
+- [와이어프레임 문서](wireframes-mvp-replay-analysis.md)
+- [개발 작업 티켓](tickets-mvp-replay-analysis.md)
 
 ## 1. 문서 목적
 

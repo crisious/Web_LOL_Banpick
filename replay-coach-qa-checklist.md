@@ -192,6 +192,6 @@ curl -s http://127.0.0.1:8123/api/samples/sample-kr-8166601659
 
 ## 관련 문서
 
-- [README.md](/Users/a1234/Documents/Web_LOL_Banpick/README.md)
-- [sample-data-cleanup-plan.md](/Users/a1234/Documents/Web_LOL_Banpick/sample-data-cleanup-plan.md)
-- [sample-data-ops-runbook.md](/Users/a1234/Documents/Web_LOL_Banpick/sample-data-ops-runbook.md)
+- [README.md](README.md)
+- [sample-data-cleanup-plan.md](sample-data-cleanup-plan.md)
+- [sample-data-ops-runbook.md](sample-data-ops-runbook.md)
