@@ -1,5 +1,62 @@
 # Web_LOL_Banpick · 디자인/접근성 통합 패치
 
+## Phase 30 — Codex win32 cleanup (2026-05-04)
+
+라이브 검증(2026-05-04)에서 Codex CLI가 매번 exit 1로 실패하던 문제 진단 + 정리.
+
+### 진단 결과
+
+서버를 모방한 spawn 호출로 stderr/stdout 캡처 — 원인은 win32 환경이 아니라
+**설치된 codex CLI 버전이 OpenAI 계정의 기본 모델(gpt-5.5)을 거부**하는 것:
+
+```text
+{"type":"error","message":"The 'gpt-5.5' model requires a newer version of
+Codex. Please upgrade to the latest app or CLI and try again."}
+```
+
+stderr는 비어있고 모든 에러 정보는 stdout JSONL의 `turn.failed`에 들어가서
+서버 로그가 `codex exited 1:` (콜론 뒤 빈 문자열)로만 표시되던 것.
+
+### 수정
+
+**파일**: [server.js](server.js), [.env.example](.env.example)
+
+1. `buildAnalysis`에 `AGENT_DISABLE_CODEX=1` env hook 추가 — 켜지면 Codex
+   호출을 건너뛰고 `[AI] Codex disabled via AGENT_DISABLE_CODEX=1` 로그 출력.
+   노후 CLI / 모델 미호환 / 인증 부재 환경에서 깨끗한 Claude-only 운용.
+2. `runCli` 에러 메시지가 stderr 비어있으면 stdout tail (300자) 포함. 향후
+   유사 실패 진단성 향상.
+3. `.env.example`에 `AGENT_DISABLE_CODEX` + `EXTRA_CLI_PATH` 두 hook 문서화.
+
+### 검증
+
+라이브 — 신규 샘플(`sample-kr-8192043774`, Milio SUPPORT WIN) 생성:
+
+- 서버 로그: `[AI] Codex disabled via AGENT_DISABLE_CODEX=1 — Claude only for ...`
+- 분석 결과: `schemaViolations: []`, `sourceType: claude_ai`
+- 생성 시간: 44.7s (Codex 실패 대기 없는 깨끗한 fast-fail)
+
+회귀: `npm test` → 122 passed / 0 failed 유지.
+
+---
+
+## Phase 29 — Track U/V 문서 백필 + riotErrorPayload 회귀 (2026-05-03)
+
+### 트랙 U — CHANGELOG Phase 26/27/28 백필
+
+**파일**: [CHANGELOG.md](CHANGELOG.md)
+
+CHANGELOG가 Phase 25에서 끊겨 있던 것을 Phase 26~28로 이어 기록.
+
+### 트랙 V — riotErrorPayload 회귀 테스트
+
+**파일**: [test-artifacts/server/riot-error-tests.mjs](test-artifacts/server/riot-error-tests.mjs)
+
+Phase 25 Track B 핵심 헬퍼 25 케이스 — 401/403 → RIOT_KEY_EXPIRED, 429 →
+RIOT_RATE_LIMITED, 500/404/null/undefined fallback, string riotStatus 타입 가드.
+
+---
+
 ## Phase 28 — Track S/T 테스트 커버리지 확장 (2026-05-03)
 
 PLAN.md Phase 28(자체 추가). main.js 순수 함수 4개 회귀 테스트 + 발견된 버그 1건 수정.

@@ -1,11 +1,11 @@
-# 작업 계획 — Phase 30+
+# 작업 계획 — Phase 31+
 
 **기준 시점**: 2026-05-04
-**상위 컨텍스트**: Phase 25~29 + 라이브 검증 완료. progress.md "다음 추천 작업" 1·2·3·4번 처리, 5번(RSO OAuth)은 외부 의존 DEFER 유지. 본 문서는 stable-state 회고 + 잔여 하나의 open issue + 후속 후보 목록.
+**상위 컨텍스트**: Phase 25~30 + 라이브 검증 완료. progress.md "다음 추천 작업" 1·2·3·4번 처리, 5번(RSO OAuth)은 외부 의존 DEFER 유지. 본 문서는 stable-state 회고 + 후속 후보 목록.
 
 ---
 
-## 0. Phase 25~29 누적 회고
+## 0. Phase 25~30 누적 회고
 
 | Phase | 트랙 | 결과 | 주요 변경 |
 | --- | --- | --- | --- |
@@ -14,6 +14,7 @@
 | 27 | Q/R | DONE | npm test runner + buildLlmPayload 회귀 |
 | 28 | S/T | DONE | utils 함수 테스트 (delta NaN 버그 수정) + aggregateRecentStats 회귀 |
 | 29 | U/V | DONE | CHANGELOG 백필 + riotErrorPayload 회귀 |
+| 30 | (codex) | DONE | AGENT_DISABLE_CODEX env hook + runCli 에러 stdout tail + 진단 |
 
 **테스트**: `npm test` → 122 passed / 0 failed across 6 test file(s)
 
@@ -51,28 +52,20 @@
 
 ---
 
-## 2. 알려진 open issue
+## 2. Codex CLI 이슈 — Phase 30에서 처리됨
 
-### Codex CLI win32 실행 실패 (KNOWN)
+**진단 결과** (Phase 30): 환경 문제가 아니라 **설치된 codex CLI 버전이 OpenAI 계정 기본 모델(gpt-5.5)을 거부**. stderr 비어있고 stdout JSONL의 `turn.failed`에 모든 정보가 들어있어 기존 로그가 침묵에 가까웠음.
 
-라이브 검증에서 3/3 케이스 모두 `[AI] Codex failed: codex exited 1` 로그 발생. 원인 추정:
+**처리 (Phase 30 — 커밋 `7b6e3c1` / `5c5febb`)**:
 
-- PATH 아님 — `d7d9f13` 수정 후에도 동일 실패. 즉, 발견은 됐지만 실행 자체가 즉시 1로 종료
-- 가능성: codex CLI 인증/세션 상태 부재, win32 sandbox 모드 비호환, `-s read-only` 플래그 미지원, stdin EOF 후 즉시 종료
+- `AGENT_DISABLE_CODEX=1` env hook 추가 — 켜면 Codex 호출 자체를 건너뜀
+- `runCli` 에러가 stderr 비어있으면 stdout tail 포함해 보고 (향후 동일 패턴 진단 향상)
+- 라이브 검증: 신규 샘플 1건(Milio SUP WIN, sample-kr-8192043774) 환경 변수 켠 상태에서 정상 생성, schemaViolations=0
 
-영향:
+**미해결 부분**:
 
-- AI Comparison(claude vs codex agreementRate) 기능 win32에서 작동 불가
-- Track C 검증은 Claude 단독 cohort로 완료 — 측정 의의는 유지
-- 사용자 경험 저하 없음 (서버측 fallback이 정상 작동, primary=claude_ai로 분석 성공)
-
-다음 액션 후보:
-
-- A. 진단 페이즈 (Phase 30): 단독 codex CLI 실행 + stderr 캡처 + 인증 상태 확인
-- B. 에이전트 분리: Windows 환경에서 Codex 비활성화 옵션 (`AGENT_DISABLE_CODEX=1` env) 추가 → 깨끗한 fallback
-- C. DEFER: macOS 환경에서는 작동하므로 우선순위 낮음 (Track C 측정 유지)
-
-권장: **B** — 30분 작업, win32 사용자 경험 정리 + 측정 데이터 노이즈 제거
+- codex CLI 자체 업그레이드 — 사용자가 OpenAI Codex CLI 새 버전 설치하면 자동 복구. 본 프로젝트에서 처리할 사항 아님.
+- macOS 환경에서는 기존대로 작동 가능성 — 검증 안 됨, 신경 쓰지 않음.
 
 ---
 
@@ -80,7 +73,6 @@
 
 ### 우선순위 P2 (요청 시 실행)
 
-- **Phase 30 — Codex win32 cleanup**: 위 권장안 B 실행 (env hook + 서버 로그에서 missing CLI 명시 노출)
 - **Phase 31 — `summarizeMatch` 회귀 테스트**: server.js의 raw-match → summary 추출 함수. Riot 응답 형태 변화 회귀 차단
 - **Phase 32 — `buildKeyMoments` / `buildActionChecklist` 테스트**: 현재 fallback 안전망의 출력 품질을 fixture로 고정
 
@@ -101,11 +93,11 @@
 
 ## 4. 다음 액션
 
-라이브 검증을 통해 PLAN Phase 26의 Track D/E 모두 처리됨. 현 시점 자동 진행 가능한 후보:
+Phase 25~30 + 라이브 Track D/E + Codex 진단 모두 처리됨. 현 시점 자동 진행 가능한 후보:
 
-- **A**: Phase 30 (Codex win32 cleanup) — env hook 추가 + 로그 정돈, 30분
-- **B**: Phase 31 (summarizeMatch 테스트) — 함수 추출 + fixture, 1h
-- **C**: 두 트랙 묶음 — 1.5h
-- **D**: 현재 stable — 외부 트리거 대기 (새 feature, 새 회귀, RSO 승인 등)
+- **A**: Phase 31 (summarizeMatch 테스트) — 함수 추출 + fixture, 1h
+- **B**: Phase 32 (buildKeyMoments / buildActionChecklist fixture) — fallback 품질 고정, 1h
+- **C**: 두 트랙 묶음 — 2h
+- **D**: 현재 stable — 외부 트리거 대기
 
-권장: **D** — 항목별 ROI가 떨어지는 시점. 새로운 사용자 시나리오/요구가 생길 때까지 stable로 둠.
+권장: **D** — 핵심 검증 다 끝났고 ROI 곡선이 평평해졌음. 새 feature 요청 / 회귀 발견 시 재개.
