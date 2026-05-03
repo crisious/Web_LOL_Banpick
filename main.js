@@ -496,7 +496,9 @@ function matchPatchLabel(version) {
  * @returns {{isUp: boolean, formatted: string, label: string} | null}
  */
 function _computeDeltaParts(current, reference, opts) {
-  if (typeof current !== "number" || typeof reference !== "number" || !isFinite(reference)) return null;
+  if (typeof current !== "number" || typeof reference !== "number") return null;
+  // NaN/Infinity 양쪽 가드 — 한쪽만 검사하던 회귀를 Track S에서 발견 (utils-tests.mjs)
+  if (!isFinite(current) || !isFinite(reference)) return null;
   if (reference === 0 && current === 0) return null;
   const diff = current - reference;
   const absDiff = Math.abs(diff);
