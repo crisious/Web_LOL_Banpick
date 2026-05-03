@@ -145,6 +145,19 @@
 - 산출물은 `test-artifacts/qa-automation/<timestamp>/`에 생성되며, `report.md`, `summary.json`, `home-*.png`, `home.dom.html`, `server.*.log`를 남김
 - 기본적으로 `main.js`와 샘플 API만 검증하므로 Riot 실시간 API rate limit 없이도 반복 실행 가능
 
+### 단위 테스트 (zero-dep)
+
+핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
+
+```bash
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
+npm run test:schema      # validateAnalysisOutput 위반 패턴 9건
+npm run test:champions   # aggregateChampionHistory 6건
+npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 18건
+```
+
+테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하는 방식 (소스 변경 0). 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
+
 ## 로컬 실행
 
 ### 사전 요구

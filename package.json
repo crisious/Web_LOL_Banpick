@@ -1,0 +1,17 @@
+{
+  "name": "lol-replay-coach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LoL Replay Coach — Riot API 기반 경기 분석 웹 (server.js + index.html + main.js).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-artifacts/run-tests.mjs",
+    "test:schema": "node test-artifacts/schema/schema-tests.mjs",
+    "test:champions": "node test-artifacts/champions-tab/aggregate-tests.mjs",
+    "test:llm-payload": "node test-artifacts/server/llm-payload-tests.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
