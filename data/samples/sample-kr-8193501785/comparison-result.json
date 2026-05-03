@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-03T15:38:02.237Z",
+  "sampleId": "sample-kr-8193501785",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8193501785_1777822682237",
+      "generatedAt": "2026-05-03T15:38:02.237Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "초반 데스 누적과 오브젝트 손실에도 중반 교전 합류로 22어시스트를 만들며 승리한 스레쉬 서폿 경기다."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 12분까지 4데스와 연속 오브젝트 손실로 불리하게 출발했으나, 중반 16분 이후 한타와 후속 합류에서 14어시스트를 쌓으며 흐름을 뒤집어 28분 39초에 승리로 마무리한 경기다. 시야 점수 65와 킬 관여 61%는 서폿 본연의 역할을 충실히 수행한 지표지만, 핵심 오브젝트 세팅 단계에서의 포지셔닝과 이니시 타이밍을 다듬으면 더 안정적인 운영이 가능하다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "2분, 3분, 9분, 12분에 걸쳐 4데스를 기록하며 초반 라인 안정성이 흔들렸고, 8분과 10분 오브젝트 세팅에서도 손실이 누적되어 불리한 출발을 보였다."
+      },
+      {
+        "phase": "MID",
+        "summary": "16분 교전 승리를 시작으로 20~22분 한타 후속 합류와 스킬샷 이니시로 14어시스트를 쌓아 골드 격차를 메우고 승리의 발판을 마련했다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "후반 28분 39초 종료 시점까지 추가 데스 없이 안정적으로 마무리했고, 중반에 잡은 템포를 그대로 이어가 승리를 확정지었다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "중반 한타 합류력",
+        "description": "16분 교전 승리부터 22분 스커미시까지 후속 합류로 킬 관여 61%와 22어시스트를 만들어 팀의 캐리 라인에 꾸준히 기여했다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019",
+          "evt_021",
+          "evt_022"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "시야 장악 능력",
+        "description": "비전 스코어 65와 제어 와드/오라클 렌즈 운용으로 한타 진입 전 시야 우위를 확보해 후속 합류 성공률을 높였다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "후반 안정적인 운영",
+        "description": "중반 이후 데스 없이 경기를 마무리하며 스레쉬 본연의 이니시·세이브 역할을 흔들림 없이 수행했다.",
+        "relatedEventIds": [
+          "evt_021",
+          "evt_022"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "초반 포지셔닝 리스크",
+        "description": "2분, 3분, 9분, 12분에 걸친 연속 데스로 라인전 주도권을 내주며 팀에 불리한 출발을 안겼다.",
+        "relatedEventIds": [
+          "evt_002",
+          "evt_003",
+          "evt_007",
+          "evt_013"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "오브젝트 세팅 실패",
+        "description": "8분, 10분, 16분, 19분, 22분 오브젝트 구도에서 시야와 진영 잡기가 부족해 상대에게 드래곤 3마리를 헌납했다.",
+        "relatedEventIds": [
+          "evt_006",
+          "evt_008",
+          "evt_016",
+          "evt_018",
+          "evt_023"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "중반 핵심 데스",
+        "description": "19분과 20분 핵심 구도에서 두 차례 데스를 내주며 운영 안정감과 한타 인원 수가 흔들렸다.",
+        "relatedEventIds": [
+          "evt_017",
+          "evt_020"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "라인전 첫 백 전까지 와드 동선을 고정하고, 적 정글 위치가 불확실할 때는 부쉬 안쪽 공격적 진입을 자제한다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "오브젝트 발생 60~90초 전부터 적 동선 카운터 와드와 제어 와드를 우선 배치해 시야 우위를 만든다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "중반 한타 진입 전 플래시·랜턴 쿨다운을 점검하고, 갈고리는 후속 합류 가능 시점에만 사용한다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 후 리스폰 시 미니맵을 먼저 확인하고, 위험 구간은 정글 또는 미드 아군과 동선을 맞춰 이동한다.",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "2:05",
+        "title": "첫 데스로 흔들린 라인전",
+        "description": "2분 5초 첫 교전에서 끊기며 라인 주도권을 상대에게 넘겨주었다.",
+        "relatedEventIds": [
+          "evt_002"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "10:12",
+        "title": "초반 핵심 오브젝트 손실",
+        "description": "10분 12초 중요도 5의 오브젝트 세팅 실패로 초반 골드 격차가 벌어졌다.",
+        "relatedEventIds": [
+          "evt_008"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "16:00",
+        "title": "반전의 시작 교전 승리",
+        "description": "16분 교전 승리로 중반 분위기를 가져오며 어시스트 누적이 시작됐다.",
+        "relatedEventIds": [
+          "evt_015"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "20:36",
+        "title": "연속 한타 후속 합류",
+        "description": "20분 36초부터 47초까지 짧은 시간에 두 번의 후속 합류로 킬 관여를 폭발적으로 늘렸다.",
+        "relatedEventIds": [
+          "evt_019",
+          "evt_021"
+        ]
+      },
+      {
+        "id": "km_5",
+        "timestampLabel": "22:39",
+        "title": "후반 오브젝트 손실에도 굳히기",
+        "description": "22분 39초 오브젝트 손실에도 한타 합류로 손해를 메우며 경기를 굳혔다.",
+        "relatedEventIds": [
+          "evt_022",
+          "evt_023"
+        ]
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_002",
+        "shortNote": "2:05 첫 데스, 라인전 흔들림"
+      },
+      {
+        "eventId": "evt_003",
+        "shortNote": "3:33 초반 추가 데스"
+      },
+      {
+        "eventId": "evt_006",
+        "shortNote": "8:28 오브젝트 세팅 실패"
+      },
+      {
+        "eventId": "evt_007",
+        "shortNote": "9:31 초반 데스 누적"
+      },
+      {
+        "eventId": "evt_008",
+        "shortNote": "10:12 중요도 5 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_013",
+        "shortNote": "12:26 라인전 마무리 데스"
+      },
+      {
+        "eventId": "evt_015",
+        "shortNote": "16:00 반전의 교전 승리"
+      },
+      {
+        "eventId": "evt_016",
+        "shortNote": "16:47 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_017",
+        "shortNote": "19:16 중반 핵심 데스"
+      },
+      {
+        "eventId": "evt_018",
+        "shortNote": "19:55 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_019",
+        "shortNote": "20:36 한타 후속 합류"
+      },
+      {
+        "eventId": "evt_020",
+        "shortNote": "20:45 중반 데스"
+      },
+      {
+        "eventId": "evt_021",
+        "shortNote": "20:47 연속 후속 합류"
+      },
+      {
+        "eventId": "evt_022",
+        "shortNote": "21:43 스커미시 승리"
+      },
+      {
+        "eventId": "evt_023",
+        "shortNote": "22:39 오브젝트 손실"
+      }
+    ]
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "중반 한타 합류력",
+        "note": "16분 교전 승리부터 22분 스커미시까지 후속 합류로 킬 관여 61%와 22어시스트를 만들어 팀의 캐리 라인에 꾸준히 기여했다."
+      },
+      {
+        "category": "strength",
+        "topic": "시야 장악 능력",
+        "note": "비전 스코어 65와 제어 와드/오라클 렌즈 운용으로 한타 진입 전 시야 우위를 확보해 후속 합류 성공률을 높였다."
+      },
+      {
+        "category": "strength",
+        "topic": "후반 안정적인 운영",
+        "note": "중반 이후 데스 없이 경기를 마무리하며 스레쉬 본연의 이니시·세이브 역할을 흔들림 없이 수행했다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 포지셔닝 리스크",
+        "note": "2분, 3분, 9분, 12분에 걸친 연속 데스로 라인전 주도권을 내주며 팀에 불리한 출발을 안겼다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 세팅 실패",
+        "note": "8분, 10분, 16분, 19분, 22분 오브젝트 구도에서 시야와 진영 잡기가 부족해 상대에게 드래곤 3마리를 헌납했다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 핵심 데스",
+        "note": "19분과 20분 핵심 구도에서 두 차례 데스를 내주며 운영 안정감과 한타 인원 수가 흔들렸다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

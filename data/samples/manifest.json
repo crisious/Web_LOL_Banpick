@@ -1,6 +1,18 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8193501785",
+      "matchId": "KR_8193501785",
+      "label": "sample-kr-8193501785 · SUPPORT WIN",
+      "champion": "Thresh",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-03",
+      "theme": "초반 데스 누적과 오브젝트 손실에도 중반 교전 합류로 22어시스트를 만들며 승리한 스레쉬 서폿 경기다.",
+      "normalizedPath": "/data/samples/sample-kr-8193501785/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8193501785/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8193501785/sample-kr-8193501785-notes.md"
+    },
+    {
       "id": "sample-kr-8190642410",
       "matchId": "KR_8190642410",
       "label": "sample-kr-8190642410 · SUPPORT WIN",
