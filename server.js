@@ -1342,11 +1342,71 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
     weaknesses,
     actionChecklist: buildActionChecklist(normalized, weaknesses),
     keyMoments,
+    combatAnalysis: [],
     evidenceIndex,
   };
 }
 
 // ─── LLM payload builder ─────────────────────────────────────────────────────
+
+// Phase 32: 전투 KDA 상황 집중 분석용 사전 계산.
+// CHAMPION_KILL / PLAYER_DEATH 이벤트를 25초 윈도우로 인접 그룹화 →
+// 한타·교전 단위 "encounter"로 만들어 AI에게 컨텍스트로 전달.
+// 플레이어 관여(isPlayerInvolved=true) 이벤트가 1개 이상인 그룹만 채택.
+function detectCombatEncounters(timelineEvents) {
+  const COMBAT_TYPES = new Set(["CHAMPION_KILL", "PLAYER_DEATH"]);
+  const WINDOW_MS = 25000;
+  const MAX_ENCOUNTERS = 8;
+
+  const combatEvts = timelineEvents
+    .filter((e) => COMBAT_TYPES.has(e.eventType))
+    .sort((a, b) => (a.timestampMs ?? 0) - (b.timestampMs ?? 0));
+
+  const groups = [];
+  let current = null;
+  for (const evt of combatEvts) {
+    const ts = evt.timestampMs ?? 0;
+    if (!current || ts - current.lastMs > WINDOW_MS) {
+      current = { events: [evt], firstMs: ts, lastMs: ts };
+      groups.push(current);
+    } else {
+      current.events.push(evt);
+      current.lastMs = ts;
+    }
+  }
+
+  const encounters = [];
+  for (const g of groups) {
+    const hasPlayer = g.events.some((e) => e.isPlayerInvolved);
+    if (!hasPlayer) continue;
+    const first = g.events[0];
+    const last = g.events[g.events.length - 1];
+    let playerKills = 0;
+    let playerDeaths = 0;
+    for (const e of g.events) {
+      if (!e.isPlayerInvolved) continue;
+      if (e.eventType === "CHAMPION_KILL") playerKills += 1;
+      else if (e.eventType === "PLAYER_DEATH") playerDeaths += 1;
+    }
+    let situation;
+    if (playerKills > playerDeaths) situation = "PLAYER_DOMINANT";
+    else if (playerDeaths > playerKills) situation = "PLAYER_DOWN";
+    else situation = "TRADED";
+    encounters.push({
+      encounterId: `enc_${String(encounters.length + 1).padStart(3, "0")}`,
+      phase: first.phase,
+      startLabel: first.timestampLabel,
+      endLabel: last.timestampLabel,
+      eventCount: g.events.length,
+      playerKills,
+      playerDeaths,
+      situation,
+      relatedEventIds: g.events.map((e) => e.eventId),
+    });
+    if (encounters.length >= MAX_ENCOUNTERS) break;
+  }
+  return encounters;
+}
 
 function buildLlmPayload(normalized) {
   const filteredEvents = normalized.timelineEvents
@@ -1357,6 +1417,8 @@ function buildLlmPayload(normalized) {
     .map(({ eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved }) => ({
       eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved,
     }));
+
+  const combatEncounters = detectCombatEncounters(normalized.timelineEvents);
 
   const { early, mid, late } = normalized.phaseContext;
   return {
@@ -1373,10 +1435,11 @@ function buildLlmPayload(normalized) {
       late:  { kills: late.kills,  deaths: late.deaths,  assists: late.assists,  notableEventCount: late.notableEventCount  },
     },
     timelineEvents: filteredEvents,
+    combatEncounters,
     derivedSignals: normalized.derivedSignals,
     outputContract: {
       schemaVersion: "1.0",
-      requiredTopLevelFields: ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex"],
+      requiredTopLevelFields: ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis"],
       requiredArrayCounts: { strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: 4 },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
@@ -1450,6 +1513,7 @@ function runCli(args, stdinText, timeoutMs) {
 const OUTPUT_SCHEMA_EXAMPLE = `정확히 다음 JSON 키 구조를 따른다. 키 이름 변경/누락/중첩 금지.
 matchSummary는 객체이며 headline은 문자열이다. coachSummary는 객체이며 overallSummary는 문자열이다.
 phaseSummaries는 배열이다 (객체 아님). keyMoments는 4개 이상의 배열이다.
+combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당 1개씩 작성하되, 입력에 encounter가 없으면 빈 배열을 반환한다.
 
 {
   "schemaVersion": "1.0",
@@ -1465,6 +1529,7 @@ phaseSummaries는 배열이다 (객체 아님). keyMoments는 4개 이상의 배
   "weaknesses": [{ "id": "wk_1", "title": "...", "description": "...", "relatedEventIds": ["evt_002"] }],
   "actionChecklist": [{ "id": "act_1", "text": "...", "linkedWeaknessId": "wk_1" }],
   "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
+  "combatAnalysis": [{ "encounterId": "enc_001", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
   "evidenceIndex": [{ "eventId": "evt_001", "shortNote": "..." }]
 }`;
 
@@ -1477,6 +1542,12 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 
 장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상.
 모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "claude_ai".
+
+combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. situationLabel은
+교전 상황(예: "초반 라인전 솔로킬", "오브젝트 셋업 중 cut off", "한타 백라인 진입 후 cut off")을 한 줄로 요약,
+playerDecision은 그 순간 플레이어의 판단/포지셔닝을 사실 기반으로 기술, takeaway는 다음에 같은 상황에서
+적용할 짧은 교훈. encounterId와 relatedEventIds는 입력값을 그대로 반영. 입력 encounter가 0개면
+combatAnalysis는 빈 배열.
 
 분석할 경기 데이터:`;
 
@@ -1514,6 +1585,9 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 
 장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상.
 모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "codex_redteam".
+
+combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. 레드팀 관점으로
+판단 실수와 구조적 약점을 더 날카롭게 지적. 입력 encounter가 0개면 빈 배열.
 
 분석할 경기 데이터:`;
 
@@ -1561,6 +1635,16 @@ function validateAnalysisOutput(json) {
   if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
   if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
   if (!Array.isArray(json?.keyMoments) || json.keyMoments.length < 2) throw new Error("keyMoments < 2");
+  // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
+  // 있으면 배열 타입과 각 항목 필수 필드만 검증.
+  if (json.combatAnalysis !== undefined && json.combatAnalysis !== null) {
+    if (!Array.isArray(json.combatAnalysis)) throw new Error("combatAnalysis not array");
+    for (const item of json.combatAnalysis) {
+      if (!item || typeof item.encounterId !== "string") throw new Error("combatAnalysis item missing encounterId");
+      if (typeof item.situationLabel !== "string" || !item.situationLabel) throw new Error("combatAnalysis item missing situationLabel");
+      if (typeof item.takeaway !== "string" || !item.takeaway) throw new Error("combatAnalysis item missing takeaway");
+    }
+  }
 }
 
 // ─── Red-team comparison builder ─────────────────────────────────────────────
@@ -1708,6 +1792,14 @@ async function buildAnalysis(normalized, sampleId) {
   if (!Array.isArray(primary.actionChecklist) || primary.actionChecklist.length < 1) {
     primary.actionChecklist = buildActionChecklist(normalized, primary.weaknesses ?? []);
     violations.push("count.actionChecklist<1");
+  }
+  // Phase 32: combatAnalysis 정규화 — 누락 시 빈 배열, 비배열이면 빈 배열로 강제.
+  // 형태 오류는 violation에 등재하되 fallback 트리거하지 않음 (선택적 필드).
+  if (primary.combatAnalysis === undefined || primary.combatAnalysis === null) {
+    primary.combatAnalysis = [];
+  } else if (!Array.isArray(primary.combatAnalysis)) {
+    primary.combatAnalysis = [];
+    violations.push("type.combatAnalysis.notArray");
   }
 
   try {
