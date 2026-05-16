@@ -1,6 +1,18 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8215889762",
+      "matchId": "KR_8215889762",
+      "label": "sample-kr-8215889762 · SUPPORT LOSS",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-16",
+      "theme": "세라핀 서폿으로 시야 점수 66을 쌓았지만 반복된 오브젝트 손실과 5데스가 패배의 핵심 원인이 됐다.",
+      "normalizedPath": "/data/samples/sample-kr-8215889762/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8215889762/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8215889762/sample-kr-8215889762-notes.md"
+    },
+    {
       "id": "sample-kr-8204958574",
       "matchId": "KR_8204958574",
       "label": "sample-kr-8204958574 · SUPPORT LOSS",

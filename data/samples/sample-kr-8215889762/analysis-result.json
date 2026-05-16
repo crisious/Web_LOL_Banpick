@@ -1,0 +1,277 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8215889762_1778940630988",
+    "generatedAt": "2026-05-16T14:10:30.988Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "세라핀 서폿으로 시야 점수 66을 쌓았지만 반복된 오브젝트 손실과 5데스가 패배의 핵심 원인이 됐다."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 라인전에서 두 번 끊기며 페이스를 잃었고, 중반에는 오브젝트 셋업이 무너질 때마다 포지셔닝이 노출되어 누적 5데스로 이어졌다. 시야 점수와 후속 합류 능력은 살아 있으니, 위험 신호가 보일 때 한 발 빠진 위치를 잡는 습관만 더하면 충분히 반등 가능한 게임이다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "6분~11분 사이 오브젝트 셋업이 세 차례 무너지는 흐름 속에서 9:33, 11:09에 연속으로 끊기며 라인전 안정감을 잃었다. 서폿 입장에서 시야 선점은 좋았지만 첫 포지션 잡기 단계에서 라인 뒤로 더 빠질 필요가 있었다."
+    },
+    {
+      "phase": "MID",
+      "summary": "16:41, 20:50, 24:01 세 번 모두 핵심 구도 직후 잘려나가며 운영 축이 흔들렸다. 18:10·18:56·20:17 후속 합류로 어시 3개를 챙긴 부분은 분명한 강점이지만, 오브젝트 셋업 실패 직후 후퇴 루트 확보가 미흡했다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "24:48에 게임이 종료되어 후반 운영 데이터는 거의 없다. 24:01 데스가 사실상 마지막 한타로 이어지며 게임 전체의 끝점이 됐다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "시야 점수 66, 서폿 본분 충실",
+      "description": "24분 48초 게임에서 비전 스코어 66은 서폿 평균을 상회하는 수치다. 오브젝트 셋업이 반복적으로 깨지는 와중에도 시야 자체는 꾸준히 제공했다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_006",
+        "evt_011"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "교전 후속 합류로 어시 3개 확보",
+      "description": "18:10·18:56·20:17 세 번의 SKIRMISH/TEAMFIGHT_FOLLOWUP에서 빠짐없이 합류해 킬 관여를 만들었다. 1차 진입이 아니라도 후속 유틸을 던지는 판단은 안정적이었다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_010",
+        "evt_012"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "아이템 빌드의 유틸 방향성 일관성",
+      "description": "구원(3107 계열 대신 6620 문킹)+조화의 보석(3114)+제어 와드(3364) 등 유틸·시야 위주 빌드로 팀 보조 컨셉을 끝까지 유지했다. 본인 안정성보다 팀 단위 기여를 우선한 의사결정이다.",
+      "relatedEventIds": [
+        "evt_010",
+        "evt_012"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "오브젝트 셋업 직후 잘려나가는 패턴",
+      "description": "6:08·8:29·9:02·11:38·17:05·19:58 모든 오브젝트 셋업 실패와 16:41·20:50·24:01의 데스 타이밍이 거의 1:1로 맞물린다. 오브젝트 손실 직후 후퇴 루트가 확보되지 않은 채 노출되는 구간이 반복됐다.",
+      "relatedEventIds": [
+        "evt_007",
+        "evt_008",
+        "evt_011",
+        "evt_013"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "라인전 단계 포지셔닝 위험",
+      "description": "9:33, 11:09 두 번의 초반 데스가 모두 라인전 단계 PLAYER_DOWN으로 기록됐다. 같은 시간대에 오브젝트 셋업도 실패했다는 점에서 사이드 압박 대비 한 발 깊은 위치 선점이 반복됐다.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_005"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "킬 관여율 27% — 합류 타이밍 일부 누락",
+      "description": "팀 11킬 중 3어시(KP 27%)로 서폿 기대치 대비 낮다. 후속 합류 자체는 좋았지만 셋업 단계 또는 사이드 운영 시 합류가 끊기는 구간이 있었다.",
+      "relatedEventIds": [
+        "evt_003",
+        "evt_008",
+        "evt_016"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "오브젝트 셋업 실패가 감지되면(상대가 시야 잡거나 정글이 비빌 때) 즉시 한 화면 뒤로 빠져 '안전 핑' 위치 확보부터 한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "라인전 2~12분 구간에는 부쉬 진입 전 제어 와드를 우선 박고, 정글 동선이 보이지 않을 땐 라인 1.5칸 뒤 위치 유지.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "팀 교전 신호(핑/와드 클리어)가 보이면 셋업 단계부터 합류 루트를 확보해 KP 40% 이상을 목표.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "바론·드래곤 구도 직후 30초는 본진/타워 라인 안쪽에서 리셋 — 무리한 시야 갱신은 다음 셋업 이후로 미룬다.",
+      "linkedWeaknessId": "wk_1"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "9:33",
+      "title": "초반 첫 데스 — 라인전 노출",
+      "description": "오브젝트 셋업 실패(6:08~9:02)가 누적된 직후 라인전 위치에서 잘렸다. 사이드 압박을 미리 읽고 한 발 뒤로 빠졌어야 할 장면.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_003"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "16:41",
+      "title": "중반 첫 데스 — 운영 축 흔들림",
+      "description": "MID 구간 첫 큰 데스. 직후 17:05 오브젝트 셋업도 실패로 이어지며 한 번의 컷이 두 번의 손실로 확장됐다.",
+      "relatedEventIds": [
+        "evt_007",
+        "evt_008"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "20:17~20:50",
+      "title": "후속 합류 성공 직후 역컷",
+      "description": "20:17 후속 합류로 킬 관여를 만든 직후 33초 만에 다시 잘렸다. 교전 성공 후 즉시 안전 거리 확보가 미흡했다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_013"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "23:29~24:01",
+      "title": "바론 손실 → 결정타 데스",
+      "description": "바론을 내준 직후 32초 뒤 다시 잘리며 사실상 게임을 닫는 한타가 됐다. 바론 직후의 시야 공백이 결정적이었다.",
+      "relatedEventIds": [
+        "evt_016",
+        "evt_017"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "18:10~18:56",
+      "title": "후속 합류 2연속 성공",
+      "description": "1차 진입이 아닌 후속 유틸 합류로 두 번의 교전에 관여한 강점 구간. 이 패턴을 셋업 단계까지 앞당기는 게 다음 과제.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_010"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situationLabel": "9:33 라인전 단계 솔로 컷오프",
+      "playerDecision": "초반 오브젝트 셋업이 무너진 직후에도 라인 압박 위치를 유지하다 사이드 갱킹/로밍에 노출됐다.",
+      "takeaway": "초반 오브젝트 손실 직후 90초는 라인 1.5칸 뒤·제어 와드 우선으로 안전 거리 확보.",
+      "relatedEventIds": [
+        "evt_004"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situationLabel": "11:09 라인전 반복 컷오프",
+      "playerDecision": "9:33 데스 이후 빠른 복귀 후 동일한 위치 패턴으로 다시 잘렸다.",
+      "takeaway": "같은 시간대 데스가 반복되면 라인 우선순위를 한 단계 낮추고 정글 동선 확인 후 진입.",
+      "relatedEventIds": [
+        "evt_005"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situationLabel": "16:41 미드 운영 단계 컷오프",
+      "playerDecision": "오브젝트 셋업 직전 시야 작업 중 상대 이니시에이팅 라인에 단독 노출됐다.",
+      "takeaway": "셋업 단계 시야는 팀과 2인 1조로 — 단독 와딩은 16분 이후 위험도가 급증한다.",
+      "relatedEventIds": [
+        "evt_007"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situationLabel": "20:50 후속 합류 직후 역컷",
+      "playerDecision": "20:17 합류 성공 직후 정리·물러나기보다 추가 시야/추격 라인을 잡다가 잘렸다.",
+      "takeaway": "교전 승리 후 30초는 무조건 후퇴/리셋 — 추격 본능을 한 박자 늦추기.",
+      "relatedEventIds": [
+        "evt_013"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situationLabel": "24:01 바론 손실 직후 결정타 컷오프",
+      "playerDecision": "바론(23:29)을 내준 직후 시야 공백 구간에서 재배치되며 상대 이니시에 그대로 노출됐다.",
+      "takeaway": "바론·드래곤 손실 직후 30~60초는 본진 라인 안쪽 리셋 — 시야 갱신은 다음 셋업으로 미룬다.",
+      "relatedEventIds": [
+        "evt_017"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "6:08 초반 오브젝트 셋업 실패 — 페이스 첫 균열"
+    },
+    {
+      "eventId": "evt_002",
+      "shortNote": "8:29 오브젝트 셋업 실패 반복"
+    },
+    {
+      "eventId": "evt_003",
+      "shortNote": "9:02 오브젝트 셋업 실패 — 라인 압박 신호"
+    },
+    {
+      "eventId": "evt_004",
+      "shortNote": "9:33 라인전 첫 데스"
+    },
+    {
+      "eventId": "evt_005",
+      "shortNote": "11:09 라인전 반복 데스"
+    },
+    {
+      "eventId": "evt_006",
+      "shortNote": "11:38 오브젝트 셋업 실패 — 초반 마무리 손실"
+    },
+    {
+      "eventId": "evt_007",
+      "shortNote": "16:41 중반 첫 데스"
+    },
+    {
+      "eventId": "evt_008",
+      "shortNote": "17:05 데스 직후 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "18:10 후속 합류 킬 관여"
+    },
+    {
+      "eventId": "evt_010",
+      "shortNote": "18:56 후속 합류 추가 관여"
+    },
+    {
+      "eventId": "evt_011",
+      "shortNote": "19:58 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_012",
+      "shortNote": "20:17 후속 합류 성공"
+    },
+    {
+      "eventId": "evt_013",
+      "shortNote": "20:50 합류 직후 역컷 데스"
+    },
+    {
+      "eventId": "evt_016",
+      "shortNote": "23:29 바론 손실"
+    },
+    {
+      "eventId": "evt_017",
+      "shortNote": "24:01 바론 직후 결정타 데스"
+    }
+  ]
+}
