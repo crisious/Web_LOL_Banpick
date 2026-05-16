@@ -139,6 +139,9 @@ function Invoke-BrowserDomDump {
   Assert-Condition ($dom -match "<title>LoL Replay Coach Report</title>") "DOM dump is missing the expected title."
   Assert-Condition ($dom -match "LoL Replay Coach") "DOM dump is missing the login title."
   Assert-Condition ($dom -match "Replay Coach Dashboard") "DOM dump is missing the dashboard heading."
+  # Phase 32: combat-analysis 섹션이 DOM에 포함되는지 검증
+  Assert-Condition ($dom -match 'data-combat-analysis') "DOM dump is missing data-combat-analysis container."
+  Assert-Condition ($dom -match '전투 KDA 상황별 집중 분석') "DOM dump is missing combat-analysis section heading."
 
   return @{
     exitCode = $process.ExitCode
@@ -156,7 +159,8 @@ New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 $nodePath = Resolve-ExecutablePath -CommandName "node" -Candidates @(
   "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VisualStudio\NodeJs\node.exe",
   "C:\Program Files\nodejs\node.exe",
-  "C:\Program Files\AMD\AI_Bundle\LMStudio\resources\app\.webpack\bin\node.exe"
+  "C:\Program Files\AMD\AI_Bundle\LMStudio\resources\app\.webpack\bin\node.exe",
+  "$env:LOCALAPPDATA\CodexTools\node-v24.15.0-win-x64\node.exe"
 )
 
 $browserPath = Resolve-ExecutablePath -CommandName "chrome" -Candidates @(
