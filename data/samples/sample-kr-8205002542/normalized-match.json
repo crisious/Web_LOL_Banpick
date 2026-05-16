@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "1.0",
+  "sourceMeta": {
+    "sourceType": "riot_match_v5",
+    "fetchedAt": "2026-05-06T16:14:25.892Z",
+    "platformRegion": "KR",
+    "regionalCluster": "ASIA",
+    "rawMatchId": "KR_8205002542"
+  },
+  "playerContext": {
+    "puuid": "NyCNzzJ1J46bvvbSdQyHNsGiJh5hzaxRLu6scZk6TvH6_DkRCDZ7iKuf8jjf3zNE59idvqLuVn6K5Q",
+    "riotId": "매운맛 비스킷#KR1",
+    "isAnonymous": true,
+    "participantId": 10
+  },
+  "matchInfo": {
+    "matchId": "KR_8205002542",
+    "queueId": 420,
+    "queueLabel": "RANKED_SOLO",
+    "mapId": 11,
+    "mapLabel": "SUMMONERS_RIFT",
+    "gameVersion": "16.9.772.8292",
+    "gameCreation": "2026-05-06T10:28:05.102Z",
+    "durationSeconds": 207,
+    "durationLabel": "3:27",
+    "result": "WIN",
+    "champion": "Seraphine",
+    "position": "SUPPORT",
+    "teamId": 200
+  },
+  "playerStats": {
+    "kills": 1,
+    "deaths": 0,
+    "assists": 0,
+    "kda": 1,
+    "cs": 2,
+    "csPerMinute": 0.58,
+    "goldEarned": 1423,
+    "damageToChampions": 592,
+    "visionScore": 1,
+    "killParticipation": 0.33,
+    "champLevel": 3,
+    "summonerSpells": [
+      4,
+      7
+    ],
+    "items": [
+      2003,
+      0,
+      0,
+      3865,
+      0,
+      0,
+      3340
+    ]
+  },
+  "challengeStats": {
+    "damagePerMinute": 171.53484314601982,
+    "goldPerMinute": 412.2352021512555,
+    "visionScorePerMinute": 0.41657192299126267,
+    "killParticipation": 0.3333333333333333,
+    "teamDamagePercentage": 0.12372063449535024,
+    "soloKills": 0,
+    "laneMinionsFirst10Minutes": 2,
+    "maxCsAdvantageOnLaneOpponent": 0,
+    "maxLevelLeadLaneOpponent": 0,
+    "turretPlatesTaken": 1,
+    "earlyLaningPhaseGoldExpAdvantage": 0,
+    "controlWardsPlaced": 0,
+    "skillshotsDodged": 9,
+    "outnumberedKills": 0
+  },
+  "teamContext": {
+    "teamTotalKills": 3,
+    "teamGoldEstimate": 0,
+    "teamDragons": 0,
+    "teamBarons": 0,
+    "teamTowers": 0,
+    "enemyDragons": 0,
+    "enemyBarons": 0,
+    "enemyTowers": 0
+  },
+  "phaseContext": {
+    "early": {
+      "startMs": 0,
+      "endMs": 900000,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 0,
+      "notableEventCount": 1
+    },
+    "mid": {
+      "startMs": 900001,
+      "endMs": 1800000,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "notableEventCount": 0
+    },
+    "late": {
+      "startMs": 1800001,
+      "endMs": 85208,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "notableEventCount": 0
+    }
+  },
+  "timelineEvents": [
+    {
+      "eventId": "evt_001",
+      "timestampMs": 85208,
+      "timestampLabel": "1:25",
+      "phase": "EARLY",
+      "eventType": "CHAMPION_KILL",
+      "importance": 4,
+      "isPlayerInvolved": true,
+      "laneHint": "RIVER",
+      "summary": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "rawRef": {
+        "frameIndex": 2,
+        "eventIndex": 2
+      }
+    }
+  ],
+  "derivedSignals": {
+    "hasEarlyLeadMoments": false,
+    "hasMidGameThrowRisk": false,
+    "hasObjectiveControlIssues": false,
+    "hasStrongRoamingPattern": false,
+    "hasPositioningRisk": false,
+    "candidateThemes": []
+  },
+  "playtimeScore": {
+    "overall": 4.9,
+    "categories": {
+      "combat": 2.4,
+      "income": 5.6,
+      "vision": 2.2,
+      "survival": 10,
+      "objective": 5,
+      "structure": 2
+    },
+    "label": "보통"
+  },
+  "objectiveTimeline": [],
+  "kdaTimeline": [
+    {
+      "time": 0,
+      "timeLabel": "0:00",
+      "phase": "EARLY",
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "kda": 0,
+      "event": "게임 시작"
+    },
+    {
+      "time": 85208,
+      "timeLabel": "1:25",
+      "phase": "EARLY",
+      "kills": 1,
+      "deaths": 0,
+      "assists": 0,
+      "kda": 1,
+      "event": "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.",
+      "eventType": "CHAMPION_KILL"
+    }
+  ],
+  "wardTimeline": {
+    "events": [
+      {
+        "time": 32318,
+        "timeLabel": "0:32",
+        "phase": "EARLY",
+        "action": "PLACED",
+        "wardType": "YELLOW_TRINKET"
+      }
+    ],
+    "summary": {
+      "totalPlaced": 1,
+      "totalKilled": 0,
+      "controlWardsPlaced": 0,
+      "wardsPerMinute": 0.25,
+      "byPhase": {
+        "EARLY": 1,
+        "MID": 0,
+        "LATE": 0
+      }
+    }
+  },
+  "itemTimeline": [
+    {
+      "time": 4526,
+      "timeLabel": "0:04",
+      "phase": "EARLY",
+      "itemId": 2003
+    },
+    {
+      "time": 4827,
+      "timeLabel": "0:04",
+      "phase": "EARLY",
+      "itemId": 2003
+    }
+  ]
+}

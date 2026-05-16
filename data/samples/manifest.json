@@ -1,6 +1,42 @@
 {
   "samples": [
     {
+      "id": "sample-kr-8204958574",
+      "matchId": "KR_8204958574",
+      "label": "sample-kr-8204958574 · SUPPORT LOSS",
+      "champion": "Pantheon",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-06",
+      "theme": "초반 라인전 주도권을 살렸지만 중반 연이은 데스로 운영 주도권을 내준 판테온 서포터 경기",
+      "normalizedPath": "/data/samples/sample-kr-8204958574/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8204958574/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8204958574/sample-kr-8204958574-notes.md"
+    },
+    {
+      "id": "sample-kr-8205002542",
+      "matchId": "KR_8205002542",
+      "label": "sample-kr-8205002542 · SUPPORT WIN",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-06",
+      "theme": "3분 27초의 초단기 종료 경기 — 1:25 초반 킬 외에는 분석 표본이 부족한 미완 표본 매치다.",
+      "normalizedPath": "/data/samples/sample-kr-8205002542/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8205002542/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8205002542/sample-kr-8205002542-notes.md"
+    },
+    {
+      "id": "sample-kr-8205009929",
+      "matchId": "KR_8205009929",
+      "label": "sample-kr-8205009929 · SUPPORT WIN",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-05-06",
+      "theme": "세라핀 서폿으로 KDA 0/8/27, 비전 점수 114를 기록하며 후반 오브젝트와 구조물 압박으로 승리를 마무리했다.",
+      "normalizedPath": "/data/samples/sample-kr-8205009929/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8205009929/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8205009929/sample-kr-8205009929-notes.md"
+    },
+    {
       "id": "sample-kr-8192043774",
       "matchId": "KR_8192043774",
       "label": "sample-kr-8192043774 · SUPPORT WIN",

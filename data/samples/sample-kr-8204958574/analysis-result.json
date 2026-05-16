@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8204958574_1778086267375",
+    "generatedAt": "2026-05-06T16:51:07.375Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "초반 라인전 주도권을 살렸지만 중반 연이은 데스로 운영 주도권을 내준 판테온 서포터 경기"
+  },
+  "coachSummary": {
+    "overallSummary": "초반 5분 안에 3킬을 만들어내며 라인전 주도권을 가져왔고 비전 점수 95로 시야 헌신은 우수했지만, 중반부터 6데스가 연속되며 오브젝트와 타워 주도권(아군 4 vs 적 9)을 모두 내주는 흐름으로 이어졌다. 킬 관여율 34%와 1.08 KDA가 보여주듯 한타·세트 페이즈에서 포지셔닝과 진입 타이밍을 다듬는 것이 다음 게임의 핵심 과제다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2:13·3:07·4:54 세 차례 연속 킬 관여로 바텀 라인전 주도권을 확보했고, 6:41 첫 데스 전까지 템포를 잘 끌어왔다."
+    },
+    {
+      "phase": "MID",
+      "summary": "15:29 드래곤 합류는 좋았으나 18:22부터 27:49까지 5번의 데스가 누적되며 23:04·29:04 오브젝트를 연달아 헌납해 운영 주도권이 무너졌다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "30:36·32:53 결정적 한타에서 추가 데스가 나오며 반전 기회를 만들지 못한 채 경기를 마무리했다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "공격적인 초반 라인전 설계",
+      "description": "2:13·3:07·4:54에 연달아 킬을 만들며 판테온 서포터의 초반 압박력을 충분히 활용했다. 3분 만에 바텀 주도권을 가져온 진입 판단이 좋았다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_002",
+        "evt_003"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "오브젝트 합류 타이밍 인식",
+      "description": "15:29 드래곤 교전에 정확히 합류해 첫 드래곤 템포를 챙겼다. 서포터로서 맵을 보며 합류 라인을 잡는 감각이 살아 있다.",
+      "relatedEventIds": [
+        "evt_013"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "시야 헌신 — 비전 점수 95",
+      "description": "33분 경기에서 비전 점수 95는 서포터 기준으로도 우수한 수치이며, 오라클 렌즈와 제어 와드 활용이 꾸준했다는 신호다.",
+      "relatedEventIds": [
+        "evt_013"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 연쇄 데스로 인한 골드·운영 손실",
+      "description": "18:22~27:49 사이 5번의 데스가 누적되며 적 팀에 골드와 시야 주도권을 헌납했다. 판테온 서포터는 부활 후 재진입 타이밍을 한 박자 늦추는 절제가 필요하다.",
+      "relatedEventIds": [
+        "evt_014",
+        "evt_018",
+        "evt_021",
+        "evt_024",
+        "evt_028"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 셋업 단계 포지셔닝",
+      "description": "23:04·29:04 오브젝트 셋업에서 본인 데스 직후 상대에게 오브젝트를 내주는 패턴이 반복됐다. 셋업 30초 전에는 시야부터 깔고 깊은 진입을 자제할 필요가 있다.",
+      "relatedEventIds": [
+        "evt_025",
+        "evt_029",
+        "evt_030"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "후반 한타 생존력",
+      "description": "30:36·32:53 결정적 한타에서 추가 데스가 나오며 킬 관여율이 34%에 머물렀다. 후반 판테온은 W 진입 후 즉시 빠지는 in-and-out 운영이 필요하다.",
+      "relatedEventIds": [
+        "evt_033",
+        "evt_034"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "리스폰 후 즉시 재진입하지 말고 미니맵을 3초 확인한 뒤 합류 각을 잡는다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "오브젝트 스폰 30~45초 전부터 제어 와드 + 측면 시야를 먼저 깔고 깊은 진입을 보류한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "후반 한타에서는 판테온 W로 진입한 직후 E 가드를 활용해 즉시 백라인에서 빠지는 in-and-out 동선을 고정한다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "초반에 만든 3킬 리드를 시야 장악(트라이부시·강 와드)으로 환산하는 루틴을 굳힌다.",
+      "linkedWeaknessId": "wk_2"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "2:13",
+      "title": "라인전 첫 솔로킬로 주도권 확보",
+      "description": "초반 첫 교전에서 직접 킬을 만들며 바텀 라인전 흐름을 가져왔다. 판테온 서포터의 강점이 가장 잘 드러난 장면.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "15:29",
+      "title": "첫 드래곤 합류 성공",
+      "description": "드래곤 타이밍에 정확히 합류해 오브젝트 템포를 챙겼다. 이 흐름이 중반 운영의 출발점이 될 수 있었다.",
+      "relatedEventIds": [
+        "evt_013"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "20:12 ~ 22:41",
+      "title": "중반 연쇄 데스 구간",
+      "description": "약 2분 사이 3번의 데스가 누적되며 운영 안정감이 무너졌다. 이 구간이 경기 흐름이 뒤집힌 분기점이다.",
+      "relatedEventIds": [
+        "evt_018",
+        "evt_021",
+        "evt_024"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "23:04",
+      "title": "오브젝트 헌납 분기점",
+      "description": "직전 데스 여파로 오브젝트 셋업이 무너지며 적 팀에 주도권을 내줬다. 셋업 전 시야 확보의 중요성을 보여주는 장면.",
+      "relatedEventIds": [
+        "evt_025"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "32:53",
+      "title": "마지막 결정 한타 데스",
+      "description": "후반 결정적인 한타에서 생존하지 못하며 반전 기회를 잃었다. 진입 후 빠지는 동선 정리가 필요한 장면.",
+      "relatedEventIds": [
+        "evt_034"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "2:13 초반 첫 킬 — 라인전 주도권 확보"
+    },
+    {
+      "eventId": "evt_002",
+      "shortNote": "3:07 추가 킬 — 바텀 압박 지속"
+    },
+    {
+      "eventId": "evt_003",
+      "shortNote": "4:54 세 번째 킬 — 초반 리드 확정"
+    },
+    {
+      "eventId": "evt_013",
+      "shortNote": "15:29 첫 드래곤 합류 성공"
+    },
+    {
+      "eventId": "evt_014",
+      "shortNote": "18:22 중반 첫 데스 — 운영 안정감 균열 시작"
+    },
+    {
+      "eventId": "evt_018",
+      "shortNote": "20:12 연쇄 데스 1"
+    },
+    {
+      "eventId": "evt_021",
+      "shortNote": "21:29 연쇄 데스 2"
+    },
+    {
+      "eventId": "evt_024",
+      "shortNote": "22:41 연쇄 데스 3"
+    },
+    {
+      "eventId": "evt_025",
+      "shortNote": "23:04 오브젝트 셋업 실패 — 운영 주도권 상실"
+    },
+    {
+      "eventId": "evt_028",
+      "shortNote": "27:49 추가 데스"
+    },
+    {
+      "eventId": "evt_029",
+      "shortNote": "28:58 추가 데스"
+    },
+    {
+      "eventId": "evt_030",
+      "shortNote": "29:04 두 번째 오브젝트 헌납"
+    },
+    {
+      "eventId": "evt_033",
+      "shortNote": "30:36 후반 한타 데스"
+    },
+    {
+      "eventId": "evt_034",
+      "shortNote": "32:53 마지막 한타 데스"
+    }
+  ]
+}
