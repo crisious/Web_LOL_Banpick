@@ -135,6 +135,59 @@ expectThrows("phaseSummaries as object (not array) — currently silent",
   },
   "phaseSummaries-object-tolerated-by-validate");
 
+// ─── Phase 32: combatAnalysis 검증 (선택적 필드, backward-compat) ────────────
+
+// 기본 fixture는 combatAnalysis 필드가 없음 → "valid fixture passes" 케이스로 이미
+// 통과 확인. 아래는 필드가 있을 때의 형태 검증.
+
+function withCombat(items) {
+  const f = validFixture();
+  f.combatAnalysis = items;
+  return f;
+}
+
+expectOk("combatAnalysis: undefined → tolerated", () => {
+  const f = validFixture();
+  delete f.combatAnalysis;
+  validateAnalysisOutput(f);
+});
+
+expectOk("combatAnalysis: null → tolerated", () => {
+  const f = validFixture();
+  f.combatAnalysis = null;
+  validateAnalysisOutput(f);
+});
+
+expectOk("combatAnalysis: empty array → tolerated", () => {
+  validateAnalysisOutput(withCombat([]));
+});
+
+expectOk("combatAnalysis: valid item passes", () => {
+  validateAnalysisOutput(withCombat([
+    { encounterId: "enc_001", situationLabel: "초반 갱킹 손실", takeaway: "와드 우선" },
+  ]));
+});
+
+expectThrows("combatAnalysis: object instead of array throws",
+  () => validateAnalysisOutput(withCombat({ enc_001: { takeaway: "x" } })),
+  "combatAnalysis not array");
+
+expectThrows("combatAnalysis: missing encounterId throws",
+  () => validateAnalysisOutput(withCombat([{ situationLabel: "x", takeaway: "y" }])),
+  "encounterId");
+
+expectThrows("combatAnalysis: missing situationLabel throws",
+  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", takeaway: "y" }])),
+  "situationLabel");
+
+expectThrows("combatAnalysis: missing takeaway throws",
+  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "x" }])),
+  "takeaway");
+
+expectThrows("combatAnalysis: empty string situationLabel throws",
+  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "", takeaway: "y" }])),
+  "situationLabel");
+
 // ─── 결과 ────────────────────────────────────────────────────────────────────
 
 console.log(`\n${pass} passed, ${fail} failed`);

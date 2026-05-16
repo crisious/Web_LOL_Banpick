@@ -34,7 +34,11 @@ function extractFunctionSource(source, name) {
 }
 
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
-const buildLlmPayload = new Function(`${buildSrc}\nreturn buildLlmPayload;`)();
+const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
+// buildLlmPayload는 detectCombatEncounters를 내부에서 호출 → 같은 클로저에 함께 평가
+const { buildLlmPayload, detectCombatEncounters } = new Function(
+  `${detectSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
+)();
 
 let pass = 0, fail = 0;
 
@@ -151,7 +155,7 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   check("outputContract.schemaVersion = 1.0", out.outputContract.schemaVersion, "1.0");
   check("requiredTopLevelFields list",
     out.outputContract.requiredTopLevelFields,
-    ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex"]);
+    ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis"]);
   check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
   check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);
@@ -184,6 +188,101 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   const f = baseFixture();
   const out = buildLlmPayload(f);
   check("empty timeline → empty array", out.timelineEvents, []);
+  check("empty timeline → empty combatEncounters", out.combatEncounters, []);
+}
+
+// ─── Phase 32: detectCombatEncounters 단독 검증 ──────────────────────────────
+
+function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = true, phase = "EARLY") {
+  return {
+    eventId,
+    eventType,
+    timestampMs,
+    timestampLabel: `${Math.floor(timestampMs / 60000)}:${String(Math.floor((timestampMs % 60000) / 1000)).padStart(2, "0")}`,
+    phase,
+    importance: 4,
+    summary: `${eventType} ${eventId}`,
+    isPlayerInvolved,
+  };
+}
+
+// 케이스 9: 빈 입력 → 빈 배열
+{
+  check("encounters: empty input → []", detectCombatEncounters([]), []);
+}
+
+// 케이스 10: 25초 윈도우 그룹화 — 20초 간격은 같은 encounter, 30초 간격은 분리
+{
+  const events = [
+    makeCombatEvent("evt_1", "CHAMPION_KILL", 60000),
+    makeCombatEvent("evt_2", "CHAMPION_KILL", 80000),   // +20s → 같은 그룹
+    makeCombatEvent("evt_3", "PLAYER_DEATH", 130000),   // +50s → 새 그룹
+    makeCombatEvent("evt_4", "PLAYER_DEATH", 140000),   // +10s → evt_3과 같은 그룹
+  ];
+  const out = detectCombatEncounters(events);
+  checkTrue("encounters: 2 groups from 20s+50s gap", out.length === 2);
+  check("encounter 1 events", out[0].relatedEventIds, ["evt_1", "evt_2"]);
+  check("encounter 2 events", out[1].relatedEventIds, ["evt_3", "evt_4"]);
+}
+
+// 케이스 11: 비전투 이벤트는 제외, 플레이어 미관여 그룹은 제거
+{
+  const events = [
+    makeCombatEvent("evt_kill_a", "CHAMPION_KILL", 60000, true),     // player involved → 채택
+    makeCombatEvent("evt_other", "DRAGON_FIGHT", 70000, true),       // 비전투 → 무시
+    makeCombatEvent("evt_kill_b", "CHAMPION_KILL", 200000, false),   // observer만 → 제외
+    makeCombatEvent("evt_kill_c", "CHAMPION_KILL", 210000, false),   // observer만 → 제외
+  ];
+  const out = detectCombatEncounters(events);
+  checkTrue("encounters: only player-involved groups", out.length === 1);
+  check("encounter only contains player events", out[0].relatedEventIds, ["evt_kill_a"]);
+}
+
+// 케이스 12: situation 분류 — DOMINANT / DOWN / TRADED
+{
+  const dominant = detectCombatEncounters([
+    makeCombatEvent("k1", "CHAMPION_KILL", 60000, true),
+    makeCombatEvent("k2", "CHAMPION_KILL", 65000, true),
+  ]);
+  check("situation: 2 kills → PLAYER_DOMINANT", dominant[0].situation, "PLAYER_DOMINANT");
+
+  const down = detectCombatEncounters([
+    makeCombatEvent("d1", "PLAYER_DEATH", 60000, true),
+    makeCombatEvent("d2", "PLAYER_DEATH", 65000, true),
+  ]);
+  check("situation: 2 deaths → PLAYER_DOWN", down[0].situation, "PLAYER_DOWN");
+
+  const traded = detectCombatEncounters([
+    makeCombatEvent("k1", "CHAMPION_KILL", 60000, true),
+    makeCombatEvent("d1", "PLAYER_DEATH", 65000, true),
+  ]);
+  check("situation: 1 kill + 1 death → TRADED", traded[0].situation, "TRADED");
+}
+
+// 케이스 13: encounterId 패딩 + 8개 cap
+{
+  const events = [];
+  // 10개 분리 그룹 (30초 간격) — 8개로 cap 돼야 함
+  for (let i = 0; i < 10; i += 1) {
+    events.push(makeCombatEvent(`evt_${i}`, "CHAMPION_KILL", 60000 + i * 60000, true));
+  }
+  const out = detectCombatEncounters(events);
+  checkTrue("encounters: capped at 8", out.length === 8);
+  check("encounter id padding (1st)", out[0].encounterId, "enc_001");
+  check("encounter id padding (8th)", out[7].encounterId, "enc_008");
+}
+
+// 케이스 14: playerKills / playerDeaths 카운트 — observer 이벤트는 제외
+{
+  const events = [
+    makeCombatEvent("evt_player_kill", "CHAMPION_KILL", 60000, true),
+    makeCombatEvent("evt_observer_kill", "CHAMPION_KILL", 70000, false), // 같은 그룹이지만 미관여
+    makeCombatEvent("evt_player_death", "PLAYER_DEATH", 80000, true),
+  ];
+  const out = detectCombatEncounters(events);
+  check("playerKills counts only involved", out[0].playerKills, 1);
+  check("playerDeaths counts only involved", out[0].playerDeaths, 1);
+  check("eventCount includes all in group", out[0].eventCount, 3);
 }
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
