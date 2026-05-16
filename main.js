@@ -20,6 +20,7 @@ const dom = {
   weaknesses: document.querySelector("[data-weaknesses]"),
   checklist: document.querySelector("[data-checklist]"),
   keyMoments: document.querySelector("[data-key-moments]"),
+  combatAnalysis: document.querySelector("[data-combat-analysis]"),
   evidence: document.querySelector("[data-evidence]"),
   evidenceQuality: document.querySelector("[data-evidence-quality]"),
   sampleSwitcher: document.querySelector("[data-sample-switcher]"),
@@ -2036,6 +2037,49 @@ function renderKeyMoments(sample) {
     .join("");
 }
 
+// Phase 32: 전투 KDA 상황별 집중 분석 카드.
+// AI 응답 항목에는 시간 정보가 없으므로 relatedEventIds 첫 ID를 timelineEvents에
+// 매핑해 startLabel을 채운다 (evidenceMap 재사용).
+function renderCombatAnalysis(sample) {
+  if (!dom.combatAnalysis) return;
+  const items = Array.isArray(sample.analysis?.combatAnalysis)
+    ? sample.analysis.combatAnalysis
+    : [];
+  if (items.length === 0) {
+    dom.combatAnalysis.innerHTML =
+      '<p class="muted">이 경기에서는 묶을 만한 전투 구간이 충분하지 않았습니다.</p>';
+    return;
+  }
+  const evMap = evidenceMap(sample);
+  const situationLabel = (s) => {
+    if (s === "PLAYER_DOMINANT") return "우세";
+    if (s === "PLAYER_DOWN") return "열세";
+    if (s === "TRADED") return "교환";
+    return s || "";
+  };
+  dom.combatAnalysis.innerHTML = items
+    .map((item) => {
+      const ids = Array.isArray(item.relatedEventIds) ? item.relatedEventIds : [];
+      const firstEvt = ids.map((id) => evMap.get(id)).find(Boolean);
+      const stampTime = firstEvt?.timestamp || "-";
+      const sit = situationLabel(item.situation);
+      return `
+        <article class="moment-card">
+          <div class="moment-stamp">
+            <span>${stampTime}</span>
+            <strong>${sit}</strong>
+          </div>
+          <div class="moment-copy">
+            <h4>${item.situationLabel || "교전"}</h4>
+            <p>${item.playerDecision || ""}</p>
+            <span>${item.takeaway || ""}</span>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function collectEvidenceEventIds(node) {
   const ids = new Set();
   const walk = (value) => {
@@ -2867,6 +2911,7 @@ function renderSample(sample) {
     dom.keyMoments.innerHTML = '<p class="muted">핵심 장면 데이터 생성 중...</p>';
   }
 
+  renderCombatAnalysis(sample);
   renderEvidence(sample);
   renderComparison(sample);
   renderPlaytimeScore(sample);
