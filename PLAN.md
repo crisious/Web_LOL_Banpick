@@ -17,6 +17,7 @@
 | 30 | (codex) | DONE | AGENT_DISABLE_CODEX env hook + runCli 에러 stdout tail + 진단 |
 | 31 | data | DONE | 측정 코호트 4→7 확장 (Pantheon LOSS + Seraphine WIN×2, 3:27 엣지 포함, 0 violations) |
 | 32 | combat | DONE | 전투 KDA 상황별 집중 분석 (`combatEncounters` 사전 계산 + `combatAnalysis` 출력 필드 + UI 카드) |
+| 32-live | qa | DONE | 라이브 검증 — KR_8215889762 (Seraphine SUP LOSS) generate-sample에서 combatAnalysis 5건 정상 생성, schemaViolations=0 |
 
 **테스트**: `npm test` → 147 passed / 0 failed across 6 test file(s) (Phase 32에서 +25)
 
@@ -24,19 +25,24 @@
 
 ## 1. 라이브 검증 결과 (2026-05-04)
 
-### Track D — Phase 25 Track C 효과 측정 (PASS N=7 누적, 0 violations)
+### Track D — Phase 25 Track C 효과 측정 (PASS N=8 누적, 0 violations)
 
-| sampleId | 매치 형태 | sourceType | violations |
-| --- | --- | --- | --- |
-| 8193501785 | Thresh SUP WIN, 28:39, 0/6/22 | claude_ai | 0 |
-| 8193453153 | Ezreal SUP WIN, 34:39, 6/4/9 | claude_ai | 0 |
-| 8194679229 | Rell SUP LOSS, 39:55, 2/16/24 | claude_ai | 0 |
-| 8192043774 | Milio SUP WIN (Phase 30 1차 검증) | claude_ai | 0 |
-| 8204958574 | Pantheon SUP LOSS, 33:39, 6/12/7 | claude_ai | 0 |
-| 8205009929 | Seraphine SUP WIN, 0/8/27, vision 114 | claude_ai | 0 |
-| 8205002542 | Seraphine SUP WIN, **3:27 초단기/엣지** | claude_ai | 0 |
+| sampleId | 매치 형태 | sourceType | violations | combatAnalysis |
+| --- | --- | --- | --- | --- |
+| 8193501785 | Thresh SUP WIN, 28:39, 0/6/22 | claude_ai | 0 | n/a (Phase 32 이전) |
+| 8193453153 | Ezreal SUP WIN, 34:39, 6/4/9 | claude_ai | 0 | n/a |
+| 8194679229 | Rell SUP LOSS, 39:55, 2/16/24 | claude_ai | 0 | n/a |
+| 8192043774 | Milio SUP WIN (Phase 30 1차 검증) | claude_ai | 0 | n/a |
+| 8204958574 | Pantheon SUP LOSS, 33:39, 6/12/7 | claude_ai | 0 | n/a |
+| 8205009929 | Seraphine SUP WIN, 0/8/27, vision 114 | claude_ai | 0 | n/a |
+| 8205002542 | Seraphine SUP WIN, **3:27 초단기/엣지** | claude_ai | 0 | n/a |
+| 8215889762 | Seraphine SUP LOSS, 5데스, vision 66 (**Phase 32 라이브**) | claude_ai | 0 | **5건 채움** |
 
-7/7 = 0 위반. Phase 26 수용 기준 ("위반 0건 또는 정규화 호출 절반 이하") 누적 초과 달성. 8205002542는 surrender/remake 추정 초단기 매치로, 표본 부족 상황에서도 스키마는 정상 출력됨을 확인하는 엣지 케이스. 서버측 정규화 안전망은 7건 전부 미발화 — 다른 모델 / 프롬프트 변경 시 안전판으로 유지.
+8/8 = 0 위반. Phase 32 라이브 검증(2026-05-16)에서 신규 `combatAnalysis` 필드가
+encounter 5건 모두 정상 생성됨을 실측 확인. 각 항목 encounterId/situationLabel/
+playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake 추정
+초단기 매치 엣지 케이스. 서버측 정규화 안전망은 8건 전부 미발화 — 다른 모델 /
+프롬프트 변경 시 안전판으로 유지.
 
 ### Track E — Riot 키 만료 UX (정적 검증 + 라이브 happy-path 200 확인)
 
