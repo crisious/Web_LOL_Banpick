@@ -22,15 +22,19 @@
 
 ## 1. 라이브 검증 결과 (2026-05-04)
 
-### Track D — Phase 25 Track C 효과 측정 (PASS N=3)
+### Track D — Phase 25 Track C 효과 측정 (PASS N=7 누적, 0 violations)
 
 | sampleId | 매치 형태 | sourceType | violations |
 | --- | --- | --- | --- |
 | 8193501785 | Thresh SUP WIN, 28:39, 0/6/22 | claude_ai | 0 |
 | 8193453153 | Ezreal SUP WIN, 34:39, 6/4/9 | claude_ai | 0 |
 | 8194679229 | Rell SUP LOSS, 39:55, 2/16/24 | claude_ai | 0 |
+| 8192043774 | Milio SUP WIN (Phase 30 1차 검증) | claude_ai | 0 |
+| 8204958574 | Pantheon SUP LOSS, 33:39, 6/12/7 | claude_ai | 0 |
+| 8205009929 | Seraphine SUP WIN, 0/8/27, vision 114 | claude_ai | 0 |
+| 8205002542 | Seraphine SUP WIN, **3:27 초단기/엣지** | claude_ai | 0 |
 
-3/3 = 0 위반. Phase 26 수용 기준 ("위반 0건 또는 정규화 호출 절반 이하") 명확히 초과 달성. Claude는 OUTPUT_SCHEMA_EXAMPLE 추가 이후 일관되게 스키마 준수 출력 생성. 서버측 정규화 안전망은 미발화 — 다른 모델 / 프롬프트 변경 시 안전판으로 유지.
+7/7 = 0 위반. Phase 26 수용 기준 ("위반 0건 또는 정규화 호출 절반 이하") 누적 초과 달성. 8205002542는 surrender/remake 추정 초단기 매치로, 표본 부족 상황에서도 스키마는 정상 출력됨을 확인하는 엣지 케이스. 서버측 정규화 안전망은 7건 전부 미발화 — 다른 모델 / 프롬프트 변경 시 안전판으로 유지.
 
 ### Track E — Riot 키 만료 UX (정적 검증 + 라이브 happy-path 200 확인)
 
@@ -106,7 +110,7 @@
 
 이전 PLAN 사이클에서 후보였으나 처리 완료:
 
-- Track D — Phase 25 Track C 효과 측정 → 라이브 N=4 모두 0 violations PASS
+- Track D — Phase 25 Track C 효과 측정 → 라이브 N=7 누적 모두 0 violations PASS (3:27 초단기 엣지 1건 포함)
 - Track E — Riot 키 만료 UX → Track V 25 케이스 + happy-path 200 정적 검증
 - Codex win32 진단 + cleanup → Phase 30 (`AGENT_DISABLE_CODEX=1`)
 - AUGMENTED_PATH win32 호환 → Phase 30 부수 fix
