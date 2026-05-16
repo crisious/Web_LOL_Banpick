@@ -15,8 +15,10 @@
 | 28 | S/T | DONE | utils 함수 테스트 (delta NaN 버그 수정) + aggregateRecentStats 회귀 |
 | 29 | U/V | DONE | CHANGELOG 백필 + riotErrorPayload 회귀 |
 | 30 | (codex) | DONE | AGENT_DISABLE_CODEX env hook + runCli 에러 stdout tail + 진단 |
+| 31 | data | DONE | 측정 코호트 4→7 확장 (Pantheon LOSS + Seraphine WIN×2, 3:27 엣지 포함, 0 violations) |
+| 32 | combat | DONE | 전투 KDA 상황별 집중 분석 (`combatEncounters` 사전 계산 + `combatAnalysis` 출력 필드 + UI 카드) |
 
-**테스트**: `npm test` → 122 passed / 0 failed across 6 test file(s)
+**테스트**: `npm test` → 147 passed / 0 failed across 6 test file(s) (Phase 32에서 +25)
 
 ---
 
@@ -80,12 +82,17 @@
 
 ### Tier A — 회귀 차단 보강 (외부 변화 시 우선)
 
-- **Phase 31: `summarizeMatch` 회귀 테스트** (~1h)
+(노트: 후보 Phase 라벨은 31/32에서 33/34로 재배정 — 31은 데이터 코호트 확장, 32는 combatAnalysis 기능이 차지)
+
+- **Phase 33: `summarizeMatch` 회귀 테스트** (~1h)
   - 트리거: Riot Match-V5 응답 스키마 변경 / 새 challenge 필드 추가 / participant 구조 변경
   - 가치: 서버 단의 raw → summary 추출 깨지면 모든 후속 분석이 손상
-- **Phase 32: `buildKeyMoments` / `buildActionChecklist` fixture** (~1h)
+- **Phase 34: `buildKeyMoments` / `buildActionChecklist` fixture** (~1h)
   - 트리거: AI 양쪽 실패 케이스가 실제 발생 (서버 콘솔 `rule-based fallback` 로그)
   - 가치: fallback 안전망의 출력 품질을 회귀 차단 — 현재는 fallback 발화 시 결과 불확실
+- **Phase 32 후속: `detectCombatEncounters` 보강 후보** (~30m)
+  - 트리거: 윈도우(25s) 또는 max(8) 임계값을 조정해야 하는 케이스 발견 — 예: 장기 한타가 두 encounter로 쪼개지거나, 라인전 단계 킬 누적이 cap에 걸려 후반 한타가 누락되는 사례
+  - 가치: 현재 임계값은 합리적 디폴트지만, 실제 코호트 통계로 검증되지 않음
 
 ### Tier B — 새 사용자 시나리오에서만 의미
 

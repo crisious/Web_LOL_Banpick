@@ -414,6 +414,51 @@
 - 카드별 `relatedEventIds`가 참조할 수 있는 공통 인덱스
 - UI에서 추후 펼침형 상세 근거로 확장 가능
 
+## 4.11 `combatAnalysis` (Phase 32 추가, 선택적)
+
+설명:
+
+- 전투 KDA 상황(한타·교전 단위)별 집중 분석
+- 서버가 `timelineEvents`의 CHAMPION_KILL / PLAYER_DEATH를 25초 윈도우로 인접 그룹화해 사전 계산한 `combatEncounters`를 페이로드에 포함하면, AI가 각 encounter마다 한 항목씩 작성한다.
+- 입력 encounter가 0개면 빈 배열이 정상.
+
+타입:
+
+- `array<object>`
+
+배열 원소 필드:
+
+- `encounterId`: `string` — 입력 payload의 encounterId와 동일 (예: `"enc_001"`)
+- `situationLabel`: `string` — 교전 상황을 한 줄로 요약 (예: "초반 라인전 솔로킬", "오브젝트 셋업 중 cut off")
+- `playerDecision`: `string` — 그 순간 플레이어의 판단/포지셔닝 (사실 기반)
+- `takeaway`: `string` — 다음에 같은 상황에서 적용할 짧은 교훈
+- `relatedEventIds`: `array<string>` — encounter에 포함된 timeline 이벤트 ID 목록
+
+예시:
+
+```json
+[
+  {
+    "encounterId": "enc_001",
+    "situationLabel": "초반 라인전 솔로킬",
+    "playerDecision": "상대 정글 동선이 탑으로 빠진 타이밍에 E 가드 후 W 진입",
+    "takeaway": "초반 솔로킬은 정글 시야 + W 쿨다운이 갖춰진 타이밍에만 시도",
+    "relatedEventIds": ["evt_001", "evt_002"]
+  }
+]
+```
+
+검증 규칙 (`validateAnalysisOutput`):
+
+- 필드 누락/`null`/빈 배열 → 통과 (선택적, 기존 코호트 backward-compat)
+- 배열이 아닌 값 → throw `"combatAnalysis not array"`
+- 각 항목의 `encounterId`/`situationLabel`/`takeaway`가 비어 있으면 throw
+
+역할:
+
+- 한 경기 내 여러 교전 상황을 분리해 패턴을 드러내 줌 (단일 weaknesses/keyMoments로는 묻히는 반복 행동을 카드 단위로 분해)
+- UI는 `data-combat-analysis` 영역에 카드 형태로 렌더링하며, `relatedEventIds`의 첫 번째 ID로 시작 시간을 보조 표시
+
 ## 5. 최소 유효 응답 조건
 
 아래 조건을 만족해야 `유효한 분석 결과`로 간주한다.
