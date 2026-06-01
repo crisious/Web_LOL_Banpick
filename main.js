@@ -2109,7 +2109,20 @@ function renderEvidence(sample) {
 
   let evidenceEntries;
   if (isRuleBasedArray) {
-    evidenceEntries = idx;
+    // evidenceIndex가 객체 배열({eventId, shortNote} 또는
+    // {eventId, timestampLabel, eventType, ...})인 경우, 렌더 템플릿이 기대하는
+    // {timestamp, eventType, summary, statNote} 형태로 timelineMap을 통해 보정한다.
+    // (이전엔 raw 객체를 그대로 넘겨 timestamp/eventType/summary가 비어 표시되지 않았음)
+    evidenceEntries = idx.map((entry) => {
+      const tl = timelineMap.get(entry.eventId);
+      return {
+        eventId: entry.eventId,
+        timestamp: entry.timestamp || entry.timestampLabel || tl?.timestamp || "—",
+        eventType: entry.eventType || tl?.eventType || "—",
+        summary: entry.shortNote || entry.note || entry.summary || tl?.summary || "",
+        statNote: entry.statNote || (entry.phase ? `${entry.phase} 구간` : tl?.statNote || ""),
+      };
+    });
   } else {
     let ids = collectEvidenceEventIds(idx);
 
@@ -2145,12 +2158,12 @@ function renderEvidence(sample) {
       (entry) => `
         <article class="evidence-item">
           <div class="evidence-stamp">
-            <span>${entry.timestamp || entry.timestampLabel || "—"}</span>
-            <strong>${entry.eventType || "—"}</strong>
+            <span>${escapeHtml(entry.timestamp || entry.timestampLabel || "—")}</span>
+            <strong>${escapeHtml(entry.eventType || "—")}</strong>
           </div>
           <div class="evidence-copy">
-            <p>${entry.summary || ""}</p>
-            <span>${entry.statNote || entry.laneHint || ""}</span>
+            <p>${escapeHtml(entry.summary || "")}</p>
+            <span>${escapeHtml(entry.statNote || entry.laneHint || "")}</span>
           </div>
         </article>
       `,
