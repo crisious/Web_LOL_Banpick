@@ -12,6 +12,12 @@ const port = Number(process.env.PORT || 8123);
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
 // S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
 const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000;
+// 오브젝트 처치 후 이 시간(ms) 내의 데스는 전략적으로 연관된 것으로 간주.
+const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
+// 약점 판정용 "저파밍 바닥선" 분당 CS 임계값 (이 값 미만이면 자원 전환 약점으로 표시).
+const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
+// calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
+const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
 const manifestPath = path.join(root, "data", "samples", "manifest.json");
 
 // ─── Simple in-memory rate limiter ───────────────────────────────────────────
@@ -481,6 +487,18 @@ function buildPhaseContext(events) {
   };
 }
 
+// 오브젝트 처치 직후(POST_OBJECTIVE_DEATH_WINDOW_MS 이내) 발생한 데스만 추출.
+// 호출부마다 objectiveWins 집합 정의가 다르므로(예: TOWER_TAKE 포함 여부) 인자로 받는다.
+function filterPostObjectiveDeaths(deaths, objectiveWins) {
+  return deaths.filter((deathEvent) =>
+    objectiveWins.some(
+      (objectiveEvent) =>
+        objectiveEvent.timestampMs < deathEvent.timestampMs &&
+        deathEvent.timestampMs - objectiveEvent.timestampMs <= POST_OBJECTIVE_DEATH_WINDOW_MS,
+    ),
+  );
+}
+
 function buildDerivedSignals(normalized) {
   const events = normalized.timelineEvents;
   const objectiveWins = events.filter((event) =>
@@ -492,13 +510,7 @@ function buildDerivedSignals(normalized) {
   const lateTowers = events.filter(
     (event) => event.phase === "LATE" && event.eventType === "TOWER_TAKE",
   );
-  const postObjectiveDeaths = playerDeaths.filter((deathEvent) =>
-    objectiveWins.some(
-      (objectiveEvent) =>
-        objectiveEvent.timestampMs < deathEvent.timestampMs &&
-        deathEvent.timestampMs - objectiveEvent.timestampMs <= 120000,
-    ),
-  );
+  const postObjectiveDeaths = filterPostObjectiveDeaths(playerDeaths, objectiveWins);
 
   const candidateThemes = [];
   if (earlyDeaths.length >= 2) {
@@ -513,7 +525,7 @@ function buildDerivedSignals(normalized) {
   if (
     normalized.matchInfo.position !== "SUPPORT" &&
     normalized.playerStats.csPerMinute <
-      { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 }[normalized.matchInfo.position]
+      CS_LOW_FARM_THRESHOLDS[normalized.matchInfo.position]
   ) {
     candidateThemes.push("low_resource_conversion");
   }
@@ -694,13 +706,7 @@ function bestFightSummary(normalized) {
 }
 
 function lowFarmThreshold(position) {
-  return {
-    TOP: 6,
-    MID: 6,
-    ADC: 6.5,
-    JUNGLE: 4.5,
-    SUPPORT: 0,
-  }[position] || 0;
+  return CS_LOW_FARM_THRESHOLDS[position] || 0;
 }
 
 function buildStrengths(normalized) {
@@ -795,13 +801,7 @@ function buildWeaknesses(normalized) {
   const objectiveWins = events.filter((event) =>
     ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
   );
-  const postObjectiveDeaths = deaths.filter((deathEvent) =>
-    objectiveWins.some(
-      (objectiveEvent) =>
-        objectiveEvent.timestampMs < deathEvent.timestampMs &&
-        deathEvent.timestampMs - objectiveEvent.timestampMs <= 120000,
-    ),
-  );
+  const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveWins);
 
   if (earlyDeaths.length >= 2) {
     weaknesses.push({
@@ -953,7 +953,7 @@ function calcCombatScore(stats, challenges, minutes) {
 }
 
 function calcIncomeScore(stats, challenges, position, minutes) {
-  const csThreshold = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 }[position] || 6;
+  const csThreshold = CS_FULL_SCORE_TARGETS[position] || 6;
   const gpm = challenges.goldPerMinute || (stats.goldEarned / minutes);
   const csPart = Math.min(stats.csPerMinute / csThreshold, 1.2) * 4;
   const goldPart = Math.min(gpm / 450, 1.2) * 4;
@@ -999,7 +999,8 @@ function buildPlaytimeScore(normalized) {
   const info = normalized.matchInfo;
   const team = normalized.teamContext;
   const events = normalized.timelineEvents;
-  const minutes = info.durationSeconds / 60;
+  // durationSeconds가 0/60 미만인 비정상 매치에서도 점수 분모가 0/NaN이 되지 않도록 하한 1분.
+  const minutes = Math.max(1, info.durationSeconds / 60);
 
   const combat = calcCombatScore(stats, challenges, minutes);
   const income = calcIncomeScore(stats, challenges, info.position, minutes);
@@ -1266,13 +1267,7 @@ function buildCoachSummary(normalized) {
     ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
   );
   const deaths = normalized.timelineEvents.filter((event) => event.eventType === "PLAYER_DEATH");
-  const postObjectiveDeaths = deaths.filter((deathEvent) =>
-    objectiveEvents.some(
-      (objectiveEvent) =>
-        objectiveEvent.timestampMs < deathEvent.timestampMs &&
-        deathEvent.timestampMs - objectiveEvent.timestampMs <= 120000,
-    ),
-  );
+  const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveEvents);
 
   const overallSummary = isWin
     ? "초반 흔들린 장면이 있었지만, 오브젝트 템포와 후속 한타 기여를 계속 만들어 결국 승리 구조를 유지한 경기였다."
@@ -2029,9 +2024,17 @@ function resolveApiKey(userKey) {
   return process.env.RIOT_API_KEY || null;
 }
 
+const MAX_BODY_BYTES = 1 << 20; // 1MB — 본 API JSON 페이로드에 충분, 메모리 고갈 방지용 상한.
 async function parseBody(req) {
   const chunks = [];
+  let total = 0;
   for await (const chunk of req) {
+    total += chunk.length;
+    if (total > MAX_BODY_BYTES) {
+      const error = new Error("Payload too large");
+      error.statusCode = 413;
+      throw error;
+    }
     chunks.push(chunk);
   }
   const raw = Buffer.concat(chunks).toString("utf8");

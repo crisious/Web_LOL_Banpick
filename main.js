@@ -1945,7 +1945,7 @@ function renderInsightCards(host, items, kind, sample) {
         .slice(0, 2);
 
       const footerText = kind === "strength" ? item.impact : item.improvementHint;
-      const footer = footerText ? `<p class="insight-footer">${footerText}</p>` : "";
+      const footer = footerText ? `<p class="insight-footer">${escapeHtml(footerText)}</p>` : "";
       const evidenceText = item.evidence || linkedEvidence[0]?.summary || "";
 
       // Phase 16: relatedEventIds 개수로 임팩트 레벨 추정
@@ -1956,20 +1956,20 @@ function renderInsightCards(host, items, kind, sample) {
       return `
         <article class="insight-card" data-kind="${kind}">
           <div class="insight-card__header">
-            <h4>${item.title}</h4>
+            <h4>${escapeHtml(item.title)}</h4>
             <div class="insight-card__chips">
               <span>${kind === "strength" ? "잘한 점" : "개선 포인트"}</span>
               ${impactChip}
             </div>
           </div>
-          <p class="insight-body">${item.description}</p>
-          <p class="insight-evidence">${evidenceText}</p>
+          <p class="insight-body">${escapeHtml(item.description)}</p>
+          <p class="insight-evidence">${escapeHtml(evidenceText)}</p>
           ${footer}
           <div class="chip-row">
             ${linkedEvidence
               .map(
                 (entry) => `
-                  <span class="event-chip">${entry.timestamp} · ${entry.eventType}</span>
+                  <span class="event-chip">${escapeHtml(entry.timestamp)} · ${escapeHtml(entry.eventType)}</span>
                 `,
               )
               .join("")}
@@ -2006,10 +2006,10 @@ function renderChecklist(sample) {
     .map(
       (item) => `
         <li class="checklist-item">
-          <div class="checklist-priority">${priorityToken(item.priority)}</div>
+          <div class="checklist-priority">${escapeHtml(priorityToken(item.priority))}</div>
           <div>
-            <strong>${item.action || item.text || item.label || ""}</strong>
-            ${item.reason || item.description ? `<p>${item.reason || item.description}</p>` : ""}
+            <strong>${escapeHtml(item.action || item.text || item.label || "")}</strong>
+            ${item.reason || item.description ? `<p>${escapeHtml(item.reason || item.description)}</p>` : ""}
           </div>
         </li>
       `,
@@ -2023,13 +2023,13 @@ function renderKeyMoments(sample) {
       (moment) => `
         <article class="moment-card">
           <div class="moment-stamp">
-            <span>${moment.timestamp || moment.timestampLabel}</span>
-            <strong>${moment.phase}</strong>
+            <span>${escapeHtml(moment.timestamp || moment.timestampLabel)}</span>
+            <strong>${escapeHtml(moment.phase)}</strong>
           </div>
           <div class="moment-copy">
-            <h4>${moment.label || moment.title}</h4>
-            <p>${moment.reason || moment.description}</p>
-            <span>${moment.impact || ""}</span>
+            <h4>${escapeHtml(moment.label || moment.title)}</h4>
+            <p>${escapeHtml(moment.reason || moment.description)}</p>
+            <span>${escapeHtml(moment.impact || "")}</span>
           </div>
         </article>
       `,
@@ -2066,13 +2066,13 @@ function renderCombatAnalysis(sample) {
       return `
         <article class="moment-card">
           <div class="moment-stamp">
-            <span>${stampTime}</span>
-            <strong>${sit}</strong>
+            <span>${escapeHtml(stampTime)}</span>
+            <strong>${escapeHtml(sit)}</strong>
           </div>
           <div class="moment-copy">
-            <h4>${item.situationLabel || "교전"}</h4>
-            <p>${item.playerDecision || ""}</p>
-            <span>${item.takeaway || ""}</span>
+            <h4>${escapeHtml(item.situationLabel || "교전")}</h4>
+            <p>${escapeHtml(item.playerDecision || "")}</p>
+            <span>${escapeHtml(item.takeaway || "")}</span>
           </div>
         </article>
       `;
@@ -2952,7 +2952,7 @@ async function selectSample(sampleId) {
     renderSample(sample);
     dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
   } catch (error) {
-    dom.fetchStatus.innerHTML = `샘플 로드 실패: ${error.message} <button class="retry-btn" data-retry-sample="${sampleId}">다시 시도</button>`;
+    dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(error.message)} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
   }
 }
 

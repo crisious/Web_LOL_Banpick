@@ -150,10 +150,10 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
-npm run test:schema      # validateAnalysisOutput 위반 패턴 9건
-npm run test:champions   # aggregateChampionHistory 6건
-npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 18건
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 224건)
+npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
+npm run test:champions   # aggregateChampionHistory 11건
+npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
 ```
 
 테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하는 방식 (소스 변경 0). 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.

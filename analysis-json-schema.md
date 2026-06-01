@@ -69,13 +69,15 @@
 타입:
 - `object`
 
-필드:
+주요 필드:
 
 - `analysisId`: `string`
 - `generatedAt`: `string`
 - `sourceType`: `string`
 - `language`: `string`
-- `confidence`: `number`
+- `confidence`: `number` (룰 기반 fallback에서만 채워짐 — 라이브 AI 샘플에는 없을 수 있음)
+- `schemaViolations`: `array<string>` — 서버측 정규화 중 발견된 위반 패턴 (Track C 측정, `server.js`에서 기록)
+- `schemaViolationCount`: `number` — `schemaViolations` 개수 편의 필드
 
 예시:
 
@@ -85,7 +87,9 @@
   "generatedAt": "2026-04-10T13:30:00+09:00",
   "sourceType": "match_timeline",
   "language": "ko",
-  "confidence": 0.82
+  "confidence": 0.82,
+  "schemaViolations": [],
+  "schemaViolationCount": 0
 }
 ```
 
@@ -93,6 +97,7 @@
 
 - `sourceType`은 `match_timeline`, `mock`, `manual`, `other` 중 하나를 권장
 - `confidence`는 0~1 범위를 사용
+- 위 목록은 주요 필드이며, 레거시 샘플은 `champion`/`matchId`/`position`/`result`/`riotId`/`schemaVersion`을 `analysisMeta`에 추가로 담고 있을 수 있다 (계약상 닫힌 집합 아님)
 
 ## 4.3 `matchSummary`
 
