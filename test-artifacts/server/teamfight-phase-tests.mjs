@@ -88,6 +88,7 @@ const tf5Events = [ev("a", 300000, "CHAMPION_KILL", "5:00"), ev("b", 302000, "CH
 const tf5 = buildTeamfightPhases([enc("enc_007", ["a", "b", "c", "d"])], tf5Events);
 check("TF5 N>3 단계 3개", tf5[0].phases.map((p) => p.phase), ["ENGAGE", "TRADE", "CLEANUP"]);
 check("TF5 TRADE 2이벤트 even", [tf5[0].phases[1].relatedEventIds.length, tf5[0].phases[1].outcomeTag], [2, "TRADE_EVEN"]);
+check("merge AI 없음 → TRADE_EVEN 룰 coaching", mergeTeamfightCoaching(tf5, [])[0].phases[1].coaching, teamfightPhaseCoaching("TRADE_EVEN"));
 
 // teamfightTakeaway 분기 하드코딩 단언 (순환 비교 제거)
 check("takeaway PLAYER_DOMINANT", teamfightTakeaway(tf1[0]), "좋은 한타 흐름을 다음에도 반복하자.");

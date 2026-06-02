@@ -201,6 +201,7 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   const out = buildLlmPayload(f);
   check("empty timeline → empty array", out.timelineEvents, []);
   check("empty timeline → empty combatEncounters", out.combatEncounters, []);
+  check("empty timeline → empty teamfightPhases", out.teamfightPhases, []);
 }
 
 // ─── Phase 32: detectCombatEncounters 단독 검증 ──────────────────────────────

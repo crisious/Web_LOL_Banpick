@@ -4416,6 +4416,7 @@ body::after {
   gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
+/* TRADE_EVEN은 의도적으로 색상 규칙 없이 중립 .tf-tag 기본 스타일을 사용한다. */
 .tf-tag {
   font-size: 0.75rem;
   padding: 0.1rem 0.5rem;

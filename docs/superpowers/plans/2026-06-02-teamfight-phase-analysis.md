@@ -699,3 +699,5 @@ Expected: 테스트 합계 0 failed, 워킹 트리에 의도한 변경만(샘플
 **2. Placeholder scan:** "적절히/등/TBD" 없음. 모든 코드 스텝에 완전한 코드 포함. ✓
 
 **3. Type consistency:** `buildTeamfightPhases`/`teamfightPhaseCoaching`/`teamfightTakeaway`/`mergeTeamfightCoaching` 시그니처가 Task 1~3·테스트·렌더 전반에서 동일. 출력 `teamfightPhaseAnalysis[].phases[].{phase,outcomeTag,coaching,playerKills,playerDeaths}` 가 서버 머지·검증·렌더·CSS(data-outcome)에서 일관. outcomeTag enum 8종이 코칭맵·tagLabel·CSS·테스트에서 동일. ✓
+
+> **구현 시 정련 (코드 리뷰 반영):** `teamfightPhaseCoaching`는 구현 단계에서 `(outcomeTag)` **단일 인자**로 확정됐다(위 Task 2 코드 블록의 `(phase, outcomeTag)`는 초기 초안). outcomeTag가 단계를 이미 결정하므로(ENGAGE↔INITIATED_KILL/CAUGHT_OUT 등) `phase` 인자는 불필요한 죽은 파라미터였고 제거됨. 호출부·테스트 모두 단일 인자 기준으로 일치.
