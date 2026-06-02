@@ -4403,3 +4403,38 @@ body::after {
     transform: none;
   }
 }
+
+/* 한타 단계별 분석 */
+.tf-phase-row {
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+}
+.tf-phase-row:first-child { border-top: none; }
+.tf-phase-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.tf-tag {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted, #a9b3c1);
+}
+.tf-phase-row[data-outcome="CAUGHT_OUT"] .tf-tag,
+.tf-phase-row[data-outcome="OVERCHASE_DEATH"] .tf-tag,
+.tf-phase-row[data-outcome="DIED_IN_FIGHT"] .tf-tag,
+.tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag {
+  background: rgba(244, 114, 114, 0.18);
+  color: #f47272;
+}
+.tf-phase-row[data-outcome="INITIATED_KILL"] .tf-tag,
+.tf-phase-row[data-outcome="CLOSED_OUT"] .tf-tag,
+.tf-phase-row[data-outcome="TRADE_WON"] .tf-tag {
+  background: rgba(110, 231, 183, 0.16);
+  color: #6ee7b7;
+}
+.tf-kd { margin-left: auto; font-size: 0.78rem; color: var(--text-muted, #a9b3c1); }
+.tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
