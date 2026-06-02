@@ -1342,6 +1342,10 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
     actionChecklist: buildActionChecklist(normalized, weaknesses),
     keyMoments,
     combatAnalysis: [],
+    teamfightPhaseAnalysis: mergeTeamfightCoaching(
+      buildTeamfightPhases(detectCombatEncounters(normalized.timelineEvents), normalized.timelineEvents),
+      [],
+    ),
     evidenceIndex,
   };
 }
@@ -1526,6 +1530,7 @@ function buildLlmPayload(normalized) {
     }));
 
   const combatEncounters = detectCombatEncounters(normalized.timelineEvents);
+  const teamfightPhases = buildTeamfightPhases(combatEncounters, normalized.timelineEvents);
 
   const { early, mid, late } = normalized.phaseContext;
   return {
@@ -1543,6 +1548,7 @@ function buildLlmPayload(normalized) {
     },
     timelineEvents: filteredEvents,
     combatEncounters,
+    teamfightPhases,
     derivedSignals: normalized.derivedSignals,
     outputContract: {
       schemaVersion: "1.0",
@@ -1621,6 +1627,7 @@ const OUTPUT_SCHEMA_EXAMPLE = `정확히 다음 JSON 키 구조를 따른다. �
 matchSummary는 객체이며 headline은 문자열이다. coachSummary는 객체이며 overallSummary는 문자열이다.
 phaseSummaries는 배열이다 (객체 아님). keyMoments는 4개 이상의 배열이다.
 combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당 1개씩 작성하되, 입력에 encounter가 없으면 빈 배열을 반환한다.
+teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 항목당 1개씩 작성하되, 입력에 teamfightPhases가 없으면 빈 배열을 반환한다.
 
 {
   "schemaVersion": "1.0",
@@ -1637,6 +1644,7 @@ combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당
   "actionChecklist": [{ "id": "act_1", "text": "...", "linkedWeaknessId": "wk_1" }],
   "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
   "combatAnalysis": [{ "encounterId": "enc_001", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
+  "teamfightPhaseAnalysis": [{ "teamfightId": "enc_001", "phases": [{ "phase": "ENGAGE", "coaching": "진입 국면 코칭 한 줄" }, { "phase": "TRADE", "coaching": "딜교환 코칭" }, { "phase": "CLEANUP", "coaching": "정리 국면 코칭" }], "takeaway": "이 한타 핵심 교훈" }],
   "evidenceIndex": [{ "eventId": "evt_001", "shortNote": "..." }]
 }`;
 
@@ -1655,6 +1663,8 @@ combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항�
 playerDecision은 그 순간 플레이어의 판단/포지셔닝을 사실 기반으로 기술, takeaway는 다음에 같은 상황에서
 적용할 짧은 교훈. encounterId와 relatedEventIds는 입력값을 그대로 반영. 입력 encounter가 0개면
 combatAnalysis는 빈 배열.
+
+teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(teamfightId)마다 1개씩 작성. 각 phase(ENGAGE/TRADE/CLEANUP)별로 그 국면의 판단을 coaching 한 줄로, takeaway는 이 한타의 핵심 교훈 한 줄. teamfightId와 phase는 입력값을 그대로 반영. 입력 teamfightPhases가 0개면 빈 배열.
 
 분석할 경기 데이터:`;
 
@@ -1695,6 +1705,8 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 
 combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. 레드팀 관점으로
 판단 실수와 구조적 약점을 더 날카롭게 지적. 입력 encounter가 0개면 빈 배열.
+
+teamfightPhaseAnalysis: 입력 teamfightPhases 각 한타를 진입/딜교환/정리 국면으로 보고, 레드팀 관점에서 국면별 판단 실수를 coaching에 날카롭게 지적. 입력이 0개면 빈 배열.
 
 분석할 경기 데이터:`;
 
@@ -1750,6 +1762,14 @@ function validateAnalysisOutput(json) {
       if (!item || typeof item.encounterId !== "string") throw new Error("combatAnalysis item missing encounterId");
       if (typeof item.situationLabel !== "string" || !item.situationLabel) throw new Error("combatAnalysis item missing situationLabel");
       if (typeof item.takeaway !== "string" || !item.takeaway) throw new Error("combatAnalysis item missing takeaway");
+    }
+  }
+  // 한타 단계별 분석은 선택적 — 있으면 배열 + 각 항목 형태만 검증.
+  if (json.teamfightPhaseAnalysis !== undefined && json.teamfightPhaseAnalysis !== null) {
+    if (!Array.isArray(json.teamfightPhaseAnalysis)) throw new Error("teamfightPhaseAnalysis not array");
+    for (const tf of json.teamfightPhaseAnalysis) {
+      if (!tf || typeof tf.teamfightId !== "string") throw new Error("teamfightPhaseAnalysis item missing teamfightId");
+      if (!Array.isArray(tf.phases)) throw new Error("teamfightPhaseAnalysis item phases not array");
     }
   }
 }
@@ -1907,6 +1927,18 @@ async function buildAnalysis(normalized, sampleId) {
   } else if (!Array.isArray(primary.combatAnalysis)) {
     primary.combatAnalysis = [];
     violations.push("type.combatAnalysis.notArray");
+  }
+
+  // 한타 단계별 분석: 서버 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
+  {
+    const tfStructure = buildTeamfightPhases(
+      detectCombatEncounters(normalized.timelineEvents),
+      normalized.timelineEvents,
+    );
+    primary.teamfightPhaseAnalysis = mergeTeamfightCoaching(
+      tfStructure,
+      Array.isArray(primary.teamfightPhaseAnalysis) ? primary.teamfightPhaseAnalysis : [],
+    );
   }
 
   try {
