@@ -1473,7 +1473,7 @@ function buildTeamfightPhases(encounters, timelineEvents) {
 }
 
 // 단계 + outcomeTag별 룰 기반 코칭 한 줄 (AI 누락 시 폴백).
-function teamfightPhaseCoaching(phase, outcomeTag) {
+function teamfightPhaseCoaching(outcomeTag) {
   const map = {
     INITIATED_KILL: "한타 시작을 선제 킬/관여로 좋게 열었다.",
     CAUGHT_OUT: "한타 시작 직후 먼저 끊겨 인원·구도 손해로 출발했다.",
@@ -1505,7 +1505,7 @@ function mergeTeamfightCoaching(structure, aiArray) {
       const aiP = aiPhaseMap.get(p.phase);
       const coaching = aiP && typeof aiP.coaching === "string" && aiP.coaching.trim()
         ? aiP.coaching.trim()
-        : teamfightPhaseCoaching(p.phase, p.outcomeTag);
+        : teamfightPhaseCoaching(p.outcomeTag);
       return { ...p, coaching };
     });
     const takeaway = ai && typeof ai.takeaway === "string" && ai.takeaway.trim()
