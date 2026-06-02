@@ -1472,6 +1472,49 @@ function buildTeamfightPhases(encounters, timelineEvents) {
   return teamfights;
 }
 
+// 단계 + outcomeTag별 룰 기반 코칭 한 줄 (AI 누락 시 폴백).
+function teamfightPhaseCoaching(phase, outcomeTag) {
+  const map = {
+    INITIATED_KILL: "한타 시작을 선제 킬/관여로 좋게 열었다.",
+    CAUGHT_OUT: "한타 시작 직후 먼저 끊겨 인원·구도 손해로 출발했다.",
+    TRADE_WON: "딜교환 구간에서 킬을 더 챙기며 이득을 봤다.",
+    TRADE_LOST: "딜교환 구간에서 데스가 더 많아 손해를 봤다.",
+    TRADE_EVEN: "딜교환은 비등하게 주고받았다.",
+    CLOSED_OUT: "한타 마무리를 킬로 깔끔하게 정리했다.",
+    OVERCHASE_DEATH: "한타가 정리되는 국면에서 무리한 추격으로 데스를 내줬다.",
+    DIED_IN_FIGHT: "한타 막바지 교전에서 생존하지 못했다.",
+  };
+  return map[outcomeTag] || "";
+}
+
+function teamfightTakeaway(teamfight) {
+  const tags = (teamfight.phases || []).map((p) => p.outcomeTag);
+  if (tags.includes("CAUGHT_OUT")) return "한타 진입 전 시야와 포지션을 먼저 잡아 선제 피해를 줄이자.";
+  if (tags.includes("OVERCHASE_DEATH")) return "이긴 한타는 추격보다 리셋·정리를 우선하자.";
+  if (teamfight.situation === "PLAYER_DOMINANT") return "좋은 한타 흐름을 다음에도 반복하자.";
+  return "한타 국면별 판단을 점검해 다음 교전에 적용하자.";
+}
+
+// 서버 구조 + AI 코칭 병합 — coaching/takeaway는 AI 우선, 없으면 룰 기반.
+function mergeTeamfightCoaching(structure, aiArray) {
+  const aiById = new Map((Array.isArray(aiArray) ? aiArray : []).map((t) => [t && t.teamfightId, t]));
+  return (structure || []).map((tf) => {
+    const ai = aiById.get(tf.teamfightId);
+    const aiPhaseMap = new Map((ai && Array.isArray(ai.phases) ? ai.phases : []).map((p) => [p && p.phase, p]));
+    const phases = tf.phases.map((p) => {
+      const aiP = aiPhaseMap.get(p.phase);
+      const coaching = aiP && typeof aiP.coaching === "string" && aiP.coaching.trim()
+        ? aiP.coaching.trim()
+        : teamfightPhaseCoaching(p.phase, p.outcomeTag);
+      return { ...p, coaching };
+    });
+    const takeaway = ai && typeof ai.takeaway === "string" && ai.takeaway.trim()
+      ? ai.takeaway.trim()
+      : teamfightTakeaway(tf);
+    return { ...tf, phases, takeaway };
+  });
+}
+
 function buildLlmPayload(normalized) {
   const filteredEvents = normalized.timelineEvents
     .filter((e) => e.importance >= 3)
