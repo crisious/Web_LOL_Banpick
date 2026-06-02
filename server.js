@@ -1929,17 +1929,11 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push("type.combatAnalysis.notArray");
   }
 
-  // 한타 단계별 분석: 서버 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
-  {
-    const tfStructure = buildTeamfightPhases(
-      detectCombatEncounters(normalized.timelineEvents),
-      normalized.timelineEvents,
-    );
-    primary.teamfightPhaseAnalysis = mergeTeamfightCoaching(
-      tfStructure,
-      Array.isArray(primary.teamfightPhaseAnalysis) ? primary.teamfightPhaseAnalysis : [],
-    );
-  }
+  // 한타 단계별 분석: payload의 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
+  primary.teamfightPhaseAnalysis = mergeTeamfightCoaching(
+    payload.teamfightPhases,
+    Array.isArray(primary.teamfightPhaseAnalysis) ? primary.teamfightPhaseAnalysis : [],
+  );
 
   try {
     validateAnalysisOutput(primary);

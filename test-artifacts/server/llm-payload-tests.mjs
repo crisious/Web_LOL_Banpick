@@ -33,11 +33,20 @@ function extractFunctionSource(source, name) {
   throw new Error(`function ${name} not closed`);
 }
 
+function extractConstSource(source, name) {
+  const m = source.match(new RegExp(`const ${name} = [^;]*;`));
+  if (!m) throw new Error(`const ${name} not found`);
+  return m[0];
+}
+
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
 const teamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
-// buildTeamfightPhases가 참조하는 모듈 레벨 상수를 인라인으로 주입
-const tfConstants = `const TEAMFIGHT_MIN_EVENTS = 3;\nconst CLEANUP_GAP_MS = 8000;\n`;
+// buildTeamfightPhases가 참조하는 모듈 레벨 상수를 server.js에서 라이브 추출
+const tfConstants = [
+  extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
+  extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
+].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
   `${tfConstants}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
