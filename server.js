@@ -18,6 +18,10 @@ const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
+// 한타 단계별 분석: 이 이상 관여 이벤트면 '한타'로 간주.
+const TEAMFIGHT_MIN_EVENTS = 3;
+// 한타 정리 단계 추격사 판정용 시간 간격(ms).
+const CLEANUP_GAP_MS = 8000;
 const manifestPath = path.join(root, "data", "samples", "manifest.json");
 
 // ─── Simple in-memory rate limiter ───────────────────────────────────────────
@@ -1401,6 +1405,71 @@ function detectCombatEncounters(timelineEvents) {
     if (encounters.length >= MAX_ENCOUNTERS) break;
   }
   return encounters;
+}
+
+// 한타 단계별 분석 — encounter(플레이어 킬/데스 시퀀스)를 진입/딜교환/정리로 분해.
+// 데이터 한계: 이벤트는 CHAMPION_KILL/PLAYER_DEATH만 → 단계는 순서·간격으로 추론.
+function buildTeamfightPhases(encounters, timelineEvents) {
+  const byId = new Map((timelineEvents || []).map((e) => [e.eventId, e]));
+  const teamfights = [];
+  for (const enc of encounters || []) {
+    if ((enc.eventCount ?? 0) < TEAMFIGHT_MIN_EVENTS) continue;
+    const events = (enc.relatedEventIds || [])
+      .map((id) => byId.get(id))
+      .filter(Boolean)
+      .sort((a, b) => (a.timestampMs ?? 0) - (b.timestampMs ?? 0));
+    if (events.length < TEAMFIGHT_MIN_EVENTS) continue;
+    const last = events.length - 1;
+
+    const phaseObj = (name, evs) => {
+      let pk = 0, pd = 0;
+      for (const e of evs) {
+        if (!e.isPlayerInvolved) continue;
+        if (e.eventType === "CHAMPION_KILL") pk += 1;
+        else if (e.eventType === "PLAYER_DEATH") pd += 1;
+      }
+      return {
+        phase: name,
+        startLabel: evs.length ? evs[0].timestampLabel : "",
+        endLabel: evs.length ? evs[evs.length - 1].timestampLabel : "",
+        playerKills: pk,
+        playerDeaths: pd,
+        outcomeTag: null,
+        relatedEventIds: evs.map((e) => e.eventId),
+      };
+    };
+
+    const engage = phaseObj("ENGAGE", [events[0]]);
+    const trade = phaseObj("TRADE", events.slice(1, last));
+    const cleanup = phaseObj("CLEANUP", [events[last]]);
+
+    engage.outcomeTag = events[0].eventType === "CHAMPION_KILL" ? "INITIATED_KILL" : "CAUGHT_OUT";
+    trade.outcomeTag =
+      trade.playerKills > trade.playerDeaths ? "TRADE_WON"
+        : trade.playerDeaths > trade.playerKills ? "TRADE_LOST" : "TRADE_EVEN";
+    const lastEvt = events[last];
+    const prevEvt = events[last - 1];
+    if (lastEvt.eventType === "CHAMPION_KILL") {
+      cleanup.outcomeTag = "CLOSED_OUT";
+    } else {
+      const gap = (lastEvt.timestampMs ?? 0) - (prevEvt.timestampMs ?? 0);
+      cleanup.outcomeTag =
+        prevEvt.eventType === "CHAMPION_KILL" || gap > CLEANUP_GAP_MS ? "OVERCHASE_DEATH" : "DIED_IN_FIGHT";
+    }
+
+    const phases = [engage, trade, cleanup].filter((p) => p.relatedEventIds.length > 0);
+    teamfights.push({
+      teamfightId: enc.encounterId,
+      gamePhase: enc.phase,
+      startLabel: events[0].timestampLabel,
+      endLabel: events[last].timestampLabel,
+      totalKills: enc.playerKills,
+      totalDeaths: enc.playerDeaths,
+      situation: enc.situation,
+      phases,
+    });
+  }
+  return teamfights;
 }
 
 function buildLlmPayload(normalized) {
