@@ -312,6 +312,24 @@ LLM에 넣는 입력 데이터는 아래 구조를 권장한다.
 
 - derivedSignals는 힌트일 뿐, evidence보다 우선하면 안 된다
 
+## 11.1 `combatEncounters` (입력)
+
+설명:
+
+- 서버가 `timelineEvents`의 CHAMPION_KILL / PLAYER_DEATH를 25초 윈도우로 인접 그룹화해 사전 계산한 교전 목록. AI는 각 encounter마다 `combatAnalysis` 항목 한 건씩을 반환한다.
+- encounter가 0개면 빈 배열로 전달하고 AI도 빈 배열을 반환한다.
+
+각 항목 필드:
+
+- `encounterId`: `string` — 고유 식별자 (예: `"enc_001"`)
+- `eventCount`: `number` — encounter에 포함된 이벤트 수
+- `startLabel`/`endLabel`: `string` — 시작/종료 타임스탬프
+- `relatedEventIds`: `array<string>` — 포함된 timeline 이벤트 ID 목록
+
+### `teamfightPhases` (입력)
+
+서버가 combatEncounters 중 eventCount≥3을 진입/딜교환/정리로 분해한 구조. AI는 각 teamfightId·phase에 `coaching` 한 줄과 한타별 `takeaway`를 채워 `teamfightPhaseAnalysis`로 반환한다. 각 항목: `{ teamfightId, gamePhase, startLabel, endLabel, totalKills, totalDeaths, situation, phases: [{ phase, startLabel, endLabel, playerKills, playerDeaths, outcomeTag, relatedEventIds }] }`.
+
 ## 12. `outputContract` 정의
 
 설명:

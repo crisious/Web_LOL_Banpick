@@ -464,6 +464,28 @@
 - 한 경기 내 여러 교전 상황을 분리해 패턴을 드러내 줌 (단일 weaknesses/keyMoments로는 묻히는 반복 행동을 카드 단위로 분해)
 - UI는 `data-combat-analysis` 영역에 카드 형태로 렌더링하며, `relatedEventIds`의 첫 번째 ID로 시작 시간을 보조 표시
 
+## 4.12 `teamfightPhaseAnalysis` (선택 필드)
+
+설명:
+
+- 한타(플레이어 관여 교전, eventCount≥3)를 진입/딜교환/정리 3단계로 분해한 코칭. 서버 결정론적 구조 + AI 또는 룰 기반 코칭 병합. 레거시 샘플에는 없을 수 있음(선택적, requiredTopLevelFields 아님).
+
+타입:
+
+- `array`
+
+항목 필드:
+
+- `teamfightId`: `string` (= combatEncounters의 encounterId)
+- `gamePhase`: `string` (EARLY/MID/LATE)
+- `startLabel`/`endLabel`: `string`
+- `totalKills`/`totalDeaths`: `number`
+- `situation`: `string` (PLAYER_DOMINANT/PLAYER_DOWN/TRADED)
+- `phases`: `array<{ phase, startLabel, endLabel, playerKills, playerDeaths, outcomeTag, coaching, relatedEventIds }>`
+  - `phase`: `ENGAGE`/`TRADE`/`CLEANUP`
+  - `outcomeTag`: `INITIATED_KILL`/`CAUGHT_OUT`/`TRADE_WON`/`TRADE_LOST`/`TRADE_EVEN`/`CLOSED_OUT`/`OVERCHASE_DEATH`/`DIED_IN_FIGHT`
+- `takeaway`: `string`
+
 ## 5. 최소 유효 응답 조건
 
 아래 조건을 만족해야 `유효한 분석 결과`로 간주한다.
