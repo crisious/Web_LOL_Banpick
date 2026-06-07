@@ -103,6 +103,8 @@ npm run smoke:report:external:protected -- https://demo.example.com --token=repl
 
 `smoke-run.json` redacts inline `--token=<value>` arguments before writing command metadata.
 
+The GitHub Actions `QA` workflow runs `npm test` and `npm run smoke:report:readonly` on `main` pushes, pull requests, and manual dispatch. It uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v4`, so the read-only smoke report can be inspected from the workflow run without rerunning the demo locally.
+
 4. Share URL only after smoke passes.
 
 ## Manifest Error Probe

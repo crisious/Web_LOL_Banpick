@@ -1,0 +1,60 @@
+name: QA
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Start read-only demo
+        run: |
+          HOST=127.0.0.1 npm run start:readonly > /tmp/lol-ai-coach-readonly.log 2>&1 &
+          echo $! > /tmp/lol-ai-coach-readonly.pid
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:8123/healthz >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/lol-ai-coach-readonly.log
+          exit 1
+
+      - name: Run read-only smoke report
+        run: npm run smoke:report:readonly
+
+      - name: Stop read-only demo
+        if: always()
+        run: |
+          if [ -f /tmp/lol-ai-coach-readonly.pid ]; then
+            kill "$(cat /tmp/lol-ai-coach-readonly.pid)" 2>/dev/null || true
+          fi
+          cat /tmp/lol-ai-coach-readonly.log 2>/dev/null || true
+
+      - name: Upload QA automation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-automation-${{ github.run_id }}
+          path: test-artifacts/qa-automation/
+          if-no-files-found: ignore
+          retention-days: 14
