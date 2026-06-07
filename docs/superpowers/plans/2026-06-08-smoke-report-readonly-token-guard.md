@@ -127,7 +127,7 @@ Expected: syntax check, focused runner suite, full test suite, and whitespace ch
 
 Observed: command exited 0. Focused runner suite reported `36 passed, 0 failed`; full `npm test` reported `742 passed, 0 failed across 25 test file(s)`; `git diff --check` reported no whitespace errors.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -139,7 +139,9 @@ git push origin main
 
 Expected: commit lands on `main` and push triggers GitHub Actions QA.
 
-- [ ] **Step 4: Verify remote QA and artifact**
+Observed: committed and pushed `691fc197703097143d23b4e91b5f5e1468828188` to `main` with message `ci: reject readonly smoke report tokens`.
+
+- [x] **Step 4: Verify remote QA and artifact**
 
 Run:
 
@@ -150,3 +152,5 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 ```
 
 Expected: latest run for the pushed head SHA succeeds, uploaded artifact contains `qa-summary.json`, read-only smoke reports zero failures, and sensitive-value search has no matches.
+
+Observed: GitHub Actions QA run `27106536567` completed successfully for head SHA `691fc197703097143d23b4e91b5f5e1468828188`. Artifact `qa-automation-27106536567` / ID `7468539793` contained `qa-summary.json`, `smoke-run.json`, and `smoke-report.json`; `qa-summary.json` recorded read-only smoke `155 passed, 0 failed`. Sensitive-value search across the downloaded artifact directory found no matches.
