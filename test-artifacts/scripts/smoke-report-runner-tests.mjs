@@ -126,6 +126,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts//"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects root dot-segment output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects child dot-segment output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/./qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects traversal output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/../qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -273,6 +281,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("unsafe env output root rejection does not create output root",
     fs.existsSync(unsafeEnvCreatedPath),
+    false);
+
+  const dotSegmentEnvOutputRoot = "test-artifacts/tmp/./smoke-report-dot-output-root";
+  const dotSegmentEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-dot-output-root");
+  fs.rmSync(dotSegmentEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects dot-segment env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: dotSegmentEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("dot-segment env output root rejection does not create output root",
+    fs.existsSync(dotSegmentEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
