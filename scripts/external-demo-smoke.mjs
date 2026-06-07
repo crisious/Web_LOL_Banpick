@@ -73,23 +73,31 @@ for (const path of blockedStaticPaths) {
   expect(out.response.status === 403 || out.response.status === 404, `${path} is not publicly served`, `status=${out.response.status}`);
 }
 
-const liveProbe = await request("/api/recent-matches", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({}),
-});
+const liveApiProbes = [
+  { path: "/api/recent-matches", label: "/api/recent-matches" },
+  { path: "/api/champion-history", label: "/api/champion-history" },
+  { path: "/api/generate-sample", label: "/api/generate-sample" },
+];
 
-if (health.body?.readonly) {
-  expect(liveProbe.response.status === 403, "readonly mode blocks /api/recent-matches", `status=${liveProbe.response.status}`);
-  expect(liveProbe.body?.code === "PUBLIC_DEMO_READONLY", "readonly block returns PUBLIC_DEMO_READONLY");
-} else if (health.body?.protected && !demoToken) {
-  expect(
-    liveProbe.response.status === 401 || liveProbe.response.status === 403,
-    "protected mode without token blocks /api/recent-matches",
-    `status=${liveProbe.response.status}`,
-  );
-} else {
-  expect(liveProbe.response.status !== 404, "/api/recent-matches route exists");
+for (const probe of liveApiProbes) {
+  const liveProbe = await request(probe.path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+
+  if (health.body?.readonly) {
+    expect(liveProbe.response.status === 403, `readonly mode blocks ${probe.label}`, `status=${liveProbe.response.status}`);
+    expect(liveProbe.body?.code === "PUBLIC_DEMO_READONLY", `${probe.label} readonly block returns PUBLIC_DEMO_READONLY`);
+  } else if (health.body?.protected && !demoToken) {
+    expect(
+      liveProbe.response.status === 401 || liveProbe.response.status === 403,
+      `protected mode without token blocks ${probe.label}`,
+      `status=${liveProbe.response.status}`,
+    );
+  } else {
+    expect(liveProbe.response.status !== 404, `${probe.label} route exists`);
+  }
 }
 
 if (process.exitCode) {

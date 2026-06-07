@@ -39,7 +39,7 @@ Expected:
 - `/api/samples` 200
 - first sample detail 200
 - sensitive static paths 403/404
-- read-only mode live API 403
+- read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 
 ## Cloudflare Tunnel Demo
 
@@ -109,6 +109,7 @@ The first cloud deploy should stay read-only. Writable sample generation needs p
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404
 - [ ] `curl <url>/data/samples/manifest.json` returns 403 or 404
+- [ ] `POST <url>/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` return 403 in read-only mode
 - [ ] Stored sample detail opens in desktop browser
 - [ ] Stored sample detail opens in mobile viewport
 - [ ] External URL is behind Cloudflare Access or shared only with intended testers
