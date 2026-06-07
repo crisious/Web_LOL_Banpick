@@ -16,6 +16,28 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     return matches[0];
   }
 
+  const booleanOptions = new Set(["--require-url", "--require-https", "--require-token"]);
+  const valueOptionPrefixes = [
+    "--token=",
+    "--expect-mode=",
+    "--min-samples=",
+    "--timeout-ms=",
+    "--expect-sample-detail-error-id=",
+    "--expect-sample-detail-error-status=",
+    "--expect-sample-detail-error-code=",
+    "--expect-sample-detail-error-message=",
+    "--expect-sample-list-error-status=",
+    "--expect-sample-list-error-code=",
+    "--expect-sample-list-error-message=",
+    "--report-json=",
+  ];
+  for (const arg of args) {
+    if (!arg.startsWith("--")) continue;
+    if (booleanOptions.has(arg)) continue;
+    if (valueOptionPrefixes.some((prefix) => arg.startsWith(prefix))) continue;
+    throw new Error(`unknown smoke option: ${arg}`);
+  }
+
   const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
   if (positionalArgs.length > 1) {
     throw new Error("base URL must be the only positional argument");

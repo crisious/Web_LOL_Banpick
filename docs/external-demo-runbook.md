@@ -100,6 +100,8 @@ Direct smoke and `smoke:report:*` commands accept at most one positional base UR
 
 Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json=<path>`, plus runner-owned singleton options such as `--mode=<mode>` and `--output-root=<path>`, accept only one value. Duplicate singleton options fail before network requests or artifact creation, so the first value cannot silently win over a later operator correction.
 
+Direct smoke also rejects unknown `--...` options before any network request or report JSON write. This keeps typos such as `--expectmode=readonly` from silently falling back to a weaker smoke configuration.
+
 For repeatable QA evidence, prefer the report runner commands. They create a top-level `test-artifacts/qa-automation/qa-summary.json`, plus `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
 
 ```bash

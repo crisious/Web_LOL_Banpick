@@ -169,6 +169,10 @@ checkThrows("parseSmokeArgs rejects duplicate singleton options",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=readonly", "--expect-mode=protected"], {}),
   "--expect-mode accepts only one value");
 
+checkThrows("parseSmokeArgs rejects unknown smoke options",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expectmode=readonly"], {}),
+  "unknown smoke option: --expectmode=readonly");
+
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");
@@ -315,6 +319,18 @@ check("CLI exits non-zero when base URL is invalid",
 check("CLI prints concise invalid base URL failure without stack trace",
   invalidBaseUrl.stderr.trim(),
   "FAIL base URL must be an http(s) URL");
+
+const unknownSmokeOption = spawnSync(process.execPath, [smokePath, "--expectmode=readonly"], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero for unknown smoke option",
+  unknownSmokeOption.status,
+  1);
+
+check("CLI prints concise unknown smoke option failure without stack trace",
+  unknownSmokeOption.stderr.trim(),
+  "FAIL unknown smoke option: --expectmode=readonly");
 
 const missingRequiredToken = spawnSync(process.execPath, [
   smokePath,
