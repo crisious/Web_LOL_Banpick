@@ -145,6 +145,34 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://100.64.0.1"),
     "external_readonly_url must not point to a local or private network target");
 
+  checkThrows("validateExternalSmokeUrl rejects documentation IPv4 TEST-NET-1",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://192.0.2.10"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects documentation IPv4 TEST-NET-2",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://198.51.100.10"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects documentation IPv4 TEST-NET-3",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://203.0.113.10"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects benchmarking IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://198.18.0.1"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects multicast IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://224.0.0.1"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects reserved IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://240.0.0.1"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects limited broadcast IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://255.255.255.255"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
   checkThrows("validateExternalSmokeUrl rejects unspecified IPv4",
     () => validateExternalSmokeUrl("external_readonly_url", "https://0.0.0.0"),
     "external_readonly_url must not point to a local or private network target");
@@ -161,6 +189,18 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://[fe80::1]"),
     "external_readonly_url must not point to a local or private network target");
 
+  checkThrows("validateExternalSmokeUrl rejects documentation IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2001:db8::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects benchmarking IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2001:2::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects multicast IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[ff02::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
   checkThrows("validateExternalSmokeUrl rejects IPv4-mapped loopback IPv6",
     () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:127.0.0.1]"),
     "external_readonly_url must not point to a local or private network target");
@@ -172,6 +212,10 @@ if (fs.existsSync(validatorPath)) {
   checkThrows("validateExternalSmokeUrl rejects IPv4-mapped carrier-grade NAT IPv6",
     () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:100.64.0.1]"),
     "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects IPv4-mapped documentation IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:203.0.113.10]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
 
   check("validateExternalSmokeUrl accepts IPv4-mapped public IPv6",
     validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:8.8.8.8]/path"),

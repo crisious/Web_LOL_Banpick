@@ -24,6 +24,19 @@ function isPrivateOrLocalIpv4(host) {
   );
 }
 
+function isReservedOrSpecialIpv4(host) {
+  const parts = ipv4Parts(host);
+  if (!parts) return false;
+  const [a, b, c] = parts;
+  return (
+    (a === 192 && b === 0 && c === 2) ||
+    (a === 198 && (b === 18 || b === 19)) ||
+    (a === 198 && b === 51 && c === 100) ||
+    (a === 203 && b === 0 && c === 113) ||
+    a >= 224
+  );
+}
+
 function mappedIpv4PartsFromIpv6(host) {
   const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
   const match = normalized.match(/^::ffff:(?:0:)?([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
@@ -50,6 +63,26 @@ function isPrivateOrLocalIpv6(host) {
     normalized.startsWith("fea") ||
     normalized.startsWith("feb")
   );
+}
+
+function isReservedOrSpecialIpv6(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  const mappedIpv4Parts = mappedIpv4PartsFromIpv6(normalized);
+  if (mappedIpv4Parts) {
+    return isReservedOrSpecialIpv4(mappedIpv4Parts.join("."));
+  }
+  return (
+    normalized.startsWith("2001:2:") ||
+    normalized.startsWith("2001:db8:") ||
+    normalized.startsWith("ff")
+  );
+}
+
+function isReservedOrSpecialIpLiteralHost(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (ipv4Parts(host)) return isReservedOrSpecialIpv4(host);
+  if (!normalized.includes(":")) return false;
+  return isReservedOrSpecialIpv6(normalized);
 }
 
 function isIpLiteralHost(host) {
@@ -101,6 +134,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   const host = parsed.hostname.toLowerCase();
   if (isLocalOrPrivateHost(host)) {
     throw new Error(`${safeLabel} must not point to a local or private network target`);
+  }
+  if (isReservedOrSpecialIpLiteralHost(host)) {
+    throw new Error(`${safeLabel} must not point to a reserved or special-use network target`);
   }
   if (isSingleLabelHostname(host)) {
     throw new Error(`${safeLabel} must use a fully qualified public hostname or IP address`);
