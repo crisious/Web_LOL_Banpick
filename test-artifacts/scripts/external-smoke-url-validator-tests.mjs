@@ -45,6 +45,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
     "https://demo.example.com/path");
 
+  check("validateExternalSmokeUrl accepts explicit default HTTPS port",
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:443/path"),
+    "https://demo.example.com/path");
+
+  checkThrows("validateExternalSmokeUrl rejects explicit non-default HTTPS port",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:4443/path"),
+    "external_readonly_url must use the default HTTPS port");
+
   checkThrows("validateExternalSmokeUrl rejects http URL",
     () => validateExternalSmokeUrl("external_readonly_url", "http://demo.example.com"),
     "external_readonly_url needs an https:// URL");

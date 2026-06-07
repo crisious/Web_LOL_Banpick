@@ -204,6 +204,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   if (parsed.username || parsed.password || parsed.search || parsed.hash) {
     throw new Error(`${safeLabel} must not include username/password, query string, or fragment`);
   }
+  if (parsed.port) {
+    throw new Error(`${safeLabel} must use the default HTTPS port`);
+  }
   const host = parsed.hostname.toLowerCase();
   const rawHost = rawHostFromUrlValue(value);
   if (ipv4Parts(host) && rawHost !== host) {
