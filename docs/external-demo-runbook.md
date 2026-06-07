@@ -47,7 +47,7 @@ Expected:
 - smoke accepts only known public demo modes: `full`, `protected`, or `readonly`
 - smoke treats `publicDemoModeValid: false` as a fatal mode configuration failure before sample or live/write probes
 - unknown `PUBLIC_DEMO_MODE` values remain visible in `/healthz` with `publicDemoModeValid: false` for diagnostics but live/write APIs fail closed with 403 `PUBLIC_DEMO_MODE_INVALID`
-- smoke validates `sampleGeneration` as aggregate-only when the field is present and fails before sample/live/write probes if lock keys, match IDs, Riot IDs, tokens, or raw payload hints appear
+- smoke validates `sampleGeneration` as aggregate-only when the field is present and fails before sample/live/write probes if lock keys, match IDs, Riot IDs, tokens, raw payload hints, or inactive `activeCount: 0` plus non-zero `oldestAgeMs` appear
 - smoke tokens are sent only to same-origin live/write API probes, not to page, asset, sample, blocked static, or cross-origin asset requests
 - smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes
 - `/api/samples` 200

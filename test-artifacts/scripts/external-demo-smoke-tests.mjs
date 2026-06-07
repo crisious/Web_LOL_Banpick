@@ -523,6 +523,51 @@ check("CLI stops after healthz when sampleGeneration health is unsafe",
   unsafeSampleGenerationHealthRequests.map((request) => request.url),
   ["/healthz"]);
 
+const inactiveSampleGenerationAgeRequests = [];
+const inactiveSampleGenerationAgeServer = http.createServer((req, res) => {
+  inactiveSampleGenerationAgeRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") {
+    return sendJson(200, {
+      ok: true,
+      publicDemoMode: "readonly",
+      sampleGeneration: {
+        activeCount: 0,
+        oldestAgeMs: 1200,
+      },
+    });
+  }
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => inactiveSampleGenerationAgeServer.listen(0, "127.0.0.1", resolve));
+const inactiveSampleGenerationAgeUrl = `http://127.0.0.1:${inactiveSampleGenerationAgeServer.address().port}`;
+const inactiveSampleGenerationAge = await runNode([
+  smokePath,
+  inactiveSampleGenerationAgeUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => inactiveSampleGenerationAgeServer.close(resolve));
+
+check("CLI exits non-zero when inactive sampleGeneration has age",
+  inactiveSampleGenerationAge.status,
+  1);
+
+check("CLI reports inactive sampleGeneration age mismatch",
+  inactiveSampleGenerationAge.stderr.includes("FAIL healthz sampleGeneration oldestAgeMs is zero when inactive"),
+  true);
+
+check("CLI stops after healthz when inactive sampleGeneration age is inconsistent",
+  inactiveSampleGenerationAgeRequests.map((request) => request.url),
+  ["/healthz"]);
+
 const modeMismatchRequests = [];
 const modeMismatchServer = http.createServer((req, res) => {
   modeMismatchRequests.push({ method: req.method, url: req.url });

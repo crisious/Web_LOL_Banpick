@@ -179,7 +179,7 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보면 live/write probe 전에 `FAIL public demo mode config is valid`로 즉시 실패합니다.
 
-`/healthz.sampleGeneration`은 writable 데모 운영 진단용으로 현재 샘플 생성 lock의 aggregate만 반환합니다. `activeCount`는 진행 중 작업 수, `oldestAgeMs`는 가장 오래된 작업의 경과 시간이며, lock key, matchId, Riot ID, 토큰, raw payload는 포함하지 않습니다. Smoke CLI는 이 필드가 있으면 두 aggregate field만 있는지 검증하고, 식별자 field가 섞이면 sample/live/write probe 전에 실패합니다.
+`/healthz.sampleGeneration`은 writable 데모 운영 진단용으로 현재 샘플 생성 lock의 aggregate만 반환합니다. `activeCount`는 진행 중 작업 수, `oldestAgeMs`는 가장 오래된 작업의 경과 시간이며, lock key, matchId, Riot ID, 토큰, raw payload는 포함하지 않습니다. Smoke CLI는 이 필드가 있으면 두 aggregate field만 있는지 검증하고, 식별자 field가 섞이거나 `activeCount: 0`인데 `oldestAgeMs`가 0이 아니면 sample/live/write probe 전에 실패합니다.
 
 `smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, redacted URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`와 redacted URL로 기록되어 토큰/URL secret 값을 남기지 않습니다.
 

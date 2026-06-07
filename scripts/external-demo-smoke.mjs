@@ -314,6 +314,13 @@ function validateSampleGenerationHealth(body) {
     "healthz sampleGeneration oldestAgeMs is non-negative",
     `oldestAgeMs=${sampleGeneration.oldestAgeMs}`,
   );
+  if (sampleGeneration.activeCount === 0) {
+    expectFatal(
+      sampleGeneration.oldestAgeMs === 0,
+      "healthz sampleGeneration oldestAgeMs is zero when inactive",
+      `oldestAgeMs=${sampleGeneration.oldestAgeMs}`,
+    );
+  }
 }
 
 const health = await request("/healthz");
