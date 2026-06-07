@@ -67,6 +67,10 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly"], {}),
     "external-readonly smoke report needs an explicit base URL");
 
+  checkThrows("parseRunnerArgs rejects multiple positional base URLs",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly", "https://demo-one.example", "https://demo-two.example"], {}),
+    "external-readonly smoke report accepts only one base URL argument");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");

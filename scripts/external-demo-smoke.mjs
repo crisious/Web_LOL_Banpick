@@ -8,7 +8,11 @@ import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 function parseSmokeArgs(argv, env = {}, deps = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
   const args = argv.slice(2);
-  const explicitBaseUrl = args.find((arg) => !arg.startsWith("--"));
+  const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
+  if (positionalArgs.length > 1) {
+    throw new Error("base URL must be the only positional argument");
+  }
+  const explicitBaseUrl = positionalArgs[0];
   const requireUrl = args.includes("--require-url");
   const requireHttps = args.includes("--require-https");
   const requireToken = args.includes("--require-token");

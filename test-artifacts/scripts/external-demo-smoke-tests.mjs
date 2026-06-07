@@ -161,6 +161,10 @@ checkThrows("parseSmokeArgs rejects non-http base URL",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "ftp://demo.example"], {}),
   "base URL must be an http(s) URL");
 
+checkThrows("parseSmokeArgs rejects multiple positional base URLs",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo-one.example", "https://demo-two.example"], {}),
+  "base URL must be the only positional argument");
+
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");

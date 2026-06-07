@@ -30,6 +30,9 @@ export function parseRunnerArgs(argv, env = {}) {
 
   const knownOptionArgs = new Set([modeArg, outputRootArg].filter(Boolean));
   const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
+  if (positionalArgs.length > 1) {
+    throw new Error(`${mode} smoke report accepts only one base URL argument`);
+  }
   const extraSmokeArgs = args.filter((arg) => arg.startsWith("--") && !knownOptionArgs.has(arg));
   const isExternal = mode.startsWith("external-");
   const isProtected = mode.endsWith("protected") || mode === "protected";
