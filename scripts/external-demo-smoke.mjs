@@ -162,6 +162,7 @@ expectFatal(contentType(health.response).includes("application/json"), "GET /hea
 expect(headerValue(health.response, "x-content-type-options") === "nosniff", "GET /healthz has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(health.response, "x-content-type-options") || "(missing)"}`);
 expectFatal(health.body?.ok === true, "healthz ok=true");
 const actualMode = demoModeFromHealth(health.body);
+expectFatal(["full", "protected", "readonly"].includes(actualMode), "public demo mode is known", `actual=${actualMode}`);
 if (expectedMode) {
   if (actualMode === expectedMode) {
     pass(`public demo mode is ${expectedMode}`);

@@ -43,6 +43,7 @@ Expected:
 - referenced `styles.css` returns a CSS content type and `main.js` returns a JavaScript content type
 - referenced `styles.css` and `main.js` return `X-Content-Type-Options: nosniff`
 - smoke stops immediately when `/healthz` does not return a 200 JSON `ok=true` response before it can touch live/write API probes
+- smoke accepts only known public demo modes: `full`, `protected`, or `readonly`
 - smoke tokens are sent only to same-origin live/write API probes, not to page, asset, sample, blocked static, or cross-origin asset requests
 - smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes
 - `/api/samples` 200
