@@ -257,6 +257,12 @@ for (const probe of liveApiProbes) {
       `${probe.label} protected block returns public demo auth code`,
       `code=${liveProbe.body?.code || "(missing)"}`,
     );
+  } else if (actualMode === "protected" && demoToken) {
+    expect(
+      liveProbe.response.status !== 401 && liveProbe.response.status !== 403,
+      `protected mode with token passes ${probe.label} auth gate`,
+      `status=${liveProbe.response.status} code=${liveProbe.body?.code || "(missing)"}`,
+    );
   } else {
     expect(liveProbe.response.status !== 404, `${probe.label} route exists`);
   }

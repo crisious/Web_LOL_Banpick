@@ -52,6 +52,7 @@ Expected:
 - sensitive static path block responses return `X-Content-Type-Options: nosniff`
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
+- protected mode with a token passes the live/write API auth gate instead of returning 401/403
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
 
 ## Cloudflare Tunnel Demo
