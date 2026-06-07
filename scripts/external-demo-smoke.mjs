@@ -87,14 +87,15 @@ function expectJsonResponse(out, label) {
 }
 
 async function request(path, options = {}) {
-  const headers = { ...(options.headers || {}) };
+  const { useDemoToken = false, ...fetchOptions } = options;
+  const headers = { ...(fetchOptions.headers || {}) };
   const requestOrigin = new URL(path, baseUrl).origin;
-  if (demoToken && requestOrigin === baseOrigin && !headers.Authorization) {
+  if (useDemoToken && demoToken && requestOrigin === baseOrigin && !headers.Authorization) {
     headers.Authorization = `Bearer ${demoToken}`;
   }
   let response;
   try {
-    response = await fetch(url(path), { ...options, headers, signal: AbortSignal.timeout(requestTimeoutMs) });
+    response = await fetch(url(path), { ...fetchOptions, headers, signal: AbortSignal.timeout(requestTimeoutMs) });
   } catch (error) {
     const detail = error?.name === "TimeoutError" || error?.name === "AbortError"
       ? `timeout after ${requestTimeoutMs}ms`
@@ -234,6 +235,7 @@ for (const probe of liveApiProbes) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
+    useDemoToken: true,
   });
   expectJsonResponse(liveProbe, probe.label);
 
