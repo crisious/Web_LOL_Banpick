@@ -105,7 +105,7 @@ Expected: all commands exit 0.
 
 Observed: syntax check exited 0, validator tests reported 26 passed / 0 failed, `npm test` reported 580 passed / 0 failed across 24 test files, and `git diff --check` exited 0.
 
-- [ ] **Step 3: Commit, push, and verify remote QA**
+- [x] **Step 3: Commit, push, and verify remote QA**
 
 Run:
 
@@ -117,3 +117,5 @@ gh run watch <run-id> --exit-status
 ```
 
 Expected: push-triggered `QA` passes; external validation steps remain skipped on push events.
+
+Observed: commit `d97926d` pushed to `origin/main`; remote `QA` run `27099083308` passed. Push-triggered external URL validation and external smoke steps were skipped as expected. Artifact `qa-automation-27099083308` included `qa-summary.json`, readonly `smoke-report.json`, and readonly `smoke-run.json`; summary reported 150 passed / 0 failed and sensitive pattern search found no matches.
