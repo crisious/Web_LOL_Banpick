@@ -2613,13 +2613,127 @@ function inferMatchIdFromSampleEntry(entry) {
   return null;
 }
 
-async function handleGenerateSample(req, res) {
+const sampleGenerationLocks = new Map();
+
+function sampleGenerationLockKey(input) {
+  const { platformRegion, matchId } = input || {};
+  const region = String(platformRegion || "").trim().toUpperCase() || "UNKNOWN";
+  const normalizedMatchId = String(matchId || "").trim().toUpperCase() || "UNKNOWN";
+  return `${region}:${normalizedMatchId}`;
+}
+
+function sampleGenerationInProgressPayload(matchId) {
+  return {
+    ok: false,
+    code: "SAMPLE_GENERATION_IN_PROGRESS",
+    error: "이미 이 경기 샘플 생성이 진행 중입니다. 완료 후 샘플 목록을 확인하세요.",
+    matchId,
+  };
+}
+
+function withSampleGenerationLock(lockKey, work) {
+  if (sampleGenerationLocks.has(lockKey)) {
+    const error = new Error("SAMPLE_GENERATION_IN_PROGRESS");
+    error.statusCode = 409;
+    error.payload = sampleGenerationInProgressPayload(String(lockKey || "").split(":").slice(1).join(":"));
+    throw error;
+  }
+
+  sampleGenerationLocks.set(lockKey, Date.now());
+  return Promise.resolve()
+    .then(work)
+    .finally(() => {
+      sampleGenerationLocks.delete(lockKey);
+    });
+}
+
+async function runGenerateSampleJob(req, res, { body, apiKey, gameName, tagLine, platformRegion, matchId }) {
   const ip = getClientIp(req);
   if (!rateLimit(`generate:${ip}`, 60000)) {
     sendJson(res, 429, { ok: false, error: "샘플 생성은 1분에 1회만 가능합니다." });
     return;
   }
 
+  const cluster = regionalCluster(platformRegion);
+  const headers = {
+    "X-Riot-Token": apiKey,
+    "User-Agent": "codex-local-sample-server",
+    Accept: "application/json",
+  };
+
+  const account = await requestJson(
+    `https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`,
+    headers,
+  );
+  const matchDetail = await requestJson(
+    `https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}`,
+    headers,
+  );
+  const timeline = await requestJson(
+    `https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}/timeline`,
+    headers,
+  );
+
+  const sampleId = `sample-${matchId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const sampleDir = path.join(root, "data", "samples", sampleId);
+  await fsp.mkdir(sampleDir, { recursive: true });
+
+  const publicAlias =
+    body.publicAlias || (account.gameName && account.tagLine ? `${account.gameName}#${account.tagLine}` : `PlayerAlias#${tagLine}`);
+  const normalized = buildNormalized(account, matchDetail, timeline, {
+    platformRegion,
+    cluster,
+    publicAlias,
+  });
+  const analysis = await buildAnalysis(normalized, sampleId);
+
+  // __comparison은 임시 전달 필드 — 저장 전 분리
+  const comparison = analysis.__comparison ?? null;
+  delete analysis.__comparison;
+
+  await Promise.all([
+    writeJson(path.join(sampleDir, "raw-account.json"), account),
+    writeJson(path.join(sampleDir, "raw-match.json"), matchDetail),
+    writeJson(path.join(sampleDir, "raw-timeline.json"), timeline),
+    writeJson(path.join(sampleDir, "normalized-match.json"), normalized),
+    writeJson(path.join(sampleDir, "analysis-result.json"), analysis),
+    comparison
+      ? writeJson(path.join(sampleDir, "comparison-result.json"), comparison)
+      : Promise.resolve(),
+    fsp.writeFile(
+      path.join(sampleDir, `${sampleId}-notes.md`),
+      `# ${sampleId} notes\n\n- Match ID: \`${matchId}\`\n- Riot ID source: \`${gameName}#${tagLine}\`\n- Public alias: \`${publicAlias}\`\n- Theme: ${analysis.matchSummary.headline}\n`,
+      "utf8",
+    ),
+  ]);
+
+  const entry = {
+    id: sampleId,
+    matchId,
+    label: `${sampleId} · ${normalized.matchInfo.position} ${normalized.matchInfo.result}`,
+    champion: normalized.matchInfo.champion,
+    publicAlias,
+    collectedDate: new Date().toISOString().slice(0, 10),
+    theme: analysis.matchSummary?.headline || analysis.coachSummary?.gameFlowSummary || "",
+    normalizedPath: `/data/samples/${sampleId}/normalized-match.json`,
+    analysisPath: `/data/samples/${sampleId}/analysis-result.json`,
+    notesPath: `/data/samples/${sampleId}/${sampleId}-notes.md`,
+  };
+
+  await upsertManifestEntry(entry);
+
+  sendJson(res, 200, {
+    ok: true,
+    sampleId,
+    publicAlias,
+    collectedDate: entry.collectedDate,
+    theme: entry.theme,
+    normalized,
+    analysis,
+  });
+}
+
+async function handleGenerateSample(req, res) {
   try {
     const body = await parseBody(req);
     const apiKey = resolveApiKey(body.riotApiKey);
@@ -2643,84 +2757,20 @@ async function handleGenerateSample(req, res) {
       return;
     }
 
-    const cluster = regionalCluster(platformRegion);
-    const headers = {
-      "X-Riot-Token": apiKey,
-      "User-Agent": "codex-local-sample-server",
-      Accept: "application/json",
-    };
-
-    const account = await requestJson(
-      `https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`,
-      headers,
-    );
-    const matchDetail = await requestJson(
-      `https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}`,
-      headers,
-    );
-    const timeline = await requestJson(
-      `https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}/timeline`,
-      headers,
-    );
-
-    const sampleId = `sample-${matchId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-    const sampleDir = path.join(root, "data", "samples", sampleId);
-    await fsp.mkdir(sampleDir, { recursive: true });
-
-    const publicAlias =
-      body.publicAlias || (account.gameName && account.tagLine ? `${account.gameName}#${account.tagLine}` : `PlayerAlias#${tagLine}`);
-    const normalized = buildNormalized(account, matchDetail, timeline, {
+    const lockKey = sampleGenerationLockKey({ platformRegion, matchId });
+    await withSampleGenerationLock(lockKey, () => runGenerateSampleJob(req, res, {
+      body,
+      apiKey,
+      gameName,
+      tagLine,
       platformRegion,
-      cluster,
-      publicAlias,
-    });
-    const analysis = await buildAnalysis(normalized, sampleId);
-
-    // __comparison은 임시 전달 필드 — 저장 전 분리
-    const comparison = analysis.__comparison ?? null;
-    delete analysis.__comparison;
-
-    await Promise.all([
-      writeJson(path.join(sampleDir, "raw-account.json"), account),
-      writeJson(path.join(sampleDir, "raw-match.json"), matchDetail),
-      writeJson(path.join(sampleDir, "raw-timeline.json"), timeline),
-      writeJson(path.join(sampleDir, "normalized-match.json"), normalized),
-      writeJson(path.join(sampleDir, "analysis-result.json"), analysis),
-      comparison
-        ? writeJson(path.join(sampleDir, "comparison-result.json"), comparison)
-        : Promise.resolve(),
-      fsp.writeFile(
-        path.join(sampleDir, `${sampleId}-notes.md`),
-        `# ${sampleId} notes\n\n- Match ID: \`${matchId}\`\n- Riot ID source: \`${gameName}#${tagLine}\`\n- Public alias: \`${publicAlias}\`\n- Theme: ${analysis.matchSummary.headline}\n`,
-        "utf8",
-      ),
-    ]);
-
-    const entry = {
-      id: sampleId,
       matchId,
-      label: `${sampleId} · ${normalized.matchInfo.position} ${normalized.matchInfo.result}`,
-      champion: normalized.matchInfo.champion,
-      publicAlias,
-      collectedDate: new Date().toISOString().slice(0, 10),
-      theme: analysis.matchSummary?.headline || analysis.coachSummary?.gameFlowSummary || "",
-      normalizedPath: `/data/samples/${sampleId}/normalized-match.json`,
-      analysisPath: `/data/samples/${sampleId}/analysis-result.json`,
-      notesPath: `/data/samples/${sampleId}/${sampleId}-notes.md`,
-    };
-
-    await upsertManifestEntry(entry);
-
-    sendJson(res, 200, {
-      ok: true,
-      sampleId,
-      publicAlias,
-      collectedDate: entry.collectedDate,
-      theme: entry.theme,
-      normalized,
-      analysis,
-    });
+    }));
   } catch (error) {
+    if (error?.payload?.code === "SAMPLE_GENERATION_IN_PROGRESS") {
+      sendJson(res, 409, error.payload);
+      return;
+    }
     const { status, body } = riotErrorPayload(error);
     sendJson(res, status, body);
   }

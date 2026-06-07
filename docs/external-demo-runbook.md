@@ -127,7 +127,7 @@ PUBLIC_DEMO_MODE=readonly
 TRUST_PROXY=1
 ```
 
-The first cloud deploy should stay read-only. Writable sample generation needs persistent storage and generate-sample queue/lock verification.
+The first cloud deploy should stay read-only. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work; persistent storage and cross-process queue/lock verification are still required before multi-instance protected demos.
 
 ## Pre-Share Checklist
 

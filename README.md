@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 344건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 359건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -242,6 +242,7 @@ payload
 - 프론트엔드 Riot API Key 입력 시 서버 키 대신 사용 (선택)
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
+- 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음
 - 외부 데모 모드: 정적 파일 allowlist만 서빙하며 `.env`, `server.js`, `data/**`, `test-artifacts/**`, 문서 파일 직접 접근은 차단
 
 ## 현재 한계
