@@ -66,6 +66,20 @@ function runNode(args) {
   });
 }
 
+function completeSampleDetail() {
+  return {
+    normalized: { matchInfo: { champion: "Nautilus", result: "LOSS" } },
+    analysis: {
+      matchSummary: { headline: "Complete report" },
+      coachSummary: { overallSummary: "Review the objective setup." },
+      strengths: [{ title: "Vision setup" }],
+      weaknesses: [{ title: "Late rotation" }],
+      actionChecklist: [{ text: "Ward before objective spawn." }],
+      keyMoments: [{ title: "First fight" }, { title: "Dragon setup" }],
+    },
+  };
+}
+
 check("parseSmokeArgs reads base URL, token, and expected mode",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly", "--min-samples=19"], {}),
   { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "readonly", minSamples: 19 });
@@ -179,7 +193,44 @@ check("CLI exits non-zero when sample detail misses report essentials",
   1);
 
 check("CLI reports missing sample detail report essentials",
-  incompleteDetail.stderr.includes("FAIL sample detail includes report essentials"),
+  incompleteDetail.stderr.includes("FAIL sample detail sample-one includes report essentials"),
+  true);
+
+const mixedDetailServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end("<title>LoL Replay Coach</title>");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-good" }, { id: "sample-bad" }] });
+  if (req.url === "/api/samples/sample-good") return sendJson(200, completeSampleDetail());
+  if (req.url === "/api/samples/sample-bad") return sendJson(200, { normalized: { matchInfo: {} }, analysis: { coachSummary: {} } });
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => mixedDetailServer.listen(0, "127.0.0.1", resolve));
+const mixedDetailUrl = `http://127.0.0.1:${mixedDetailServer.address().port}`;
+const incompleteSecondDetail = await runNode([
+  smokePath,
+  mixedDetailUrl,
+  "--expect-mode=readonly",
+  "--min-samples=2",
+]);
+await new Promise((resolve) => mixedDetailServer.close(resolve));
+
+check("CLI exits non-zero when any checked sample detail misses report essentials",
+  incompleteSecondDetail.status,
+  1);
+
+check("CLI reports missing report essentials for a later checked sample",
+  incompleteSecondDetail.stderr.includes("FAIL sample detail sample-bad includes report essentials"),
   true);
 
 console.log(`\n${pass} passed, ${fail} failed`);

@@ -109,23 +109,25 @@ expect(samples.response.status === 200, "GET /api/samples returns 200", `status=
 expect(Array.isArray(samples.body?.samples), "/api/samples returns samples array");
 expect((samples.body?.samples?.length || 0) >= minSamples, `/api/samples has at least ${minSamples} samples`, `count=${samples.body?.samples?.length || 0}`);
 
-const firstSample = samples.body?.samples?.[0];
-if (firstSample?.id) {
-  const detail = await request(`/api/samples/${encodeURIComponent(firstSample.id)}`);
-  expect(detail.response.status === 200, "GET /api/samples/:id returns 200", `status=${detail.response.status}`);
-  expect(detail.body?.normalized && detail.body?.analysis, "sample detail includes normalized + analysis");
-  const analysis = detail.body?.analysis || {};
-  expect(
-    Boolean(
-      analysis.matchSummary?.headline &&
-        analysis.coachSummary?.overallSummary &&
-        Array.isArray(analysis.strengths) && analysis.strengths.length > 0 &&
-        Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0 &&
-        Array.isArray(analysis.actionChecklist) && analysis.actionChecklist.length > 0 &&
-        Array.isArray(analysis.keyMoments) && analysis.keyMoments.length >= 2,
-    ),
-    "sample detail includes report essentials",
+function hasReportEssentials(analysis) {
+  return Boolean(
+    analysis?.matchSummary?.headline &&
+      analysis?.coachSummary?.overallSummary &&
+      Array.isArray(analysis?.strengths) && analysis.strengths.length > 0 &&
+      Array.isArray(analysis?.weaknesses) && analysis.weaknesses.length > 0 &&
+      Array.isArray(analysis?.actionChecklist) && analysis.actionChecklist.length > 0 &&
+      Array.isArray(analysis?.keyMoments) && analysis.keyMoments.length >= 2
   );
+}
+
+const samplesToCheck = (samples.body?.samples || []).slice(0, minSamples);
+for (const sample of samplesToCheck) {
+  if (!sample?.id) continue;
+  const detail = await request(`/api/samples/${encodeURIComponent(sample.id)}`);
+  expect(detail.response.status === 200, `GET /api/samples/:id returns 200 for ${sample.id}`, `status=${detail.response.status}`);
+  expect(detail.body?.normalized && detail.body?.analysis, `sample detail ${sample.id} includes normalized + analysis`);
+  const analysis = detail.body?.analysis || {};
+  expect(hasReportEssentials(analysis), `sample detail ${sample.id} includes report essentials`);
 }
 
 const blockedStaticPaths = [

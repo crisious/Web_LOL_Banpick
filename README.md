@@ -150,12 +150,12 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 288건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 290건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
 npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
-npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 기준 read-only smoke
+npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 상세 기준 read-only smoke
 ```
 
 테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하는 방식 (소스 변경 0). 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
