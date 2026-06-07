@@ -147,7 +147,7 @@ Expected: syntax check, focused runner suite, full test suite, and whitespace ch
 
 Observed: command exited 0. Focused runner suite reported `32 passed, 0 failed`; full `npm test` reported `738 passed, 0 failed across 25 test file(s)`; `git diff --check` reported no whitespace errors.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -159,7 +159,9 @@ git push origin main
 
 Expected: commit lands on `main` and push triggers GitHub Actions QA.
 
-- [ ] **Step 4: Verify remote QA and artifact**
+Observed: committed and pushed `e7786b04dca5189095db39e90116c3dcc11a2efe` to `main` with message `ci: preflight protected smoke report tokens`.
+
+- [x] **Step 4: Verify remote QA and artifact**
 
 Run:
 
@@ -170,3 +172,5 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 ```
 
 Expected: latest run for the pushed head SHA succeeds, uploaded artifact contains `qa-summary.json`, read-only smoke reports zero failures, and sensitive-value search has no matches.
+
+Observed: GitHub Actions QA run `27106401270` completed successfully for head SHA `e7786b04dca5189095db39e90116c3dcc11a2efe`. Artifact `qa-automation-27106401270` / ID `7468496160` contained `qa-summary.json`, `smoke-run.json`, and `smoke-report.json`; `qa-summary.json` recorded read-only smoke `155 passed, 0 failed`. Sensitive-value search across the downloaded artifact directory found no matches.
