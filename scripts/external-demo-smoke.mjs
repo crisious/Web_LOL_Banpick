@@ -6,6 +6,7 @@ function parseSmokeArgs(argv, env = {}) {
   const explicitBaseUrl = args.find((arg) => !arg.startsWith("--"));
   const requireUrl = args.includes("--require-url");
   const requireHttps = args.includes("--require-https");
+  const requireToken = args.includes("--require-token");
   if (requireUrl && !explicitBaseUrl) {
     throw new Error("--require-url needs an explicit base URL argument");
   }
@@ -23,6 +24,10 @@ function parseSmokeArgs(argv, env = {}) {
     throw new Error("--require-https needs an https:// base URL");
   }
   const tokenArg = args.find((arg) => arg.startsWith("--token="));
+  const demoToken = (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim();
+  if (requireToken && !demoToken) {
+    throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
+  }
   const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
   const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
   const minSamplesArg = args.find((arg) => arg.startsWith("--min-samples="));
@@ -42,7 +47,7 @@ function parseSmokeArgs(argv, env = {}) {
 
   return {
     baseUrl,
-    demoToken: tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "",
+    demoToken,
     expectedMode,
     minSamples,
     requestTimeoutMs,

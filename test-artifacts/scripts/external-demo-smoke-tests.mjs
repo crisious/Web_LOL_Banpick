@@ -120,6 +120,14 @@ check("parseSmokeArgs accepts https when required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "https://demo.example", "--expect-mode=readonly"], {}),
   { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000 });
 
+checkThrows("parseSmokeArgs requires token when requested",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "https://demo.example", "--expect-mode=protected"], {}),
+  "--require-token needs --token or PUBLIC_DEMO_TOKEN");
+
+check("parseSmokeArgs accepts env token when token is required",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "https://demo.example", "--expect-mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token" }),
+  { baseUrl: "https://demo.example", demoToken: "env-token", expectedMode: "protected", minSamples: 1, requestTimeoutMs: 10000 });
+
 checkThrows("parseSmokeArgs rejects invalid minimum sample count",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--min-samples=0"], {}),
   "--min-samples must be a positive integer");
@@ -173,6 +181,23 @@ check("CLI exits non-zero when base URL is invalid",
 check("CLI prints concise invalid base URL failure without stack trace",
   invalidBaseUrl.stderr.trim(),
   "FAIL base URL must be an http(s) URL");
+
+const missingRequiredToken = spawnSync(process.execPath, [
+  smokePath,
+  "--require-token",
+  "--expect-mode=protected",
+  "https://demo.example",
+], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero when --require-token has no token",
+  missingRequiredToken.status,
+  1);
+
+check("CLI prints concise missing token failure without stack trace",
+  missingRequiredToken.stderr.trim(),
+  "FAIL --require-token needs --token or PUBLIC_DEMO_TOKEN");
 
 const invalidHealthRequests = [];
 const invalidHealthServer = http.createServer((req, res) => {

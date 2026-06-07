@@ -96,9 +96,10 @@ PUBLIC_DEMO_MODE=protected PUBLIC_DEMO_TOKEN='replace-with-long-random-token' TR
 Smoke with token:
 
 ```bash
-npm run smoke:external -- https://demo.example.com --token=replace-with-long-random-token --expect-mode=protected
+npm run smoke:external:protected -- https://demo.example.com --token=replace-with-long-random-token
 ```
 
+`smoke:external:protected` requires an explicit `https://` URL and a token from `--token` or `PUBLIC_DEMO_TOKEN` before it makes any network request.
 The smoke CLI sends the token only to the demo origin. If `index.html` references cross-origin client assets, those requests must remain unauthenticated.
 
 Client/API callers must send:

@@ -48,5 +48,18 @@ check("smoke:external:readonly requires explicit external URL and readonly mode"
     /--min-samples=19/.test(scripts["smoke:external:readonly"] || ""),
   scripts["smoke:external:readonly"] || "(missing)");
 
+check("smoke:external:protected script exists",
+  typeof scripts["smoke:external:protected"] === "string",
+  "missing package script smoke:external:protected");
+
+check("smoke:external:protected requires explicit external URL, token, and protected mode",
+  /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:external:protected"] || "") &&
+    /--require-url/.test(scripts["smoke:external:protected"] || "") &&
+    /--require-https/.test(scripts["smoke:external:protected"] || "") &&
+    /--require-token/.test(scripts["smoke:external:protected"] || "") &&
+    /--expect-mode=protected/.test(scripts["smoke:external:protected"] || "") &&
+    /--min-samples=19/.test(scripts["smoke:external:protected"] || ""),
+  scripts["smoke:external:protected"] || "(missing)");
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
