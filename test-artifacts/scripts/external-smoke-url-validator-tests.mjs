@@ -38,12 +38,20 @@ if (fs.existsSync(validatorPath)) {
   const { validateExternalSmokeUrl } = await import(validatorPath);
 
   check("validateExternalSmokeUrl accepts external https URL",
-    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/path"),
-    "https://demo.example.com/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com"),
+    "https://demo.example.com/");
+
+  check("validateExternalSmokeUrl accepts explicit root slash URL",
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/"),
+    "https://demo.example.com/");
 
   check("validateExternalSmokeUrl trims URL input",
-    validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
-    "https://demo.example.com/path");
+    validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com  "),
+    "https://demo.example.com/");
+
+  checkThrows("validateExternalSmokeUrl rejects non-root path",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/app"),
+    "external_readonly_url must point to the demo origin root path");
 
   checkThrows("validateExternalSmokeUrl rejects unencoded path space",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa th"),
@@ -69,9 +77,9 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/.%2e/admin"),
     "external_readonly_url must not include path dot segments");
 
-  check("validateExternalSmokeUrl accepts non-dot ellipsis path segment",
-    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/.../admin"),
-    "https://demo.example.com/.../admin");
+  checkThrows("validateExternalSmokeUrl rejects non-root ellipsis path segment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/.../admin"),
+    "external_readonly_url must point to the demo origin root path");
 
   checkThrows("validateExternalSmokeUrl rejects embedded newline",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa\nth"),
@@ -90,8 +98,8 @@ if (fs.existsSync(validatorPath)) {
     "external_readonly_url must not include backslashes");
 
   check("validateExternalSmokeUrl accepts explicit default HTTPS port",
-    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:443/path"),
-    "https://demo.example.com/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:443/"),
+    "https://demo.example.com/");
 
   checkThrows("validateExternalSmokeUrl rejects explicit non-default HTTPS port",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:4443/path"),
@@ -158,16 +166,16 @@ if (fs.existsSync(validatorPath)) {
     "external_readonly_url must use DNS-compatible public hostname labels");
 
   check("validateExternalSmokeUrl accepts hyphenated hostname labels",
-    validateExternalSmokeUrl("external_readonly_url", "https://demo-edge.example.com/path"),
-    "https://demo-edge.example.com/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://demo-edge.example.com"),
+    "https://demo-edge.example.com/");
 
   check("validateExternalSmokeUrl accepts punycoded hostname labels",
-    validateExternalSmokeUrl("external_readonly_url", "https://xn--bcher-kva.example/path"),
-    "https://xn--bcher-kva.example/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://xn--bcher-kva.example"),
+    "https://xn--bcher-kva.example/");
 
   check("validateExternalSmokeUrl accepts public IPv4 literal",
-    validateExternalSmokeUrl("external_readonly_url", "https://8.8.8.8/path"),
-    "https://8.8.8.8/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://8.8.8.8"),
+    "https://8.8.8.8/");
 
   checkThrows("validateExternalSmokeUrl rejects integer IPv4 literal",
     () => validateExternalSmokeUrl("external_readonly_url", "https://134744072/path"),
@@ -178,8 +186,8 @@ if (fs.existsSync(validatorPath)) {
     "external_readonly_url must use canonical dotted-decimal IPv4 literals");
 
   check("validateExternalSmokeUrl accepts public IPv6 literal",
-    validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860::8888]/path"),
-    "https://[2001:4860:4860::8888]/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860::8888]"),
+    "https://[2001:4860:4860::8888]/");
 
   checkThrows("validateExternalSmokeUrl rejects private IPv4 10/8",
     () => validateExternalSmokeUrl("external_readonly_url", "https://10.0.0.5"),
@@ -342,8 +350,8 @@ if (fs.existsSync(validatorPath)) {
     "external_readonly_url must not point to a reserved or special-use network target");
 
   check("validateExternalSmokeUrl accepts IPv4-mapped public IPv6",
-    validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:8.8.8.8]/path"),
-    "https://[::ffff:808:808]/path");
+    validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:8.8.8.8]"),
+    "https://[::ffff:808:808]/");
 
   const badCli = spawnSync(process.execPath, [
     validatorPath,
@@ -362,7 +370,7 @@ if (fs.existsSync(validatorPath)) {
   const goodCli = spawnSync(process.execPath, [
     validatorPath,
     "external_readonly_url",
-    "https://demo.example.com/path",
+    "https://demo.example.com",
   ], { encoding: "utf8" });
 
   check("CLI exits zero for valid URL",
@@ -371,7 +379,7 @@ if (fs.existsSync(validatorPath)) {
 
   check("CLI prints normalized valid URL",
     goodCli.stdout.trim(),
-    "OK external_readonly_url https://demo.example.com/path");
+    "OK external_readonly_url https://demo.example.com/");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

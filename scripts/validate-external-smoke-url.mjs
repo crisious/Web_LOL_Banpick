@@ -249,6 +249,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   if (!isDnsCompatibleHostname(host)) {
     throw new Error(`${safeLabel} must use DNS-compatible public hostname labels`);
   }
+  if (parsed.pathname !== "/") {
+    throw new Error(`${safeLabel} must point to the demo origin root path`);
+  }
   return parsed.toString();
 }
 
