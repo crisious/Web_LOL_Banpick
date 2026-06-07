@@ -354,6 +354,53 @@ check("CLI omits Authorization on cross-origin client asset requests",
   crossOriginAssetRequests.map((request) => request.authorization),
   ["", ""]);
 
+const htmlAssetServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?v=20260419">
+      <button data-login-sample-button>저장 샘플 열기</button>
+      <div data-sample-switcher>저장된 샘플</div>
+      <script src="./main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/styles.css?v=20260419" || req.url === "/main.js?v=20260419") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end("<!doctype html><title>Fallback</title>");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => htmlAssetServer.listen(0, "127.0.0.1", resolve));
+const htmlAssetUrl = `http://127.0.0.1:${htmlAssetServer.address().port}`;
+const htmlAssets = await runNode([
+  smokePath,
+  htmlAssetUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => htmlAssetServer.close(resolve));
+
+check("CLI exits non-zero when client assets return HTML content type",
+  htmlAssets.status,
+  1);
+
+check("CLI reports client asset content type mismatch",
+  htmlAssets.stderr.includes("FAIL /styles.css?v=20260419 content-type is CSS") ||
+    htmlAssets.stderr.includes("FAIL /main.js?v=20260419 content-type is JavaScript"),
+  true);
+
 const oneSampleServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
     res.writeHead(status, { "Content-Type": "application/json" });

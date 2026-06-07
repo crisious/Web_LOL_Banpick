@@ -73,6 +73,10 @@ function referencedAssetPath(html, filename) {
     : assetUrl.toString();
 }
 
+function contentType(response) {
+  return response.headers?.get?.("content-type")?.toLowerCase() || "";
+}
+
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   const requestOrigin = new URL(path, baseUrl).origin;
@@ -157,9 +161,11 @@ if (actualMode === "readonly") {
 const stylesheetPath = referencedAssetPath(home.text, "styles.css");
 const stylesheet = await request(stylesheetPath);
 expect(stylesheet.response.status === 200, `GET ${stylesheetPath} returns 200`, `status=${stylesheet.response.status}`);
+expect(contentType(stylesheet.response).includes("text/css"), `${stylesheetPath} content-type is CSS`, `content-type=${contentType(stylesheet.response) || "(missing)"}`);
 const appScriptPath = referencedAssetPath(home.text, "main.js");
 const appScript = await request(appScriptPath);
 expect(appScript.response.status === 200, `GET ${appScriptPath} returns 200`, `status=${appScript.response.status}`);
+expect(contentType(appScript.response).includes("javascript"), `${appScriptPath} content-type is JavaScript`, `content-type=${contentType(appScript.response) || "(missing)"}`);
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);
