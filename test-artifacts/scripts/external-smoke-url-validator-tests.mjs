@@ -117,6 +117,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "https://8.8.8.8/path"),
     "https://8.8.8.8/path");
 
+  checkThrows("validateExternalSmokeUrl rejects integer IPv4 literal",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://134744072/path"),
+    "external_readonly_url must use canonical dotted-decimal IPv4 literals");
+
+  checkThrows("validateExternalSmokeUrl rejects shortened IPv4 literal",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://8.8.2056/path"),
+    "external_readonly_url must use canonical dotted-decimal IPv4 literals");
+
   check("validateExternalSmokeUrl accepts public IPv6 literal",
     validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860::8888]/path"),
     "https://[2001:4860:4860::8888]/path");

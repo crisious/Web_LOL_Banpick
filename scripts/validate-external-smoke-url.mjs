@@ -9,6 +9,17 @@ function ipv4Parts(host) {
   return parts.every((part) => Number.isInteger(part) && part >= 0 && part <= 255) ? parts : null;
 }
 
+function rawHostFromUrlValue(value) {
+  const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
+  const authority = withoutScheme.split(/[/?#]/, 1)[0] || "";
+  const hostPort = authority.includes("@") ? authority.slice(authority.lastIndexOf("@") + 1) : authority;
+  if (hostPort.startsWith("[")) {
+    const closingBracketIndex = hostPort.indexOf("]");
+    return closingBracketIndex >= 0 ? hostPort.slice(0, closingBracketIndex + 1).toLowerCase() : hostPort.toLowerCase();
+  }
+  return hostPort.split(":")[0].toLowerCase();
+}
+
 function isPrivateOrLocalIpv4(host) {
   const parts = ipv4Parts(host);
   if (!parts) return false;
@@ -194,6 +205,10 @@ export function validateExternalSmokeUrl(label, rawUrl) {
     throw new Error(`${safeLabel} must not include username/password, query string, or fragment`);
   }
   const host = parsed.hostname.toLowerCase();
+  const rawHost = rawHostFromUrlValue(value);
+  if (ipv4Parts(host) && rawHost !== host) {
+    throw new Error(`${safeLabel} must use canonical dotted-decimal IPv4 literals`);
+  }
   if (isLocalOrPrivateHost(host)) {
     throw new Error(`${safeLabel} must not point to a local or private network target`);
   }
