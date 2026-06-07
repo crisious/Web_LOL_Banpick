@@ -107,7 +107,7 @@ Expected: workflow contract tests pass, full suite passes, and diff whitespace c
 
 Observed: `node test-artifacts/scripts/github-actions-workflow-tests.mjs && npm test && git diff --check` exited 0; workflow contract tests reported `28 passed, 0 failed` and full suite reported `585 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -117,7 +117,9 @@ git commit -m "ci: fail fast external smoke preflight"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed `160ded3 ci: fail fast external smoke preflight` and pushed to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -129,6 +131,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions run `27099571193` succeeded for `160ded3`; artifact `qa-automation-27099571193` uploaded as artifact id `7466329951`, expires `2026-06-21T17:24:58Z`. Downloaded artifact contained `qa-summary.json`, `2026-06-07T17-24-58Z-readonly/smoke-report.json`, and `2026-06-07T17-24-58Z-readonly/smoke-run.json`; `qa-summary.json` reported `150 passed / 0 failed`. Sensitive-value search for `Authorization`, `Bearer`, non-empty `PUBLIC_DEMO_TOKEN`, non-empty external URL env, `access_token=`, `token=secret`, and `user:pass@` returned no matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local test count, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: Obsidian project note updated with `585 passed / 0 failed`, run `27099571193`, artifact `7466329951`, and sensitive-value search result.
