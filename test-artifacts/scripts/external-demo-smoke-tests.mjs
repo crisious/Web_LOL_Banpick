@@ -198,19 +198,23 @@ checkThrows("parseSmokeArgs rejects empty report JSON path",
 
 checkThrows("parseSmokeArgs rejects absolute report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=/tmp/smoke-report.json"], {}),
-  "--report-json must be a relative .json path under test-artifacts");
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
 checkThrows("parseSmokeArgs rejects non-artifact report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=smoke-report.json"], {}),
-  "--report-json must be a relative .json path under test-artifacts");
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
+checkThrows("parseSmokeArgs rejects root artifact report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
 checkThrows("parseSmokeArgs rejects traversal report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/../smoke-report.json"], {}),
-  "--report-json must be a relative .json path under test-artifacts");
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
 checkThrows("parseSmokeArgs rejects non-json report path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.txt"], {}),
-  "--report-json must be a relative .json path under test-artifacts");
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
 checkThrows("parseSmokeArgs requires an explicit URL when requested",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--expect-mode=readonly"], {}),
@@ -1082,7 +1086,7 @@ check("CLI exits non-zero for unsafe report JSON path",
   1);
 
 check("CLI reports unsafe report JSON path without network request",
-  unsafeReportJson.stderr.includes("FAIL --report-json must be a relative .json path under test-artifacts"),
+  unsafeReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
   true);
 
 check("CLI unsafe report JSON path does not create file",

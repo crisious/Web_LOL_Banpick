@@ -57,11 +57,11 @@ function normalizeOutputRoot(outputRoot) {
   }
   const comparable = raw.replace(/\\/g, "/");
   if (path.isAbsolute(raw) || path.win32.isAbsolute(raw) || comparable.split("/").includes("..")) {
-    throw new Error("--output-root must be a relative path under test-artifacts");
+    throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
   const normalized = path.posix.normalize(comparable);
-  if (normalized !== "test-artifacts" && !normalized.startsWith("test-artifacts/")) {
-    throw new Error("--output-root must be a relative path under test-artifacts");
+  if (!normalized.startsWith("test-artifacts/")) {
+    throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
   return normalized;
 }

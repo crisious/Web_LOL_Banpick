@@ -95,15 +95,19 @@ if (fs.existsSync(runnerPath)) {
 
   checkThrows("parseRunnerArgs rejects absolute output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=/tmp/qa-automation"], {}),
-    "--output-root must be a relative path under test-artifacts");
+    "--output-root must be a relative path under a test-artifacts subdirectory");
 
   checkThrows("parseRunnerArgs rejects non-artifact output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=.github/qa-automation"], {}),
-    "--output-root must be a relative path under test-artifacts");
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects artifact root output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
 
   checkThrows("parseRunnerArgs rejects traversal output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/../qa-automation"], {}),
-    "--output-root must be a relative path under test-artifacts");
+    "--output-root must be a relative path under a test-artifacts subdirectory");
 
   checkThrows("parseRunnerArgs rejects unknown smoke pass-through options",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expectmode=readonly"], {}),
@@ -245,7 +249,7 @@ if (fs.existsSync(runnerPath)) {
   fs.rmSync(unsafeEnvCreatedPath, { recursive: true, force: true });
   await checkRejects("runSmokeReport rejects unsafe env output root before artifact creation",
     () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: unsafeEnvOutputRoot }),
-    "--output-root must be a relative path under test-artifacts");
+    "--output-root must be a relative path under a test-artifacts subdirectory");
   check("unsafe env output root rejection does not create output root",
     fs.existsSync(unsafeEnvCreatedPath),
     false);

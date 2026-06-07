@@ -23,11 +23,12 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
     const comparable = raw.replace(/\\/g, "/");
     if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || comparable.split("/").includes("..")) {
-      throw new Error("--report-json must be a relative .json path under test-artifacts");
+      throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
     const normalized = comparable.split("/").filter(Boolean).join("/");
-    if (!normalized.startsWith("test-artifacts/") || !normalized.toLowerCase().endsWith(".json")) {
-      throw new Error("--report-json must be a relative .json path under test-artifacts");
+    const parts = normalized.split("/");
+    if (parts.length < 3 || parts[0] !== "test-artifacts" || !normalized.toLowerCase().endsWith(".json")) {
+      throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
     return normalized;
   }
