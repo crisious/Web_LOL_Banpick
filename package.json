@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "start:readonly": "PUBLIC_DEMO_MODE=readonly node server.js",
+    "start:protected": "PUBLIC_DEMO_MODE=protected node server.js",
     "test": "node test-artifacts/run-tests.mjs",
     "test:schema": "node test-artifacts/schema/schema-tests.mjs",
     "test:champions": "node test-artifacts/champions-tab/aggregate-tests.mjs",

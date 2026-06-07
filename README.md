@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 340건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 342건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -192,6 +192,8 @@ PORT=8123
 
 ```bash
 node server.js
+# protected 외부 데모를 로컬/터널에서 띄울 때
+PUBLIC_DEMO_TOKEN=replace-with-long-random-token TRUST_PROXY=1 npm run start:protected
 ```
 
 브라우저에서 아래 경로로 접속:

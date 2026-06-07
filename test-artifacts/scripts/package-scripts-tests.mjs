@@ -25,6 +25,14 @@ check("start:readonly starts server in readonly mode",
   /PUBLIC_DEMO_MODE=readonly/.test(scripts["start:readonly"] || "") && /node server\.js/.test(scripts["start:readonly"] || ""),
   scripts["start:readonly"] || "(missing)");
 
+check("start:protected script exists",
+  typeof scripts["start:protected"] === "string",
+  "missing package script start:protected");
+
+check("start:protected starts server in protected mode",
+  /PUBLIC_DEMO_MODE=protected/.test(scripts["start:protected"] || "") && /node server\.js/.test(scripts["start:protected"] || ""),
+  scripts["start:protected"] || "(missing)");
+
 check("smoke:readonly script exists",
   typeof scripts["smoke:readonly"] === "string",
   "missing package script smoke:readonly");

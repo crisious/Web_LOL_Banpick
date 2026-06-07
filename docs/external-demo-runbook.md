@@ -90,7 +90,7 @@ Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>
 Use this only for a small trusted tester group.
 
 ```bash
-PUBLIC_DEMO_MODE=protected PUBLIC_DEMO_TOKEN='replace-with-long-random-token' TRUST_PROXY=1 npm start
+PUBLIC_DEMO_TOKEN='replace-with-long-random-token' TRUST_PROXY=1 npm run start:protected
 ```
 
 Smoke with token:
