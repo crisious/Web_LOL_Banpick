@@ -2220,8 +2220,40 @@ function riotErrorPayload(error) {
   };
 }
 
+function manifestValidationError(message) {
+  const error = new Error(message);
+  error.statusCode = 500;
+  error.payload = {
+    ok: false,
+    code: "SAMPLE_MANIFEST_INVALID",
+    error: message,
+  };
+  return error;
+}
+
+function validateManifest(manifest) {
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
+    throw manifestValidationError("Sample manifest must be a JSON object.");
+  }
+  if (!Array.isArray(manifest.samples)) {
+    throw manifestValidationError("Sample manifest must include a samples array.");
+  }
+
+  const hasInvalidEntry = manifest.samples.some((sample) =>
+    !sample || typeof sample !== "object" ||
+    typeof sample.id !== "string" ||
+    typeof sample.normalizedPath !== "string" ||
+    typeof sample.analysisPath !== "string"
+  );
+  if (hasInvalidEntry) {
+    throw manifestValidationError("Sample manifest contains an invalid sample entry.");
+  }
+
+  return manifest;
+}
+
 async function loadManifest() {
-  return readJson(manifestPath);
+  return validateManifest(await readJson(manifestPath));
 }
 
 async function saveManifest(manifest) {
@@ -3054,7 +3086,7 @@ const server = http.createServer(async (req, res) => {
     }
     await handleStatic(req, res, url);
   } catch (error) {
-    sendJson(res, 500, {
+    sendJson(res, error?.statusCode || 500, error?.payload || {
       ok: false,
       error: error.message,
     });
