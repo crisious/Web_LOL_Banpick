@@ -32,6 +32,18 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Validate external read-only smoke URL
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_readonly_url != '' }}
+        env:
+          EXTERNAL_READONLY_URL: ${{ inputs.external_readonly_url }}
+        run: npm run smoke:validate:external-url -- external_readonly_url "$EXTERNAL_READONLY_URL"
+
+      - name: Validate external protected smoke URL
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' }}
+        env:
+          EXTERNAL_PROTECTED_URL: ${{ inputs.external_protected_url }}
+        run: npm run smoke:validate:external-url -- external_protected_url "$EXTERNAL_PROTECTED_URL"
+
       - name: Run unit tests
         run: npm test
 
@@ -100,23 +112,11 @@ jobs:
           fi
           cat /tmp/lol-ai-coach-protected.log 2>/dev/null || true
 
-      - name: Validate external read-only smoke URL
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_readonly_url != '' }}
-        env:
-          EXTERNAL_READONLY_URL: ${{ inputs.external_readonly_url }}
-        run: npm run smoke:validate:external-url -- external_readonly_url "$EXTERNAL_READONLY_URL"
-
       - name: Run external read-only smoke report
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_readonly_url != '' }}
         env:
           EXTERNAL_READONLY_URL: ${{ inputs.external_readonly_url }}
         run: npm run smoke:report:external:readonly -- "$EXTERNAL_READONLY_URL"
-
-      - name: Validate external protected smoke URL
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' }}
-        env:
-          EXTERNAL_PROTECTED_URL: ${{ inputs.external_protected_url }}
-        run: npm run smoke:validate:external-url -- external_protected_url "$EXTERNAL_PROTECTED_URL"
 
       - name: Require token for external protected smoke
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' && steps.protected-smoke-token.outputs.available != 'true' }}

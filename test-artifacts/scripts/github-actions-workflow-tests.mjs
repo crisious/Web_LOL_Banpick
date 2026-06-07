@@ -121,6 +121,15 @@ if (exists) {
       workflow.indexOf("Require token for external protected smoke") < workflow.indexOf("Run external protected smoke report"),
     workflow);
 
+  check("QA workflow validates manual external URLs before expensive QA steps",
+    workflow.indexOf("Setup Node") < workflow.indexOf("Validate external read-only smoke URL") &&
+      workflow.indexOf("Setup Node") < workflow.indexOf("Validate external protected smoke URL") &&
+      workflow.indexOf("Validate external read-only smoke URL") < workflow.indexOf("Run unit tests") &&
+      workflow.indexOf("Validate external protected smoke URL") < workflow.indexOf("Run unit tests") &&
+      workflow.indexOf("Validate external protected smoke URL") < workflow.indexOf("Detect protected smoke token") &&
+      workflow.indexOf("Validate external read-only smoke URL") < workflow.indexOf("Start read-only demo"),
+    workflow);
+
   check("QA workflow fails external protected smoke when token is missing",
     /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_protected_url\s*!=\s*''\s*&&\s*steps\.protected-smoke-token\.outputs\.available\s*!=\s*'true'\s*\}\}/.test(workflow) &&
       /external_protected_url requires repository secret PUBLIC_DEMO_TOKEN/.test(workflow) &&
