@@ -47,6 +47,35 @@ function mappedIpv4PartsFromIpv6(host) {
   return [high >> 8, high & 0xff, low >> 8, low & 0xff];
 }
 
+function ipv6Hextets(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (!normalized.includes(":")) return null;
+  const compressedParts = normalized.split("::");
+  if (compressedParts.length > 2) return null;
+  const head = compressedParts[0] ? compressedParts[0].split(":") : [];
+  const tail = compressedParts.length === 2 && compressedParts[1] ? compressedParts[1].split(":") : [];
+  const missingCount = compressedParts.length === 2 ? 8 - head.length - tail.length : 0;
+  if (missingCount < 0 || (compressedParts.length === 1 && head.length !== 8)) return null;
+  const labels = [...head, ...Array(missingCount).fill("0"), ...tail];
+  if (labels.length !== 8) return null;
+  const hextets = labels.map((label) => {
+    if (!/^[0-9a-f]{1,4}$/.test(label)) return null;
+    return Number.parseInt(label, 16);
+  });
+  return hextets.every((value) => Number.isInteger(value) && value >= 0 && value <= 0xffff) ? hextets : null;
+}
+
+function ipv6PrefixMatches(hextets, prefix, prefixLength) {
+  let remainingBits = prefixLength;
+  for (let index = 0; remainingBits > 0; index++) {
+    const bits = Math.min(remainingBits, 16);
+    const mask = bits === 16 ? 0xffff : (0xffff << (16 - bits)) & 0xffff;
+    if ((hextets[index] & mask) !== (prefix[index] & mask)) return false;
+    remainingBits -= bits;
+  }
+  return true;
+}
+
 function isPrivateOrLocalIpv6(host) {
   const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
   const mappedIpv4Parts = mappedIpv4PartsFromIpv6(normalized);
@@ -71,10 +100,38 @@ function isReservedOrSpecialIpv6(host) {
   if (mappedIpv4Parts) {
     return isReservedOrSpecialIpv4(mappedIpv4Parts.join("."));
   }
-  return (
-    normalized.startsWith("2001:2:") ||
-    normalized.startsWith("2001:db8:") ||
-    normalized.startsWith("ff")
+  const hextets = ipv6Hextets(normalized);
+  if (!hextets) return false;
+  const specialPrefixes = [
+    [[0x0064, 0xff9b, 0x0001, 0, 0, 0, 0, 0], 48],
+    [[0x0100, 0, 0, 0, 0, 0, 0, 0], 64],
+    [[0x0100, 0, 0, 1, 0, 0, 0, 0], 64],
+    [[0x2001, 0x0002, 0, 0, 0, 0, 0, 0], 48],
+    [[0x2001, 0x0010, 0, 0, 0, 0, 0, 0], 28],
+    [[0x2001, 0x0db8, 0, 0, 0, 0, 0, 0], 32],
+    [[0x2002, 0, 0, 0, 0, 0, 0, 0], 16],
+    [[0x3fff, 0, 0, 0, 0, 0, 0, 0], 20],
+    [[0x5f00, 0, 0, 0, 0, 0, 0, 0], 16],
+    [[0xff00, 0, 0, 0, 0, 0, 0, 0], 8],
+  ];
+  const reservedGlobalUnicastPrefixes = [
+    [[0x2d00, 0, 0, 0, 0, 0, 0, 0], 8],
+    [[0x2e00, 0, 0, 0, 0, 0, 0, 0], 7],
+    [[0x3000, 0, 0, 0, 0, 0, 0, 0], 5],
+    [[0x3800, 0, 0, 0, 0, 0, 0, 0], 6],
+    [[0x3c00, 0, 0, 0, 0, 0, 0, 0], 7],
+    [[0x3e00, 0, 0, 0, 0, 0, 0, 0], 8],
+    [[0x3f00, 0, 0, 0, 0, 0, 0, 0], 9],
+    [[0x3f80, 0, 0, 0, 0, 0, 0, 0], 10],
+    [[0x3fc0, 0, 0, 0, 0, 0, 0, 0], 11],
+    [[0x3fe0, 0, 0, 0, 0, 0, 0, 0], 12],
+    [[0x3ff0, 0, 0, 0, 0, 0, 0, 0], 13],
+    [[0x3ff8, 0, 0, 0, 0, 0, 0, 0], 14],
+    [[0x3ffc, 0, 0, 0, 0, 0, 0, 0], 15],
+    [[0x3ffe, 0, 0, 0, 0, 0, 0, 0], 16],
+  ];
+  return [...specialPrefixes, ...reservedGlobalUnicastPrefixes].some(
+    ([prefix, prefixLength]) => ipv6PrefixMatches(hextets, prefix, prefixLength)
   );
 }
 

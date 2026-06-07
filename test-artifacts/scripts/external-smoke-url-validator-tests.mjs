@@ -201,6 +201,42 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://[ff02::1]"),
     "external_readonly_url must not point to a reserved or special-use network target");
 
+  checkThrows("validateExternalSmokeUrl rejects discard-only IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[100::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects dummy IPv6 prefix",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[100:0:0:1::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects local-use translation IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[64:ff9b:1::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects deprecated ORCHID IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2001:10::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects 6to4 IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2002::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects SRv6 SID IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[5f00::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects 6bone returned IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[3ffe::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects new documentation IPv6 block",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[3fff::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
+  checkThrows("validateExternalSmokeUrl rejects IANA reserved IPv6 global-unicast block",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[3000::1]"),
+    "external_readonly_url must not point to a reserved or special-use network target");
+
   checkThrows("validateExternalSmokeUrl rejects IPv4-mapped loopback IPv6",
     () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:127.0.0.1]"),
     "external_readonly_url must not point to a local or private network target");
