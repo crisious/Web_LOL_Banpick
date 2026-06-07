@@ -4,7 +4,7 @@
 
 **Goal:** Remove the GitHub Actions JavaScript action runtime deprecation annotation while keeping the app test runtime pinned to Node.js 20.
 
-**Architecture:** Keep `actions/setup-node@v4` configured with `node-version: "20"` for project tests and smoke commands. Add the workflow-level `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` environment variable so GitHub-hosted JavaScript actions run on the newer runtime ahead of the deprecation deadline.
+**Architecture:** Keep the project test runtime configured with `node-version: "20"` for app tests and smoke commands. Upgrade the GitHub-maintained JavaScript actions to Node 24-native major versions (`actions/checkout@v6`, `actions/setup-node@v6`, `actions/upload-artifact@v7`) and remove the temporary `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` override so the workflow no longer relies on forced legacy action runtime behavior.
 
 **Tech Stack:** GitHub Actions, existing `.github/workflows/qa.yml`, zero-dependency workflow contract test.
 
@@ -16,17 +16,27 @@
 - Modify: `test-artifacts/scripts/github-actions-workflow-tests.mjs`
 - Modify: `.github/workflows/qa.yml`
 
-- [ ] **Step 1: Write the failing contract test**
+- [x] **Step 1: Write the failing contract test**
 
-Add this assertion after the read-only permissions check:
+Add assertions after the read-only permissions check:
 
 ```js
-check("QA workflow opts JavaScript actions into Node 24 runtime",
-  /FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:\s*true/.test(workflow),
+check("QA workflow does not force old JavaScript action runtime",
+  !/FORCE_JAVASCRIPT_ACTIONS_TO_NODE24/.test(workflow),
+  workflow);
+
+check("QA workflow uses Node 24-native checkout action",
+  /uses:\s*actions\/checkout@v6/.test(workflow),
+  workflow);
+
+check("QA workflow uses Node 24-native setup-node action",
+  /uses:\s*actions\/setup-node@v6/.test(workflow),
   workflow);
 ```
 
-- [ ] **Step 2: Verify RED**
+Update the artifact upload assertion to require `actions/upload-artifact@v7`.
+
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -34,15 +44,16 @@ Run:
 node test-artifacts/scripts/github-actions-workflow-tests.mjs
 ```
 
-Expected: FAIL with `QA workflow opts JavaScript actions into Node 24 runtime`.
+Observed: 11 passed / 4 failed for the forced runtime env and old action majors.
 
-- [ ] **Step 3: Add workflow env**
+- [x] **Step 3: Upgrade workflow actions**
 
-In `.github/workflows/qa.yml`, add:
+In `.github/workflows/qa.yml`, use:
 
 ```yaml
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+- uses: actions/checkout@v6
+- uses: actions/setup-node@v6
+- uses: actions/upload-artifact@v7
 ```
 
 Keep:
@@ -51,7 +62,13 @@ Keep:
 node-version: "20"
 ```
 
-- [ ] **Step 4: Verify GREEN**
+Remove:
+
+```yaml
+FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+```
+
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -59,7 +76,7 @@ Run:
 node test-artifacts/scripts/github-actions-workflow-tests.mjs
 ```
 
-Expected: 13 passed / 0 failed.
+Observed: 15 passed / 0 failed.
 
 ### Task 2: Full Verification And Push
 
@@ -67,11 +84,11 @@ Expected: 13 passed / 0 failed.
 - Modify: `README.md`
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Update test count docs**
+- [x] **Step 1: Update test count docs**
 
-Update README's `npm test` count from 531 to 532 after full test verification.
+Updated README's `npm test` count to 534 after full-suite verification.
 
-- [ ] **Step 2: Run full verification**
+- [x] **Step 2: Run full verification**
 
 Run:
 
@@ -84,13 +101,15 @@ git diff --check
 
 Expected: all commands exit 0.
 
+Observed: `node --check`, workflow contract tests, `npm test` (534 passed / 0 failed across 23 files), and `git diff --check` all exited 0.
+
 - [ ] **Step 3: Commit and push**
 
 Run:
 
 ```bash
 git add .github/workflows/qa.yml README.md docs/superpowers/plans/2026-06-08-github-actions-node24-runtime.md test-artifacts/scripts/github-actions-workflow-tests.mjs
-git commit -m "ci: opt actions into node24 runtime"
+git commit -m "ci: use node24-native actions"
 git push origin main
 ```
 

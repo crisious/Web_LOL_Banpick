@@ -42,8 +42,16 @@ if (exists) {
     /permissions:\s*\n\s+contents:\s*read/.test(workflow),
     workflow);
 
-  check("QA workflow opts JavaScript actions into Node 24 runtime",
-    /FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:\s*true/.test(workflow),
+  check("QA workflow does not force old JavaScript action runtime",
+    !/FORCE_JAVASCRIPT_ACTIONS_TO_NODE24/.test(workflow),
+    workflow);
+
+  check("QA workflow uses Node 24-native checkout action",
+    /uses:\s*actions\/checkout@v6/.test(workflow),
+    workflow);
+
+  check("QA workflow uses Node 24-native setup-node action",
+    /uses:\s*actions\/setup-node@v6/.test(workflow),
     workflow);
 
   check("QA workflow pins Node 20",
@@ -59,7 +67,7 @@ if (exists) {
     workflow);
 
   check("QA workflow uploads QA automation artifacts",
-    /uses:\s*actions\/upload-artifact@v4/.test(workflow) &&
+    /uses:\s*actions\/upload-artifact@v7/.test(workflow) &&
       /path:\s*test-artifacts\/qa-automation\//.test(workflow),
     workflow);
 
