@@ -122,7 +122,7 @@ Expected: syntax check passes, validator tests pass, full suite passes, and diff
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` exited 0. Validator tests reported `82 passed, 0 failed`; full suite reported `643 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -132,7 +132,9 @@ git commit -m "ci: reject dot segment smoke urls"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed and pushed `c457e0a ci: reject dot segment smoke urls` to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -144,6 +146,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions QA run `27101969829` succeeded for `c457e0a`; artifact `qa-automation-27101969829` uploaded with id `7467082260` and expires at `2026-06-21T19:06:56Z`. Downloaded artifact summary reported `smokeSummary.passed = 150`, `smokeSummary.failed = 0`; sensitive-value scan returned no matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local test count, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: appended Obsidian log at `2026-06-08 04:07 KST` with local RED/GREEN/full QA, code commit `c457e0a`, remote QA run `27101969829`, artifact id `7467082260`, and no-match sensitive scan result.
