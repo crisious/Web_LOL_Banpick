@@ -7,7 +7,7 @@
 ## Safe Default
 
 ```bash
-PUBLIC_DEMO_MODE=readonly npm start
+npm run start:readonly
 ```
 
 read-only 모드에서 허용:
@@ -30,7 +30,7 @@ read-only 모드에서 차단:
 npm test
 node --check server.js
 node --check main.js
-npm run smoke:external -- http://127.0.0.1:8123 --expect-mode=readonly
+npm run smoke:readonly
 ```
 
 Expected:
@@ -105,7 +105,8 @@ The first cloud deploy should stay read-only. Writable sample generation needs p
 ## Pre-Share Checklist
 
 - [ ] `npm test` passes
-- [ ] `npm run smoke:external -- <url> --expect-mode=readonly` passes
+- [ ] `npm run smoke:external -- <url> --expect-mode=readonly` passes for external URLs
+- [ ] `npm run smoke:readonly` passes for local read-only smoke
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404
 - [ ] `curl <url>/data/samples/manifest.json` returns 403 or 404

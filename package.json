@@ -6,11 +6,13 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start:readonly": "PUBLIC_DEMO_MODE=readonly node server.js",
     "test": "node test-artifacts/run-tests.mjs",
     "test:schema": "node test-artifacts/schema/schema-tests.mjs",
     "test:champions": "node test-artifacts/champions-tab/aggregate-tests.mjs",
     "test:llm-payload": "node test-artifacts/server/llm-payload-tests.mjs",
-    "smoke:external": "node scripts/external-demo-smoke.mjs"
+    "smoke:external": "node scripts/external-demo-smoke.mjs",
+    "smoke:readonly": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly"
   },
   "engines": {
     "node": ">=20"
