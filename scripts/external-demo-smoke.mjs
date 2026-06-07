@@ -20,15 +20,21 @@ function parseSmokeArgs(argv, env = {}) {
   const tokenArg = args.find((arg) => arg.startsWith("--token="));
   const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
   const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
+  const minSamplesArg = args.find((arg) => arg.startsWith("--min-samples="));
+  const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
 
   if (expectedMode && !validExpectedModes.includes(expectedMode)) {
     throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
+  }
+  if (!Number.isInteger(minSamples) || minSamples < 1) {
+    throw new Error("--min-samples must be a positive integer");
   }
 
   return {
     baseUrl,
     demoToken: tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "",
     expectedMode,
+    minSamples,
   };
 }
 
@@ -40,7 +46,7 @@ try {
   process.exit(1);
 }
 
-const { baseUrl, demoToken, expectedMode } = parsedArgs;
+const { baseUrl, demoToken, expectedMode, minSamples } = parsedArgs;
 
 function url(path) {
   return new URL(path, baseUrl).toString();
@@ -101,7 +107,7 @@ expect(home.text.includes("LoL Replay Coach"), "home contains app title");
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);
 expect(Array.isArray(samples.body?.samples), "/api/samples returns samples array");
-expect((samples.body?.samples?.length || 0) > 0, "/api/samples has at least one sample");
+expect((samples.body?.samples?.length || 0) >= minSamples, `/api/samples has at least ${minSamples} samples`, `count=${samples.body?.samples?.length || 0}`);
 
 const firstSample = samples.body?.samples?.[0];
 if (firstSample?.id) {

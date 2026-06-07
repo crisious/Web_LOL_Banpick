@@ -12,8 +12,8 @@
     "test:champions": "node test-artifacts/champions-tab/aggregate-tests.mjs",
     "test:llm-payload": "node test-artifacts/server/llm-payload-tests.mjs",
     "smoke:external": "node scripts/external-demo-smoke.mjs",
-    "smoke:readonly": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly",
-    "smoke:external:readonly": "node scripts/external-demo-smoke.mjs --require-url --require-https --expect-mode=readonly"
+    "smoke:readonly": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly --min-samples=19",
+    "smoke:external:readonly": "node scripts/external-demo-smoke.mjs --require-url --require-https --expect-mode=readonly --min-samples=19"
   },
   "engines": {
     "node": ">=20"

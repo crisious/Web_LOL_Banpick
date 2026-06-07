@@ -37,6 +37,7 @@ Expected:
 
 - `/healthz` 200
 - `/api/samples` 200
+- `/api/samples` includes at least 19 stored samples
 - first sample detail 200
 - sensitive static paths 403/404
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
@@ -61,7 +62,7 @@ cloudflared tunnel --url http://localhost:8123
 npm run smoke:external:readonly -- https://your-tunnel-url.trycloudflare.com
 ```
 
-`smoke:external:readonly` requires an explicit `https://` URL. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
+`smoke:external:readonly` requires an explicit `https://` URL and at least 19 stored samples. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
 
 4. Share URL only after smoke passes.
 
@@ -109,6 +110,7 @@ The first cloud deploy should stay read-only. Writable sample generation needs p
 - [ ] `npm test` passes
 - [ ] `npm run smoke:external:readonly -- <https-url>` passes for external HTTPS URLs
 - [ ] `npm run smoke:readonly` passes for local read-only smoke
+- [ ] External `/api/samples` exposes at least 19 stored samples
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404
 - [ ] `curl <url>/data/samples/manifest.json` returns 403 or 404

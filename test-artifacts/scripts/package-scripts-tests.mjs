@@ -32,7 +32,8 @@ check("smoke:readonly script exists",
 check("smoke:readonly pins local URL and expected mode",
   /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:readonly"] || "") &&
     /http:\/\/127\.0\.0\.1:8123/.test(scripts["smoke:readonly"] || "") &&
-    /--expect-mode=readonly/.test(scripts["smoke:readonly"] || ""),
+    /--expect-mode=readonly/.test(scripts["smoke:readonly"] || "") &&
+    /--min-samples=19/.test(scripts["smoke:readonly"] || ""),
   scripts["smoke:readonly"] || "(missing)");
 
 check("smoke:external:readonly script exists",
@@ -43,7 +44,8 @@ check("smoke:external:readonly requires explicit external URL and readonly mode"
   /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:external:readonly"] || "") &&
     /--require-url/.test(scripts["smoke:external:readonly"] || "") &&
     /--require-https/.test(scripts["smoke:external:readonly"] || "") &&
-    /--expect-mode=readonly/.test(scripts["smoke:external:readonly"] || ""),
+    /--expect-mode=readonly/.test(scripts["smoke:external:readonly"] || "") &&
+    /--min-samples=19/.test(scripts["smoke:external:readonly"] || ""),
   scripts["smoke:external:readonly"] || "(missing)");
 
 console.log(`\n${pass} passed, ${fail} failed`);
