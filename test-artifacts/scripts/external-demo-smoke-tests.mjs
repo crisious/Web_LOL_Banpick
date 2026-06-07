@@ -92,6 +92,14 @@ check("parseSmokeArgs omits expected mode when not provided",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "http://127.0.0.1:9000"], {}),
   { baseUrl: "http://127.0.0.1:9000", demoToken: "", expectedMode: "", minSamples: 1, requestTimeoutMs: 10000 });
 
+checkThrows("parseSmokeArgs rejects invalid base URL",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "not-a-url"], {}),
+  "base URL must be an http(s) URL");
+
+checkThrows("parseSmokeArgs rejects non-http base URL",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "ftp://demo.example"], {}),
+  "base URL must be an http(s) URL");
+
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");
@@ -149,6 +157,22 @@ check("CLI exits non-zero when --require-https gets http URL",
 check("CLI prints concise non-https URL failure without stack trace",
   nonHttpsRequiredUrl.stderr.trim(),
   "FAIL --require-https needs an https:// base URL");
+
+const invalidBaseUrl = spawnSync(process.execPath, [
+  smokePath,
+  "not-a-url",
+  "--expect-mode=readonly",
+], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero when base URL is invalid",
+  invalidBaseUrl.status,
+  1);
+
+check("CLI prints concise invalid base URL failure without stack trace",
+  invalidBaseUrl.stderr.trim(),
+  "FAIL base URL must be an http(s) URL");
 
 const modeMismatchRequests = [];
 const modeMismatchServer = http.createServer((req, res) => {

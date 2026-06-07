@@ -10,12 +10,17 @@ function parseSmokeArgs(argv, env = {}) {
     throw new Error("--require-url needs an explicit base URL argument");
   }
   const baseUrl = explicitBaseUrl || "http://127.0.0.1:8123";
-  if (requireHttps) {
-    try {
-      if (new URL(baseUrl).protocol !== "https:") throw new Error("not https");
-    } catch {
-      throw new Error("--require-https needs an https:// base URL");
-    }
+  let parsedBaseUrl;
+  try {
+    parsedBaseUrl = new URL(baseUrl);
+  } catch {
+    throw new Error("base URL must be an http(s) URL");
+  }
+  if (!["http:", "https:"].includes(parsedBaseUrl.protocol)) {
+    throw new Error("base URL must be an http(s) URL");
+  }
+  if (requireHttps && parsedBaseUrl.protocol !== "https:") {
+    throw new Error("--require-https needs an https:// base URL");
   }
   const tokenArg = args.find((arg) => arg.startsWith("--token="));
   const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
