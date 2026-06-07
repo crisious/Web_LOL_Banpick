@@ -145,6 +145,22 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo/path"),
     "external_readonly_url must use a fully qualified public hostname or IP address");
 
+  checkThrows("validateExternalSmokeUrl rejects Unicode hostname label",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://bücher.example"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects Unicode TLD label",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.例子"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects percent-encoded hostname label",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://%65xample.com"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects fullwidth hostname label",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://ｅxample.com"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
   checkThrows("validateExternalSmokeUrl rejects hostname label underscore",
     () => validateExternalSmokeUrl("external_readonly_url", "https://bad_host.example.com/path"),
     "external_readonly_url must use DNS-compatible public hostname labels");

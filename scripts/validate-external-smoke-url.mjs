@@ -192,6 +192,10 @@ function isDnsCompatibleHostname(host) {
   ));
 }
 
+function isDnsHostnameRawHostCompatible(rawHost) {
+  return !isIpLiteralHost(rawHost) && isDnsCompatibleHostname(rawHost);
+}
+
 function isLocalOrPrivateHost(host) {
   return (
     host === "localhost" ||
@@ -236,6 +240,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   const rawHost = rawHostFromUrlValue(value);
   if (ipv4Parts(host) && rawHost !== host) {
     throw new Error(`${safeLabel} must use canonical dotted-decimal IPv4 literals`);
+  }
+  if (!isIpLiteralHost(host) && !isDnsHostnameRawHostCompatible(rawHost)) {
+    throw new Error(`${safeLabel} must use DNS-compatible public hostname labels`);
   }
   if (isLocalOrPrivateHost(host)) {
     throw new Error(`${safeLabel} must not point to a local or private network target`);
