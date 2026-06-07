@@ -54,6 +54,7 @@ function makeHelpers(readJson, writeJson, events) {
     "events",
     [
       "const manifestPath = '/samples/manifest.json';",
+      "const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;",
       extractFunctionSource(serverSrc, "manifestValidationError"),
       extractFunctionSource(serverSrc, "validateManifest"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
@@ -88,22 +89,31 @@ try {
 
 if (helpers) {
   const { validateManifest } = helpers;
+  const validSample = {
+    id: "sample-kr-1",
+    normalizedPath: "/data/samples/sample-kr-1/normalized-match.json",
+    analysisPath: "/data/samples/sample-kr-1/analysis-result.json",
+  };
   const validManifest = {
-    samples: [{
-      id: "sample-kr-1",
-      normalizedPath: "/data/samples/sample-kr-1/normalized-match.json",
-      analysisPath: "/data/samples/sample-kr-1/analysis-result.json",
-    }],
+    schemaVersion: 1,
+    samples: [validSample],
+  };
+  const legacyManifest = {
+    samples: [validSample],
   };
 
   check("valid manifest passes through",
     validateManifest(validManifest),
     validManifest);
+  check("legacy manifest defaults to schemaVersion 1",
+    validateManifest(legacyManifest),
+    { schemaVersion: 1, samples: [validSample] });
 
   for (const [label, manifest, expectedMessage] of [
     ["manifest array is rejected", [], "Sample manifest must be a JSON object."],
     ["manifest without samples is rejected", {}, "Sample manifest must include a samples array."],
     ["manifest with invalid entry is rejected", { samples: [{ id: "sample-kr-1" }] }, "Sample manifest contains an invalid sample entry."],
+    ["manifest with unsupported schemaVersion is rejected", { schemaVersion: 2, samples: [] }, "Unsupported sample manifest schemaVersion: 2."],
   ]) {
     let caught = null;
     try {
@@ -159,6 +169,17 @@ if (helpers) {
     const { saveManifest } = makeHelpers(async () => validManifest, async (filePath, data) => {
       events.push({ op: "writeJson", filePath, data });
     }, events);
+    await saveManifest(legacyManifest);
+    check("saveManifest writes legacy manifest as versioned v1",
+      events,
+      [{ op: "writeJson", filePath: "/samples/manifest.json", data: { schemaVersion: 1, samples: [validSample] } }]);
+  }
+
+  {
+    const events = [];
+    const { saveManifest } = makeHelpers(async () => validManifest, async (filePath, data) => {
+      events.push({ op: "writeJson", filePath, data });
+    }, events);
     let caught = null;
     try {
       await saveManifest({ samples: [{ id: "sample-kr-1" }] });
@@ -174,6 +195,8 @@ if (helpers) {
   }
 }
 
+checkTrue("server declares sample manifest schema version",
+  /const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error status",
   /sendJson\(res,\s*error\?\.statusCode\s*\|\|\s*500/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error payload",

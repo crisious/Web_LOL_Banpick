@@ -67,6 +67,7 @@ for (const sample of samples) {
 }
 
 check("manifest exposes samples array", Array.isArray(manifest.samples));
+check("manifest declares schemaVersion 1", manifest.schemaVersion === 1, `schemaVersion=${manifest.schemaVersion}`);
 check("manifest keeps at least 19 stored samples", samples.length >= 19, `count=${samples.length}`);
 check("sample ids are unique", duplicateIds.length === 0, duplicateIds.join(", "));
 check("sample entries include required metadata", missingFieldEntries.length === 0, missingFieldEntries.slice(0, 10).join(", "));

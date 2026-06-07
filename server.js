@@ -38,6 +38,7 @@ function resolveSamplesDir(configuredDir, appRoot) {
 const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);
 const manifestPath = path.join(samplesDir, "manifest.json");
 const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
+const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
@@ -2235,11 +2236,18 @@ function validateManifest(manifest) {
   if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
     throw manifestValidationError("Sample manifest must be a JSON object.");
   }
+  const hasSchemaVersion = Object.prototype.hasOwnProperty.call(manifest, "schemaVersion");
+  const schemaVersion = hasSchemaVersion ? manifest.schemaVersion : SAMPLE_MANIFEST_SCHEMA_VERSION;
+  if (schemaVersion !== SAMPLE_MANIFEST_SCHEMA_VERSION) {
+    throw manifestValidationError(`Unsupported sample manifest schemaVersion: ${String(schemaVersion)}.`);
+  }
+  const versionedManifest = hasSchemaVersion ? manifest : { schemaVersion, ...manifest };
+
   if (!Array.isArray(manifest.samples)) {
     throw manifestValidationError("Sample manifest must include a samples array.");
   }
 
-  const hasInvalidEntry = manifest.samples.some((sample) =>
+  const hasInvalidEntry = versionedManifest.samples.some((sample) =>
     !sample || typeof sample !== "object" ||
     typeof sample.id !== "string" ||
     typeof sample.normalizedPath !== "string" ||
@@ -2249,7 +2257,7 @@ function validateManifest(manifest) {
     throw manifestValidationError("Sample manifest contains an invalid sample entry.");
   }
 
-  return manifest;
+  return versionedManifest;
 }
 
 async function loadManifest() {
