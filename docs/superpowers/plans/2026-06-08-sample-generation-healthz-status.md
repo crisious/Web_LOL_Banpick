@@ -134,7 +134,7 @@ Expected: all commands exit 0; full suite reports zero failures.
 
 Observed: `node --check server.js && node test-artifacts/server/generate-sample-lock-tests.mjs && npm test && git diff --check` exited 0. Focused sample generation lock tests reported `20 passed, 0 failed`; the full suite reported `707 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -144,7 +144,9 @@ git commit -m "feat: report sample generation health"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify remote QA artifact**
+Observed: committed and pushed `5321e16 feat: report sample generation health` to `origin/main`.
+
+- [x] **Step 4: Verify remote QA artifact**
 
 Run:
 
@@ -155,3 +157,5 @@ gh run download <run-id> -n qa-automation-<run-id> -D <tmp-dir>
 ```
 
 Expected: run conclusion `success`, `qa-summary.json` read-only smoke summary is `150 passed / 0 failed`, and artifact scan has no sensitive token/header matches.
+
+Observed: GitHub Actions QA run `27104647492` completed with conclusion `success` for head SHA `5321e169da80e51f87e0d5d8f8ff5fd3a4862882`. Artifact `qa-automation-27104647492` / id `7467923008` downloaded to `/tmp/lol-ai-coach-sample-generation-healthz.zGC6hS`; `qa-summary.json` recorded read-only smoke `150 passed / 0 failed`, and the sensitive scan returned no matches.
