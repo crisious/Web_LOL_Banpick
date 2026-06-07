@@ -59,6 +59,11 @@ function assertPositiveIntegerOption(args, prefix, message) {
   }
 }
 
+function inlineTokenValue(extraSmokeArgs) {
+  const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
+  return tokenArg ? tokenArg.slice("--token=".length).trim() : "";
+}
+
 function validateExtraSmokeArgs(extraSmokeArgs) {
   for (const arg of extraSmokeArgs) {
     if (SMOKE_PASSTHROUGH_VALUE_OPTIONS.some((prefix) => arg.startsWith(prefix))) continue;
@@ -134,6 +139,13 @@ export function parseRunnerArgs(argv, env = {}) {
   }
   if (isExternal) {
     validateExternalSmokeUrl(isProtected ? "external_protected_url" : "external_readonly_url", baseUrl);
+  }
+  if (isProtected) {
+    const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
+    const demoToken = tokenArg ? inlineTokenValue(extraSmokeArgs) : (env.PUBLIC_DEMO_TOKEN || "").trim();
+    if (!demoToken) {
+      throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
+    }
   }
 
   return {

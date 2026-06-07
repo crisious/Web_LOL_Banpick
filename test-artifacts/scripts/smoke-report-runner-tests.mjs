@@ -117,6 +117,27 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID", "--expect-sample-list-error-status=0"], {}),
     "--expect-sample-list-error-status must be a positive integer");
 
+  checkThrows("parseRunnerArgs rejects protected mode without token source",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected"], {}),
+    "--require-token needs --token or PUBLIC_DEMO_TOKEN");
+
+  check("parseRunnerArgs accepts protected mode with env token",
+    runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token" }),
+    {
+      mode: "protected",
+      baseUrl: "http://127.0.0.1:8123",
+      expectedMode: "protected",
+      outputRoot: "test-artifacts/qa-automation",
+      requiresUrl: false,
+      requiresHttps: false,
+      requiresToken: true,
+      extraSmokeArgs: [],
+    });
+
+  checkThrows("parseRunnerArgs rejects protected mode with empty inline token",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected", "--token=   "], { PUBLIC_DEMO_TOKEN: "env-token" }),
+    "--require-token needs --token or PUBLIC_DEMO_TOKEN");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
@@ -179,6 +200,15 @@ if (fs.existsSync(runnerPath)) {
     "--timeout-ms must be a positive integer");
   check("invalid pass-through does not create output root",
     fs.existsSync(invalidOutputRoot),
+    false);
+
+  const missingTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-missing-token");
+  fs.rmSync(missingTokenOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects missing protected token before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", "--mode=protected", `--output-root=${missingTokenOutputRoot}`], {}),
+    "--require-token needs --token or PUBLIC_DEMO_TOKEN");
+  check("missing protected token does not create output root",
+    fs.existsSync(missingTokenOutputRoot),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
