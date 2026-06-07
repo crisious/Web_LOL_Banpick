@@ -36,11 +36,12 @@ function makeGate({ publicDemoMode, publicDemoToken }) {
       extractFunctionSource(serverSrc, "isReadOnlyDemoMode"),
       extractFunctionSource(serverSrc, "isProtectedDemoMode"),
       extractFunctionSource(serverSrc, "isInvalidDemoMode"),
+      extractFunctionSource(serverSrc, "publicDemoModeHealth"),
       extractFunctionSource(serverSrc, "tokenFromRequest"),
       extractFunctionSource(serverSrc, "sendDemoModeBlocked"),
       extractFunctionSource(serverSrc, "sendDemoModeInvalid"),
       extractFunctionSource(serverSrc, "requireLiveApiAccess"),
-      "return { requireLiveApiAccess, tokenFromRequest, isInvalidDemoMode };",
+      "return { requireLiveApiAccess, tokenFromRequest, isInvalidDemoMode, publicDemoModeHealth };",
     ].join("\n"),
   )(publicDemoMode, publicDemoToken);
 }
@@ -76,6 +77,18 @@ checkTrue("invalid demo mode helper exists", !gateFactoryError, gateFactoryError
 
 if (invalidModeGate) {
   const invalidModeRes = makeResponseRecorder();
+  check("unknown demo mode health preserves raw configured mode",
+    invalidModeGate.publicDemoModeHealth().publicDemoMode,
+    "readnoly");
+  check("unknown demo mode health marks mode invalid",
+    invalidModeGate.publicDemoModeHealth().publicDemoModeValid,
+    false);
+  check("unknown demo mode health keeps readonly false",
+    invalidModeGate.publicDemoModeHealth().readonly,
+    false);
+  check("unknown demo mode health keeps protected false",
+    invalidModeGate.publicDemoModeHealth().protected,
+    false);
   check("unknown demo mode is detected",
     invalidModeGate.isInvalidDemoMode(),
     true);
@@ -95,6 +108,12 @@ if (invalidModeGate) {
 if (invalidModeGate) {
   const readonlyGate = makeGate({ publicDemoMode: "readonly", publicDemoToken: "" });
   const res = makeResponseRecorder();
+  check("readonly mode health marks mode valid",
+    readonlyGate.publicDemoModeHealth().publicDemoModeValid,
+    true);
+  check("readonly mode health marks readonly true",
+    readonlyGate.publicDemoModeHealth().readonly,
+    true);
   check("readonly mode blocks live API access",
     readonlyGate.requireLiveApiAccess({ headers: {} }, res),
     false);
@@ -106,6 +125,12 @@ if (invalidModeGate) {
 if (invalidModeGate) {
   const protectedGate = makeGate({ publicDemoMode: "protected", publicDemoToken: "demo-secret" });
   const missingTokenRes = makeResponseRecorder();
+  check("protected mode health marks mode valid",
+    protectedGate.publicDemoModeHealth().publicDemoModeValid,
+    true);
+  check("protected mode health marks protected true",
+    protectedGate.publicDemoModeHealth().protected,
+    true);
   check("protected mode without request token blocks live API access",
     protectedGate.requireLiveApiAccess({ headers: {} }, missingTokenRes),
     false);
@@ -125,6 +150,15 @@ if (invalidModeGate) {
 if (invalidModeGate) {
   const fullGate = makeGate({ publicDemoMode: "full", publicDemoToken: "" });
   const res = makeResponseRecorder();
+  check("full mode health marks mode valid",
+    fullGate.publicDemoModeHealth().publicDemoModeValid,
+    true);
+  check("full mode health keeps readonly false",
+    fullGate.publicDemoModeHealth().readonly,
+    false);
+  check("full mode health keeps protected false",
+    fullGate.publicDemoModeHealth().protected,
+    false);
   check("full mode allows live API access",
     fullGate.requireLiveApiAccess({ headers: {} }, res),
     true);

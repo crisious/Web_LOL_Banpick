@@ -145,6 +145,15 @@ function isInvalidDemoMode() {
   return !validPublicDemoModes.has(publicDemoMode);
 }
 
+function publicDemoModeHealth() {
+  return {
+    publicDemoMode,
+    publicDemoModeValid: !isInvalidDemoMode(),
+    readonly: isReadOnlyDemoMode(),
+    protected: isProtectedDemoMode(),
+  };
+}
+
 function tokenFromRequest(req) {
   const auth = firstHeaderValue(req.headers.authorization).trim();
   const bearerMatch = auth.match(/^Bearer\s+(.+)$/i);
@@ -2935,9 +2944,7 @@ async function handleApi(req, res, url) {
     sendJson(res, 200, {
       ok: true,
       service: "lol-replay-coach",
-      publicDemoMode,
-      readonly: isReadOnlyDemoMode(),
-      protected: isProtectedDemoMode(),
+      ...publicDemoModeHealth(),
       timestamp: new Date().toISOString(),
     });
     return true;
