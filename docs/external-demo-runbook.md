@@ -102,7 +102,7 @@ Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json
 
 Direct smoke also rejects unknown `--...` options before any network request or report JSON write. This keeps typos such as `--expectmode=readonly` from silently falling back to a weaker smoke configuration.
 
-The `smoke:report:*` runner only forwards allowlisted smoke pass-through options: `--token=`, `--timeout-ms=`, and sample manifest error expectation options. Unknown options or runner-owned smoke options such as `--expect-mode=<mode>` fail in the runner before report directories or metadata files are created.
+The `smoke:report:*` runner only forwards allowlisted smoke pass-through options: `--token=`, `--timeout-ms=`, and sample manifest error expectation options. Unknown options or runner-owned smoke options such as `--expect-mode=<mode>` fail in the runner before report directories or metadata files are created. Allowlisted pass-through options are also checked for singleton, value, and required-field contracts in the runner, so invalid values such as `--timeout-ms=0`, duplicate timeout flags, or incomplete sample manifest error expectations fail before artifact creation.
 
 For repeatable QA evidence, prefer the report runner commands. They create a top-level `test-artifacts/qa-automation/qa-summary.json`, plus `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
 

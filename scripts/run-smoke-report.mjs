@@ -11,13 +11,24 @@ const LOCAL_BASE_URL = "http://127.0.0.1:8123";
 const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
 const MIN_SAMPLES = 19;
 const VALID_MODES = ["readonly", "protected", "external-readonly", "external-protected"];
-const ALLOWED_SMOKE_ARG_PREFIXES = [
+const SMOKE_PASSTHROUGH_VALUE_OPTIONS = [
   "--token=",
   "--timeout-ms=",
   "--expect-sample-detail-error-id=",
   "--expect-sample-detail-error-status=",
   "--expect-sample-detail-error-code=",
   "--expect-sample-detail-error-message=",
+  "--expect-sample-list-error-status=",
+  "--expect-sample-list-error-code=",
+  "--expect-sample-list-error-message=",
+];
+const SAMPLE_DETAIL_ERROR_OPTIONS = [
+  "--expect-sample-detail-error-id=",
+  "--expect-sample-detail-error-status=",
+  "--expect-sample-detail-error-code=",
+  "--expect-sample-detail-error-message=",
+];
+const SAMPLE_LIST_ERROR_OPTIONS = [
   "--expect-sample-list-error-status=",
   "--expect-sample-list-error-code=",
   "--expect-sample-list-error-message=",
@@ -29,6 +40,51 @@ function singleOptionArg(args, prefix) {
     throw new Error(`${prefix.slice(0, -1)} accepts only one value`);
   }
   return matches[0];
+}
+
+function passThroughOptionArg(args, prefix) {
+  const matches = args.filter((arg) => arg.startsWith(prefix));
+  if (matches.length > 1) {
+    throw new Error(`${prefix.slice(0, -1)} accepts only one value`);
+  }
+  return matches[0];
+}
+
+function assertPositiveIntegerOption(args, prefix, message) {
+  const arg = passThroughOptionArg(args, prefix);
+  if (!arg) return;
+  const value = Number(arg.slice(prefix.length));
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(message);
+  }
+}
+
+function validateExtraSmokeArgs(extraSmokeArgs) {
+  for (const arg of extraSmokeArgs) {
+    if (SMOKE_PASSTHROUGH_VALUE_OPTIONS.some((prefix) => arg.startsWith(prefix))) continue;
+    throw new Error(`unknown smoke report option: ${arg}`);
+  }
+
+  for (const prefix of SMOKE_PASSTHROUGH_VALUE_OPTIONS) {
+    passThroughOptionArg(extraSmokeArgs, prefix);
+  }
+  assertPositiveIntegerOption(extraSmokeArgs, "--timeout-ms=", "--timeout-ms must be a positive integer");
+  assertPositiveIntegerOption(extraSmokeArgs, "--expect-sample-detail-error-status=", "--expect-sample-detail-error-status must be a positive integer");
+  assertPositiveIntegerOption(extraSmokeArgs, "--expect-sample-list-error-status=", "--expect-sample-list-error-status must be a positive integer");
+
+  const hasSampleDetailErrorArg = SAMPLE_DETAIL_ERROR_OPTIONS.some((prefix) => extraSmokeArgs.some((arg) => arg.startsWith(prefix)));
+  if (hasSampleDetailErrorArg) {
+    const id = passThroughOptionArg(extraSmokeArgs, "--expect-sample-detail-error-id=")?.slice("--expect-sample-detail-error-id=".length).trim() || "";
+    const code = passThroughOptionArg(extraSmokeArgs, "--expect-sample-detail-error-code=")?.slice("--expect-sample-detail-error-code=".length).trim() || "";
+    if (!id) throw new Error("--expect-sample-detail-error-id is required when sample detail error options are set");
+    if (!code) throw new Error("--expect-sample-detail-error-code is required when --expect-sample-detail-error-id is set");
+  }
+
+  const hasSampleListErrorArg = SAMPLE_LIST_ERROR_OPTIONS.some((prefix) => extraSmokeArgs.some((arg) => arg.startsWith(prefix)));
+  if (hasSampleListErrorArg) {
+    const code = passThroughOptionArg(extraSmokeArgs, "--expect-sample-list-error-code=")?.slice("--expect-sample-list-error-code=".length).trim() || "";
+    if (!code) throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
+  }
 }
 
 export function parseRunnerArgs(argv, env = {}) {
@@ -53,10 +109,7 @@ export function parseRunnerArgs(argv, env = {}) {
     throw new Error(`${mode} smoke report accepts only one base URL argument`);
   }
   const extraSmokeArgs = args.filter((arg) => arg.startsWith("--") && !knownOptionArgs.has(arg));
-  for (const arg of extraSmokeArgs) {
-    if (ALLOWED_SMOKE_ARG_PREFIXES.some((prefix) => arg.startsWith(prefix))) continue;
-    throw new Error(`unknown smoke report option: ${arg}`);
-  }
+  validateExtraSmokeArgs(extraSmokeArgs);
   const isExternal = mode.startsWith("external-");
   const isProtected = mode.endsWith("protected") || mode === "protected";
   const expectedMode = isProtected ? "protected" : "readonly";

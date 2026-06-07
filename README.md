@@ -183,7 +183,7 @@ Direct smoke와 `smoke:report:*` runner는 positional base URL을 최대 1개만
 
 Direct smoke는 알 수 없는 `--...` 옵션도 즉시 실패합니다. 예를 들어 `--expectmode=readonly`처럼 option 이름을 잘못 입력하면 기본값으로 smoke를 계속 진행하지 않고, 네트워크 요청 전에 `FAIL unknown smoke option: --expectmode=readonly`로 종료합니다.
 
-`smoke:report:*` runner는 `--token=`, `--timeout-ms=`, sample manifest error expectation 계열만 smoke pass-through 옵션으로 허용합니다. `--expectmode=readonly` 같은 오타나 runner가 직접 생성하는 `--expect-mode=<mode>`를 수동으로 넘기면 report 디렉터리나 메타데이터를 만들기 전에 `FAIL unknown smoke report option: ...`로 종료합니다.
+`smoke:report:*` runner는 `--token=`, `--timeout-ms=`, sample manifest error expectation 계열만 smoke pass-through 옵션으로 허용합니다. `--expectmode=readonly` 같은 오타나 runner가 직접 생성하는 `--expect-mode=<mode>`를 수동으로 넘기면 report 디렉터리나 메타데이터를 만들기 전에 `FAIL unknown smoke report option: ...`로 종료합니다. 허용된 pass-through 옵션도 runner 단계에서 singleton/value/필수 조합을 검증하므로 `--timeout-ms=0`, 중복 `--timeout-ms=...`, sample manifest expectation의 누락된 id/code/status 오류 역시 artifact 생성 전에 실패합니다.
 
 `PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보면 live/write probe 전에 `FAIL public demo mode config is valid`로 즉시 실패합니다.
 

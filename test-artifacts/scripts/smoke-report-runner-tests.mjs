@@ -30,6 +30,20 @@ function checkThrows(label, fn, expectedMessage) {
   }
 }
 
+async function checkRejects(label, fn, expectedMessage) {
+  try {
+    await fn();
+    console.log(`FAIL  ${label}`);
+    console.log(`  expected reject ${JSON.stringify(expectedMessage)}`);
+    fail++;
+  } catch (error) {
+    const ok = String(error.message) === expectedMessage;
+    console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
+    if (!ok) console.log(`  expected ${JSON.stringify(expectedMessage)}\n  got      ${JSON.stringify(error.message)}`);
+    ok ? pass++ : fail++;
+  }
+}
+
 check("smoke report runner script exists",
   fs.existsSync(runnerPath),
   true);
@@ -87,6 +101,22 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-mode=protected"], {}),
     "unknown smoke report option: --expect-mode=protected");
 
+  checkThrows("parseRunnerArgs rejects duplicate smoke pass-through timeout",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--timeout-ms=1000", "--timeout-ms=2000"], {}),
+    "--timeout-ms accepts only one value");
+
+  checkThrows("parseRunnerArgs rejects invalid smoke pass-through timeout",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--timeout-ms=0"], {}),
+    "--timeout-ms must be a positive integer");
+
+  checkThrows("parseRunnerArgs rejects incomplete sample detail error pass-through",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-detail-error-message=blocked"], {}),
+    "--expect-sample-detail-error-id is required when sample detail error options are set");
+
+  checkThrows("parseRunnerArgs rejects invalid sample list error status pass-through",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID", "--expect-sample-list-error-status=0"], {}),
+    "--expect-sample-list-error-status must be a positive integer");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
@@ -141,6 +171,15 @@ if (fs.existsSync(runnerPath)) {
       "scripts/external-demo-smoke.mjs",
       "https://demo.example/path?redacted#redacted",
     ]);
+
+  const invalidOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-invalid-timeout");
+  fs.rmSync(invalidOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects invalid pass-through before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", `--output-root=${invalidOutputRoot}`, "--timeout-ms=0"], {}),
+    "--timeout-ms must be a positive integer");
+  check("invalid pass-through does not create output root",
+    fs.existsSync(invalidOutputRoot),
+    false);
 
   const protectedConfig = runner.parseRunnerArgs([
     "node",
