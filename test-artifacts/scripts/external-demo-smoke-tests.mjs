@@ -188,6 +188,42 @@ check("CLI reports actual sample count when below --min-samples",
   insufficientSamples.stderr.includes("FAIL /api/samples has at least 2 samples"),
   true);
 
+const missingHomeUiServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end("<title>LoL Replay Coach</title>");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => missingHomeUiServer.listen(0, "127.0.0.1", resolve));
+const missingHomeUiUrl = `http://127.0.0.1:${missingHomeUiServer.address().port}`;
+const missingReadonlyHomeUi = await runNode([
+  smokePath,
+  missingHomeUiUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => missingHomeUiServer.close(resolve));
+
+check("CLI exits non-zero when readonly home misses sample entry UI",
+  missingReadonlyHomeUi.status,
+  1);
+
+check("CLI reports missing readonly home sample entry UI",
+  missingReadonlyHomeUi.stderr.includes("FAIL readonly home exposes stored sample entry UI"),
+  true);
+
 check("CLI exits non-zero when sample detail misses report essentials",
   incompleteDetail.status,
   1);

@@ -95,14 +95,22 @@ function demoModeFromHealth(body) {
 const health = await request("/healthz");
 expect(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
 expect(health.body?.ok === true, "healthz ok=true");
+const actualMode = demoModeFromHealth(health.body);
 if (expectedMode) {
-  const actualMode = demoModeFromHealth(health.body);
   expect(actualMode === expectedMode, `public demo mode is ${expectedMode}`, `actual=${actualMode}`);
 }
 
 const home = await request("/");
 expect(home.response.status === 200, "GET / returns 200", `status=${home.response.status}`);
 expect(home.text.includes("LoL Replay Coach"), "home contains app title");
+if (actualMode === "readonly") {
+  expect(
+    home.text.includes("data-login-sample-button") &&
+      home.text.includes("data-sample-switcher") &&
+      home.text.includes("저장된 샘플"),
+    "readonly home exposes stored sample entry UI",
+  );
+}
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);
