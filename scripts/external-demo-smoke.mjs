@@ -38,11 +38,19 @@ function parseSmokeArgs(argv, env = {}) {
   const sampleDetailErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-code="));
   const sampleDetailErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-status="));
   const sampleDetailErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-message="));
+  const sampleListErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-code="));
+  const sampleListErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-status="));
+  const sampleListErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-message="));
   const hasSampleDetailErrorArg = Boolean(
     sampleDetailErrorIdArg ||
       sampleDetailErrorCodeArg ||
       sampleDetailErrorStatusArg ||
       sampleDetailErrorMessageArg
+  );
+  const hasSampleListErrorArg = Boolean(
+    sampleListErrorCodeArg ||
+      sampleListErrorStatusArg ||
+      sampleListErrorMessageArg
   );
   const expectedSampleDetailError = hasSampleDetailErrorArg
     ? {
@@ -50,6 +58,13 @@ function parseSmokeArgs(argv, env = {}) {
         status: sampleDetailErrorStatusArg ? Number(sampleDetailErrorStatusArg.slice("--expect-sample-detail-error-status=".length)) : 500,
         code: sampleDetailErrorCodeArg ? sampleDetailErrorCodeArg.slice("--expect-sample-detail-error-code=".length).trim() : "",
         message: sampleDetailErrorMessageArg ? sampleDetailErrorMessageArg.slice("--expect-sample-detail-error-message=".length) : "",
+      }
+    : null;
+  const expectedSampleListError = hasSampleListErrorArg
+    ? {
+        status: sampleListErrorStatusArg ? Number(sampleListErrorStatusArg.slice("--expect-sample-list-error-status=".length)) : 500,
+        code: sampleListErrorCodeArg ? sampleListErrorCodeArg.slice("--expect-sample-list-error-code=".length).trim() : "",
+        message: sampleListErrorMessageArg ? sampleListErrorMessageArg.slice("--expect-sample-list-error-message=".length) : "",
       }
     : null;
 
@@ -73,6 +88,14 @@ function parseSmokeArgs(argv, env = {}) {
       throw new Error("--expect-sample-detail-error-status must be a positive integer");
     }
   }
+  if (expectedSampleListError) {
+    if (!expectedSampleListError.code) {
+      throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
+    }
+    if (!Number.isInteger(expectedSampleListError.status) || expectedSampleListError.status < 1) {
+      throw new Error("--expect-sample-list-error-status must be a positive integer");
+    }
+  }
 
   return {
     baseUrl,
@@ -81,6 +104,7 @@ function parseSmokeArgs(argv, env = {}) {
     minSamples,
     requestTimeoutMs,
     ...(expectedSampleDetailError ? { expectedSampleDetailError } : {}),
+    ...(expectedSampleListError ? { expectedSampleListError } : {}),
   };
 }
 
@@ -92,7 +116,7 @@ try {
   process.exit(1);
 }
 
-const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError } = parsedArgs;
+const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError, expectedSampleListError } = parsedArgs;
 const baseOrigin = new URL(baseUrl).origin;
 
 function url(path) {
@@ -124,6 +148,28 @@ function headerValue(response, name) {
 function expectJsonResponse(out, label) {
   expect(contentType(out.response).includes("application/json"), `${label} content-type is JSON`, `content-type=${contentType(out.response) || "(missing)"}`);
   expect(headerValue(out.response, "x-content-type-options") === "nosniff", `${label} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`);
+}
+
+function expectStructuredErrorResponse(out, label, expected) {
+  expect(
+    out.response.status === expected.status,
+    `${label} returns ${expected.status}`,
+    `status=${out.response.status}`,
+  );
+  expectJsonResponse(out, label);
+  expect(out.body?.ok === false, `${label} has ok=false`);
+  expect(
+    out.body?.code === expected.code,
+    `${label} returns ${expected.code}`,
+    `code=${out.body?.code || "(missing)"}`,
+  );
+  if (expected.message) {
+    expect(
+      out.body?.error === expected.message,
+      `${label} returns expected message`,
+      `error=${out.body?.error || "(missing)"}`,
+    );
+  }
 }
 
 async function request(path, options = {}) {
@@ -206,28 +252,24 @@ if (expectedMode) {
   }
 }
 
+if (expectedSampleListError) {
+  const samplesOut = await request("/api/samples");
+  expectStructuredErrorResponse(samplesOut, "sample list error", expectedSampleListError);
+  if (process.exitCode) {
+    process.exit(process.exitCode);
+  }
+  console.log(`External demo sample list error smoke passed for ${baseUrl}`);
+  process.exit(0);
+}
+
 if (expectedSampleDetailError) {
   const detailPath = `/api/samples/${encodeURIComponent(expectedSampleDetailError.id)}`;
   const detail = await request(detailPath);
-  expect(
-    detail.response.status === expectedSampleDetailError.status,
-    `sample detail error ${expectedSampleDetailError.id} returns ${expectedSampleDetailError.status}`,
-    `status=${detail.response.status}`,
+  expectStructuredErrorResponse(
+    detail,
+    `sample detail error ${expectedSampleDetailError.id}`,
+    expectedSampleDetailError,
   );
-  expectJsonResponse(detail, `sample detail error ${expectedSampleDetailError.id}`);
-  expect(detail.body?.ok === false, `sample detail error ${expectedSampleDetailError.id} has ok=false`);
-  expect(
-    detail.body?.code === expectedSampleDetailError.code,
-    `sample detail error ${expectedSampleDetailError.id} returns ${expectedSampleDetailError.code}`,
-    `code=${detail.body?.code || "(missing)"}`,
-  );
-  if (expectedSampleDetailError.message) {
-    expect(
-      detail.body?.error === expectedSampleDetailError.message,
-      `sample detail error ${expectedSampleDetailError.id} returns expected message`,
-      `error=${detail.body?.error || "(missing)"}`,
-    );
-  }
   if (process.exitCode) {
     process.exit(process.exitCode);
   }

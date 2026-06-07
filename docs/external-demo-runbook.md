@@ -57,7 +57,7 @@ Expected:
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
-- targeted sample detail error smoke can verify `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample-list flow
+- targeted sample list/detail error smoke can verify `/api/samples` or `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample flow
 
 ## Cloudflare Tunnel Demo
 
@@ -97,6 +97,16 @@ node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 \
   --expect-sample-detail-error-status=500 \
   --expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID \
   --expect-sample-detail-error-message="Sample manifest entry path must not contain traversal segments: normalizedPath."
+```
+
+Use the list variant when the manifest should fail during `/api/samples` loading itself:
+
+```bash
+node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 \
+  --expect-mode=readonly \
+  --expect-sample-list-error-status=500 \
+  --expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID \
+  --expect-sample-list-error-message="Sample manifest entry missing required field: label."
 ```
 
 ## Protected Live Demo

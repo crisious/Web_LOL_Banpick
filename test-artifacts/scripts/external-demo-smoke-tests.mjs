@@ -117,6 +117,29 @@ check("parseSmokeArgs reads expected sample detail error probe",
     },
   });
 
+check("parseSmokeArgs reads expected sample list error probe",
+  parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "https://demo.example",
+    "--expect-mode=readonly",
+    "--expect-sample-list-error-status=500",
+    "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+  ], {}),
+  {
+    baseUrl: "https://demo.example",
+    demoToken: "",
+    expectedMode: "readonly",
+    minSamples: 1,
+    requestTimeoutMs: 10000,
+    expectedSampleListError: {
+      status: 500,
+      code: "SAMPLE_MANIFEST_INVALID",
+      message: "Sample manifest entry missing required field: label.",
+    },
+  });
+
 checkThrows("parseSmokeArgs rejects invalid base URL",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "not-a-url"], {}),
   "base URL must be an http(s) URL");
@@ -178,6 +201,23 @@ checkThrows("parseSmokeArgs rejects invalid sample detail error status",
     "--expect-sample-detail-error-status=ok",
   ], {}),
   "--expect-sample-detail-error-status must be a positive integer");
+
+checkThrows("parseSmokeArgs requires sample list error code when list error options are set",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-list-error-status=500",
+  ], {}),
+  "--expect-sample-list-error-code is required when sample list error options are set");
+
+checkThrows("parseSmokeArgs rejects invalid sample list error status",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-list-error-status=ok",
+  ], {}),
+  "--expect-sample-list-error-status must be a positive integer");
 
 const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
   encoding: "utf8",
@@ -480,6 +520,87 @@ check("CLI exits non-zero when sample detail error code differs",
 
 check("CLI reports unexpected sample detail error code",
   wrongSampleDetailErrorCode.stderr.includes("FAIL sample detail error sample-bad returns SAMPLE_MANIFEST_INVALID"),
+  true);
+
+const sampleListErrorRequests = [];
+const sampleListErrorServer = http.createServer((req, res) => {
+  sampleListErrorRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples") {
+    return sendJson(500, {
+      ok: false,
+      code: "SAMPLE_MANIFEST_INVALID",
+      error: "Sample manifest entry missing required field: label.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => sampleListErrorServer.listen(0, "127.0.0.1", resolve));
+const sampleListErrorUrl = `http://127.0.0.1:${sampleListErrorServer.address().port}`;
+const sampleListError = await runNode([
+  smokePath,
+  sampleListErrorUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-list-error-status=500",
+  "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+]);
+await new Promise((resolve) => sampleListErrorServer.close(resolve));
+
+check("CLI succeeds for expected sample list structured error",
+  sampleListError.status,
+  0);
+
+check("CLI reports expected sample list error status",
+  sampleListError.stdout.includes("PASS sample list error returns 500"),
+  true);
+
+check("CLI stops after targeted sample list error probe",
+  sampleListErrorRequests,
+  [
+    { method: "GET", url: "/healthz" },
+    { method: "GET", url: "/api/samples" },
+  ]);
+
+const wrongSampleListErrorCodeServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples") {
+    return sendJson(500, {
+      ok: false,
+      code: "WRONG_MANIFEST_CODE",
+      error: "Sample manifest entry missing required field: label.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => wrongSampleListErrorCodeServer.listen(0, "127.0.0.1", resolve));
+const wrongSampleListErrorCodeUrl = `http://127.0.0.1:${wrongSampleListErrorCodeServer.address().port}`;
+const wrongSampleListErrorCode = await runNode([
+  smokePath,
+  wrongSampleListErrorCodeUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-list-error-status=500",
+  "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+]);
+await new Promise((resolve) => wrongSampleListErrorCodeServer.close(resolve));
+
+check("CLI exits non-zero when sample list error code differs",
+  wrongSampleListErrorCode.status,
+  1);
+
+check("CLI reports unexpected sample list error code",
+  wrongSampleListErrorCode.stderr.includes("FAIL sample list error returns SAMPLE_MANIFEST_INVALID"),
   true);
 
 const closedPort = await new Promise((resolve) => {
