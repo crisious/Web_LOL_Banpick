@@ -61,6 +61,8 @@ cloudflared tunnel --url http://localhost:8123
 npm run smoke:external:readonly -- https://your-tunnel-url.trycloudflare.com
 ```
 
+`smoke:external:readonly` requires an explicit `https://` URL. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
+
 4. Share URL only after smoke passes.
 
 ## Protected Live Demo
@@ -105,7 +107,7 @@ The first cloud deploy should stay read-only. Writable sample generation needs p
 ## Pre-Share Checklist
 
 - [ ] `npm test` passes
-- [ ] `npm run smoke:external:readonly -- <url>` passes for external URLs
+- [ ] `npm run smoke:external:readonly -- <https-url>` passes for external HTTPS URLs
 - [ ] `npm run smoke:readonly` passes for local read-only smoke
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404

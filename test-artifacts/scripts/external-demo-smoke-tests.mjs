@@ -76,6 +76,14 @@ check("parseSmokeArgs accepts an explicit URL when required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "https://demo.example", "--expect-mode=readonly"], {}),
   { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly" });
 
+checkThrows("parseSmokeArgs requires https when requested",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "http://demo.example", "--expect-mode=readonly"], {}),
+  "--require-https needs an https:// base URL");
+
+check("parseSmokeArgs accepts https when required",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "https://demo.example", "--expect-mode=readonly"], {}),
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly" });
+
 const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
   encoding: "utf8",
 });
@@ -87,6 +95,24 @@ check("CLI exits non-zero when --require-url has no URL",
 check("CLI prints concise missing URL failure without stack trace",
   missingRequiredUrl.stderr.trim(),
   "FAIL --require-url needs an explicit base URL argument");
+
+const nonHttpsRequiredUrl = spawnSync(process.execPath, [
+  smokePath,
+  "--require-url",
+  "--require-https",
+  "--expect-mode=readonly",
+  "http://127.0.0.1:8123",
+], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero when --require-https gets http URL",
+  nonHttpsRequiredUrl.status,
+  1);
+
+check("CLI prints concise non-https URL failure without stack trace",
+  nonHttpsRequiredUrl.stderr.trim(),
+  "FAIL --require-https needs an https:// base URL");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

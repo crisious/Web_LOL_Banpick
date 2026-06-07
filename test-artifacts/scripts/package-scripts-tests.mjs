@@ -42,6 +42,7 @@ check("smoke:external:readonly script exists",
 check("smoke:external:readonly requires explicit external URL and readonly mode",
   /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:external:readonly"] || "") &&
     /--require-url/.test(scripts["smoke:external:readonly"] || "") &&
+    /--require-https/.test(scripts["smoke:external:readonly"] || "") &&
     /--expect-mode=readonly/.test(scripts["smoke:external:readonly"] || ""),
   scripts["smoke:external:readonly"] || "(missing)");
 
