@@ -5,7 +5,10 @@ const fsp = require("fs/promises");
 const path = require("path");
 const { URL } = require("url");
 const { spawn } = require("child_process");
-const { validateManifest } = require("./lib/sample-manifest");
+const {
+  sampleManifestPublicPathToStorageRelativePath,
+  validateManifest,
+} = require("./lib/sample-manifest");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -48,11 +51,15 @@ function sampleStoragePath(sampleId, ...segments) {
 }
 
 function sampleEntryStoragePath(publicPath) {
-  const normalized = String(publicPath || "").replace(/^\//, "");
-  const samplePrefix = "data/samples/";
-  if (normalized.startsWith(samplePrefix)) {
-    return path.join(samplesDir, normalized.slice(samplePrefix.length));
+  const storageRelativePath = sampleManifestPublicPathToStorageRelativePath(publicPath);
+  if (storageRelativePath) {
+    return path.join(samplesDir, storageRelativePath);
   }
+  const rawPath = String(publicPath || "");
+  if (rawPath.startsWith("/data/samples/") || rawPath.startsWith("data/samples/")) {
+    throw new Error(`Invalid sample manifest public path: ${rawPath}`);
+  }
+  const normalized = rawPath.replace(/^\//, "");
   return path.join(root, normalized);
 }
 

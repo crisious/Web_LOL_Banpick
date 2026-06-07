@@ -5,8 +5,13 @@
 // supplied SAMPLES_DIR outside the app checkout.
 
 import fs from "fs";
+import { createRequire } from "module";
 import path from "path";
 
+const require = createRequire(import.meta.url);
+const {
+  sampleManifestPublicPathToStorageRelativePath,
+} = require("../../lib/sample-manifest.js");
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
 function extractFunctionSource(source, name) {
@@ -80,10 +85,21 @@ function checkTrue(label, condition, detail = "") {
   condition ? pass++ : fail++;
 }
 
+function checkThrows(label, fn, expectedMessage) {
+  let caught = null;
+  try {
+    fn();
+  } catch (error) {
+    caught = error;
+  }
+  check(label, caught?.message, expectedMessage);
+}
+
 let helpers = null;
 try {
   helpers = new Function(
     "path",
+    "sampleManifestPublicPathToStorageRelativePath",
     [
       "const root = '/app/lol-ai-coach';",
       "const samplesDir = '/mnt/lol-ai-coach-samples';",
@@ -92,7 +108,7 @@ try {
       extractFunctionSource(serverSrc, "sampleEntryStoragePath"),
       "return { resolveSamplesDir, sampleStoragePath, sampleEntryStoragePath };",
     ].join("\n"),
-  )(path);
+  )(path, sampleManifestPublicPathToStorageRelativePath);
   checkTrue("SAMPLES_DIR path helpers exist", true);
 } catch (error) {
   checkTrue("SAMPLES_DIR path helpers exist", false, error.message);
@@ -115,9 +131,12 @@ if (helpers) {
   check("sampleEntryStoragePath maps public data paths to samplesDir",
     sampleEntryStoragePath("/data/samples/sample-kr-1/normalized-match.json"),
     "/mnt/lol-ai-coach-samples/sample-kr-1/normalized-match.json");
-  check("sampleEntryStoragePath accepts manifest paths without leading slash",
-    sampleEntryStoragePath("data/samples/sample-kr-1/analysis-result.json"),
-    "/mnt/lol-ai-coach-samples/sample-kr-1/analysis-result.json");
+  checkThrows("sampleEntryStoragePath rejects sample paths without public slash",
+    () => sampleEntryStoragePath("data/samples/sample-kr-1/analysis-result.json"),
+    "Invalid sample manifest public path: data/samples/sample-kr-1/analysis-result.json");
+  checkThrows("sampleEntryStoragePath rejects traversal in sample public paths",
+    () => sampleEntryStoragePath("/data/samples/sample-kr-1/../other/analysis-result.json"),
+    "Invalid sample manifest public path: /data/samples/sample-kr-1/../other/analysis-result.json");
   check("sampleEntryStoragePath preserves legacy non-sample app-relative paths",
     sampleEntryStoragePath("/legacy/fixture.json"),
     "/app/lol-ai-coach/legacy/fixture.json");
@@ -131,6 +150,9 @@ const loadSampleBundleSrc = extractAsyncFunctionSource(serverSrc, "loadSampleBun
 checkTrue("loadSampleBundle reads manifest public paths through sampleEntryStoragePath",
   /readJson\(sampleEntryStoragePath\(entry\.normalizedPath\)\)/.test(loadSampleBundleSrc) &&
     /readJson\(sampleEntryStoragePath\(entry\.analysisPath\)\)/.test(loadSampleBundleSrc));
+const sampleEntryStoragePathSrc = extractFunctionSource(serverSrc, "sampleEntryStoragePath");
+checkTrue("sampleEntryStoragePath uses shared public path helper",
+  /sampleManifestPublicPathToStorageRelativePath\(publicPath\)/.test(sampleEntryStoragePathSrc));
 checkTrue("loadSampleBundle reads supplemental sample files through sampleStoragePath",
   /sampleStoragePath\(sampleId,\s*"raw-timeline\.json"\)/.test(loadSampleBundleSrc) &&
     /sampleStoragePath\(sampleId,\s*"raw-match\.json"\)/.test(loadSampleBundleSrc) &&
