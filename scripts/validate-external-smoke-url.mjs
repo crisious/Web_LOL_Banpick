@@ -93,6 +93,12 @@ function mappedIpv4PartsFromIpv6(host) {
   return [high >> 8, high & 0xff, low >> 8, low & 0xff];
 }
 
+function dottedIpv4MappedIpv6Parts(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (!normalized.startsWith("::ffff:")) return null;
+  return ipv4Parts(normalized.slice("::ffff:".length));
+}
+
 function ipv6Hextets(host) {
   const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
   if (!normalized.includes(":")) return null;
@@ -273,6 +279,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   const rawHost = rawHostFromUrlValue(value);
   if (ipv4Parts(host) && rawHost !== host) {
     throw new Error(`${safeLabel} must use canonical dotted-decimal IPv4 literals`);
+  }
+  if (host.includes(":") && rawHost !== host && !dottedIpv4MappedIpv6Parts(rawHost)) {
+    throw new Error(`${safeLabel} must use canonical IPv6 literal spelling`);
   }
   if (!isIpLiteralHost(host) && !isDnsHostnameRawHostCompatible(rawHost)) {
     throw new Error(`${safeLabel} must use DNS-compatible public hostname labels`);

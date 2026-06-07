@@ -265,6 +265,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860::8888]"),
     "https://[2001:4860:4860::8888]/");
 
+  checkThrows("validateExternalSmokeUrl rejects expanded public IPv6 literal spelling",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860:0:0:0:0:8888]"),
+    "external_readonly_url must use canonical IPv6 literal spelling");
+
+  checkThrows("validateExternalSmokeUrl rejects zero-padded public IPv6 literal spelling",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860:0000:0000:0000:0000:8888]"),
+    "external_readonly_url must use canonical IPv6 literal spelling");
+
   checkThrows("validateExternalSmokeUrl rejects private IPv4 10/8",
     () => validateExternalSmokeUrl("external_readonly_url", "https://10.0.0.5"),
     "external_readonly_url must not point to a local or private network target");
