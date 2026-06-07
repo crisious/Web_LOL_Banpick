@@ -60,10 +60,11 @@ function normalizeOutputRoot(outputRoot) {
     throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
   const normalized = path.posix.normalize(comparable);
-  if (!normalized.startsWith("test-artifacts/")) {
+  const parts = normalized.split("/").filter(Boolean);
+  if (parts.length < 2 || parts[0] !== "test-artifacts") {
     throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
-  return normalized;
+  return parts.join("/");
 }
 
 function assertPositiveIntegerOption(args, prefix, message) {

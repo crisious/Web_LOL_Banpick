@@ -77,6 +77,19 @@ if (fs.existsSync(runnerPath)) {
       extraSmokeArgs: ["--timeout-ms=15000"],
     });
 
+  check("parseRunnerArgs normalizes child output root trailing slash",
+    runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/qa-automation/"], {}),
+    {
+      mode: "readonly",
+      baseUrl: "http://127.0.0.1:8123",
+      expectedMode: "readonly",
+      outputRoot: "test-artifacts/qa-automation",
+      requiresUrl: false,
+      requiresHttps: false,
+      requiresToken: false,
+      extraSmokeArgs: [],
+    });
+
   checkThrows("parseRunnerArgs rejects external mode without URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly"], {}),
     "external-readonly smoke report needs an explicit base URL");
@@ -103,6 +116,14 @@ if (fs.existsSync(runnerPath)) {
 
   checkThrows("parseRunnerArgs rejects artifact root output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects artifact root output root with trailing slash",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects artifact root output root with repeated trailing slash",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts//"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
   checkThrows("parseRunnerArgs rejects traversal output root",
