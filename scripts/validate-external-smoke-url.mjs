@@ -20,6 +20,20 @@ function rawHostFromUrlValue(value) {
   return hostPort.split(":")[0].toLowerCase();
 }
 
+function rawPortFromUrlValue(value) {
+  const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
+  const authority = withoutScheme.split(/[/?#]/, 1)[0] || "";
+  const hostPort = authority.includes("@") ? authority.slice(authority.lastIndexOf("@") + 1) : authority;
+  if (hostPort.startsWith("[")) {
+    const closingBracketIndex = hostPort.indexOf("]");
+    if (closingBracketIndex < 0) return null;
+    const rest = hostPort.slice(closingBracketIndex + 1);
+    return rest.startsWith(":") ? rest.slice(1) : null;
+  }
+  const portSeparatorIndex = hostPort.lastIndexOf(":");
+  return portSeparatorIndex >= 0 ? hostPort.slice(portSeparatorIndex + 1) : null;
+}
+
 function rawPathFromUrlValue(value) {
   const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
   const pathStartIndex = withoutScheme.search(/[/?#]/);
@@ -245,6 +259,10 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   }
   if (parsed.port) {
     throw new Error(`${safeLabel} must use the default HTTPS port`);
+  }
+  const rawPort = rawPortFromUrlValue(value);
+  if (rawPort !== null && rawPort !== "443") {
+    throw new Error(`${safeLabel} must use canonical HTTPS port spelling`);
   }
   const host = parsed.hostname.toLowerCase();
   const rawHost = rawHostFromUrlValue(value);

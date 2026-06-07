@@ -137,6 +137,18 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:443/"),
     "https://demo.example.com/");
 
+  checkThrows("validateExternalSmokeUrl rejects empty HTTPS port marker",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:/"),
+    "external_readonly_url must use canonical HTTPS port spelling");
+
+  checkThrows("validateExternalSmokeUrl rejects zero-padded default HTTPS port",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:0443/"),
+    "external_readonly_url must use canonical HTTPS port spelling");
+
+  checkThrows("validateExternalSmokeUrl rejects multi-zero-padded default HTTPS port",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:000443/"),
+    "external_readonly_url must use canonical HTTPS port spelling");
+
   checkThrows("validateExternalSmokeUrl rejects explicit non-default HTTPS port",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:4443/path"),
     "external_readonly_url must use the default HTTPS port");
