@@ -92,6 +92,31 @@ check("parseSmokeArgs omits expected mode when not provided",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "http://127.0.0.1:9000"], {}),
   { baseUrl: "http://127.0.0.1:9000", demoToken: "", expectedMode: "", minSamples: 1, requestTimeoutMs: 10000 });
 
+check("parseSmokeArgs reads expected sample detail error probe",
+  parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "https://demo.example",
+    "--expect-mode=readonly",
+    "--expect-sample-detail-error-id=sample-kr-1",
+    "--expect-sample-detail-error-status=500",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-detail-error-message=Sample manifest entry path must not contain traversal segments: normalizedPath.",
+  ], {}),
+  {
+    baseUrl: "https://demo.example",
+    demoToken: "",
+    expectedMode: "readonly",
+    minSamples: 1,
+    requestTimeoutMs: 10000,
+    expectedSampleDetailError: {
+      id: "sample-kr-1",
+      status: 500,
+      code: "SAMPLE_MANIFEST_INVALID",
+      message: "Sample manifest entry path must not contain traversal segments: normalizedPath.",
+    },
+  });
+
 checkThrows("parseSmokeArgs rejects invalid base URL",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "not-a-url"], {}),
   "base URL must be an http(s) URL");
@@ -135,6 +160,24 @@ checkThrows("parseSmokeArgs rejects invalid minimum sample count",
 checkThrows("parseSmokeArgs rejects invalid request timeout",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--timeout-ms=0"], {}),
   "--timeout-ms must be a positive integer");
+
+checkThrows("parseSmokeArgs requires sample detail error code with id",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-kr-1",
+  ], {}),
+  "--expect-sample-detail-error-code is required when --expect-sample-detail-error-id is set");
+
+checkThrows("parseSmokeArgs rejects invalid sample detail error status",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-kr-1",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-detail-error-status=ok",
+  ], {}),
+  "--expect-sample-detail-error-status must be a positive integer");
 
 const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
   encoding: "utf8",
@@ -355,6 +398,89 @@ check("CLI stops before live/write probes when mode differs from --expect-mode",
   modeMismatchRequests.some((request) => request.method === "POST" &&
     ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(request.url)),
   false);
+
+const sampleDetailErrorRequests = [];
+const sampleDetailErrorServer = http.createServer((req, res) => {
+  sampleDetailErrorRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples/sample-bad") {
+    return sendJson(500, {
+      ok: false,
+      code: "SAMPLE_MANIFEST_INVALID",
+      error: "Sample manifest entry path must not contain traversal segments: normalizedPath.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => sampleDetailErrorServer.listen(0, "127.0.0.1", resolve));
+const sampleDetailErrorUrl = `http://127.0.0.1:${sampleDetailErrorServer.address().port}`;
+const sampleDetailError = await runNode([
+  smokePath,
+  sampleDetailErrorUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-detail-error-id=sample-bad",
+  "--expect-sample-detail-error-status=500",
+  "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-detail-error-message=Sample manifest entry path must not contain traversal segments: normalizedPath.",
+]);
+await new Promise((resolve) => sampleDetailErrorServer.close(resolve));
+
+check("CLI succeeds for expected sample detail structured error",
+  sampleDetailError.status,
+  0);
+
+check("CLI reports expected sample detail error status",
+  sampleDetailError.stdout.includes("PASS sample detail error sample-bad returns 500"),
+  true);
+
+check("CLI stops after targeted sample detail error probe",
+  sampleDetailErrorRequests,
+  [
+    { method: "GET", url: "/healthz" },
+    { method: "GET", url: "/api/samples/sample-bad" },
+  ]);
+
+const wrongSampleDetailErrorCodeServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples/sample-bad") {
+    return sendJson(500, {
+      ok: false,
+      code: "WRONG_MANIFEST_CODE",
+      error: "Sample manifest entry path must not contain traversal segments: normalizedPath.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => wrongSampleDetailErrorCodeServer.listen(0, "127.0.0.1", resolve));
+const wrongSampleDetailErrorCodeUrl = `http://127.0.0.1:${wrongSampleDetailErrorCodeServer.address().port}`;
+const wrongSampleDetailErrorCode = await runNode([
+  smokePath,
+  wrongSampleDetailErrorCodeUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-detail-error-id=sample-bad",
+  "--expect-sample-detail-error-status=500",
+  "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-detail-error-message=Sample manifest entry path must not contain traversal segments: normalizedPath.",
+]);
+await new Promise((resolve) => wrongSampleDetailErrorCodeServer.close(resolve));
+
+check("CLI exits non-zero when sample detail error code differs",
+  wrongSampleDetailErrorCode.status,
+  1);
+
+check("CLI reports unexpected sample detail error code",
+  wrongSampleDetailErrorCode.stderr.includes("FAIL sample detail error sample-bad returns SAMPLE_MANIFEST_INVALID"),
+  true);
 
 const closedPort = await new Promise((resolve) => {
   const server = http.createServer();

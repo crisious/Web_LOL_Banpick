@@ -34,6 +34,24 @@ function parseSmokeArgs(argv, env = {}) {
   const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
   const timeoutArg = args.find((arg) => arg.startsWith("--timeout-ms="));
   const requestTimeoutMs = timeoutArg ? Number(timeoutArg.slice("--timeout-ms=".length)) : 10000;
+  const sampleDetailErrorIdArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-id="));
+  const sampleDetailErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-code="));
+  const sampleDetailErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-status="));
+  const sampleDetailErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-message="));
+  const hasSampleDetailErrorArg = Boolean(
+    sampleDetailErrorIdArg ||
+      sampleDetailErrorCodeArg ||
+      sampleDetailErrorStatusArg ||
+      sampleDetailErrorMessageArg
+  );
+  const expectedSampleDetailError = hasSampleDetailErrorArg
+    ? {
+        id: sampleDetailErrorIdArg ? sampleDetailErrorIdArg.slice("--expect-sample-detail-error-id=".length).trim() : "",
+        status: sampleDetailErrorStatusArg ? Number(sampleDetailErrorStatusArg.slice("--expect-sample-detail-error-status=".length)) : 500,
+        code: sampleDetailErrorCodeArg ? sampleDetailErrorCodeArg.slice("--expect-sample-detail-error-code=".length).trim() : "",
+        message: sampleDetailErrorMessageArg ? sampleDetailErrorMessageArg.slice("--expect-sample-detail-error-message=".length) : "",
+      }
+    : null;
 
   if (expectedMode && !validExpectedModes.includes(expectedMode)) {
     throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
@@ -44,6 +62,17 @@ function parseSmokeArgs(argv, env = {}) {
   if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1) {
     throw new Error("--timeout-ms must be a positive integer");
   }
+  if (expectedSampleDetailError) {
+    if (!expectedSampleDetailError.id) {
+      throw new Error("--expect-sample-detail-error-id is required when sample detail error options are set");
+    }
+    if (!expectedSampleDetailError.code) {
+      throw new Error("--expect-sample-detail-error-code is required when --expect-sample-detail-error-id is set");
+    }
+    if (!Number.isInteger(expectedSampleDetailError.status) || expectedSampleDetailError.status < 1) {
+      throw new Error("--expect-sample-detail-error-status must be a positive integer");
+    }
+  }
 
   return {
     baseUrl,
@@ -51,6 +80,7 @@ function parseSmokeArgs(argv, env = {}) {
     expectedMode,
     minSamples,
     requestTimeoutMs,
+    ...(expectedSampleDetailError ? { expectedSampleDetailError } : {}),
   };
 }
 
@@ -62,7 +92,7 @@ try {
   process.exit(1);
 }
 
-const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs } = parsedArgs;
+const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError } = parsedArgs;
 const baseOrigin = new URL(baseUrl).origin;
 
 function url(path) {
@@ -174,6 +204,35 @@ if (expectedMode) {
   } else {
     fatal(`public demo mode is ${expectedMode}`, `actual=${actualMode}`);
   }
+}
+
+if (expectedSampleDetailError) {
+  const detailPath = `/api/samples/${encodeURIComponent(expectedSampleDetailError.id)}`;
+  const detail = await request(detailPath);
+  expect(
+    detail.response.status === expectedSampleDetailError.status,
+    `sample detail error ${expectedSampleDetailError.id} returns ${expectedSampleDetailError.status}`,
+    `status=${detail.response.status}`,
+  );
+  expectJsonResponse(detail, `sample detail error ${expectedSampleDetailError.id}`);
+  expect(detail.body?.ok === false, `sample detail error ${expectedSampleDetailError.id} has ok=false`);
+  expect(
+    detail.body?.code === expectedSampleDetailError.code,
+    `sample detail error ${expectedSampleDetailError.id} returns ${expectedSampleDetailError.code}`,
+    `code=${detail.body?.code || "(missing)"}`,
+  );
+  if (expectedSampleDetailError.message) {
+    expect(
+      detail.body?.error === expectedSampleDetailError.message,
+      `sample detail error ${expectedSampleDetailError.id} returns expected message`,
+      `error=${detail.body?.error || "(missing)"}`,
+    );
+  }
+  if (process.exitCode) {
+    process.exit(process.exitCode);
+  }
+  console.log(`External demo sample detail error smoke passed for ${baseUrl}`);
+  process.exit(0);
 }
 
 const home = await request("/");

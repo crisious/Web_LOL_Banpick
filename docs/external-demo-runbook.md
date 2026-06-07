@@ -57,6 +57,7 @@ Expected:
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
+- targeted sample detail error smoke can verify `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample-list flow
 
 ## Cloudflare Tunnel Demo
 
@@ -84,6 +85,19 @@ If the external URL is unreachable, the smoke should fail fast on the first netw
 Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>` only when debugging slow tunnels.
 
 4. Share URL only after smoke passes.
+
+## Manifest Error Probe
+
+Use this when a persistent sample volume or copied `manifest.json` is suspected to be invalid and `/api/samples` cannot complete the normal list flow. The probe runs `/healthz`, validates the expected public demo mode, calls the target sample detail endpoint directly, checks the structured JSON error, and exits before home/assets/live API probes:
+
+```bash
+node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 \
+  --expect-mode=readonly \
+  --expect-sample-detail-error-id=sample-kr-1 \
+  --expect-sample-detail-error-status=500 \
+  --expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID \
+  --expect-sample-detail-error-message="Sample manifest entry path must not contain traversal segments: normalizedPath."
+```
 
 ## Protected Live Demo
 
