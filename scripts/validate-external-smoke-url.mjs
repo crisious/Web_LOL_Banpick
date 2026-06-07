@@ -24,8 +24,22 @@ function isPrivateOrLocalIpv4(host) {
   );
 }
 
+function mappedIpv4PartsFromIpv6(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  const match = normalized.match(/^::ffff:(?:0:)?([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (!match) return null;
+  const high = Number.parseInt(match[1], 16);
+  const low = Number.parseInt(match[2], 16);
+  if (!Number.isInteger(high) || !Number.isInteger(low) || high > 0xffff || low > 0xffff) return null;
+  return [high >> 8, high & 0xff, low >> 8, low & 0xff];
+}
+
 function isPrivateOrLocalIpv6(host) {
   const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  const mappedIpv4Parts = mappedIpv4PartsFromIpv6(normalized);
+  if (mappedIpv4Parts) {
+    return isPrivateOrLocalIpv4(mappedIpv4Parts.join("."));
+  }
   return (
     normalized === "::1" ||
     normalized === "::" ||

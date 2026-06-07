@@ -121,6 +121,22 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://[fe80::1]"),
     "external_readonly_url must not point to a local or private network target");
 
+  checkThrows("validateExternalSmokeUrl rejects IPv4-mapped loopback IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:127.0.0.1]"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects IPv4-mapped private IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:192.168.1.1]"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects IPv4-mapped carrier-grade NAT IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:100.64.0.1]"),
+    "external_readonly_url must not point to a local or private network target");
+
+  check("validateExternalSmokeUrl accepts IPv4-mapped public IPv6",
+    validateExternalSmokeUrl("external_readonly_url", "https://[::ffff:8.8.8.8]/path"),
+    "https://[::ffff:808:808]/path");
+
   const badCli = spawnSync(process.execPath, [
     validatorPath,
     "external_readonly_url",
