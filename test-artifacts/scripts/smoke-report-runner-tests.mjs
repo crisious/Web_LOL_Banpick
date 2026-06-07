@@ -93,6 +93,18 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/a", "--output-root=test-artifacts/b"], {}),
     "--output-root accepts only one value");
 
+  checkThrows("parseRunnerArgs rejects absolute output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=/tmp/qa-automation"], {}),
+    "--output-root must be a relative path under test-artifacts");
+
+  checkThrows("parseRunnerArgs rejects non-artifact output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=.github/qa-automation"], {}),
+    "--output-root must be a relative path under test-artifacts");
+
+  checkThrows("parseRunnerArgs rejects traversal output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/../qa-automation"], {}),
+    "--output-root must be a relative path under test-artifacts");
+
   checkThrows("parseRunnerArgs rejects unknown smoke pass-through options",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expectmode=readonly"], {}),
     "unknown smoke report option: --expectmode=readonly");
@@ -226,6 +238,16 @@ if (fs.existsSync(runnerPath)) {
     "--token is only accepted for protected smoke reports");
   check("readonly token rejection does not create output root",
     fs.existsSync(readonlyTokenOutputRoot),
+    false);
+
+  const unsafeEnvOutputRoot = "test-artifacts/../smoke-report-unsafe-output-root";
+  const unsafeEnvCreatedPath = "smoke-report-unsafe-output-root";
+  fs.rmSync(unsafeEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects unsafe env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: unsafeEnvOutputRoot }),
+    "--output-root must be a relative path under test-artifacts");
+  check("unsafe env output root rejection does not create output root",
+    fs.existsSync(unsafeEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([

@@ -102,6 +102,8 @@ Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json
 
 Direct smoke also rejects unknown `--...` options before any network request or report JSON write. This keeps typos such as `--expectmode=readonly` from silently falling back to a weaker smoke configuration.
 
+Report runner output roots from `--output-root=<path>` or `SMOKE_REPORT_OUTPUT_ROOT` must be relative `test-artifacts/...` paths. Absolute paths, `..` traversal, or non-artifact roots such as `.github/...` fail before any report directory or `qa-summary.json` is created with `FAIL --output-root must be a relative path under test-artifacts`.
+
 The `smoke:report:*` runner only forwards allowlisted smoke pass-through options: `--token=`, `--timeout-ms=`, and sample manifest error expectation options. Unknown options or runner-owned smoke options such as `--expect-mode=<mode>` fail in the runner before report directories or metadata files are created. Allowlisted pass-through options are also checked for singleton, value, and required-field contracts in the runner, so invalid values such as `--timeout-ms=0`, duplicate timeout flags, or incomplete sample manifest error expectations fail before artifact creation.
 
 Protected report runners, `smoke:report:protected` and `smoke:report:external:protected`, require a non-empty `--token=<value>` or `PUBLIC_DEMO_TOKEN` before artifact creation. An empty inline `--token=` does not fall back to the environment token and fails immediately with `FAIL --require-token needs --token or PUBLIC_DEMO_TOKEN`.

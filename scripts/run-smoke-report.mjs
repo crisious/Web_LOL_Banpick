@@ -50,6 +50,22 @@ function passThroughOptionArg(args, prefix) {
   return matches[0];
 }
 
+function normalizeOutputRoot(outputRoot) {
+  const raw = outputRoot.trim();
+  if (!raw) {
+    throw new Error("--output-root needs a directory path");
+  }
+  const comparable = raw.replace(/\\/g, "/");
+  if (path.isAbsolute(raw) || path.win32.isAbsolute(raw) || comparable.split("/").includes("..")) {
+    throw new Error("--output-root must be a relative path under test-artifacts");
+  }
+  const normalized = path.posix.normalize(comparable);
+  if (normalized !== "test-artifacts" && !normalized.startsWith("test-artifacts/")) {
+    throw new Error("--output-root must be a relative path under test-artifacts");
+  }
+  return normalized;
+}
+
 function assertPositiveIntegerOption(args, prefix, message) {
   const arg = passThroughOptionArg(args, prefix);
   if (!arg) return;
@@ -101,12 +117,9 @@ export function parseRunnerArgs(argv, env = {}) {
     throw new Error("--mode must be one of: " + VALID_MODES.join(", "));
   }
 
-  const outputRoot = outputRootArg
-    ? outputRootArg.slice("--output-root=".length).trim()
-    : (env.SMOKE_REPORT_OUTPUT_ROOT || DEFAULT_OUTPUT_ROOT).trim();
-  if (!outputRoot) {
-    throw new Error("--output-root needs a directory path");
-  }
+  const outputRoot = normalizeOutputRoot(outputRootArg
+    ? outputRootArg.slice("--output-root=".length)
+    : env.SMOKE_REPORT_OUTPUT_ROOT || DEFAULT_OUTPUT_ROOT);
 
   const knownOptionArgs = new Set([modeArg, outputRootArg].filter(Boolean));
   const positionalArgs = args.filter((arg) => !arg.startsWith("--"));

@@ -183,6 +183,8 @@ Direct smoke와 `smoke:report:*` runner는 positional base URL을 최대 1개만
 
 Direct smoke는 알 수 없는 `--...` 옵션도 즉시 실패합니다. 예를 들어 `--expectmode=readonly`처럼 option 이름을 잘못 입력하면 기본값으로 smoke를 계속 진행하지 않고, 네트워크 요청 전에 `FAIL unknown smoke option: --expectmode=readonly`로 종료합니다.
 
+`smoke:report:*`의 `--output-root=<path>`와 `SMOKE_REPORT_OUTPUT_ROOT`는 `test-artifacts/...` 아래 상대 경로만 허용합니다. 절대 경로, `..` traversal, `.github/...`처럼 artifact tree 밖의 경로는 report 디렉터리나 `qa-summary.json`을 만들기 전에 `FAIL --output-root must be a relative path under test-artifacts`로 종료합니다.
+
 `smoke:report:*` runner는 `--token=`, `--timeout-ms=`, sample manifest error expectation 계열만 smoke pass-through 옵션으로 허용합니다. `--expectmode=readonly` 같은 오타나 runner가 직접 생성하는 `--expect-mode=<mode>`를 수동으로 넘기면 report 디렉터리나 메타데이터를 만들기 전에 `FAIL unknown smoke report option: ...`로 종료합니다. 허용된 pass-through 옵션도 runner 단계에서 singleton/value/필수 조합을 검증하므로 `--timeout-ms=0`, 중복 `--timeout-ms=...`, sample manifest expectation의 누락된 id/code/status 오류 역시 artifact 생성 전에 실패합니다.
 
 `smoke:report:protected`와 `smoke:report:external:protected`는 report artifact를 만들기 전에 non-empty `--token=<value>` 또는 `PUBLIC_DEMO_TOKEN`을 확인합니다. `--token=`처럼 빈 inline token을 넘기면 env token fallback을 사용하지 않고 `FAIL --require-token needs --token or PUBLIC_DEMO_TOKEN`로 즉시 실패합니다.
