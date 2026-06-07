@@ -32,8 +32,10 @@ const dom = {
   trendTags: document.querySelector("[data-trend-tags]"),
   trendStrengths: document.querySelector("[data-trend-strengths]"),
   trendWeaknesses: document.querySelector("[data-trend-weaknesses]"),
+  fetcherDetails: document.querySelector("[data-fetcher-details]"),
   recentForm: document.querySelector("[data-recent-form]"),
   fetchStatus: document.querySelector("[data-fetch-status]"),
+  fetchLiveLock: document.querySelector("[data-fetch-live-lock]"),
   candidateList: document.querySelector("[data-candidate-list]"),
   comparisonStatus: document.querySelector("[data-comparison-status]"),
   comparisonOverview: document.querySelector("[data-comparison-overview]"),
@@ -45,6 +47,7 @@ const dom = {
   loginDemoNote: document.querySelector("[data-login-demo-note]"),
   loginSampleButton: document.querySelector("[data-login-sample-button]"),
   loginSampleMeta: document.querySelector("[data-login-sample-meta]"),
+  loginLiveLock: document.querySelector("[data-login-live-lock]"),
   matchListView: document.querySelector("[data-match-list-view]"),
   matchListGrid: document.querySelector("[data-match-list-grid]"),
   matchListHeader: document.querySelector("[data-match-list-header]"),
@@ -1307,6 +1310,11 @@ async function fetchRecentStats({ force = false } = {}) {
     renderRecentStatsEmpty("계정을 먼저 설정하세요");
     return;
   }
+  if (isLiveControlLocked()) {
+    renderRecentStatsEmpty("외부 데모 모드에서는 최근 20경기 live 조회가 잠겨 있습니다.");
+    toggleRefreshButton(false);
+    return;
+  }
   if (state.recentStatsLoading) return;
   const accountKey = currentAccountKey();
   if (!force && state.recentStats && state.recentStatsAccount === accountKey) {
@@ -1374,8 +1382,9 @@ async function fetchRecentStats({ force = false } = {}) {
 
 function toggleRefreshButton(loading) {
   if (!dom.refreshStats) return;
-  dom.refreshStats.disabled = Boolean(loading);
-  dom.refreshStats.textContent = loading ? "불러오는 중…" : "↻ 새로고침";
+  const liveLocked = isLiveControlLocked();
+  dom.refreshStats.disabled = Boolean(loading || liveLocked);
+  dom.refreshStats.textContent = loading ? "불러오는 중…" : liveLocked ? "잠김" : "↻ 새로고침";
 }
 
 function showRecentAggregateStatus(message) {
@@ -1702,6 +1711,8 @@ function serverModeUi(status, error) {
       mode: "offline",
       label: "상태 확인 실패",
       note: "저장 샘플은 서버 연결이 복구되면 다시 시도할 수 있습니다.",
+      lockLiveControls: false,
+      liveControlMessage: "",
     };
   }
 
@@ -1710,6 +1721,8 @@ function serverModeUi(status, error) {
       mode: "checking",
       label: "서버 확인 중",
       note: "샘플 목록을 불러오고 있습니다.",
+      lockLiveControls: false,
+      liveControlMessage: "",
     };
   }
 
@@ -1718,6 +1731,8 @@ function serverModeUi(status, error) {
       mode: "readonly",
       label: "샘플 전용",
       note: "외부 데모 모드에서는 저장된 분석 리포트만 열람합니다.",
+      lockLiveControls: true,
+      liveControlMessage: "외부 데모 모드에서는 Riot ID 조회가 잠겨 있습니다. 저장 샘플을 열어 분석 리포트를 확인하세요.",
     };
   }
 
@@ -1726,6 +1741,8 @@ function serverModeUi(status, error) {
       mode: "protected",
       label: "보호 모드",
       note: "접속 토큰이 확인되면 라이브 Riot 조회와 샘플 열람을 사용할 수 있습니다.",
+      lockLiveControls: false,
+      liveControlMessage: "",
     };
   }
 
@@ -1733,7 +1750,21 @@ function serverModeUi(status, error) {
     mode: "full",
     label: "라이브 조회 가능",
     note: "Riot ID 조회와 저장 샘플 열람을 사용할 수 있습니다.",
+    lockLiveControls: false,
+    liveControlMessage: "",
   };
+}
+
+function currentServerModeUi() {
+  return serverModeUi(state.serverStatus, state.serverStatusError);
+}
+
+function isLiveControlLocked() {
+  return Boolean(currentServerModeUi().lockLiveControls);
+}
+
+function liveControlLockedMessage() {
+  return currentServerModeUi().liveControlMessage || "현재 모드에서는 라이브 Riot 조회를 사용할 수 없습니다.";
 }
 
 function renderLoginDemoStatus() {
@@ -1759,6 +1790,14 @@ function renderLoginDemoStatus() {
     dom.loginSampleMeta.textContent = sample
       ? `${sampleCount}개 보관 · ${sample.publicAlias || sample.label || sample.id}`
       : "샘플 대기 중";
+  }
+  if (dom.loginLiveLock) {
+    dom.loginLiveLock.textContent = mode.liveControlMessage || "";
+    dom.loginLiveLock.hidden = !mode.lockLiveControls;
+  }
+  if (dom.fetchLiveLock) {
+    dom.fetchLiveLock.textContent = mode.liveControlMessage || "";
+    dom.fetchLiveLock.hidden = !mode.lockLiveControls;
   }
 }
 
@@ -3221,25 +3260,39 @@ function toggleDisabled(elements, disabled) {
 }
 
 function applyPendingUi() {
-  const loginDisabled = Boolean(state.isLoginPending);
-  const recentDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending);
+  const liveLocked = isLiveControlLocked();
+  const loginDisabled = Boolean(state.isLoginPending || liveLocked);
+  const liveActionDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending || liveLocked);
+  const sampleSwitcherDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending);
   const detailDisabled = Boolean(state.isDetailPending || state.isGeneratePending);
   const sampleLoginDisabled = Boolean(state.isLoginPending || state.isSampleLoginPending || !firstManifestSample());
 
   toggleDisabled(Array.from(dom.loginForm.querySelectorAll("input, select, button")), loginDisabled);
   toggleDisabled([dom.loginSampleButton], sampleLoginDisabled);
-  toggleDisabled(Array.from(dom.recentForm.querySelectorAll("input, select, button")), recentDisabled);
-  toggleDisabled(Array.from(dom.candidateList.querySelectorAll("[data-generate-match]")), recentDisabled);
-  toggleDisabled(Array.from(dom.sampleSwitcher.querySelectorAll("[data-sample-button]")), recentDisabled);
+  toggleDisabled(Array.from(dom.recentForm.querySelectorAll("input, select, button")), liveActionDisabled);
+  toggleDisabled(Array.from(dom.candidateList.querySelectorAll("[data-generate-match]")), liveActionDisabled);
+  toggleDisabled(Array.from(dom.sampleSwitcher.querySelectorAll("[data-sample-button]")), sampleSwitcherDisabled);
   toggleDisabled(Array.from(dom.matchListGrid.querySelectorAll("[data-match-detail]")), detailDisabled);
   toggleDisabled(Array.from(dom.matchListHeader.querySelectorAll("button")), detailDisabled);
   toggleDisabled([dom.backToListBtn], detailDisabled);
+  if (dom.loginForm) dom.loginForm.dataset.liveLocked = liveLocked ? "true" : "false";
+  if (dom.fetcherDetails) {
+    dom.fetcherDetails.dataset.liveLocked = liveLocked ? "true" : "false";
+    dom.fetcherDetails.setAttribute("aria-disabled", liveLocked ? "true" : "false");
+  }
+  toggleRefreshButton(Boolean(state.recentStatsLoading));
+  if (dom.championHistoryAction) dom.championHistoryAction.disabled = Boolean(state.championHistoryLoading || liveLocked);
   renderLoginDemoStatus();
 }
 
 async function handleRecentMatchesSubmit(event) {
   event.preventDefault();
   if (state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending) return;
+  if (isLiveControlLocked()) {
+    dom.fetchStatus.textContent = liveControlLockedMessage();
+    applyPendingUi();
+    return;
+  }
 
   const formData = new FormData(dom.recentForm);
   const gameName = (formData.get("gameName") || "").trim();
@@ -3289,6 +3342,11 @@ async function handleRecentMatchesSubmit(event) {
 async function handleGenerateSample(matchId) {
   if (state.isGeneratePending) {
     throw new Error("샘플 생성이 이미 진행 중입니다. 잠시 후 다시 시도하세요.");
+  }
+  if (isLiveControlLocked()) {
+    dom.fetchStatus.textContent = liveControlLockedMessage();
+    applyPendingUi();
+    return null;
   }
 
   const gameName = dom.recentForm.querySelector("[name=gameName]")?.value || "";
@@ -3374,6 +3432,11 @@ async function handleLoginSampleOpen() {
 async function handleLogin(event) {
   if (event) event.preventDefault();
   if (state.isLoginPending) return;
+  if (isLiveControlLocked()) {
+    dom.loginStatus.textContent = liveControlLockedMessage();
+    applyPendingUi();
+    return;
+  }
 
   const form = new FormData(dom.loginForm);
   const account = {
@@ -3634,6 +3697,10 @@ async function loadMoreRecentMatches() {
   if (state.isLoadMorePending || !state.recentMatchesHasMore) return;
   const acct = state.account;
   if (!acct) return;
+  if (isLiveControlLocked()) {
+    alert(liveControlLockedMessage());
+    return;
+  }
 
   state.isLoadMorePending = true;
   renderMatchListFooter();
@@ -4090,6 +4157,11 @@ async function startChampionHistoryFetch(force) {
     setChampionHistoryEmpty("먼저 Riot ID로 로그인해주세요.");
     return;
   }
+  if (isLiveControlLocked()) {
+    setChampionHistoryEmpty("외부 데모 모드에서는 챔피언 히스토리 live 분석이 잠겨 있습니다.");
+    if (dom.championHistoryAction) dom.championHistoryAction.disabled = true;
+    return;
+  }
 
   const puuid = state.account.puuid;
   if (!force) {
@@ -4143,7 +4215,7 @@ async function startChampionHistoryFetch(force) {
     state.championHistoryLoading = false;
     state.championHistoryAbort = null;
     hideChampionHistoryProgress();
-    if (dom.championHistoryAction) dom.championHistoryAction.disabled = false;
+    if (dom.championHistoryAction) dom.championHistoryAction.disabled = isLiveControlLocked();
   }
 }
 

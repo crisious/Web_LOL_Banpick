@@ -2508,6 +2508,27 @@ body::after {
   line-height: 1.55;
 }
 
+.live-lock-note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--amber-border);
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg-soft);
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.live-lock-note--compact {
+  margin: 0 0 14px;
+}
+
+.login-form[data-live-locked="true"],
+.panel--fetcher[data-live-locked="true"] .fetch-form {
+  opacity: 0.66;
+}
+
 .login-demo-actions {
   display: flex;
   align-items: center;
