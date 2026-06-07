@@ -42,6 +42,10 @@ if (exists) {
     /permissions:\s*\n\s+contents:\s*read/.test(workflow),
     workflow);
 
+  check("QA workflow opts JavaScript actions into Node 24 runtime",
+    /FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:\s*true/.test(workflow),
+    workflow);
+
   check("QA workflow pins Node 20",
     /node-version:\s*"20"/.test(workflow),
     workflow);
