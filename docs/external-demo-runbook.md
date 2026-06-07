@@ -101,7 +101,7 @@ npm run smoke:report:external:readonly -- https://demo.example.com
 npm run smoke:report:external:protected -- https://demo.example.com --token=replace-with-long-random-token
 ```
 
-`qa-summary.json` records the latest run's mode, URL, status, exit code, pass/fail counts, check count, and artifact paths. `smoke-run.json` redacts inline `--token=<value>` arguments before writing command metadata.
+`qa-summary.json` records the latest run's mode, redacted URL, status, exit code, pass/fail counts, check count, and artifact paths. The smoke request still uses the original URL, but persisted evidence redacts URL userinfo, query strings, and fragments. `smoke-run.json` also redacts inline `--token=<value>` arguments before writing command metadata.
 
 The GitHub Actions `QA` workflow runs `npm test` and `npm run smoke:report:readonly` on `main` pushes, pull requests, and manual dispatch. It uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v7`, so the read-only smoke report can be inspected from the workflow run without rerunning the demo locally.
 

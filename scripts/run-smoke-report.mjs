@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { redactUrlForEvidence } from "../lib/qa-evidence-redaction.mjs";
 
 const LOCAL_BASE_URL = "http://127.0.0.1:8123";
 const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
@@ -87,7 +88,11 @@ export function smokeArgsFor(config, reportJsonPath) {
 }
 
 export function redactSmokeArgs(args) {
-  return args.map((arg) => arg.startsWith("--token=") ? "--token=<redacted>" : arg);
+  return args.map((arg) => {
+    if (arg.startsWith("--token=")) return "--token=<redacted>";
+    if (/^https?:\/\//.test(arg)) return redactUrlForEvidence(arg);
+    return arg;
+  });
 }
 
 export function qaSummaryPathFor(outputRoot) {
@@ -109,7 +114,7 @@ export function buildQaSummary({
     generatedAt: finishedAt,
     latestRun: {
       mode: config.mode,
-      baseUrl: config.baseUrl,
+      baseUrl: redactUrlForEvidence(config.baseUrl),
       expectedMode: config.expectedMode,
       actualMode: smokeReport?.actualMode || "",
       status: smokeReport?.status || (exitCode ? "failed" : "passed"),
@@ -161,7 +166,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
   writeRunMetadata(metadataPath, {
     schemaVersion: 1,
     mode: config.mode,
-    baseUrl: config.baseUrl,
+    baseUrl: redactUrlForEvidence(config.baseUrl),
     reportJsonPath,
     startedAt,
     finishedAt,

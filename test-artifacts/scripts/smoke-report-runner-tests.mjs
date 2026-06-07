@@ -104,6 +104,16 @@ if (fs.existsSync(runnerPath)) {
     runner.redactSmokeArgs(["scripts/external-demo-smoke.mjs", "--token=secret", "--timeout-ms=15000"]),
     ["scripts/external-demo-smoke.mjs", "--token=<redacted>", "--timeout-ms=15000"]);
 
+  check("redactSmokeArgs removes URL credentials, query, and fragment",
+    runner.redactSmokeArgs([
+      "scripts/external-demo-smoke.mjs",
+      "https://user:pass@demo.example/path?access_token=secret#secret",
+    ]),
+    [
+      "scripts/external-demo-smoke.mjs",
+      "https://demo.example/path?redacted#redacted",
+    ]);
+
   const protectedConfig = runner.parseRunnerArgs([
     "node",
     "scripts/run-smoke-report.mjs",
@@ -150,6 +160,35 @@ if (fs.existsSync(runnerPath)) {
 
   check("buildQaSummary omits demo token material",
     JSON.stringify(qaSummary || {}).includes("secret"),
+    false);
+
+  const sensitiveUrlConfig = runner.parseRunnerArgs([
+    "node",
+    "scripts/run-smoke-report.mjs",
+    "--mode=external-readonly",
+    "https://user:pass@demo.example/path?access_token=summary-secret#summary-secret",
+  ], {});
+  const sensitiveUrlSummary = runner.buildQaSummary?.({
+    config: sensitiveUrlConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T01-40-30Z-external-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-40-30Z-external-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T01-40-30Z-external-readonly/smoke-run.json",
+    startedAt: "2026-06-08T01:40:30.000Z",
+    finishedAt: "2026-06-08T01:40:45.000Z",
+    exitCode: 0,
+    smokeReport: {
+      status: "passed",
+      actualMode: "readonly",
+      summary: { passed: 42, failed: 0 },
+      checks: [{ status: "pass", label: "GET /healthz returns 200" }],
+    },
+  });
+  check("buildQaSummary redacts URL credentials, query, and fragment",
+    sensitiveUrlSummary?.latestRun?.baseUrl,
+    "https://demo.example/path?redacted#redacted");
+
+  check("buildQaSummary omits sensitive URL material",
+    JSON.stringify(sensitiveUrlSummary || {}).includes("summary-secret"),
     false);
 }
 

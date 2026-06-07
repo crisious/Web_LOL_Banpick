@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 546건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 550건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -174,9 +174,9 @@ npm run smoke:external:manifest:detail-error -- https://your-demo-url.example
 npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 ```
 
-`--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
+`--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 요청에는 입력한 원본 URL을 사용하지만, 리포트에 남는 `baseUrl`은 URL userinfo, query string, fragment를 redacted 값으로 바꿉니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
-`smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`로 기록되어 토큰 값을 남기지 않습니다.
+`smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, redacted URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`와 redacted URL로 기록되어 토큰/URL secret 값을 남기지 않습니다.
 
 GitHub Actions `QA` workflow는 `main` push, pull request, manual dispatch에서 `npm test`와 `npm run smoke:report:readonly`를 실행하고, 생성된 `test-artifacts/qa-automation/`를 `actions/upload-artifact@v7` workflow artifact로 업로드합니다. Repository secret `PUBLIC_DEMO_TOKEN`이 설정되어 있으면 같은 workflow가 protected demo server를 추가로 띄우고 `npm run smoke:report:protected`도 실행합니다. 이 token은 step env로만 주입되며 `--token` 인자로 기록하지 않습니다.
 

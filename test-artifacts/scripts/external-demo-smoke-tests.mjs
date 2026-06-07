@@ -640,9 +640,10 @@ const sampleListReportServer = http.createServer((req, res) => {
 
 await new Promise((resolve) => sampleListReportServer.listen(0, "127.0.0.1", resolve));
 const sampleListReportUrl = `http://127.0.0.1:${sampleListReportServer.address().port}`;
+const sampleListReportInputUrl = `${sampleListReportUrl}/?access_token=report-secret#report-secret-fragment`;
 const sampleListReport = await runNode([
   smokePath,
-  sampleListReportUrl,
+  sampleListReportInputUrl,
   "--expect-mode=readonly",
   "--token=secret-smoke-token",
   "--expect-sample-list-error-status=500",
@@ -676,6 +677,10 @@ check("passed smoke report records checked labels",
 
 check("passed smoke report excludes demo token",
   JSON.stringify(passedReport).includes("secret-smoke-token"),
+  false);
+
+check("passed smoke report redacts base URL query and fragment",
+  JSON.stringify(passedReport).includes("report-secret"),
   false);
 
 const failingSampleListReportServer = http.createServer((req, res) => {

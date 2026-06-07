@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { redactUrlForEvidence } from "../lib/qa-evidence-redaction.mjs";
 
 function parseSmokeArgs(argv, env = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
@@ -126,6 +127,7 @@ try {
 }
 
 const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError, expectedSampleListError, reportJsonPath } = parsedArgs;
+const evidenceBaseUrl = redactUrlForEvidence(baseUrl);
 const baseOrigin = new URL(baseUrl).origin;
 const startedAt = new Date().toISOString();
 const reportChecks = [];
@@ -246,7 +248,7 @@ function writeReport(exitCode) {
   const reportPath = path.resolve(reportJsonPath);
   const payload = {
     schemaVersion: 1,
-    baseUrl,
+    baseUrl: evidenceBaseUrl,
     expectedMode,
     actualMode: observedMode,
     startedAt,
@@ -302,7 +304,7 @@ if (expectedSampleListError) {
     writeReport(process.exitCode);
     process.exit(process.exitCode);
   }
-  console.log(`External demo sample list error smoke passed for ${baseUrl}`);
+  console.log(`External demo sample list error smoke passed for ${evidenceBaseUrl}`);
   writeReport(0);
   process.exit(0);
 }
@@ -319,7 +321,7 @@ if (expectedSampleDetailError) {
     writeReport(process.exitCode);
     process.exit(process.exitCode);
   }
-  console.log(`External demo sample detail error smoke passed for ${baseUrl}`);
+  console.log(`External demo sample detail error smoke passed for ${evidenceBaseUrl}`);
   writeReport(0);
   process.exit(0);
 }
@@ -442,5 +444,5 @@ if (process.exitCode) {
   process.exit(process.exitCode);
 }
 
-console.log(`External demo smoke passed for ${baseUrl}`);
+console.log(`External demo smoke passed for ${evidenceBaseUrl}`);
 writeReport(0);
