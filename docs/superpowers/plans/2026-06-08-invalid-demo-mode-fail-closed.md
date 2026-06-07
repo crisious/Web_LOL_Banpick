@@ -117,7 +117,7 @@ Expected: focused test passes and the full suite reports zero failures.
 
 Observed: `node --check server.js && node test-artifacts/server/public-demo-mode-gate-tests.mjs && npm test && git diff --check` exited 0. Focused gate tests reported `14 passed, 0 failed`; the full suite reported `688 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -127,7 +127,9 @@ git commit -m "fix: fail closed for invalid demo mode"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify remote QA artifact**
+Observed: committed and pushed `d77e9d3 fix: fail closed for invalid demo mode` to `origin/main`.
+
+- [x] **Step 4: Verify remote QA artifact**
 
 Run:
 
@@ -138,3 +140,5 @@ gh run download <run-id> -n qa-automation-<run-id> -D <tmp-dir>
 ```
 
 Expected: run conclusion `success`, artifact contains `qa-summary.json`, and the read-only smoke summary is `150 passed / 0 failed` with no sensitive token/header matches.
+
+Observed: GitHub Actions QA run `27104128535` completed with conclusion `success` for head SHA `d77e9d387c47014cb7f7e85803fce7272f9d27bf`. Artifact `qa-automation-27104128535` / id `7467759421` downloaded to `/tmp/lol-ai-coach-invalid-demo-mode.x2pVP0`; `qa-summary.json` recorded read-only smoke `150 passed / 0 failed`, and the sensitive scan returned no matches.
