@@ -55,9 +55,12 @@ function makeHelpers(fakeFsp, events) {
       "const manifestFileLockPath = '/samples/.manifest.lock';",
       "const MANIFEST_FILE_LOCK_TIMEOUT_MS = 30;",
       "const MANIFEST_FILE_LOCK_RETRY_MS = 5;",
+      "const MANIFEST_FILE_LOCK_STALE_MS = 20;",
       "let now = 1000;",
       "const Date = { now: () => now };",
       "const sleep = async (ms) => { events.push({ op: 'sleep', ms }); now += ms; };",
+      extractFunctionSource(serverSrc, "isManifestFileLockStale"),
+      extractAsyncFunctionSource(serverSrc, "tryRemoveStaleManifestFileLock"),
       extractAsyncFunctionSource(serverSrc, "acquireManifestFileLock"),
       extractAsyncFunctionSource(serverSrc, "releaseManifestFileLock"),
       extractAsyncFunctionSource(serverSrc, "withManifestFileLock"),
@@ -151,6 +154,10 @@ if (helpers) {
           throw error;
         }
       },
+      async stat(filePath) {
+        events.push({ op: "stat", filePath });
+        return { mtimeMs: 995 };
+      },
       async rmdir(filePath) { events.push({ op: "rmdir", filePath }); },
     };
     const { withManifestFileLock } = makeHelpers(fakeFsp, events);
@@ -158,9 +165,38 @@ if (helpers) {
     check("withManifestFileLock retries after existing lock",
       await withManifestFileLock(async () => "after wait"),
       "after wait");
-    check("withManifestFileLock sleeps before retry",
+    check("withManifestFileLock checks fresh lock age before retry",
       events.map((event) => event.op),
-      ["mkdir", "sleep", "mkdir", "rmdir"]);
+      ["mkdir", "stat", "sleep", "mkdir", "rmdir"]);
+  }
+
+  {
+    const events = [];
+    let mkdirCount = 0;
+    const fakeFsp = {
+      async mkdir(filePath) {
+        mkdirCount += 1;
+        events.push({ op: "mkdir", filePath, attempt: mkdirCount });
+        if (mkdirCount === 1) {
+          const error = new Error("exists");
+          error.code = "EEXIST";
+          throw error;
+        }
+      },
+      async stat(filePath) {
+        events.push({ op: "stat", filePath });
+        return { mtimeMs: 900 };
+      },
+      async rmdir(filePath) { events.push({ op: "rmdir", filePath }); },
+    };
+    const { withManifestFileLock } = makeHelpers(fakeFsp, events);
+
+    check("withManifestFileLock removes stale lock before retry",
+      await withManifestFileLock(async () => "after stale"),
+      "after stale");
+    check("withManifestFileLock retries immediately after stale removal",
+      events.map((event) => event.op),
+      ["mkdir", "stat", "rmdir", "mkdir", "rmdir"]);
   }
 
   {

@@ -40,6 +40,7 @@ const manifestPath = path.join(samplesDir, "manifest.json");
 const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
+const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
 
 function sampleStoragePath(sampleId, ...segments) {
   return path.join(samplesDir, sampleId, ...segments);
@@ -2638,6 +2639,37 @@ function withManifestMutationLock(work) {
   return run;
 }
 
+function isManifestFileLockStale(lockStats, nowMs = Date.now()) {
+  return Number.isFinite(lockStats?.mtimeMs) &&
+    nowMs - lockStats.mtimeMs >= MANIFEST_FILE_LOCK_STALE_MS;
+}
+
+async function tryRemoveStaleManifestFileLock() {
+  let lockStats = null;
+  try {
+    lockStats = await fsp.stat(manifestFileLockPath);
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return true;
+    }
+    throw error;
+  }
+
+  if (!isManifestFileLockStale(lockStats)) {
+    return false;
+  }
+
+  try {
+    await fsp.rmdir(manifestFileLockPath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return true;
+    }
+    throw error;
+  }
+}
+
 async function acquireManifestFileLock() {
   const startedAt = Date.now();
 
@@ -2648,6 +2680,10 @@ async function acquireManifestFileLock() {
     } catch (error) {
       if (error?.code !== "EEXIST") {
         throw error;
+      }
+      const removedStaleLock = await tryRemoveStaleManifestFileLock();
+      if (removedStaleLock) {
+        continue;
       }
       if (Date.now() - startedAt >= MANIFEST_FILE_LOCK_TIMEOUT_MS) {
         const timeoutError = new Error("Timed out waiting for manifest file lock.");
