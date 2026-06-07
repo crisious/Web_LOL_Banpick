@@ -22,6 +22,8 @@ function parseSmokeArgs(argv, env = {}) {
   const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
   const minSamplesArg = args.find((arg) => arg.startsWith("--min-samples="));
   const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
+  const timeoutArg = args.find((arg) => arg.startsWith("--timeout-ms="));
+  const requestTimeoutMs = timeoutArg ? Number(timeoutArg.slice("--timeout-ms=".length)) : 10000;
 
   if (expectedMode && !validExpectedModes.includes(expectedMode)) {
     throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
@@ -29,12 +31,16 @@ function parseSmokeArgs(argv, env = {}) {
   if (!Number.isInteger(minSamples) || minSamples < 1) {
     throw new Error("--min-samples must be a positive integer");
   }
+  if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1) {
+    throw new Error("--timeout-ms must be a positive integer");
+  }
 
   return {
     baseUrl,
     demoToken: tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "",
     expectedMode,
     minSamples,
+    requestTimeoutMs,
   };
 }
 
@@ -46,7 +52,7 @@ try {
   process.exit(1);
 }
 
-const { baseUrl, demoToken, expectedMode, minSamples } = parsedArgs;
+const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs } = parsedArgs;
 
 function url(path) {
   return new URL(path, baseUrl).toString();
@@ -59,9 +65,12 @@ async function request(path, options = {}) {
   }
   let response;
   try {
-    response = await fetch(url(path), { ...options, headers });
+    response = await fetch(url(path), { ...options, headers, signal: AbortSignal.timeout(requestTimeoutMs) });
   } catch (error) {
-    fail(`request ${path} failed`, error?.message || String(error));
+    const detail = error?.name === "TimeoutError" || error?.name === "AbortError"
+      ? `timeout after ${requestTimeoutMs}ms`
+      : error?.message || String(error);
+    fail(`request ${path} failed`, detail);
     return {
       response: { status: 0 },
       body: null,

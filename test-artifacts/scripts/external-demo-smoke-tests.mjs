@@ -81,16 +81,16 @@ function completeSampleDetail() {
 }
 
 check("parseSmokeArgs reads base URL, token, and expected mode",
-  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly", "--min-samples=19"], {}),
-  { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "readonly", minSamples: 19 });
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly", "--min-samples=19", "--timeout-ms=5000"], {}),
+  { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "readonly", minSamples: 19, requestTimeoutMs: 5000 });
 
 check("parseSmokeArgs falls back to env token and default base URL",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token" }),
-  { baseUrl: "http://127.0.0.1:8123", demoToken: "env-token", expectedMode: "protected", minSamples: 1 });
+  { baseUrl: "http://127.0.0.1:8123", demoToken: "env-token", expectedMode: "protected", minSamples: 1, requestTimeoutMs: 10000 });
 
 check("parseSmokeArgs omits expected mode when not provided",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "http://127.0.0.1:9000"], {}),
-  { baseUrl: "http://127.0.0.1:9000", demoToken: "", expectedMode: "", minSamples: 1 });
+  { baseUrl: "http://127.0.0.1:9000", demoToken: "", expectedMode: "", minSamples: 1, requestTimeoutMs: 10000 });
 
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
@@ -102,7 +102,7 @@ checkThrows("parseSmokeArgs requires an explicit URL when requested",
 
 check("parseSmokeArgs accepts an explicit URL when required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "https://demo.example", "--expect-mode=readonly"], {}),
-  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1 });
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000 });
 
 checkThrows("parseSmokeArgs requires https when requested",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "http://demo.example", "--expect-mode=readonly"], {}),
@@ -110,11 +110,15 @@ checkThrows("parseSmokeArgs requires https when requested",
 
 check("parseSmokeArgs accepts https when required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "https://demo.example", "--expect-mode=readonly"], {}),
-  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1 });
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000 });
 
 checkThrows("parseSmokeArgs rejects invalid minimum sample count",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--min-samples=0"], {}),
   "--min-samples must be a positive integer");
+
+checkThrows("parseSmokeArgs rejects invalid request timeout",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--timeout-ms=0"], {}),
+  "--timeout-ms must be a positive integer");
 
 const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
   encoding: "utf8",
@@ -166,6 +170,39 @@ check("CLI exits non-zero when the demo URL is unreachable",
 
 check("CLI reports unreachable demo URL without stack trace",
   unreachableDemo.stderr.includes("FAIL request /healthz failed") && !unreachableDemo.stderr.includes("TypeError: fetch failed"),
+  true);
+
+const slowHealthServer = http.createServer((req, res) => {
+  if (req.url === "/healthz") {
+    setTimeout(() => {
+      if (!res.destroyed) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true, readonly: true, publicDemoMode: "readonly" }));
+      }
+    }, 500);
+    return;
+  }
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end("<title>LoL Replay Coach</title>");
+});
+
+await new Promise((resolve) => slowHealthServer.listen(0, "127.0.0.1", resolve));
+const slowHealthUrl = `http://127.0.0.1:${slowHealthServer.address().port}`;
+const timedOutHealth = await runNode([
+  smokePath,
+  slowHealthUrl,
+  "--expect-mode=readonly",
+  "--timeout-ms=50",
+]);
+slowHealthServer.closeAllConnections?.();
+await new Promise((resolve) => slowHealthServer.close(resolve));
+
+check("CLI exits non-zero when a request exceeds --timeout-ms",
+  timedOutHealth.status,
+  1);
+
+check("CLI reports timed out request without stack trace",
+  timedOutHealth.stderr.includes("FAIL request /healthz failed") && !timedOutHealth.stderr.includes("TimeoutError"),
   true);
 
 const oneSampleServer = http.createServer((req, res) => {
