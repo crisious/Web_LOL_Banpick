@@ -3245,8 +3245,15 @@ function syncRecentFormWithAccount() {
   dom.recentForm.querySelector("[name=platformRegion]").value = state.account.platformRegion || "KR";
 }
 
+function isNonRetryablePublicDemoMessage(message) {
+  return message.includes("외부 데모 모드에서는") && message.includes("비활성화");
+}
+
 function formatRetryMessage(error) {
   const baseMessage = String(error?.message || "알 수 없는 오류가 발생했습니다.").trim();
+  if (isNonRetryablePublicDemoMessage(baseMessage)) {
+    return baseMessage;
+  }
   if (baseMessage.includes("다시 시도") || baseMessage.includes("잠시 후")) {
     return baseMessage;
   }
