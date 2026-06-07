@@ -36,6 +36,7 @@ npm run smoke:readonly
 Expected:
 
 - `/healthz` 200
+- `/healthz.sampleGeneration` reports only aggregate sample generation status: `activeCount` and `oldestAgeMs`
 - `/` exposes stored sample entry UI in read-only mode
 - `/` returns `X-Content-Type-Options: nosniff`
 - `/` references `styles.css` and `main.js`
@@ -46,6 +47,7 @@ Expected:
 - smoke accepts only known public demo modes: `full`, `protected`, or `readonly`
 - smoke treats `publicDemoModeValid: false` as a fatal mode configuration failure before sample or live/write probes
 - unknown `PUBLIC_DEMO_MODE` values remain visible in `/healthz` with `publicDemoModeValid: false` for diagnostics but live/write APIs fail closed with 403 `PUBLIC_DEMO_MODE_INVALID`
+- sample generation health never exposes lock keys, match IDs, Riot IDs, tokens, or raw payloads
 - smoke tokens are sent only to same-origin live/write API probes, not to page, asset, sample, blocked static, or cross-origin asset requests
 - smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes
 - `/api/samples` 200
@@ -175,7 +177,7 @@ TRUST_PROXY=1
 SAMPLES_DIR=/var/lib/lol-ai-coach/samples
 ```
 
-The first cloud deploy should stay read-only. `PUBLIC_DEMO_MODE` must be exactly `full`, `readonly`, or `protected`; any other value blocks live/write APIs with 403 `PUBLIC_DEMO_MODE_INVALID` while preserving the raw mode and `publicDemoModeValid: false` in `/healthz` for diagnosis. `SAMPLES_DIR` should point at a persistent volume; when unset, the server uses `./data/samples`. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work, local JSON writes use a temp file plus rename to reduce partial-write corruption, manifest read-modify-write operations are queued inside a single process, and processes sharing the same `SAMPLES_DIR` coordinate through a `.manifest.lock` directory. A lock directory older than 5 minutes is treated as stale and removed before retrying acquisition. `manifest.json` declares `schemaVersion: 1`; legacy manifests without the field are normalized as v1, and unsupported versions, invalid runtime shape, missing required sample entry metadata, missing exact `/data/samples/` public prefixes, escaped per-sample public paths, traversal segments, or raw/internal path exposure responses use the `SAMPLE_MANIFEST_INVALID` diagnostic code. Runtime validation and stored fixture integrity tests share `lib/sample-manifest.js` so path and metadata criteria stay aligned. Multi-instance protected demos still need provider-level persistent storage validation before wider use.
+The first cloud deploy should stay read-only. `PUBLIC_DEMO_MODE` must be exactly `full`, `readonly`, or `protected`; any other value blocks live/write APIs with 403 `PUBLIC_DEMO_MODE_INVALID` while preserving the raw mode and `publicDemoModeValid: false` in `/healthz` for diagnosis. `SAMPLES_DIR` should point at a persistent volume; when unset, the server uses `./data/samples`. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work; `/healthz.sampleGeneration` exposes only aggregate lock status with `activeCount` and `oldestAgeMs`, not lock keys, match IDs, Riot IDs, tokens, or raw payloads. Local JSON writes use a temp file plus rename to reduce partial-write corruption, manifest read-modify-write operations are queued inside a single process, and processes sharing the same `SAMPLES_DIR` coordinate through a `.manifest.lock` directory. A lock directory older than 5 minutes is treated as stale and removed before retrying acquisition. `manifest.json` declares `schemaVersion: 1`; legacy manifests without the field are normalized as v1, and unsupported versions, invalid runtime shape, missing required sample entry metadata, missing exact `/data/samples/` public prefixes, escaped per-sample public paths, traversal segments, or raw/internal path exposure responses use the `SAMPLE_MANIFEST_INVALID` diagnostic code. Runtime validation and stored fixture integrity tests share `lib/sample-manifest.js` so path and metadata criteria stay aligned. Multi-instance protected demos still need provider-level persistent storage validation before wider use.
 
 ## Pre-Share Checklist
 

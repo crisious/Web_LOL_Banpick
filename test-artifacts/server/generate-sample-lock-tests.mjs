@@ -56,8 +56,9 @@ try {
       "const sampleGenerationLocks = new Map();",
       extractFunctionSource(serverSrc, "sampleGenerationLockKey"),
       extractFunctionSource(serverSrc, "sampleGenerationInProgressPayload"),
+      extractFunctionSource(serverSrc, "sampleGenerationHealth"),
       extractFunctionSource(serverSrc, "withSampleGenerationLock"),
-      "return { sampleGenerationLockKey, sampleGenerationInProgressPayload, withSampleGenerationLock };",
+      "return { sampleGenerationLocks, sampleGenerationLockKey, sampleGenerationInProgressPayload, sampleGenerationHealth, withSampleGenerationLock };",
     ].join("\n"),
   )();
   checkTrue("sample generation lock helpers exist", true);
@@ -68,7 +69,9 @@ try {
 if (helpers) {
   const {
     sampleGenerationLockKey,
+    sampleGenerationLocks,
     sampleGenerationInProgressPayload,
+    sampleGenerationHealth,
     withSampleGenerationLock,
   } = helpers;
 
@@ -108,6 +111,22 @@ if (helpers) {
   check("lock releases after failure",
     await withSampleGenerationLock("KR:KR_9999999999", () => "after failure"),
     "after failure");
+
+  sampleGenerationLocks.set("KR:KR_8242613150", 1000);
+  sampleGenerationLocks.set("NA1:NA1_1111111111", 2500);
+  check("sample generation health reports active count",
+    sampleGenerationHealth(4000).activeCount,
+    2);
+  check("sample generation health reports oldest age",
+    sampleGenerationHealth(4000).oldestAgeMs,
+    3000);
+  check("sample generation health does not expose lock keys",
+    Object.keys(sampleGenerationHealth(4000)).sort(),
+    ["activeCount", "oldestAgeMs"]);
+  sampleGenerationLocks.clear();
+  check("sample generation health reports zero active work",
+    sampleGenerationHealth(4000),
+    { activeCount: 0, oldestAgeMs: 0 });
 }
 
 const handleGenerateSampleSrc = extractFunctionSource(serverSrc, "handleGenerateSample");
@@ -117,6 +136,8 @@ checkTrue("handleGenerateSample wraps generation work in the lock",
   /withSampleGenerationLock\(lockKey,\s*\(\)\s*=>/.test(handleGenerateSampleSrc));
 checkTrue("handleGenerateSample maps duplicate generation to HTTP 409",
   /SAMPLE_GENERATION_IN_PROGRESS/.test(handleGenerateSampleSrc) && /sendJson\(res,\s*409/.test(handleGenerateSampleSrc));
+checkTrue("healthz includes sample generation aggregate status",
+  /sampleGeneration:\s*sampleGenerationHealth\(\)/.test(serverSrc));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

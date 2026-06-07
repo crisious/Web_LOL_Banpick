@@ -179,6 +179,8 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보면 live/write probe 전에 `FAIL public demo mode config is valid`로 즉시 실패합니다.
 
+`/healthz.sampleGeneration`은 writable 데모 운영 진단용으로 현재 샘플 생성 lock의 aggregate만 반환합니다. `activeCount`는 진행 중 작업 수, `oldestAgeMs`는 가장 오래된 작업의 경과 시간이며, lock key, matchId, Riot ID, 토큰, raw payload는 포함하지 않습니다.
+
 `smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, redacted URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`와 redacted URL로 기록되어 토큰/URL secret 값을 남기지 않습니다.
 
 GitHub Actions `QA` workflow는 `main` push, pull request, manual dispatch에서 `npm test`와 `npm run smoke:report:readonly`를 실행하고, 생성된 `test-artifacts/qa-automation/`를 `actions/upload-artifact@v7` workflow artifact로 업로드합니다. Repository secret `PUBLIC_DEMO_TOKEN`이 설정되어 있으면 같은 workflow가 protected demo server를 추가로 띄우고 `npm run smoke:report:protected`도 실행합니다. 이 token은 step env로만 주입되며 `--token` 인자로 기록하지 않습니다.
@@ -241,6 +243,7 @@ PUBLIC_DEMO_TOKEN=replace-with-long-random-token TRUST_PROXY=1 npm run start:pro
 
 | Method | Path | 설명 |
 |---|---|---|
+| GET | `/healthz` | 서비스 상태, 공개 데모 모드, 샘플 생성 aggregate 진단 |
 | GET | `/api/samples` | 저장된 샘플 목록 |
 | GET | `/api/samples/:id` | 샘플 번들 (normalized + analysis + comparison) |
 | POST | `/api/recent-matches` | Riot ID 기준 최근 경기 요약 (body: `start`, `matchCount` ≤ 20, 응답: `hasMore`) |
@@ -271,6 +274,7 @@ payload
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
 - 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음
+- 생성 상태 진단: `/healthz.sampleGeneration`은 진행 중 생성 작업 수와 가장 오래된 작업의 경과 시간만 노출하고 작업 키/경기 ID/사용자 식별자는 숨김
 - JSON 저장 안정성: manifest와 sample bundle JSON은 임시 파일에 쓴 뒤 rename으로 교체해 부분 쓰기 손상을 줄임
 - Manifest 저장 안정성: 같은 프로세스 안에서는 queue로, 같은 `SAMPLES_DIR` 파일시스템을 공유하는 프로세스 간에는 `.manifest.lock` directory로 manifest read-modify-write 충돌을 줄이며 5분 이상 남은 stale lock은 회수 후 재시도. manifest는 `schemaVersion: 1`로 명시하고, legacy missing-version manifest는 v1로 정규화하며, 읽기/쓰기 전 shape, 지원 버전, sample entry 필수 metadata, exact `/data/samples/` public prefix, per-sample path prefix, traversal segment, raw/internal path 노출 여부를 `lib/sample-manifest.js` 공통 모듈 기준으로 검증해 오류는 `SAMPLE_MANIFEST_INVALID` 코드로 진단 가능
 - 외부 데모 모드: 정적 파일 allowlist만 서빙하며 `.env`, `server.js`, `data/**`, `test-artifacts/**`, 문서 파일 직접 접근은 차단

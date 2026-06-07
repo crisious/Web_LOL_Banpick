@@ -2794,6 +2794,20 @@ function sampleGenerationInProgressPayload(matchId) {
   };
 }
 
+function sampleGenerationHealth(nowMs = Date.now()) {
+  let oldestStartedAt = null;
+  for (const startedAt of sampleGenerationLocks.values()) {
+    if (!Number.isFinite(startedAt)) continue;
+    if (oldestStartedAt === null || startedAt < oldestStartedAt) {
+      oldestStartedAt = startedAt;
+    }
+  }
+  return {
+    activeCount: sampleGenerationLocks.size,
+    oldestAgeMs: oldestStartedAt === null ? 0 : Math.max(0, nowMs - oldestStartedAt),
+  };
+}
+
 function withSampleGenerationLock(lockKey, work) {
   if (sampleGenerationLocks.has(lockKey)) {
     const error = new Error("SAMPLE_GENERATION_IN_PROGRESS");
@@ -2945,6 +2959,7 @@ async function handleApi(req, res, url) {
       ok: true,
       service: "lol-replay-coach",
       ...publicDemoModeHealth(),
+      sampleGeneration: sampleGenerationHealth(),
       timestamp: new Date().toISOString(),
     });
     return true;
