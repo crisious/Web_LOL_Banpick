@@ -218,6 +218,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   if (value.includes("\\")) {
     throw new Error(`${safeLabel} must not include backslashes`);
   }
+  if (/^https:/i.test(value) && !value.startsWith("https://")) {
+    throw new Error(`${safeLabel} must begin with https://`);
+  }
   if (rawPathFromUrlValue(value).split("/").some(isPathDotSegment)) {
     throw new Error(`${safeLabel} must not include path dot segments`);
   }

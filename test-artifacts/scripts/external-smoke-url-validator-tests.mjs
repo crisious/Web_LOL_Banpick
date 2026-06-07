@@ -49,6 +49,18 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com  "),
     "https://demo.example.com/");
 
+  checkThrows("validateExternalSmokeUrl rejects missing scheme authority separator",
+    () => validateExternalSmokeUrl("external_readonly_url", "https:demo.example.com"),
+    "external_readonly_url must begin with https://");
+
+  checkThrows("validateExternalSmokeUrl rejects single slash scheme authority separator",
+    () => validateExternalSmokeUrl("external_readonly_url", "https:/demo.example.com"),
+    "external_readonly_url must begin with https://");
+
+  checkThrows("validateExternalSmokeUrl rejects uppercase scheme spelling",
+    () => validateExternalSmokeUrl("external_readonly_url", "HTTPS://demo.example.com"),
+    "external_readonly_url must begin with https://");
+
   checkThrows("validateExternalSmokeUrl rejects non-root path",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/app"),
     "external_readonly_url must point to the demo origin root path");
