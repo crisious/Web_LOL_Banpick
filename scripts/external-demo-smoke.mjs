@@ -58,6 +58,20 @@ function url(path) {
   return new URL(path, baseUrl).toString();
 }
 
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function referencedAssetPath(html, filename) {
+  const pattern = new RegExp(`(?:href|src)\\s*=\\s*["']([^"']*${escapeRegex(filename)}[^"']*)["']`, "i");
+  const match = html.match(pattern);
+  if (!match) return `/${filename}`;
+  const assetUrl = new URL(match[1], baseUrl);
+  return assetUrl.origin === new URL(baseUrl).origin
+    ? `${assetUrl.pathname}${assetUrl.search}`
+    : assetUrl.toString();
+}
+
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   if (demoToken && !headers.Authorization) {
@@ -138,10 +152,12 @@ if (actualMode === "readonly") {
   );
 }
 
-const stylesheet = await request("/styles.css");
-expect(stylesheet.response.status === 200, "GET /styles.css returns 200", `status=${stylesheet.response.status}`);
-const appScript = await request("/main.js");
-expect(appScript.response.status === 200, "GET /main.js returns 200", `status=${appScript.response.status}`);
+const stylesheetPath = referencedAssetPath(home.text, "styles.css");
+const stylesheet = await request(stylesheetPath);
+expect(stylesheet.response.status === 200, `GET ${stylesheetPath} returns 200`, `status=${stylesheet.response.status}`);
+const appScriptPath = referencedAssetPath(home.text, "main.js");
+const appScript = await request(appScriptPath);
+expect(appScript.response.status === 200, `GET ${appScriptPath} returns 200`, `status=${appScript.response.status}`);
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);

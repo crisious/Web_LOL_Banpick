@@ -38,7 +38,7 @@ Expected:
 - `/healthz` 200
 - `/` exposes stored sample entry UI in read-only mode
 - `/` references `styles.css` and `main.js`
-- `/styles.css` and `/main.js` return 200
+- the exact referenced `styles.css` and `main.js` URLs, including cache query strings, return 200
 - `/api/samples` 200
 - `/api/samples` includes at least 19 stored samples
 - first 19 sample details return 200
