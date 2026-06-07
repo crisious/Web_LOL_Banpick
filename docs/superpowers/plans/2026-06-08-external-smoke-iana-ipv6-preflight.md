@@ -187,7 +187,7 @@ Expected: syntax check passes, validator tests pass, full suite passes, and diff
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` passed; validator tests reported `60 passed, 0 failed`, full suite reported `615 passed, 0 failed across 24 test file(s)`, and diff whitespace check passed.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -197,7 +197,9 @@ git commit -m "ci: reject reserved smoke ipv6 targets"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: `git commit -m "ci: reject reserved smoke ipv6 targets"` created `fa73b59`, and `git push origin main` updated `origin/main` from `0293702` to `fa73b59`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -209,6 +211,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions QA run `27100387061` passed for `fa73b59d4efdc2e63e5463ce1baf3b4d9f61c779`: https://github.com/crisious/Web_LOL_Banpick/actions/runs/27100387061. Artifact `qa-automation-27100387061` id `7466580017` expires `2026-06-21T18:00:00Z`. Downloaded artifact contained `qa-summary.json`, `2026-06-07T18-00-00Z-readonly/smoke-report.json`, and `2026-06-07T18-00-00Z-readonly/smoke-run.json`; `qa-summary.json` reported `150 passed / 0 failed`. Sensitive-value search for Authorization/Bearer/token/credential URL patterns returned no matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local test count, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: Obsidian project log was updated at `2026-06-08 03:00 KST` with the IANA IPv6 preflight scope, local verification, remote QA run, artifact id, and sensitive-value search result.
