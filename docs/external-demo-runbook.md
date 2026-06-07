@@ -48,7 +48,7 @@ Expected:
 - `/api/samples` includes at least 19 stored samples
 - first 19 sample details return 200
 - first 19 sample details include `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
-- sensitive static paths 403/404
+- sensitive static paths and encoded variants 403/404
 - sensitive static path block responses return `X-Content-Type-Options: nosniff`
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`

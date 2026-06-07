@@ -216,6 +216,10 @@ const blockedStaticPaths = [
   "/data/samples/manifest.json",
   "/test-artifacts/run-tests.mjs",
   "/external-access-deployment-plan.md",
+  "/%2eenv",
+  "/..%2Fserver.js",
+  "/%2e%2e%2Fserver.js",
+  "/data%2Fsamples%2Fmanifest.json",
 ];
 
 for (const path of blockedStaticPaths) {
