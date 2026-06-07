@@ -122,7 +122,9 @@ if (helpers) {
 
 const upsertSrc = extractAsyncFunctionSource(serverSrc, "upsertManifestEntry");
 checkTrue("upsertManifestEntry runs inside manifest mutation lock",
-  /return withManifestMutationLock\(async \(\) =>/.test(upsertSrc));
+  /return withManifestMutationLock\(\(\) =>/.test(upsertSrc));
+checkTrue("upsertManifestEntry composes manifest file lock inside mutation queue",
+  /withManifestFileLock\(async \(\) =>/.test(upsertSrc));
 checkTrue("upsertManifestEntry still removes existing entry before unshift",
   /manifest\.samples\.filter\(\(sample\) => sample\.id !== entry\.id\)/.test(upsertSrc) &&
     /nextSamples\.unshift\(entry\)/.test(upsertSrc));

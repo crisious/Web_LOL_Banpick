@@ -37,6 +37,9 @@ function resolveSamplesDir(configuredDir, appRoot) {
 
 const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);
 const manifestPath = path.join(samplesDir, "manifest.json");
+const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
+const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
+const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 
 function sampleStoragePath(sampleId, ...segments) {
   return path.join(samplesDir, sampleId, ...segments);
@@ -49,6 +52,10 @@ function sampleEntryStoragePath(publicPath) {
     return path.join(samplesDir, normalized.slice(samplePrefix.length));
   }
   return path.join(root, normalized);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const publicStaticPaths = new Set([
@@ -2631,15 +2638,55 @@ function withManifestMutationLock(work) {
   return run;
 }
 
+async function acquireManifestFileLock() {
+  const startedAt = Date.now();
+
+  while (true) {
+    try {
+      await fsp.mkdir(manifestFileLockPath);
+      return;
+    } catch (error) {
+      if (error?.code !== "EEXIST") {
+        throw error;
+      }
+      if (Date.now() - startedAt >= MANIFEST_FILE_LOCK_TIMEOUT_MS) {
+        const timeoutError = new Error("Timed out waiting for manifest file lock.");
+        timeoutError.code = "MANIFEST_FILE_LOCK_TIMEOUT";
+        throw timeoutError;
+      }
+      await sleep(MANIFEST_FILE_LOCK_RETRY_MS);
+    }
+  }
+}
+
+async function releaseManifestFileLock() {
+  try {
+    await fsp.rmdir(manifestFileLockPath);
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
+async function withManifestFileLock(work) {
+  await acquireManifestFileLock();
+  try {
+    return await work();
+  } finally {
+    await releaseManifestFileLock();
+  }
+}
+
 async function upsertManifestEntry(entry) {
-  return withManifestMutationLock(async () => {
+  return withManifestMutationLock(() => withManifestFileLock(async () => {
     const manifest = await loadManifest();
     const nextSamples = manifest.samples.filter((sample) => sample.id !== entry.id);
     nextSamples.unshift(entry);
     manifest.samples = nextSamples;
     await saveManifest(manifest);
     return manifest;
-  });
+  }));
 }
 
 function inferMatchIdFromSampleEntry(entry) {
