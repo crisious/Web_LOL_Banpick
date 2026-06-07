@@ -70,7 +70,7 @@ async function request(path, options = {}) {
     const detail = error?.name === "TimeoutError" || error?.name === "AbortError"
       ? `timeout after ${requestTimeoutMs}ms`
       : error?.message || String(error);
-    fail(`request ${path} failed`, detail);
+    fatal(`request ${path} failed`, detail);
     return {
       response: { status: 0 },
       body: null,
@@ -95,6 +95,11 @@ function fail(label, detail) {
   console.error(`FAIL ${label}`);
   if (detail) console.error(`  ${detail}`);
   process.exitCode = 1;
+}
+
+function fatal(label, detail) {
+  fail(label, detail);
+  process.exit(process.exitCode || 1);
 }
 
 function expect(condition, label, detail) {

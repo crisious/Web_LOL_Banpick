@@ -66,7 +66,7 @@ npm run smoke:external:readonly -- https://your-tunnel-url.trycloudflare.com
 
 `smoke:external:readonly` requires an explicit `https://` URL and at least 19 stored samples. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
 
-If the external URL is unreachable, the smoke should fail with `FAIL request /healthz failed` rather than a Node stack trace.
+If the external URL is unreachable, the smoke should fail fast on the first network request with `FAIL request /healthz failed` rather than a Node stack trace or a long cascade of endpoint failures.
 Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>` only when debugging slow tunnels.
 
 4. Share URL only after smoke passes.

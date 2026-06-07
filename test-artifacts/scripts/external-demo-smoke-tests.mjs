@@ -172,6 +172,10 @@ check("CLI reports unreachable demo URL without stack trace",
   unreachableDemo.stderr.includes("FAIL request /healthz failed") && !unreachableDemo.stderr.includes("TypeError: fetch failed"),
   true);
 
+check("CLI stops after the first network request failure",
+  (unreachableDemo.stderr.match(/FAIL request /g) || []).length,
+  1);
+
 const slowHealthServer = http.createServer((req, res) => {
   if (req.url === "/healthz") {
     setTimeout(() => {
