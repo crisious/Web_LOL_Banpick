@@ -175,7 +175,7 @@ Observed:
 
 `node --check scripts/external-demo-smoke.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && npm test && git diff --check` exited 0. Focused direct smoke tests reported `133 passed, 0 failed`; the full npm suite reported `763 passed, 0 failed across 25 test file(s)`; `git diff --check` produced no output.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -189,7 +189,9 @@ Expected: commit lands on `main` and pushes to `origin/main`.
 
 Observed:
 
-- [ ] **Step 4: Verify remote QA and artifact**
+Commit `9370f82` (`ci: redact smoke report check evidence`) landed on `main` and pushed to `origin/main`.
+
+- [x] **Step 4: Verify remote QA and artifact**
 
 Run:
 
@@ -205,6 +207,8 @@ Download `qa-automation-<run-id>`, inspect `qa-summary.json`, and scan for sensi
 Expected: latest run for the pushed head SHA succeeds, uploaded artifact contains `qa-summary.json`, read-only smoke reports zero failures, and sensitive-value search has no matches.
 
 Observed:
+
+GitHub Actions QA run `27107361569` completed successfully for head SHA `9370f82f0bda952597f679be0ebdcfc03102183f`. Artifact `qa-automation-27107361569` (`7468811054`) was downloaded and inspected. `qa-summary.json` recorded read-only smoke status `passed`, `actualMode=readonly`, `expectedMode=readonly`, and `155 passed, 0 failed`; `smoke-report.json` matched that summary with `checkCount=155`. Sensitive-value scan across the downloaded artifact, including `asset-secret` and `script-secret`, produced no matches.
 
 - [ ] **Step 5: Update Obsidian project log**
 
