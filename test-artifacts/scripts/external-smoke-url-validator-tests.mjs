@@ -67,19 +67,59 @@ if (fs.existsSync(validatorPath)) {
 
   checkThrows("validateExternalSmokeUrl rejects localhost",
     () => validateExternalSmokeUrl("external_readonly_url", "https://localhost"),
-    "external_readonly_url must not point to localhost or loopback");
+    "external_readonly_url must not point to a local or private network target");
 
   checkThrows("validateExternalSmokeUrl rejects loopback IPv4",
     () => validateExternalSmokeUrl("external_readonly_url", "https://127.0.0.1"),
-    "external_readonly_url must not point to localhost or loopback");
+    "external_readonly_url must not point to a local or private network target");
 
   checkThrows("validateExternalSmokeUrl rejects loopback IPv6",
     () => validateExternalSmokeUrl("external_readonly_url", "https://[::1]"),
-    "external_readonly_url must not point to localhost or loopback");
+    "external_readonly_url must not point to a local or private network target");
 
   checkThrows("validateExternalSmokeUrl rejects .localhost names",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.localhost"),
-    "external_readonly_url must not point to localhost or loopback");
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects private IPv4 10/8",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://10.0.0.5"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects private IPv4 172.16/12 lower bound",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://172.16.0.1"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects private IPv4 172.16/12 upper bound",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://172.31.255.255"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects private IPv4 192.168/16",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://192.168.1.10"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects link-local IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://169.254.1.1"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects carrier-grade NAT IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://100.64.0.1"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects unspecified IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://0.0.0.0"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects unique-local IPv6 fc00",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[fc00::1]"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects unique-local IPv6 fd00",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[fd12::1]"),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("validateExternalSmokeUrl rejects link-local IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[fe80::1]"),
+    "external_readonly_url must not point to a local or private network target");
 
   const badCli = spawnSync(process.execPath, [
     validatorPath,

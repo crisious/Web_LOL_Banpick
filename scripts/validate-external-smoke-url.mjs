@@ -2,6 +2,51 @@
 
 import { pathToFileURL } from "node:url";
 
+function ipv4Parts(host) {
+  const match = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!match) return null;
+  const parts = match.slice(1).map(Number);
+  return parts.every((part) => Number.isInteger(part) && part >= 0 && part <= 255) ? parts : null;
+}
+
+function isPrivateOrLocalIpv4(host) {
+  const parts = ipv4Parts(host);
+  if (!parts) return false;
+  const [a, b] = parts;
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168)
+  );
+}
+
+function isPrivateOrLocalIpv6(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  return (
+    normalized === "::1" ||
+    normalized === "::" ||
+    normalized.startsWith("fc") ||
+    normalized.startsWith("fd") ||
+    normalized.startsWith("fe8") ||
+    normalized.startsWith("fe9") ||
+    normalized.startsWith("fea") ||
+    normalized.startsWith("feb")
+  );
+}
+
+function isLocalOrPrivateHost(host) {
+  return (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    isPrivateOrLocalIpv4(host) ||
+    isPrivateOrLocalIpv6(host)
+  );
+}
+
 export function validateExternalSmokeUrl(label, rawUrl) {
   const safeLabel = label && !String(label).startsWith("--") ? String(label) : "external_url";
   const value = String(rawUrl || "").trim();
@@ -18,8 +63,8 @@ export function validateExternalSmokeUrl(label, rawUrl) {
     throw new Error(`${safeLabel} must not include username/password, query string, or fragment`);
   }
   const host = parsed.hostname.toLowerCase();
-  if (host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]" || host.endsWith(".localhost")) {
-    throw new Error(`${safeLabel} must not point to localhost or loopback`);
+  if (isLocalOrPrivateHost(host)) {
+    throw new Error(`${safeLabel} must not point to a local or private network target`);
   }
   return parsed.toString();
 }
