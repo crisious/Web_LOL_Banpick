@@ -12,10 +12,18 @@ const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
 const MIN_SAMPLES = 19;
 const VALID_MODES = ["readonly", "protected", "external-readonly", "external-protected"];
 
+function singleOptionArg(args, prefix) {
+  const matches = args.filter((arg) => arg.startsWith(prefix));
+  if (matches.length > 1) {
+    throw new Error(`${prefix.slice(0, -1)} accepts only one value`);
+  }
+  return matches[0];
+}
+
 export function parseRunnerArgs(argv, env = {}) {
   const args = argv.slice(2);
-  const modeArg = args.find((arg) => arg.startsWith("--mode="));
-  const outputRootArg = args.find((arg) => arg.startsWith("--output-root="));
+  const modeArg = singleOptionArg(args, "--mode=");
+  const outputRootArg = singleOptionArg(args, "--output-root=");
   const mode = modeArg ? modeArg.slice("--mode=".length).trim() : "readonly";
   if (!VALID_MODES.includes(mode)) {
     throw new Error("--mode must be one of: " + VALID_MODES.join(", "));

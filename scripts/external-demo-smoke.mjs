@@ -8,6 +8,14 @@ import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 function parseSmokeArgs(argv, env = {}, deps = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
   const args = argv.slice(2);
+  function singleOptionArg(args, prefix) {
+    const matches = args.filter((arg) => arg.startsWith(prefix));
+    if (matches.length > 1) {
+      throw new Error(`${prefix.slice(0, -1)} accepts only one value`);
+    }
+    return matches[0];
+  }
+
   const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
   if (positionalArgs.length > 1) {
     throw new Error("base URL must be the only positional argument");
@@ -16,6 +24,7 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
   const requireUrl = args.includes("--require-url");
   const requireHttps = args.includes("--require-https");
   const requireToken = args.includes("--require-token");
+  const modeArg = singleOptionArg(args, "--expect-mode=");
   if (requireUrl && !explicitBaseUrl) {
     throw new Error("--require-url needs an explicit base URL argument");
   }
@@ -33,28 +42,27 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     throw new Error("--require-https needs an https:// base URL");
   }
   if (requireUrl && requireHttps) {
-    const modeForLabel = args.find((arg) => arg.startsWith("--expect-mode="))?.slice("--expect-mode=".length).trim().toLowerCase();
+    const modeForLabel = modeArg?.slice("--expect-mode=".length).trim().toLowerCase();
     deps.validateExternalUrl?.(modeForLabel === "protected" ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
-  const tokenArg = args.find((arg) => arg.startsWith("--token="));
+  const tokenArg = singleOptionArg(args, "--token=");
   const demoToken = (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim();
   if (requireToken && !demoToken) {
     throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
   }
-  const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
   const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
-  const minSamplesArg = args.find((arg) => arg.startsWith("--min-samples="));
+  const minSamplesArg = singleOptionArg(args, "--min-samples=");
   const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
-  const timeoutArg = args.find((arg) => arg.startsWith("--timeout-ms="));
+  const timeoutArg = singleOptionArg(args, "--timeout-ms=");
   const requestTimeoutMs = timeoutArg ? Number(timeoutArg.slice("--timeout-ms=".length)) : 10000;
-  const sampleDetailErrorIdArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-id="));
-  const sampleDetailErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-code="));
-  const sampleDetailErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-status="));
-  const sampleDetailErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-detail-error-message="));
-  const sampleListErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-code="));
-  const sampleListErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-status="));
-  const sampleListErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-message="));
-  const reportJsonArg = args.find((arg) => arg.startsWith("--report-json="));
+  const sampleDetailErrorIdArg = singleOptionArg(args, "--expect-sample-detail-error-id=");
+  const sampleDetailErrorCodeArg = singleOptionArg(args, "--expect-sample-detail-error-code=");
+  const sampleDetailErrorStatusArg = singleOptionArg(args, "--expect-sample-detail-error-status=");
+  const sampleDetailErrorMessageArg = singleOptionArg(args, "--expect-sample-detail-error-message=");
+  const sampleListErrorCodeArg = singleOptionArg(args, "--expect-sample-list-error-code=");
+  const sampleListErrorStatusArg = singleOptionArg(args, "--expect-sample-list-error-status=");
+  const sampleListErrorMessageArg = singleOptionArg(args, "--expect-sample-list-error-message=");
+  const reportJsonArg = singleOptionArg(args, "--report-json=");
   const reportJsonPath = reportJsonArg ? reportJsonArg.slice("--report-json=".length).trim() : "";
   const hasSampleDetailErrorArg = Boolean(
     sampleDetailErrorIdArg ||

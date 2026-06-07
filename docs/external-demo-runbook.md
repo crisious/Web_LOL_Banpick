@@ -98,6 +98,8 @@ The JSON report contains the same PASS/FAIL check labels used in console output,
 
 Direct smoke and `smoke:report:*` commands accept at most one positional base URL. Extra positional URL arguments fail before any network request or report artifact creation, so operators do not accidentally collect evidence for the wrong URL.
 
+Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json=<path>`, plus runner-owned singleton options such as `--mode=<mode>` and `--output-root=<path>`, accept only one value. Duplicate singleton options fail before network requests or artifact creation, so the first value cannot silently win over a later operator correction.
+
 For repeatable QA evidence, prefer the report runner commands. They create a top-level `test-artifacts/qa-automation/qa-summary.json`, plus `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
 
 ```bash

@@ -165,6 +165,10 @@ checkThrows("parseSmokeArgs rejects multiple positional base URLs",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo-one.example", "https://demo-two.example"], {}),
   "base URL must be the only positional argument");
 
+checkThrows("parseSmokeArgs rejects duplicate singleton options",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=readonly", "--expect-mode=protected"], {}),
+  "--expect-mode accepts only one value");
+
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");

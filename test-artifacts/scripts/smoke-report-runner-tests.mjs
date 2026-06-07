@@ -71,6 +71,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly", "https://demo-one.example", "https://demo-two.example"], {}),
     "external-readonly smoke report accepts only one base URL argument");
 
+  checkThrows("parseRunnerArgs rejects duplicate mode options",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--mode=protected"], {}),
+    "--mode accepts only one value");
+
+  checkThrows("parseRunnerArgs rejects duplicate output root options",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/a", "--output-root=test-artifacts/b"], {}),
+    "--output-root accepts only one value");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
