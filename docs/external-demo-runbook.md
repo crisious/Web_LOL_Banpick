@@ -49,6 +49,7 @@ Expected:
 - first 19 sample details return 200
 - first 19 sample details include `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
 - sensitive static paths 403/404
+- sensitive static path block responses return `X-Content-Type-Options: nosniff`
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
 

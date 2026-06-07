@@ -206,6 +206,7 @@ function sendText(res, statusCode, body, contentType = "text/plain; charset=utf-
   res.writeHead(statusCode, {
     "Content-Type": contentType,
     "Content-Length": Buffer.byteLength(body),
+    "X-Content-Type-Options": "nosniff",
   });
   res.end(body);
 }

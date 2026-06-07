@@ -220,6 +220,7 @@ const blockedStaticPaths = [
 for (const path of blockedStaticPaths) {
   const out = await request(path);
   expect(out.response.status === 403 || out.response.status === 404, `${path} is not publicly served`, `status=${out.response.status}`);
+  expect(headerValue(out.response, "x-content-type-options") === "nosniff", `${path} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`);
 }
 
 const liveApiProbes = [
