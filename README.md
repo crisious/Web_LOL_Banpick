@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 668건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -176,6 +176,8 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 ```
 
 `--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 요청에는 입력한 원본 URL을 사용하지만, 리포트에 남는 `baseUrl`은 URL userinfo, query string, fragment를 redacted 값으로 바꿉니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
+
+`PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다.
 
 `smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, redacted URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`와 redacted URL로 기록되어 토큰/URL secret 값을 남기지 않습니다.
 
@@ -211,7 +213,7 @@ PORT=8123
 # TRUST_PROXY=1
 ```
 
-외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
+외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. `PUBLIC_DEMO_MODE` 오타도 live/write API를 403 `PUBLIC_DEMO_MODE_INVALID`로 차단하므로, `/healthz`와 smoke 결과로 실제 mode를 먼저 확인하세요. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
 
 `SAMPLES_DIR`를 설정하면 manifest와 생성된 sample bundle JSON은 해당 경로에서 읽고 씁니다. 비워두면 기존처럼 `./data/samples`를 사용하며, manifest의 `/data/samples/...` 공개 경로 값은 UI/API 호환을 위해 그대로 유지됩니다.
 

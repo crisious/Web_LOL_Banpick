@@ -16,6 +16,7 @@ const port = Number(process.env.PORT || 8123);
 const host = process.env.HOST || "127.0.0.1";
 const publicDemoMode = String(process.env.PUBLIC_DEMO_MODE || "full").trim().toLowerCase();
 const publicDemoToken = String(process.env.PUBLIC_DEMO_TOKEN || "").trim();
+const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
 const trustProxy = String(process.env.TRUST_PROXY || "").trim() === "1";
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
 // S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
@@ -140,6 +141,10 @@ function isProtectedDemoMode() {
   return publicDemoMode === "protected";
 }
 
+function isInvalidDemoMode() {
+  return !validPublicDemoModes.has(publicDemoMode);
+}
+
 function tokenFromRequest(req) {
   const auth = firstHeaderValue(req.headers.authorization).trim();
   const bearerMatch = auth.match(/^Bearer\s+(.+)$/i);
@@ -155,9 +160,22 @@ function sendDemoModeBlocked(res) {
   });
 }
 
+function sendDemoModeInvalid(res) {
+  sendJson(res, 403, {
+    ok: false,
+    code: "PUBLIC_DEMO_MODE_INVALID",
+    error: "PUBLIC_DEMO_MODE 값이 full, readonly, protected 중 하나가 아니라 live API를 차단했습니다.",
+  });
+}
+
 function requireLiveApiAccess(req, res) {
   if (isReadOnlyDemoMode()) {
     sendDemoModeBlocked(res);
+    return false;
+  }
+
+  if (isInvalidDemoMode()) {
+    sendDemoModeInvalid(res);
     return false;
   }
 
