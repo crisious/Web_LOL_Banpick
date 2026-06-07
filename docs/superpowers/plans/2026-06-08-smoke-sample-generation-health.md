@@ -163,7 +163,7 @@ Expected: all commands exit 0; full suite reports zero failures.
 
 Observed: `node --check scripts/external-demo-smoke.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && npm test && git diff --check` exited 0. Focused external demo smoke tests reported `106 passed, 0 failed`; the full suite reported `710 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -173,7 +173,9 @@ git commit -m "ci: validate sample generation health in smoke"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify remote QA artifact**
+Observed: committed and pushed `002b3c7 ci: validate sample generation health in smoke` to `origin/main`.
+
+- [x] **Step 4: Verify remote QA artifact**
 
 Run:
 
@@ -183,4 +185,6 @@ gh run watch <run-id> --exit-status
 gh run download <run-id> -n qa-automation-<run-id> -D <tmp-dir>
 ```
 
-Expected: run conclusion `success`, `qa-summary.json` read-only smoke summary is `150 passed / 0 failed`, and artifact scan has no sensitive token/header matches.
+Expected: run conclusion `success`, `qa-summary.json` read-only smoke summary has zero failures, and artifact scan has no sensitive token/header matches.
+
+Observed: GitHub Actions QA run `27104823167` completed with conclusion `success` for head SHA `002b3c716830b43f6af388be31ac110e793b7191`. Artifact `qa-automation-27104823167` / id `7467976684` downloaded to `/tmp/lol-ai-coach-smoke-sample-generation-health.sgpZGz`; `qa-summary.json` recorded read-only smoke `154 passed / 0 failed`, and the sensitive scan returned no matches.
