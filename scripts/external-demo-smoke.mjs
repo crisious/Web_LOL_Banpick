@@ -310,8 +310,8 @@ function validateSampleGenerationHealth(body) {
     `activeCount=${sampleGeneration.activeCount}`,
   );
   expectFatal(
-    Number.isFinite(sampleGeneration.oldestAgeMs) && sampleGeneration.oldestAgeMs >= 0,
-    "healthz sampleGeneration oldestAgeMs is non-negative",
+    Number.isInteger(sampleGeneration.oldestAgeMs) && sampleGeneration.oldestAgeMs >= 0,
+    "healthz sampleGeneration oldestAgeMs is a non-negative integer",
     `oldestAgeMs=${sampleGeneration.oldestAgeMs}`,
   );
   if (sampleGeneration.activeCount === 0) {

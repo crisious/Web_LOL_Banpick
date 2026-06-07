@@ -568,6 +568,51 @@ check("CLI stops after healthz when inactive sampleGeneration age is inconsisten
   inactiveSampleGenerationAgeRequests.map((request) => request.url),
   ["/healthz"]);
 
+const fractionalSampleGenerationAgeRequests = [];
+const fractionalSampleGenerationAgeServer = http.createServer((req, res) => {
+  fractionalSampleGenerationAgeRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") {
+    return sendJson(200, {
+      ok: true,
+      publicDemoMode: "readonly",
+      sampleGeneration: {
+        activeCount: 1,
+        oldestAgeMs: 1200.5,
+      },
+    });
+  }
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => fractionalSampleGenerationAgeServer.listen(0, "127.0.0.1", resolve));
+const fractionalSampleGenerationAgeUrl = `http://127.0.0.1:${fractionalSampleGenerationAgeServer.address().port}`;
+const fractionalSampleGenerationAge = await runNode([
+  smokePath,
+  fractionalSampleGenerationAgeUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => fractionalSampleGenerationAgeServer.close(resolve));
+
+check("CLI exits non-zero when sampleGeneration oldestAgeMs is fractional",
+  fractionalSampleGenerationAge.status,
+  1);
+
+check("CLI reports fractional sampleGeneration age mismatch",
+  fractionalSampleGenerationAge.stderr.includes("FAIL healthz sampleGeneration oldestAgeMs is a non-negative integer"),
+  true);
+
+check("CLI stops after healthz when sampleGeneration age is fractional",
+  fractionalSampleGenerationAgeRequests.map((request) => request.url),
+  ["/healthz"]);
+
 const modeMismatchRequests = [];
 const modeMismatchServer = http.createServer((req, res) => {
   modeMismatchRequests.push({ method: req.method, url: req.url });
