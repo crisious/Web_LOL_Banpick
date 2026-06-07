@@ -5,6 +5,15 @@ on:
     branches: ["main"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      external_readonly_url:
+        description: "Optional https:// read-only demo URL for external smoke artifact collection"
+        required: false
+        type: string
+      external_protected_url:
+        description: "Optional https:// protected demo URL for external smoke artifact collection"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -90,6 +99,19 @@ jobs:
             kill "$(cat /tmp/lol-ai-coach-protected.pid)" 2>/dev/null || true
           fi
           cat /tmp/lol-ai-coach-protected.log 2>/dev/null || true
+
+      - name: Run external read-only smoke report
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_readonly_url != '' }}
+        env:
+          EXTERNAL_READONLY_URL: ${{ inputs.external_readonly_url }}
+        run: npm run smoke:report:external:readonly -- "$EXTERNAL_READONLY_URL"
+
+      - name: Run external protected smoke report
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' && steps.protected-smoke-token.outputs.available == 'true' }}
+        env:
+          EXTERNAL_PROTECTED_URL: ${{ inputs.external_protected_url }}
+          PUBLIC_DEMO_TOKEN: ${{ secrets.PUBLIC_DEMO_TOKEN }}
+        run: npm run smoke:report:external:protected -- "$EXTERNAL_PROTECTED_URL"
 
       - name: Upload QA automation artifacts
         if: always()

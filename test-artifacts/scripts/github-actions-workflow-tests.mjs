@@ -38,6 +38,18 @@ if (exists) {
     /workflow_dispatch:/.test(workflow),
     workflow);
 
+  check("QA workflow accepts optional external readonly URL input",
+    /external_readonly_url:/.test(workflow) &&
+      /type:\s*string/.test(workflow) &&
+      /required:\s*false/.test(workflow),
+    workflow);
+
+  check("QA workflow accepts optional external protected URL input",
+    /external_protected_url:/.test(workflow) &&
+      /type:\s*string/.test(workflow) &&
+      /required:\s*false/.test(workflow),
+    workflow);
+
   check("QA workflow uses read-only permissions",
     /permissions:\s*\n\s+contents:\s*read/.test(workflow),
     workflow);
@@ -79,6 +91,22 @@ if (exists) {
 
   check("QA workflow runs protected smoke report when token is available",
     /run:\s*npm run smoke:report:protected/.test(workflow),
+    workflow);
+
+  check("QA workflow runs external readonly smoke only for manual URL input",
+    /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_readonly_url\s*!=\s*''\s*\}\}/.test(workflow) &&
+      /EXTERNAL_READONLY_URL:\s*\$\{\{\s*inputs\.external_readonly_url\s*\}\}/.test(workflow) &&
+      /run:\s*npm run smoke:report:external:readonly -- "\$EXTERNAL_READONLY_URL"/.test(workflow),
+    workflow);
+
+  check("QA workflow runs external protected smoke only for manual URL input and token",
+    /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_protected_url\s*!=\s*''\s*&&\s*steps\.protected-smoke-token\.outputs\.available\s*==\s*'true'\s*\}\}/.test(workflow) &&
+      /EXTERNAL_PROTECTED_URL:\s*\$\{\{\s*inputs\.external_protected_url\s*\}\}/.test(workflow) &&
+      /run:\s*npm run smoke:report:external:protected -- "\$EXTERNAL_PROTECTED_URL"/.test(workflow),
+    workflow);
+
+  check("QA workflow avoids direct shell interpolation of external URL inputs",
+    !/run:.*\$\{\{\s*inputs\.external_(readonly|protected)_url\s*\}\}/.test(workflow),
     workflow);
 
   check("QA workflow does not pass the demo token in command arguments",
