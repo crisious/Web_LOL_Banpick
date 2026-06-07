@@ -61,6 +61,18 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/\u3000"),
     "external_readonly_url must not include Unicode whitespace");
 
+  checkThrows("validateExternalSmokeUrl rejects leading byte order mark",
+    () => validateExternalSmokeUrl("external_readonly_url", "\ufeffhttps://demo.example.com"),
+    "external_readonly_url must not include Unicode whitespace");
+
+  checkThrows("validateExternalSmokeUrl rejects trailing byte order mark",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com\ufeff"),
+    "external_readonly_url must not include Unicode whitespace");
+
+  checkThrows("validateExternalSmokeUrl rejects root path byte order mark",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/\ufeff"),
+    "external_readonly_url must not include Unicode whitespace");
+
   checkThrows("validateExternalSmokeUrl rejects missing scheme authority separator",
     () => validateExternalSmokeUrl("external_readonly_url", "https:demo.example.com"),
     "external_readonly_url must begin with https://");
