@@ -71,6 +71,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
 
+  checkThrows("parseRunnerArgs rejects external readonly private URL via preflight",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly", "https://10.0.0.5"], {}),
+    "external_readonly_url must not point to a local or private network target");
+
+  checkThrows("parseRunnerArgs rejects external protected URL query via preflight",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "https://demo.example.com?token=secret"], {}),
+    "external_protected_url must not include username/password, query string, or fragment");
+
   const reportDir = runner.reportDirectoryFor("test-artifacts/qa-automation", "readonly", new Date("2026-06-08T00:45:30.123Z"));
   check("reportDirectoryFor builds timestamped mode directory",
     reportDir,
@@ -162,12 +170,11 @@ if (fs.existsSync(runnerPath)) {
     JSON.stringify(qaSummary || {}).includes("secret"),
     false);
 
-  const sensitiveUrlConfig = runner.parseRunnerArgs([
-    "node",
-    "scripts/run-smoke-report.mjs",
-    "--mode=external-readonly",
-    "https://user:pass@demo.example/path?access_token=summary-secret#summary-secret",
-  ], {});
+  const sensitiveUrlConfig = {
+    mode: "external-readonly",
+    baseUrl: "https://user:pass@demo.example/path?access_token=summary-secret#summary-secret",
+    expectedMode: "readonly",
+  };
   const sensitiveUrlSummary = runner.buildQaSummary?.({
     config: sensitiveUrlConfig,
     reportDir: "test-artifacts/qa-automation/2026-06-08T01-40-30Z-external-readonly",

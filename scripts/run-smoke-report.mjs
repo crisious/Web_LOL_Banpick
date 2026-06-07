@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { redactUrlForEvidence } from "../lib/qa-evidence-redaction.mjs";
+import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 
 const LOCAL_BASE_URL = "http://127.0.0.1:8123";
 const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
@@ -51,6 +52,9 @@ export function parseRunnerArgs(argv, env = {}) {
   }
   if (isExternal && parsedBaseUrl.protocol !== "https:") {
     throw new Error(`${mode} smoke report needs an https:// base URL`);
+  }
+  if (isExternal) {
+    validateExternalSmokeUrl(isProtected ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
 
   return {
