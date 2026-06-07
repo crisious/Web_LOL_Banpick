@@ -114,6 +114,18 @@ if (firstSample?.id) {
   const detail = await request(`/api/samples/${encodeURIComponent(firstSample.id)}`);
   expect(detail.response.status === 200, "GET /api/samples/:id returns 200", `status=${detail.response.status}`);
   expect(detail.body?.normalized && detail.body?.analysis, "sample detail includes normalized + analysis");
+  const analysis = detail.body?.analysis || {};
+  expect(
+    Boolean(
+      analysis.matchSummary?.headline &&
+        analysis.coachSummary?.overallSummary &&
+        Array.isArray(analysis.strengths) && analysis.strengths.length > 0 &&
+        Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0 &&
+        Array.isArray(analysis.actionChecklist) && analysis.actionChecklist.length > 0 &&
+        Array.isArray(analysis.keyMoments) && analysis.keyMoments.length >= 2,
+    ),
+    "sample detail includes report essentials",
+  );
 }
 
 const blockedStaticPaths = [

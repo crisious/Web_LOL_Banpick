@@ -39,6 +39,7 @@ Expected:
 - `/api/samples` 200
 - `/api/samples` includes at least 19 stored samples
 - first sample detail 200
+- first sample detail includes `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
 - sensitive static paths 403/404
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 

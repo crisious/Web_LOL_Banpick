@@ -158,6 +158,12 @@ const insufficientSamples = await runNode([
   "--expect-mode=readonly",
   "--min-samples=2",
 ]);
+const incompleteDetail = await runNode([
+  smokePath,
+  oneSampleUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
 await new Promise((resolve) => oneSampleServer.close(resolve));
 
 check("CLI exits non-zero when sample count is below --min-samples",
@@ -166,6 +172,14 @@ check("CLI exits non-zero when sample count is below --min-samples",
 
 check("CLI reports actual sample count when below --min-samples",
   insufficientSamples.stderr.includes("FAIL /api/samples has at least 2 samples"),
+  true);
+
+check("CLI exits non-zero when sample detail misses report essentials",
+  incompleteDetail.status,
+  1);
+
+check("CLI reports missing sample detail report essentials",
+  incompleteDetail.stderr.includes("FAIL sample detail includes report essentials"),
   true);
 
 console.log(`\n${pass} passed, ${fail} failed`);
