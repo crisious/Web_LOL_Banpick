@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 376건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 389건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -184,10 +184,13 @@ PORT=8123
 # HOST=0.0.0.0
 # PUBLIC_DEMO_MODE=readonly
 # PUBLIC_DEMO_TOKEN=change-me
+# SAMPLES_DIR=/var/lib/lol-ai-coach/samples
 # TRUST_PROXY=1
 ```
 
 외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
+
+`SAMPLES_DIR`를 설정하면 manifest와 생성된 sample bundle JSON은 해당 경로에서 읽고 씁니다. 비워두면 기존처럼 `./data/samples`를 사용하며, manifest의 `/data/samples/...` 공개 경로 값은 UI/API 호환을 위해 그대로 유지됩니다.
 
 ### 2. 서버 실행
 

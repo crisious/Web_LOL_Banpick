@@ -26,7 +26,30 @@ const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 
 const TEAMFIGHT_MIN_EVENTS = 3;
 // 한타 정리 단계 추격사 판정용 시간 간격(ms).
 const CLEANUP_GAP_MS = 8000;
-const manifestPath = path.join(root, "data", "samples", "manifest.json");
+
+function resolveSamplesDir(configuredDir, appRoot) {
+  const raw = String(configuredDir || "").trim();
+  if (!raw) {
+    return path.join(appRoot, "data", "samples");
+  }
+  return path.resolve(appRoot, raw);
+}
+
+const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);
+const manifestPath = path.join(samplesDir, "manifest.json");
+
+function sampleStoragePath(sampleId, ...segments) {
+  return path.join(samplesDir, sampleId, ...segments);
+}
+
+function sampleEntryStoragePath(publicPath) {
+  const normalized = String(publicPath || "").replace(/^\//, "");
+  const samplePrefix = "data/samples/";
+  if (normalized.startsWith(samplePrefix)) {
+    return path.join(samplesDir, normalized.slice(samplePrefix.length));
+  }
+  return path.join(root, normalized);
+}
 
 const publicStaticPaths = new Set([
   "/",
@@ -2204,8 +2227,8 @@ async function loadSampleBundle(sampleId) {
     return null;
   }
 
-  const normalized = await readJson(path.join(root, entry.normalizedPath.replace(/^\//, "")));
-  const analysis = await readJson(path.join(root, entry.analysisPath.replace(/^\//, "")));
+  const normalized = await readJson(sampleEntryStoragePath(entry.normalizedPath));
+  const analysis = await readJson(sampleEntryStoragePath(entry.analysisPath));
 
   // 누락된 필드 서버측 보강 (기존 샘플 호환)
   if (!normalized.playtimeScore && normalized.playerStats && normalized.timelineEvents) {
@@ -2213,8 +2236,8 @@ async function loadSampleBundle(sampleId) {
   }
   if (!normalized.objectiveTimeline) {
     // raw-timeline.json이 있으면 objectiveTimeline 생성
-    const tlPath = path.join(root, "data", "samples", sampleId, "raw-timeline.json");
-    const matchPath = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    const tlPath = sampleStoragePath(sampleId, "raw-timeline.json");
+    const matchPath = sampleStoragePath(sampleId, "raw-match.json");
     try {
       const timeline = await readJson(tlPath);
       const matchDetail = await readJson(matchPath);
@@ -2230,8 +2253,8 @@ async function loadSampleBundle(sampleId) {
     normalized.kdaTimeline = buildKdaTimeline(normalized);
   }
   if (!normalized.wardTimeline || !normalized.itemTimeline) {
-    const tlPath2 = path.join(root, "data", "samples", sampleId, "raw-timeline.json");
-    const matchPath2 = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    const tlPath2 = sampleStoragePath(sampleId, "raw-timeline.json");
+    const matchPath2 = sampleStoragePath(sampleId, "raw-match.json");
     try {
       const tl2 = await readJson(tlPath2);
       const md2 = await readJson(matchPath2);
@@ -2243,7 +2266,7 @@ async function loadSampleBundle(sampleId) {
     } catch {}
   }
   if (!normalized.challengeStats) {
-    const matchPath3 = path.join(root, "data", "samples", sampleId, "raw-match.json");
+    const matchPath3 = sampleStoragePath(sampleId, "raw-match.json");
     try {
       const md3 = await readJson(matchPath3);
       const pt3 = md3.info.participants.find((p) => p.puuid === normalized.playerContext?.puuid);
@@ -2266,7 +2289,7 @@ async function loadSampleBundle(sampleId) {
   }
 
   let comparison = null;
-  const compPath = path.join(root, "data", "samples", sampleId, "comparison-result.json");
+  const compPath = sampleStoragePath(sampleId, "comparison-result.json");
   try { comparison = await readJson(compPath); } catch {}
 
   return {
@@ -2697,7 +2720,7 @@ async function runGenerateSampleJob(req, res, { body, apiKey, gameName, tagLine,
   );
 
   const sampleId = `sample-${matchId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-  const sampleDir = path.join(root, "data", "samples", sampleId);
+  const sampleDir = sampleStoragePath(sampleId);
   await fsp.mkdir(sampleDir, { recursive: true });
 
   const publicAlias =
