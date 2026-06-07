@@ -11,6 +11,17 @@ const LOCAL_BASE_URL = "http://127.0.0.1:8123";
 const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
 const MIN_SAMPLES = 19;
 const VALID_MODES = ["readonly", "protected", "external-readonly", "external-protected"];
+const ALLOWED_SMOKE_ARG_PREFIXES = [
+  "--token=",
+  "--timeout-ms=",
+  "--expect-sample-detail-error-id=",
+  "--expect-sample-detail-error-status=",
+  "--expect-sample-detail-error-code=",
+  "--expect-sample-detail-error-message=",
+  "--expect-sample-list-error-status=",
+  "--expect-sample-list-error-code=",
+  "--expect-sample-list-error-message=",
+];
 
 function singleOptionArg(args, prefix) {
   const matches = args.filter((arg) => arg.startsWith(prefix));
@@ -42,6 +53,10 @@ export function parseRunnerArgs(argv, env = {}) {
     throw new Error(`${mode} smoke report accepts only one base URL argument`);
   }
   const extraSmokeArgs = args.filter((arg) => arg.startsWith("--") && !knownOptionArgs.has(arg));
+  for (const arg of extraSmokeArgs) {
+    if (ALLOWED_SMOKE_ARG_PREFIXES.some((prefix) => arg.startsWith(prefix))) continue;
+    throw new Error(`unknown smoke report option: ${arg}`);
+  }
   const isExternal = mode.startsWith("external-");
   const isProtected = mode.endsWith("protected") || mode === "protected";
   const expectedMode = isProtected ? "protected" : "readonly";

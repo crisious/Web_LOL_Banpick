@@ -79,6 +79,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/a", "--output-root=test-artifacts/b"], {}),
     "--output-root accepts only one value");
 
+  checkThrows("parseRunnerArgs rejects unknown smoke pass-through options",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expectmode=readonly"], {}),
+    "unknown smoke report option: --expectmode=readonly");
+
+  checkThrows("parseRunnerArgs rejects runner-controlled smoke pass-through options",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-mode=protected"], {}),
+    "unknown smoke report option: --expect-mode=protected");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
