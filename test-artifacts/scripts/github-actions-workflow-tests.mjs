@@ -105,6 +105,12 @@ if (exists) {
       /run:\s*npm run smoke:report:external:protected -- "\$EXTERNAL_PROTECTED_URL"/.test(workflow),
     workflow);
 
+  check("QA workflow fails external protected smoke when token is missing",
+    /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_protected_url\s*!=\s*''\s*&&\s*steps\.protected-smoke-token\.outputs\.available\s*!=\s*'true'\s*\}\}/.test(workflow) &&
+      /external_protected_url requires repository secret PUBLIC_DEMO_TOKEN/.test(workflow) &&
+      /exit 1/.test(workflow),
+    workflow);
+
   check("QA workflow avoids direct shell interpolation of external URL inputs",
     !/run:.*\$\{\{\s*inputs\.external_(readonly|protected)_url\s*\}\}/.test(workflow),
     workflow);

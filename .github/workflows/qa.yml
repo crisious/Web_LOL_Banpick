@@ -106,6 +106,12 @@ jobs:
           EXTERNAL_READONLY_URL: ${{ inputs.external_readonly_url }}
         run: npm run smoke:report:external:readonly -- "$EXTERNAL_READONLY_URL"
 
+      - name: Require token for external protected smoke
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' && steps.protected-smoke-token.outputs.available != 'true' }}
+        run: |
+          echo "external_protected_url requires repository secret PUBLIC_DEMO_TOKEN" >&2
+          exit 1
+
       - name: Run external protected smoke report
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.external_protected_url != '' && steps.protected-smoke-token.outputs.available == 'true' }}
         env:
