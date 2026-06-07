@@ -121,7 +121,7 @@ Expected: syntax check passes, validator tests pass, full suite passes, and diff
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` passed; validator reported `67 passed, 0 failed`, and the full suite reported `622 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -131,7 +131,9 @@ git commit -m "ci: reject reserved smoke ipv4 targets"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed and pushed `695e64f ci: reject reserved smoke ipv4 targets` to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -143,6 +145,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions QA run `27100611443` passed for `695e64f7d1abdda7fc55ce28ba1ecde808fc2d9a`. Artifact `qa-automation-27100611443` / artifact id `7466647357` uploaded `qa-summary.json`, `2026-06-07T18-09-09Z-readonly/smoke-report.json`, and `2026-06-07T18-09-09Z-readonly/smoke-run.json`; summary reported `150 passed / 0 failed`. Sensitive-value scan across the downloaded artifact found no Authorization/Bearer/token/credential URL matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local test count, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: Obsidian project log updated at `2026-06-08 03:09 KST`.
