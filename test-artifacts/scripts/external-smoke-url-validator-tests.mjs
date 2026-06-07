@@ -45,6 +45,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
     "https://demo.example.com/path");
 
+  checkThrows("validateExternalSmokeUrl rejects embedded newline",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa\nth"),
+    "external_readonly_url must not include ASCII control characters");
+
+  checkThrows("validateExternalSmokeUrl rejects embedded tab",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa\tth"),
+    "external_readonly_url must not include ASCII control characters");
+
   checkThrows("validateExternalSmokeUrl rejects backslash in URL path",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com\\path"),
     "external_readonly_url must not include backslashes");

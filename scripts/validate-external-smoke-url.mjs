@@ -191,7 +191,11 @@ function isLocalOrPrivateHost(host) {
 
 export function validateExternalSmokeUrl(label, rawUrl) {
   const safeLabel = label && !String(label).startsWith("--") ? String(label) : "external_url";
-  const value = String(rawUrl || "").trim();
+  const rawValue = String(rawUrl || "");
+  const value = rawValue.trim();
+  if (/[\u0000-\u001f\u007f]/.test(rawValue)) {
+    throw new Error(`${safeLabel} must not include ASCII control characters`);
+  }
   if (value.includes("\\")) {
     throw new Error(`${safeLabel} must not include backslashes`);
   }
