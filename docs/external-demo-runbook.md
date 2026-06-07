@@ -99,6 +99,7 @@ npm run smoke:report:readonly
 PUBLIC_DEMO_TOKEN='replace-with-long-random-token' npm run smoke:report:protected
 npm run smoke:report:external:readonly -- https://demo.example.com
 npm run smoke:report:external:protected -- https://demo.example.com --token=replace-with-long-random-token
+npm run smoke:validate:external-url -- external_readonly_url https://demo.example.com
 ```
 
 `qa-summary.json` records the latest run's mode, redacted URL, status, exit code, pass/fail counts, check count, and artifact paths. The smoke request still uses the original URL, but persisted evidence redacts URL userinfo, query strings, and fragments. `smoke-run.json` also redacts inline `--token=<value>` arguments before writing command metadata.
@@ -107,7 +108,7 @@ The GitHub Actions `QA` workflow runs `npm test` and `npm run smoke:report:reado
 
 If repository secret `PUBLIC_DEMO_TOKEN` is configured, the same `QA` workflow also starts a protected demo server and runs `npm run smoke:report:protected`. The workflow detects the secret through a step-local environment variable and gates protected smoke steps on that detection result. The token is not passed as a `--token` command argument, so `smoke-run.json` keeps its command metadata token-free.
 
-For external HTTPS evidence collection, run the `QA` workflow manually and fill `external_readonly_url` with the deployed or tunneled demo URL. The workflow runs `npm run smoke:report:external:readonly -- "$EXTERNAL_READONLY_URL"` and uploads the resulting report alongside the normal read-only artifact. To collect protected external evidence, also configure repository secret `PUBLIC_DEMO_TOKEN` and fill `external_protected_url`; the workflow runs the protected external smoke only when both the URL and token are available. If `external_protected_url` is filled without that secret, the workflow fails with `external_protected_url requires repository secret PUBLIC_DEMO_TOKEN` instead of silently skipping the protected smoke.
+For external HTTPS evidence collection, run the `QA` workflow manually and fill `external_readonly_url` with the deployed or tunneled demo URL. Manual external URLs are preflighted before smoke runs: they must be `https://` URLs and must not include username/password, query strings, fragments, localhost, or loopback targets. The workflow runs `npm run smoke:report:external:readonly -- "$EXTERNAL_READONLY_URL"` and uploads the resulting report alongside the normal read-only artifact. To collect protected external evidence, also configure repository secret `PUBLIC_DEMO_TOKEN` and fill `external_protected_url`; the workflow runs the protected external smoke only when both the URL and token are available. If `external_protected_url` is filled without that secret, the workflow fails with `external_protected_url requires repository secret PUBLIC_DEMO_TOKEN` instead of silently skipping the protected smoke.
 
 4. Share URL only after smoke passes.
 

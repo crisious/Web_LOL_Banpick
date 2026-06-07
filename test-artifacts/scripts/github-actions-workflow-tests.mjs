@@ -99,10 +99,26 @@ if (exists) {
       /run:\s*npm run smoke:report:external:readonly -- "\$EXTERNAL_READONLY_URL"/.test(workflow),
     workflow);
 
+  check("QA workflow validates external readonly URL before smoke",
+    /name:\s*Validate external read-only smoke URL/.test(workflow) &&
+      /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_readonly_url\s*!=\s*''\s*\}\}/.test(workflow) &&
+      /EXTERNAL_READONLY_URL:\s*\$\{\{\s*inputs\.external_readonly_url\s*\}\}/.test(workflow) &&
+      /run:\s*npm run smoke:validate:external-url -- external_readonly_url "\$EXTERNAL_READONLY_URL"/.test(workflow),
+    workflow);
+
   check("QA workflow runs external protected smoke only for manual URL input and token",
     /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_protected_url\s*!=\s*''\s*&&\s*steps\.protected-smoke-token\.outputs\.available\s*==\s*'true'\s*\}\}/.test(workflow) &&
       /EXTERNAL_PROTECTED_URL:\s*\$\{\{\s*inputs\.external_protected_url\s*\}\}/.test(workflow) &&
       /run:\s*npm run smoke:report:external:protected -- "\$EXTERNAL_PROTECTED_URL"/.test(workflow),
+    workflow);
+
+  check("QA workflow validates external protected URL before token guard and smoke",
+    /name:\s*Validate external protected smoke URL/.test(workflow) &&
+      /if:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.external_protected_url\s*!=\s*''\s*\}\}/.test(workflow) &&
+      /EXTERNAL_PROTECTED_URL:\s*\$\{\{\s*inputs\.external_protected_url\s*\}\}/.test(workflow) &&
+      /run:\s*npm run smoke:validate:external-url -- external_protected_url "\$EXTERNAL_PROTECTED_URL"/.test(workflow) &&
+      workflow.indexOf("Validate external protected smoke URL") < workflow.indexOf("Require token for external protected smoke") &&
+      workflow.indexOf("Require token for external protected smoke") < workflow.indexOf("Run external protected smoke report"),
     workflow);
 
   check("QA workflow fails external protected smoke when token is missing",

@@ -117,6 +117,14 @@ check("smoke:report:external:protected runs external protected report runner",
     /--mode=external-protected/.test(scripts["smoke:report:external:protected"] || ""),
   scripts["smoke:report:external:protected"] || "(missing)");
 
+check("smoke:validate:external-url script exists",
+  typeof scripts["smoke:validate:external-url"] === "string",
+  "missing package script smoke:validate:external-url");
+
+check("smoke:validate:external-url runs external smoke URL validator",
+  scripts["smoke:validate:external-url"] === "node scripts/validate-external-smoke-url.mjs",
+  scripts["smoke:validate:external-url"] || "(missing)");
+
 check("smoke:manifest:list-error script exists",
   typeof scripts["smoke:manifest:list-error"] === "string",
   "missing package script smoke:manifest:list-error");

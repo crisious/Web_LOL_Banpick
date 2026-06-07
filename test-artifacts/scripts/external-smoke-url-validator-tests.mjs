@@ -1,0 +1,114 @@
+// External smoke URL preflight validator tests.
+
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+
+const validatorPath = fileURLToPath(new URL("../../scripts/validate-external-smoke-url.mjs", import.meta.url));
+
+let pass = 0;
+let fail = 0;
+
+function check(label, got, expected) {
+  const ok = JSON.stringify(got) === JSON.stringify(expected);
+  console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
+  if (!ok) console.log(`  expected ${JSON.stringify(expected)}\n  got      ${JSON.stringify(got)}`);
+  ok ? pass++ : fail++;
+}
+
+function checkThrows(label, fn, expectedMessage) {
+  try {
+    fn();
+    console.log(`FAIL  ${label}`);
+    console.log(`  expected throw ${JSON.stringify(expectedMessage)}`);
+    fail++;
+  } catch (error) {
+    const ok = String(error.message) === expectedMessage;
+    console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
+    if (!ok) console.log(`  expected ${JSON.stringify(expectedMessage)}\n  got      ${JSON.stringify(error.message)}`);
+    ok ? pass++ : fail++;
+  }
+}
+
+check("external smoke URL validator script exists",
+  fs.existsSync(validatorPath),
+  true);
+
+if (fs.existsSync(validatorPath)) {
+  const { validateExternalSmokeUrl } = await import(validatorPath);
+
+  check("validateExternalSmokeUrl accepts external https URL",
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/path"),
+    "https://demo.example.com/path");
+
+  check("validateExternalSmokeUrl trims URL input",
+    validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
+    "https://demo.example.com/path");
+
+  checkThrows("validateExternalSmokeUrl rejects http URL",
+    () => validateExternalSmokeUrl("external_readonly_url", "http://demo.example.com"),
+    "external_readonly_url needs an https:// URL");
+
+  checkThrows("validateExternalSmokeUrl rejects invalid URL",
+    () => validateExternalSmokeUrl("external_readonly_url", "not-a-url"),
+    "external_readonly_url needs an https:// URL");
+
+  checkThrows("validateExternalSmokeUrl rejects URL credentials",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://user:pass@demo.example.com"),
+    "external_readonly_url must not include username/password, query string, or fragment");
+
+  checkThrows("validateExternalSmokeUrl rejects query string",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com?token=secret"),
+    "external_readonly_url must not include username/password, query string, or fragment");
+
+  checkThrows("validateExternalSmokeUrl rejects fragment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com#secret"),
+    "external_readonly_url must not include username/password, query string, or fragment");
+
+  checkThrows("validateExternalSmokeUrl rejects localhost",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://localhost"),
+    "external_readonly_url must not point to localhost or loopback");
+
+  checkThrows("validateExternalSmokeUrl rejects loopback IPv4",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://127.0.0.1"),
+    "external_readonly_url must not point to localhost or loopback");
+
+  checkThrows("validateExternalSmokeUrl rejects loopback IPv6",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://[::1]"),
+    "external_readonly_url must not point to localhost or loopback");
+
+  checkThrows("validateExternalSmokeUrl rejects .localhost names",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.localhost"),
+    "external_readonly_url must not point to localhost or loopback");
+
+  const badCli = spawnSync(process.execPath, [
+    validatorPath,
+    "external_readonly_url",
+    "https://demo.example.com/?token=secret",
+  ], { encoding: "utf8" });
+
+  check("CLI exits non-zero for URL with query string",
+    badCli.status,
+    1);
+
+  check("CLI prints concise URL preflight failure",
+    badCli.stderr.trim(),
+    "FAIL external_readonly_url must not include username/password, query string, or fragment");
+
+  const goodCli = spawnSync(process.execPath, [
+    validatorPath,
+    "external_readonly_url",
+    "https://demo.example.com/path",
+  ], { encoding: "utf8" });
+
+  check("CLI exits zero for valid URL",
+    goodCli.status,
+    0);
+
+  check("CLI prints normalized valid URL",
+    goodCli.stdout.trim(),
+    "OK external_readonly_url https://demo.example.com/path");
+}
+
+console.log(`\n${pass} passed, ${fail} failed`);
+process.exit(fail > 0 ? 1 : 0);
