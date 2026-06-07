@@ -83,12 +83,23 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     const modeForLabel = modeArg?.slice("--expect-mode=".length).trim().toLowerCase();
     deps.validateExternalUrl?.(modeForLabel === "protected" ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
+  const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
+  if (expectedMode && !validExpectedModes.includes(expectedMode)) {
+    throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
+  }
   const tokenArg = singleOptionArg(args, "--token=");
-  const demoToken = (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim();
+  if (requireToken && expectedMode !== "protected") {
+    throw new Error("--require-token is only accepted with --expect-mode=protected");
+  }
+  if (tokenArg && !requireToken) {
+    throw new Error("--token is only accepted with --require-token and --expect-mode=protected");
+  }
+  const demoToken = requireToken
+    ? (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim()
+    : "";
   if (requireToken && !demoToken) {
     throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
   }
-  const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
   const minSamplesArg = singleOptionArg(args, "--min-samples=");
   const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
   const timeoutArg = singleOptionArg(args, "--timeout-ms=");
@@ -131,9 +142,6 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
       }
     : null;
 
-  if (expectedMode && !validExpectedModes.includes(expectedMode)) {
-    throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
-  }
   if (!Number.isInteger(minSamples) || minSamples < 1) {
     throw new Error("--min-samples must be a positive integer");
   }

@@ -88,13 +88,29 @@ function readJsonFileIfExists(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-check("parseSmokeArgs reads base URL, token, and expected mode",
-  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly", "--min-samples=19", "--timeout-ms=5000"], {}),
-  { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "readonly", minSamples: 19, requestTimeoutMs: 5000 });
+check("parseSmokeArgs reads base URL and expected mode",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--expect-mode=readonly", "--min-samples=19", "--timeout-ms=5000"], {}),
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 19, requestTimeoutMs: 5000 });
+
+checkThrows("parseSmokeArgs rejects readonly inline token",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly"], {}),
+  "--token is only accepted with --require-token and --expect-mode=protected");
+
+check("parseSmokeArgs ignores env token for readonly smoke",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=readonly"], { PUBLIC_DEMO_TOKEN: "env-token" }),
+  { baseUrl: "http://127.0.0.1:8123", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000 });
+
+checkThrows("parseSmokeArgs rejects require-token outside protected expected mode",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "--expect-mode=readonly"], { PUBLIC_DEMO_TOKEN: "env-token" }),
+  "--require-token is only accepted with --expect-mode=protected");
 
 check("parseSmokeArgs falls back to env token and default base URL",
-  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token" }),
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "--expect-mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token" }),
   { baseUrl: "http://127.0.0.1:8123", demoToken: "env-token", expectedMode: "protected", minSamples: 1, requestTimeoutMs: 10000 });
+
+check("parseSmokeArgs accepts protected inline token when token is required",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "https://demo.example", "--token=abc", "--expect-mode=protected"], {}),
+  { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "protected", minSamples: 1, requestTimeoutMs: 10000 });
 
 check("parseSmokeArgs omits expected mode when not provided",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "http://127.0.0.1:9000"], {}),
@@ -896,7 +912,6 @@ const sampleListReport = await runNode([
   smokePath,
   sampleListReportInputUrl,
   "--expect-mode=readonly",
-  "--token=secret-smoke-token",
   "--expect-sample-list-error-status=500",
   "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
   "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
@@ -1010,6 +1025,22 @@ check("CLI reports unsafe report JSON path without network request",
 check("CLI unsafe report JSON path does not create file",
   fs.existsSync(unsafeReportJsonPath),
   false);
+
+const readonlyToken = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--token=secret-readonly-token",
+]);
+
+check("CLI exits non-zero for readonly inline token",
+  readonlyToken.status,
+  1);
+
+check("CLI reports readonly inline token before network request",
+  readonlyToken.stderr.includes("FAIL --token is only accepted with --require-token and --expect-mode=protected") &&
+    !readonlyToken.stderr.includes("FAIL request /healthz failed"),
+  true);
 
 const unreachableDemo = await runNode([
   smokePath,
@@ -1195,6 +1226,7 @@ const crossOriginAppUrl = `http://127.0.0.1:${crossOriginAppServer.address().por
 const crossOriginAssets = await runNode([
   smokePath,
   crossOriginAppUrl,
+  "--require-token",
   "--token=protected-token",
   "--expect-mode=protected",
   "--min-samples=1",
@@ -1251,6 +1283,7 @@ const sameOriginTokenUrl = `http://127.0.0.1:${sameOriginTokenServer.address().p
 const sameOriginTokenSmoke = await runNode([
   smokePath,
   sameOriginTokenUrl,
+  "--require-token",
   "--token=protected-token",
   "--expect-mode=protected",
   "--min-samples=1",
@@ -1309,6 +1342,7 @@ const rejectedProtectedTokenUrl = `http://127.0.0.1:${rejectedProtectedTokenServ
 const rejectedProtectedToken = await runNode([
   smokePath,
   rejectedProtectedTokenUrl,
+  "--require-token",
   "--token=protected-token",
   "--expect-mode=protected",
   "--min-samples=1",
