@@ -121,6 +121,8 @@ git push origin main
 
 Expected: commit lands on `main` and push triggers GitHub Actions QA.
 
+Observed: committed and pushed `62dda58 ci: validate sample generation age integer` to `origin/main`.
+
 - [ ] **Step 4: Verify remote QA**
 
 Run:
@@ -131,3 +133,5 @@ gh run view <run-id> --json conclusion,headSha,status,url
 ```
 
 Expected: latest run for the pushed head SHA completes with conclusion `success`, uploads `qa-automation-*`, read-only smoke summary has zero failures, and artifact sensitive-value scan has no matches.
+
+Observed: GitHub Actions QA run `27105156958` completed with conclusion `success` for head SHA `62dda58edb6e8bc7871fdb0592870c5f3dfb6f27`. Artifact `qa-automation-27105156958` uploaded as artifact id `7468091822` and expires at `2026-06-21T21:21:11Z`; downloaded artifact `qa-summary.json` reported read-only smoke `155 passed / 0 failed`, and sensitive-value search for `Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY_URL=[^[:space:]]|EXTERNAL_PROTECTED_URL=[^[:space:]]|access_token=|token=secret|user:pass@|RIOT_API_KEY|RGAPI-|KR_[0-9]{8,}|NA1_[0-9]{8,}|lockKey` returned no matches.
