@@ -94,7 +94,7 @@ npm run smoke:readonly -- --report-json=test-artifacts/qa-automation/smoke-reado
 npm run smoke:external:readonly -- https://demo.example.com --report-json=test-artifacts/qa-automation/external-readonly.json
 ```
 
-The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. It does not store the demo token, Authorization header, or API response bodies.
+The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. URL evidence inside `baseUrl`, check labels, and check details redacts userinfo, query strings, and fragments; relative asset paths are persisted with markers such as `/styles.css?redacted` instead of raw query values. It does not store the demo token, Authorization header, or API response bodies.
 
 Direct smoke `--report-json=<path>` accepts only relative `test-artifacts/.../*.json` paths. Absolute paths, `..` traversal, paths outside the artifact tree, or non-JSON targets fail before any network request or report write with `FAIL --report-json must be a relative .json path under test-artifacts`.
 

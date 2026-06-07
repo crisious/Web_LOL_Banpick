@@ -222,6 +222,23 @@ function headerValue(response, name) {
   return response.headers?.get?.(name)?.toLowerCase() || "";
 }
 
+function redactRelativeUrlEvidence(rawPath) {
+  const firstQuery = rawPath.indexOf("?");
+  const firstHash = rawPath.indexOf("#");
+  const markers = [firstQuery, firstHash].filter((idx) => idx >= 0).sort((a, b) => a - b);
+  if (!markers.length) return rawPath;
+  const pathOnly = rawPath.slice(0, markers[0]);
+  return `${pathOnly}${firstQuery >= 0 ? "?redacted" : ""}${firstHash >= 0 ? "#redacted" : ""}`;
+}
+
+function redactEvidenceText(value) {
+  return String(value)
+    .replace(/https?:\/\/[^\s"'<>]+/g, (match) => redactUrlForEvidence(match))
+    .replace(/(^|[\s"'`(])((?:\/|\.\.?\/)[^\s"'`<>]*[?#][^\s"'`<>]*)/g, (_match, prefix, rawPath) => {
+      return `${prefix}${redactRelativeUrlEvidence(rawPath)}`;
+    });
+}
+
 function expectJsonResponse(out, label) {
   expect(contentType(out.response).includes("application/json"), `${label} content-type is JSON`, `content-type=${contentType(out.response) || "(missing)"}`);
   expect(headerValue(out.response, "x-content-type-options") === "nosniff", `${label} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`);
@@ -281,14 +298,17 @@ async function request(path, options = {}) {
 }
 
 function pass(label) {
-  recordCheck("pass", label);
-  console.log(`PASS ${label}`);
+  const safeLabel = redactEvidenceText(label);
+  recordCheck("pass", safeLabel);
+  console.log(`PASS ${safeLabel}`);
 }
 
 function fail(label, detail) {
-  recordCheck("fail", label, detail);
-  console.error(`FAIL ${label}`);
-  if (detail) console.error(`  ${detail}`);
+  const safeLabel = redactEvidenceText(label);
+  const safeDetail = detail ? redactEvidenceText(detail) : "";
+  recordCheck("fail", safeLabel, safeDetail);
+  console.error(`FAIL ${safeLabel}`);
+  if (safeDetail) console.error(`  ${safeDetail}`);
   process.exitCode = 1;
 }
 

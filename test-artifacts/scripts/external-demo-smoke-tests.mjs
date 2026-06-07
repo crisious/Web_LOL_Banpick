@@ -888,6 +888,7 @@ const reportDir = path.join("test-artifacts", "tmp", `lol-smoke-report-${process
 fs.rmSync(reportDir, { recursive: true, force: true });
 const passedReportPath = path.join(reportDir, "passed", "smoke.json");
 const failedReportPath = path.join(reportDir, "failed", "smoke.json");
+const assetEvidenceReportPath = path.join(reportDir, "asset-evidence", "smoke.json");
 
 const sampleListReportServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
@@ -948,6 +949,68 @@ check("passed smoke report excludes demo token",
 check("passed smoke report redacts base URL query and fragment",
   JSON.stringify(passedReport).includes("report-secret"),
   false);
+
+const assetEvidenceServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html", "X-Content-Type-Options": "nosniff" });
+    res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?asset_token=asset-secret">
+      <script src="./main.js?script_token=script-secret"></script>
+      <button data-login-sample-button>저장 샘플 열기</button>
+      <div data-sample-switcher>저장된 샘플</div>
+    `);
+    return;
+  }
+  if (req.url === "/styles.css?asset_token=asset-secret") {
+    res.writeHead(200, { "Content-Type": "text/css", "X-Content-Type-Options": "nosniff" });
+    res.end("body { color: #111; }");
+    return;
+  }
+  if (req.url === "/main.js?script_token=script-secret") {
+    res.writeHead(200, { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff" });
+    res.end("window.__smoke = true;");
+    return;
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { ok: false, code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => assetEvidenceServer.listen(0, "127.0.0.1", resolve));
+const assetEvidenceUrl = `http://127.0.0.1:${assetEvidenceServer.address().port}`;
+const assetEvidenceSmoke = await runNode([
+  smokePath,
+  assetEvidenceUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+  `--report-json=${assetEvidenceReportPath}`,
+]);
+await new Promise((resolve) => assetEvidenceServer.close(resolve));
+
+const assetEvidenceReport = readJsonFileIfExists(assetEvidenceReportPath);
+
+check("CLI succeeds when writing asset evidence smoke report JSON",
+  assetEvidenceSmoke.status,
+  0);
+
+check("passed smoke report redacts asset query secrets from checks",
+  !JSON.stringify(assetEvidenceReport).includes("asset-secret") &&
+    !JSON.stringify(assetEvidenceReport).includes("script-secret"),
+  true);
+
+check("passed smoke report keeps redacted asset query markers",
+  JSON.stringify(assetEvidenceReport).includes("/styles.css?redacted") &&
+    JSON.stringify(assetEvidenceReport).includes("/main.js?redacted"),
+  true);
 
 const failingSampleListReportServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
@@ -1132,8 +1195,8 @@ check("CLI exits non-zero when client assets are not served",
   1);
 
 check("CLI reports missing client asset",
-  missingAssets.stderr.includes("FAIL GET /styles.css?v=20260419 returns 200") ||
-    missingAssets.stderr.includes("FAIL GET /main.js?v=20260419 returns 200"),
+  missingAssets.stderr.includes("FAIL GET /styles.css?redacted returns 200") ||
+    missingAssets.stderr.includes("FAIL GET /main.js?redacted returns 200"),
   true);
 
 const missingCacheBustedAssetServer = http.createServer((req, res) => {
@@ -1179,8 +1242,8 @@ check("CLI exits non-zero when cache-busted client assets are not served",
   1);
 
 check("CLI reports missing cache-busted client asset",
-  missingCacheBustedAssets.stderr.includes("FAIL GET /styles.css?v=20260419 returns 200") ||
-    missingCacheBustedAssets.stderr.includes("FAIL GET /main.js?v=20260419 returns 200"),
+  missingCacheBustedAssets.stderr.includes("FAIL GET /styles.css?redacted returns 200") ||
+    missingCacheBustedAssets.stderr.includes("FAIL GET /main.js?redacted returns 200"),
   true);
 
 const crossOriginAssetRequests = [];
@@ -1449,8 +1512,8 @@ check("CLI exits non-zero when client assets return HTML content type",
   1);
 
 check("CLI reports client asset content type mismatch",
-  htmlAssets.stderr.includes("FAIL /styles.css?v=20260419 content-type is CSS") ||
-    htmlAssets.stderr.includes("FAIL /main.js?v=20260419 content-type is JavaScript"),
+  htmlAssets.stderr.includes("FAIL /styles.css?redacted content-type is CSS") ||
+    htmlAssets.stderr.includes("FAIL /main.js?redacted content-type is JavaScript"),
   true);
 
 const missingNosniffAssetServer = http.createServer((req, res) => {
@@ -1500,8 +1563,8 @@ check("CLI exits non-zero when client assets omit nosniff",
   1);
 
 check("CLI reports missing client asset nosniff",
-  missingNosniffAssets.stderr.includes("FAIL /styles.css?v=20260419 has X-Content-Type-Options nosniff") ||
-    missingNosniffAssets.stderr.includes("FAIL /main.js?v=20260419 has X-Content-Type-Options nosniff"),
+  missingNosniffAssets.stderr.includes("FAIL /styles.css?redacted has X-Content-Type-Options nosniff") ||
+    missingNosniffAssets.stderr.includes("FAIL /main.js?redacted has X-Content-Type-Options nosniff"),
   true);
 
 const missingHomeNosniffServer = http.createServer((req, res) => {
