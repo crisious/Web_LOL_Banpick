@@ -227,10 +227,10 @@ for (const probe of liveApiProbes) {
     body: JSON.stringify({}),
   });
 
-  if (health.body?.readonly) {
+  if (actualMode === "readonly") {
     expect(liveProbe.response.status === 403, `readonly mode blocks ${probe.label}`, `status=${liveProbe.response.status}`);
     expect(liveProbe.body?.code === "PUBLIC_DEMO_READONLY", `${probe.label} readonly block returns PUBLIC_DEMO_READONLY`);
-  } else if (health.body?.protected && !demoToken) {
+  } else if (actualMode === "protected" && !demoToken) {
     expect(
       liveProbe.response.status === 401 || liveProbe.response.status === 403,
       `protected mode without token blocks ${probe.label}`,
