@@ -175,7 +175,7 @@ Expected: all commands exit 0.
 
 Observed: syntax checks exited 0, external smoke tests reported 96 passed / 0 failed, smoke report runner tests reported 14 passed / 0 failed, `npm test` reported 550 passed / 0 failed across 23 test files, and `git diff --check` exited 0.
 
-- [ ] **Step 3: Commit, push, and verify remote QA**
+- [x] **Step 3: Commit, push, and verify remote QA**
 
 Run:
 
@@ -187,3 +187,5 @@ gh run watch <run-id> --exit-status
 ```
 
 Expected: push-triggered `QA` passes and artifact URL/token sensitive-pattern searches find no matches.
+
+Observed: commit `47ca772` pushed to `origin/main`; remote `QA` run `27098595947` passed. Artifact `qa-automation-27098595947` included `qa-summary.json`, readonly `smoke-report.json`, and readonly `smoke-run.json`; summary reported 150 passed / 0 failed and sensitive pattern search found no matches for Authorization, bearer tokens, public demo token env values, external URL env values, or URL secret fixtures.
