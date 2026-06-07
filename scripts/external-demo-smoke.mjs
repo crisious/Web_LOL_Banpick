@@ -127,6 +127,8 @@ if (expectedMode) {
 const home = await request("/");
 expect(home.response.status === 200, "GET / returns 200", `status=${home.response.status}`);
 expect(home.text.includes("LoL Replay Coach"), "home contains app title");
+expect(home.text.includes("styles.css"), "home references styles.css");
+expect(home.text.includes("main.js"), "home references main.js");
 if (actualMode === "readonly") {
   expect(
     home.text.includes("data-login-sample-button") &&
@@ -135,6 +137,11 @@ if (actualMode === "readonly") {
     "readonly home exposes stored sample entry UI",
   );
 }
+
+const stylesheet = await request("/styles.css");
+expect(stylesheet.response.status === 200, "GET /styles.css returns 200", `status=${stylesheet.response.status}`);
+const appScript = await request("/main.js");
+expect(appScript.response.status === 200, "GET /main.js returns 200", `status=${appScript.response.status}`);
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);

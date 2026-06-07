@@ -209,6 +209,48 @@ check("CLI reports timed out request without stack trace",
   timedOutHealth.stderr.includes("FAIL request /healthz failed") && !timedOutHealth.stderr.includes("TimeoutError"),
   true);
 
+const missingAssetServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?v=20260419">
+      <button data-login-sample-button>저장 샘플 열기</button>
+      <div data-sample-switcher>저장된 샘플</div>
+      <script src="./main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => missingAssetServer.listen(0, "127.0.0.1", resolve));
+const missingAssetUrl = `http://127.0.0.1:${missingAssetServer.address().port}`;
+const missingAssets = await runNode([
+  smokePath,
+  missingAssetUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => missingAssetServer.close(resolve));
+
+check("CLI exits non-zero when client assets are not served",
+  missingAssets.status,
+  1);
+
+check("CLI reports missing client asset",
+  missingAssets.stderr.includes("FAIL GET /styles.css returns 200") || missingAssets.stderr.includes("FAIL GET /main.js returns 200"),
+  true);
+
 const oneSampleServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
     res.writeHead(status, { "Content-Type": "application/json" });
