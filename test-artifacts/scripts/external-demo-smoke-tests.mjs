@@ -299,6 +299,61 @@ check("CLI reports missing cache-busted client asset",
     missingCacheBustedAssets.stderr.includes("FAIL GET /main.js?v=20260419 returns 200"),
   true);
 
+const crossOriginAssetRequests = [];
+const crossOriginAssetServer = http.createServer((req, res) => {
+  crossOriginAssetRequests.push({ url: req.url, authorization: req.headers.authorization || "" });
+  if (req.headers.authorization) {
+    res.writeHead(401, { "Content-Type": "text/plain" });
+    return res.end("unexpected authorization header");
+  }
+  res.writeHead(200, { "Content-Type": req.url?.includes("styles.css") ? "text/css" : "text/javascript" });
+  return res.end("/* public cross-origin asset */");
+});
+
+await new Promise((resolve) => crossOriginAssetServer.listen(0, "127.0.0.1", resolve));
+const crossOriginAssetUrl = `http://127.0.0.1:${crossOriginAssetServer.address().port}`;
+const crossOriginAppServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, protected: true, publicDemoMode: "protected" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="${crossOriginAssetUrl}/styles.css?v=20260419">
+      <script src="${crossOriginAssetUrl}/main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => crossOriginAppServer.listen(0, "127.0.0.1", resolve));
+const crossOriginAppUrl = `http://127.0.0.1:${crossOriginAppServer.address().port}`;
+const crossOriginAssets = await runNode([
+  smokePath,
+  crossOriginAppUrl,
+  "--token=protected-token",
+  "--expect-mode=protected",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => crossOriginAppServer.close(resolve));
+await new Promise((resolve) => crossOriginAssetServer.close(resolve));
+
+check("CLI succeeds when protected smoke loads cross-origin client assets",
+  crossOriginAssets.status,
+  0);
+
+check("CLI omits Authorization on cross-origin client asset requests",
+  crossOriginAssetRequests.map((request) => request.authorization),
+  ["", ""]);
+
 const oneSampleServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
     res.writeHead(status, { "Content-Type": "application/json" });

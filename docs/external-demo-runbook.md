@@ -39,6 +39,7 @@ Expected:
 - `/` exposes stored sample entry UI in read-only mode
 - `/` references `styles.css` and `main.js`
 - the exact referenced `styles.css` and `main.js` URLs, including cache query strings, return 200
+- smoke tokens are sent only to the demo origin, not to cross-origin client assets
 - `/api/samples` 200
 - `/api/samples` includes at least 19 stored samples
 - first 19 sample details return 200
@@ -86,6 +87,8 @@ Smoke with token:
 ```bash
 npm run smoke:external -- https://demo.example.com --token=replace-with-long-random-token --expect-mode=protected
 ```
+
+The smoke CLI sends the token only to the demo origin. If `index.html` references cross-origin client assets, those requests must remain unauthenticated.
 
 Client/API callers must send:
 

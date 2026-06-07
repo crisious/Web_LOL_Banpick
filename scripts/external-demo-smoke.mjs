@@ -53,6 +53,7 @@ try {
 }
 
 const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs } = parsedArgs;
+const baseOrigin = new URL(baseUrl).origin;
 
 function url(path) {
   return new URL(path, baseUrl).toString();
@@ -74,7 +75,8 @@ function referencedAssetPath(html, filename) {
 
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
-  if (demoToken && !headers.Authorization) {
+  const requestOrigin = new URL(path, baseUrl).origin;
+  if (demoToken && requestOrigin === baseOrigin && !headers.Authorization) {
     headers.Authorization = `Bearer ${demoToken}`;
   }
   let response;
