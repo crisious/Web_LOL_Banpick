@@ -173,7 +173,7 @@ Expected: focused tests pass, full suite passes, and whitespace check passes.
 
 Observed: `node --check scripts/external-demo-smoke.mjs && node --check scripts/run-smoke-report.mjs && node --check test-artifacts/scripts/external-demo-smoke-tests.mjs && node --check test-artifacts/scripts/smoke-report-runner-tests.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && node test-artifacts/scripts/smoke-report-runner-tests.mjs && npm test && git diff --check` exited 0. Focused direct smoke tests reported `147 passed, 0 failed`; smoke report runner tests reported `54 passed, 0 failed`; the full suite reported `790 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 2: Commit and push implementation evidence**
+- [x] **Step 2: Commit and push implementation evidence**
 
 Run:
 
@@ -183,7 +183,9 @@ git commit -m "ci: reject repeated slash smoke report paths"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions artifact**
+Observed: committed `aeb9c2c ci: reject repeated slash smoke report paths` and pushed it to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions artifact**
 
 Run:
 
@@ -194,6 +196,8 @@ gh run download <run-id> --name qa-automation-<run-id> --dir /tmp/<download-dir>
 ```
 
 Expected: GitHub Actions QA succeeds, `qa-summary.json` reports read-only smoke `155 passed / 0 failed` or higher, and artifact sensitive-value scan has no matches.
+
+Observed: GitHub Actions QA run `27108404315` completed with conclusion `success` for head SHA `aeb9c2cec4bc2a9963dbcaaada11239cb2047eb4`. Artifact `qa-automation-27108404315` uploaded as artifact id `7469132952` and contained `qa-summary.json`, `2026-06-07T23-44-24Z-readonly/smoke-report.json`, and `2026-06-07T23-44-24Z-readonly/smoke-run.json`. `qa-summary.json` reported read-only smoke `155 passed / 0 failed`, `actualMode=readonly`, and `checkCount=155`. Sensitive-value search for Authorization/Bearer/token material, external URL env values, Riot key patterns, match id patterns, and `lockKey` returned no matches.
 
 - [ ] **Step 4: Update Obsidian**
 
