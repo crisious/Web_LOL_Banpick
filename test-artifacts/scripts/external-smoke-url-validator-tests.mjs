@@ -45,6 +45,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
     "https://demo.example.com/path");
 
+  checkThrows("validateExternalSmokeUrl rejects backslash in URL path",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com\\path"),
+    "external_readonly_url must not include backslashes");
+
+  checkThrows("validateExternalSmokeUrl rejects backslash after scheme",
+    () => validateExternalSmokeUrl("external_readonly_url", "https:\\\\demo.example.com\\path"),
+    "external_readonly_url must not include backslashes");
+
   check("validateExternalSmokeUrl accepts explicit default HTTPS port",
     validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com:443/path"),
     "https://demo.example.com/path");

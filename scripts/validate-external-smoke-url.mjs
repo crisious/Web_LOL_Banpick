@@ -192,6 +192,9 @@ function isLocalOrPrivateHost(host) {
 export function validateExternalSmokeUrl(label, rawUrl) {
   const safeLabel = label && !String(label).startsWith("--") ? String(label) : "external_url";
   const value = String(rawUrl || "").trim();
+  if (value.includes("\\")) {
+    throw new Error(`${safeLabel} must not include backslashes`);
+  }
   let parsed;
   try {
     parsed = new URL(value);
