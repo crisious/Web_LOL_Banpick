@@ -5,6 +5,7 @@ const fsp = require("fs/promises");
 const path = require("path");
 const { URL } = require("url");
 const { spawn } = require("child_process");
+const { validateManifest } = require("./lib/sample-manifest");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -38,21 +39,6 @@ function resolveSamplesDir(configuredDir, appRoot) {
 const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);
 const manifestPath = path.join(samplesDir, "manifest.json");
 const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
-const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;
-const REQUIRED_MANIFEST_ENTRY_FIELDS = [
-  "id",
-  "matchId",
-  "label",
-  "champion",
-  "publicAlias",
-  "collectedDate",
-  "theme",
-  "normalizedPath",
-  "analysisPath",
-  "notesPath",
-];
-const MANIFEST_ENTRY_PATH_FIELDS = ["normalizedPath", "analysisPath", "notesPath"];
-const MANIFEST_ENTRY_RAW_PATH_PATTERN = /(?:^|\/)(?:raw-|manifest\.json$)/;
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
@@ -2233,73 +2219,6 @@ function riotErrorPayload(error) {
     status: 500,
     body: { ok: false, error: error?.message || String(error) },
   };
-}
-
-function manifestValidationError(message) {
-  const error = new Error(message);
-  error.statusCode = 500;
-  error.payload = {
-    ok: false,
-    code: "SAMPLE_MANIFEST_INVALID",
-    error: message,
-  };
-  return error;
-}
-
-function validateManifestEntryPaths(sample) {
-  const expectedPrefix = `/data/samples/${sample.id}/`;
-  for (const field of MANIFEST_ENTRY_PATH_FIELDS) {
-    const publicPath = sample[field].trim();
-    if (!publicPath.startsWith(expectedPrefix)) {
-      return `Sample manifest entry path must stay under ${expectedPrefix}: ${field}.`;
-    }
-    const relativePath = publicPath.slice(expectedPrefix.length);
-    if (MANIFEST_ENTRY_RAW_PATH_PATTERN.test(relativePath)) {
-      return `Sample manifest entry path must not expose raw/internal files: ${field}.`;
-    }
-  }
-  return null;
-}
-
-function validateManifest(manifest) {
-  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
-    throw manifestValidationError("Sample manifest must be a JSON object.");
-  }
-  const hasSchemaVersion = Object.prototype.hasOwnProperty.call(manifest, "schemaVersion");
-  const schemaVersion = hasSchemaVersion ? manifest.schemaVersion : SAMPLE_MANIFEST_SCHEMA_VERSION;
-  if (schemaVersion !== SAMPLE_MANIFEST_SCHEMA_VERSION) {
-    throw manifestValidationError(`Unsupported sample manifest schemaVersion: ${String(schemaVersion)}.`);
-  }
-  const versionedManifest = hasSchemaVersion ? manifest : { schemaVersion, ...manifest };
-
-  if (!Array.isArray(manifest.samples)) {
-    throw manifestValidationError("Sample manifest must include a samples array.");
-  }
-
-  let invalidEntryMessage = null;
-  const hasInvalidEntry = versionedManifest.samples.some((sample) => {
-    if (!sample || typeof sample !== "object") {
-      return true;
-    }
-    const missingField = REQUIRED_MANIFEST_ENTRY_FIELDS.find((field) =>
-      typeof sample[field] !== "string" || sample[field].trim() === ""
-    );
-    if (missingField) {
-      invalidEntryMessage = `Sample manifest entry missing required field: ${missingField}.`;
-      return true;
-    }
-    const pathError = validateManifestEntryPaths(sample);
-    if (pathError) {
-      invalidEntryMessage = pathError;
-      return true;
-    }
-    return false;
-  });
-  if (hasInvalidEntry) {
-    throw manifestValidationError(invalidEntryMessage || "Sample manifest contains an invalid sample entry.");
-  }
-
-  return versionedManifest;
 }
 
 async function loadManifest() {

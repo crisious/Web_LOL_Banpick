@@ -5,20 +5,11 @@
 // JSON but not safe for the API to consume.
 
 import fs from "fs";
+import { createRequire } from "module";
 
+const require = createRequire(import.meta.url);
+const manifestModule = require("../../lib/sample-manifest.js");
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
-
-function extractFunctionSource(source, name) {
-  const startIdx = source.indexOf(`function ${name}(`);
-  if (startIdx < 0) throw new Error(`function ${name} not found`);
-  return extractSourceFromStart(source, startIdx, `function ${name}`);
-}
-
-function extractOptionalFunctionSource(source, name, fallbackSource) {
-  const startIdx = source.indexOf(`function ${name}(`);
-  if (startIdx < 0) return fallbackSource;
-  return extractSourceFromStart(source, startIdx, `function ${name}`);
-}
 
 function extractAsyncFunctionSource(source, name) {
   const startIdx = source.indexOf(`async function ${name}(`);
@@ -53,43 +44,19 @@ function extractSourceFromStart(source, startIdx, label) {
   throw new Error(`${label} not closed`);
 }
 
-function extractRequiredEntryFieldsDeclaration(source) {
-  const match = source.match(/const REQUIRED_MANIFEST_ENTRY_FIELDS = \[[\s\S]*?\];/);
-  if (!match) throw new Error("REQUIRED_MANIFEST_ENTRY_FIELDS declaration not found");
-  return match[0];
-}
-
-function extractManifestPathFieldsDeclaration(source) {
-  const match = source.match(/const MANIFEST_ENTRY_PATH_FIELDS = \[[\s\S]*?\];/);
-  if (match) return match[0];
-  return "const MANIFEST_ENTRY_PATH_FIELDS = [\"normalizedPath\", \"analysisPath\", \"notesPath\"];";
-}
-
-function extractManifestRawPathPatternDeclaration(source) {
-  const match = source.match(/const MANIFEST_ENTRY_RAW_PATH_PATTERN = [^\n]+;/);
-  if (match) return match[0];
-  return "const MANIFEST_ENTRY_RAW_PATH_PATTERN = /(?:^|\\/)(?:raw-|manifest\\.json$)/;";
-}
-
 function makeHelpers(readJson, writeJson, events) {
   return new Function(
     "readJson",
     "writeJson",
     "events",
+    "validateManifest",
     [
       "const manifestPath = '/samples/manifest.json';",
-      "const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;",
-      extractRequiredEntryFieldsDeclaration(serverSrc),
-      extractManifestPathFieldsDeclaration(serverSrc),
-      extractManifestRawPathPatternDeclaration(serverSrc),
-      extractFunctionSource(serverSrc, "manifestValidationError"),
-      extractOptionalFunctionSource(serverSrc, "validateManifestEntryPaths", "function validateManifestEntryPaths() { return null; }"),
-      extractFunctionSource(serverSrc, "validateManifest"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
       extractAsyncFunctionSource(serverSrc, "saveManifest"),
-      "return { manifestValidationError, validateManifest, loadManifest, saveManifest };",
+      "return { loadManifest, saveManifest };",
     ].join("\n"),
-  )(readJson, writeJson, events);
+  )(readJson, writeJson, events, manifestModule.validateManifest);
 }
 
 let pass = 0, fail = 0;
@@ -116,7 +83,7 @@ try {
 }
 
 if (helpers) {
-  const { validateManifest } = helpers;
+  const { validateManifest } = manifestModule;
   const validSample = {
     id: "sample-kr-1",
     matchId: "KR_1",
@@ -237,15 +204,10 @@ if (helpers) {
 }
 
 checkTrue("server declares sample manifest schema version",
-  /const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;/.test(serverSrc));
-checkTrue("server declares required manifest entry fields",
-  /const REQUIRED_MANIFEST_ENTRY_FIELDS = \[/.test(serverSrc));
-checkTrue("server declares manifest entry path fields",
-  /const MANIFEST_ENTRY_PATH_FIELDS = \[/.test(serverSrc));
-checkTrue("server declares manifest raw path exposure pattern",
-  /const MANIFEST_ENTRY_RAW_PATH_PATTERN = /.test(serverSrc));
-checkTrue("server declares manifest entry path validator",
-  /function validateManifestEntryPaths\(/.test(serverSrc));
+  /SAMPLE_MANIFEST_SCHEMA_VERSION/.test(fs.readFileSync(new URL("../../lib/sample-manifest.js", import.meta.url), "utf8")));
+checkTrue("server imports shared sample manifest validator",
+  /require\("\.\/lib\/sample-manifest"\)/.test(serverSrc) &&
+    /validateManifest/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error status",
   /sendJson\(res,\s*error\?\.statusCode\s*\|\|\s*500/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error payload",

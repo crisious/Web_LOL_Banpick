@@ -4,7 +4,16 @@
 // to a missing report file, the demo can load but fail at the first sample click.
 
 import fs from "fs";
+import { createRequire } from "module";
 
+const require = createRequire(import.meta.url);
+const {
+  REQUIRED_MANIFEST_ENTRY_FIELDS,
+  MANIFEST_ENTRY_PATH_FIELDS,
+  MANIFEST_ENTRY_RAW_PATH_PATTERN,
+  validateManifest,
+  validateManifestEntryPaths,
+} = require("../../lib/sample-manifest.js");
 const root = new URL("../..", import.meta.url);
 const manifest = JSON.parse(fs.readFileSync(new URL("../../data/samples/manifest.json", import.meta.url), "utf8"));
 const samples = Array.isArray(manifest.samples) ? manifest.samples : [];
@@ -25,25 +34,36 @@ function localPathFromPublicPath(publicPath) {
 
 const ids = samples.map((sample) => sample.id);
 const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
-const requiredEntryFields = ["id", "matchId", "label", "champion", "publicAlias", "collectedDate", "theme", "normalizedPath", "analysisPath", "notesPath"];
 const missingFieldEntries = samples.flatMap((sample) =>
-  requiredEntryFields
+  REQUIRED_MANIFEST_ENTRY_FIELDS
     .filter((field) => !sample[field])
     .map((field) => `${sample.id || "(missing id)"}:${field}`),
 );
+let validationError = null;
 const missingFiles = [];
 const invalidPublicPaths = [];
 const rawExposures = [];
 const invalidBundles = [];
 
+try {
+  validateManifest(manifest);
+} catch (error) {
+  validationError = error;
+}
+
 for (const sample of samples) {
-  for (const key of ["normalizedPath", "analysisPath", "notesPath"]) {
+  const pathError = sample && typeof sample === "object" ? validateManifestEntryPaths(sample) : null;
+  if (pathError) {
+    invalidPublicPaths.push(`${sample?.id || "(missing id)"}:${pathError}`);
+  }
+  for (const key of MANIFEST_ENTRY_PATH_FIELDS) {
     const publicPath = sample[key];
     if (typeof publicPath !== "string" || !publicPath.startsWith(`/data/samples/${sample.id}/`)) {
       invalidPublicPaths.push(`${sample.id}:${key}:${publicPath}`);
       continue;
     }
-    if (/raw-|manifest\.json/.test(publicPath)) {
+    const relativePath = publicPath.slice(`/data/samples/${sample.id}/`.length);
+    if (MANIFEST_ENTRY_RAW_PATH_PATTERN.test(relativePath)) {
       rawExposures.push(`${sample.id}:${key}:${publicPath}`);
     }
     const fileUrl = localPathFromPublicPath(publicPath);
@@ -68,6 +88,7 @@ for (const sample of samples) {
 
 check("manifest exposes samples array", Array.isArray(manifest.samples));
 check("manifest declares schemaVersion 1", manifest.schemaVersion === 1, `schemaVersion=${manifest.schemaVersion}`);
+check("stored manifest passes shared runtime validation", !validationError, validationError?.message || "");
 check("manifest keeps at least 19 stored samples", samples.length >= 19, `count=${samples.length}`);
 check("sample ids are unique", duplicateIds.length === 0, duplicateIds.join(", "));
 check("sample entries include required metadata", missingFieldEntries.length === 0, missingFieldEntries.slice(0, 10).join(", "));

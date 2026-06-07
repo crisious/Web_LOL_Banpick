@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 451건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 458건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -160,7 +160,7 @@ npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS
 npm run smoke:external:protected -- https://your-demo-url.example --token=your-demo-token  # 외부 HTTPS URL + 토큰 기준 protected smoke
 ```
 
-테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하는 방식 (소스 변경 0). 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
+테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하거나, `lib/sample-manifest.js`처럼 side-effect 없는 공통 모듈을 직접 import하는 방식으로 실행합니다. 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
 
 ## 로컬 실행
 
@@ -247,7 +247,7 @@ payload
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
 - 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음
 - JSON 저장 안정성: manifest와 sample bundle JSON은 임시 파일에 쓴 뒤 rename으로 교체해 부분 쓰기 손상을 줄임
-- Manifest 저장 안정성: 같은 프로세스 안에서는 queue로, 같은 `SAMPLES_DIR` 파일시스템을 공유하는 프로세스 간에는 `.manifest.lock` directory로 manifest read-modify-write 충돌을 줄이며 5분 이상 남은 stale lock은 회수 후 재시도. manifest는 `schemaVersion: 1`로 명시하고, legacy missing-version manifest는 v1로 정규화하며, 읽기/쓰기 전 shape, 지원 버전, sample entry 필수 metadata, per-sample public path prefix, raw/internal path 노출 여부를 검증해 오류는 `SAMPLE_MANIFEST_INVALID` 코드로 진단 가능
+- Manifest 저장 안정성: 같은 프로세스 안에서는 queue로, 같은 `SAMPLES_DIR` 파일시스템을 공유하는 프로세스 간에는 `.manifest.lock` directory로 manifest read-modify-write 충돌을 줄이며 5분 이상 남은 stale lock은 회수 후 재시도. manifest는 `schemaVersion: 1`로 명시하고, legacy missing-version manifest는 v1로 정규화하며, 읽기/쓰기 전 shape, 지원 버전, sample entry 필수 metadata, per-sample public path prefix, raw/internal path 노출 여부를 `lib/sample-manifest.js` 공통 모듈 기준으로 검증해 오류는 `SAMPLE_MANIFEST_INVALID` 코드로 진단 가능
 - 외부 데모 모드: 정적 파일 allowlist만 서빙하며 `.env`, `server.js`, `data/**`, `test-artifacts/**`, 문서 파일 직접 접근은 차단
 
 ## 현재 한계
