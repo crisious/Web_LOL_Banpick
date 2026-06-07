@@ -43,6 +43,7 @@ Expected:
 - referenced `styles.css` returns a CSS content type and `main.js` returns a JavaScript content type
 - referenced `styles.css` and `main.js` return `X-Content-Type-Options: nosniff`
 - smoke tokens are sent only to same-origin live/write API probes, not to page, asset, sample, blocked static, or cross-origin asset requests
+- smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes
 - `/api/samples` 200
 - `/healthz`, `/api/samples`, sample details, and live/write API responses use a JSON content type and return `X-Content-Type-Options: nosniff`
 - `/api/samples` includes at least 19 stored samples

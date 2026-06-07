@@ -152,7 +152,11 @@ expectJsonResponse(health, "GET /healthz");
 expect(health.body?.ok === true, "healthz ok=true");
 const actualMode = demoModeFromHealth(health.body);
 if (expectedMode) {
-  expect(actualMode === expectedMode, `public demo mode is ${expectedMode}`, `actual=${actualMode}`);
+  if (actualMode === expectedMode) {
+    pass(`public demo mode is ${expectedMode}`);
+  } else {
+    fatal(`public demo mode is ${expectedMode}`, `actual=${actualMode}`);
+  }
 }
 
 const home = await request("/");
