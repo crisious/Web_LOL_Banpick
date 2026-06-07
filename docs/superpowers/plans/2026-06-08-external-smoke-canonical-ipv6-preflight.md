@@ -143,7 +143,7 @@ Expected:
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` exited 0. Validator tests reported `109 passed, 0 failed`; the full suite reported `670 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -153,7 +153,9 @@ git commit -m "ci: reject normalized smoke ipv6 literals"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions QA artifact**
+Observed: committed and pushed `263dbf2 ci: reject normalized smoke ipv6 literals` to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA artifact**
 
 Run:
 
@@ -169,7 +171,9 @@ Expected:
 "conclusion": "success"
 ```
 
-- [ ] **Step 4: Download and scan the QA artifact**
+Observed: GitHub Actions QA run `27103545379` completed with conclusion `success` for head SHA `263dbf27df42f08aee044b8d2d0952801186806d`.
+
+- [x] **Step 4: Download and scan the QA artifact**
 
 Run:
 
@@ -188,15 +192,19 @@ Expected:
 no sensitive scan matches
 ```
 
+Observed: artifact `qa-automation-27103545379` / id `7467574445` downloaded to `/tmp/lol-ai-coach-canonical-ipv6.7HJRYy`. `qa-summary.json` recorded read-only smoke `150 passed / 0 failed`, and the sensitive scan returned no matches.
+
 - [ ] **Step 5: Commit and push documentation evidence**
 
 Run:
 
 ```bash
-git add docs/superpowers/plans/2026-06-08-external-smoke-canonical-ipv6-preflight.md "/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md"
+git add docs/superpowers/plans/2026-06-08-external-smoke-canonical-ipv6-preflight.md
 git commit -m "docs: record canonical ipv6 preflight qa"
 git push origin main
 ```
+
+Note: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` is maintained outside this git repository and was updated directly rather than staged.
 
 - [ ] **Step 6: Verify final sync**
 
