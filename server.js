@@ -39,6 +39,18 @@ const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);
 const manifestPath = path.join(samplesDir, "manifest.json");
 const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
 const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;
+const REQUIRED_MANIFEST_ENTRY_FIELDS = [
+  "id",
+  "matchId",
+  "label",
+  "champion",
+  "publicAlias",
+  "collectedDate",
+  "theme",
+  "normalizedPath",
+  "analysisPath",
+  "notesPath",
+];
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
@@ -2247,14 +2259,24 @@ function validateManifest(manifest) {
     throw manifestValidationError("Sample manifest must include a samples array.");
   }
 
-  const hasInvalidEntry = versionedManifest.samples.some((sample) =>
-    !sample || typeof sample !== "object" ||
-    typeof sample.id !== "string" ||
-    typeof sample.normalizedPath !== "string" ||
-    typeof sample.analysisPath !== "string"
-  );
+  let missingEntryField = null;
+  const hasInvalidEntry = versionedManifest.samples.some((sample) => {
+    if (!sample || typeof sample !== "object") {
+      return true;
+    }
+    const missingField = REQUIRED_MANIFEST_ENTRY_FIELDS.find((field) =>
+      typeof sample[field] !== "string" || sample[field].trim() === ""
+    );
+    if (missingField) {
+      missingEntryField = missingField;
+      return true;
+    }
+    return false;
+  });
   if (hasInvalidEntry) {
-    throw manifestValidationError("Sample manifest contains an invalid sample entry.");
+    throw manifestValidationError(missingEntryField
+      ? `Sample manifest entry missing required field: ${missingEntryField}.`
+      : "Sample manifest contains an invalid sample entry.");
   }
 
   return versionedManifest;

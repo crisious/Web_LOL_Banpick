@@ -47,6 +47,12 @@ function extractSourceFromStart(source, startIdx, label) {
   throw new Error(`${label} not closed`);
 }
 
+function extractRequiredEntryFieldsDeclaration(source) {
+  const match = source.match(/const REQUIRED_MANIFEST_ENTRY_FIELDS = \[[\s\S]*?\];/);
+  if (!match) throw new Error("REQUIRED_MANIFEST_ENTRY_FIELDS declaration not found");
+  return match[0];
+}
+
 function makeHelpers(readJson, writeJson, events) {
   return new Function(
     "readJson",
@@ -55,6 +61,7 @@ function makeHelpers(readJson, writeJson, events) {
     [
       "const manifestPath = '/samples/manifest.json';",
       "const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;",
+      extractRequiredEntryFieldsDeclaration(serverSrc),
       extractFunctionSource(serverSrc, "manifestValidationError"),
       extractFunctionSource(serverSrc, "validateManifest"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
@@ -91,8 +98,15 @@ if (helpers) {
   const { validateManifest } = helpers;
   const validSample = {
     id: "sample-kr-1",
+    matchId: "KR_1",
+    label: "sample-kr-1 · MID WIN",
+    champion: "Ahri",
+    publicAlias: "Tester#KR1",
+    collectedDate: "2026-06-07",
+    theme: "Runtime manifest validation fixture",
     normalizedPath: "/data/samples/sample-kr-1/normalized-match.json",
     analysisPath: "/data/samples/sample-kr-1/analysis-result.json",
+    notesPath: "/data/samples/sample-kr-1/sample-kr-1-notes.md",
   };
   const validManifest = {
     schemaVersion: 1,
@@ -112,7 +126,9 @@ if (helpers) {
   for (const [label, manifest, expectedMessage] of [
     ["manifest array is rejected", [], "Sample manifest must be a JSON object."],
     ["manifest without samples is rejected", {}, "Sample manifest must include a samples array."],
-    ["manifest with invalid entry is rejected", { samples: [{ id: "sample-kr-1" }] }, "Sample manifest contains an invalid sample entry."],
+    ["manifest with null entry is rejected", { samples: [null] }, "Sample manifest contains an invalid sample entry."],
+    ["manifest with missing metadata field is rejected", { samples: [{ ...validSample, label: "" }] }, "Sample manifest entry missing required field: label."],
+    ["manifest with missing notes path is rejected", { samples: [{ ...validSample, notesPath: "" }] }, "Sample manifest entry missing required field: notesPath."],
     ["manifest with unsupported schemaVersion is rejected", { schemaVersion: 2, samples: [] }, "Unsupported sample manifest schemaVersion: 2."],
   ]) {
     let caught = null;
@@ -197,6 +213,8 @@ if (helpers) {
 
 checkTrue("server declares sample manifest schema version",
   /const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;/.test(serverSrc));
+checkTrue("server declares required manifest entry fields",
+  /const REQUIRED_MANIFEST_ENTRY_FIELDS = \[/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error status",
   /sendJson\(res,\s*error\?\.statusCode\s*\|\|\s*500/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error payload",
