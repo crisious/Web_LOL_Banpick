@@ -40,6 +40,7 @@ Expected:
 - `/` references `styles.css` and `main.js`
 - the exact referenced `styles.css` and `main.js` URLs, including cache query strings, return 200
 - referenced `styles.css` returns a CSS content type and `main.js` returns a JavaScript content type
+- referenced `styles.css` and `main.js` return `X-Content-Type-Options: nosniff`
 - smoke tokens are sent only to the demo origin, not to cross-origin client assets
 - `/api/samples` 200
 - `/api/samples` includes at least 19 stored samples

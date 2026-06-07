@@ -77,6 +77,10 @@ function contentType(response) {
   return response.headers?.get?.("content-type")?.toLowerCase() || "";
 }
 
+function headerValue(response, name) {
+  return response.headers?.get?.(name)?.toLowerCase() || "";
+}
+
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   const requestOrigin = new URL(path, baseUrl).origin;
@@ -162,10 +166,12 @@ const stylesheetPath = referencedAssetPath(home.text, "styles.css");
 const stylesheet = await request(stylesheetPath);
 expect(stylesheet.response.status === 200, `GET ${stylesheetPath} returns 200`, `status=${stylesheet.response.status}`);
 expect(contentType(stylesheet.response).includes("text/css"), `${stylesheetPath} content-type is CSS`, `content-type=${contentType(stylesheet.response) || "(missing)"}`);
+expect(headerValue(stylesheet.response, "x-content-type-options") === "nosniff", `${stylesheetPath} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(stylesheet.response, "x-content-type-options") || "(missing)"}`);
 const appScriptPath = referencedAssetPath(home.text, "main.js");
 const appScript = await request(appScriptPath);
 expect(appScript.response.status === 200, `GET ${appScriptPath} returns 200`, `status=${appScript.response.status}`);
 expect(contentType(appScript.response).includes("javascript"), `${appScriptPath} content-type is JavaScript`, `content-type=${contentType(appScript.response) || "(missing)"}`);
+expect(headerValue(appScript.response, "x-content-type-options") === "nosniff", `${appScriptPath} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(appScript.response, "x-content-type-options") || "(missing)"}`);
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);

@@ -2847,13 +2847,17 @@ async function handleStatic(req, res, url) {
     const finalPath = stat.isDirectory() ? path.join(filePath, "index.html") : filePath;
     const ext = path.extname(finalPath).toLowerCase();
     const contentType = mimeTypes[ext] || "application/octet-stream";
+    const headers = {
+      "Content-Type": contentType,
+      "X-Content-Type-Options": "nosniff",
+    };
     if (req.method === "HEAD") {
-      res.writeHead(200, { "Content-Type": contentType });
+      res.writeHead(200, headers);
       res.end();
       return;
     }
     const stream = fs.createReadStream(finalPath);
-    res.writeHead(200, { "Content-Type": contentType });
+    res.writeHead(200, headers);
     stream.pipe(res);
   } catch (error) {
     sendText(res, 404, "Not found");
