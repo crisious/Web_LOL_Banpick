@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 
 const smokePath = fileURLToPath(new URL("../../scripts/external-demo-smoke.mjs", import.meta.url));
 const smokeSrc = fs.readFileSync(smokePath, "utf8");
+const { validateExternalSmokeUrl } = await import(new URL("../../scripts/validate-external-smoke-url.mjs", import.meta.url));
+const preflightDeps = { validateExternalUrl: validateExternalSmokeUrl };
 
 function extractFunctionSource(source, name) {
   const startIdx = source.indexOf(`function ${name}(`);
@@ -183,6 +185,14 @@ check("parseSmokeArgs accepts https when required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-https", "https://demo.example", "--expect-mode=readonly"], {}),
   { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000 });
 
+checkThrows("parseSmokeArgs rejects required external private URL via preflight",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--require-https", "https://10.0.0.5", "--expect-mode=readonly"], {}, preflightDeps),
+  "external_readonly_url must not point to a local or private network target");
+
+checkThrows("parseSmokeArgs rejects required external URL query via preflight",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--require-https", "https://demo.example.com?token=secret", "--expect-mode=protected"], {}, preflightDeps),
+  "external_protected_url must not include username/password, query string, or fragment");
+
 checkThrows("parseSmokeArgs requires token when requested",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "https://demo.example", "--expect-mode=protected"], {}),
   "--require-token needs --token or PUBLIC_DEMO_TOKEN");
@@ -263,6 +273,24 @@ check("CLI exits non-zero when --require-https gets http URL",
 check("CLI prints concise non-https URL failure without stack trace",
   nonHttpsRequiredUrl.stderr.trim(),
   "FAIL --require-https needs an https:// base URL");
+
+const privateRequiredExternalUrl = spawnSync(process.execPath, [
+  smokePath,
+  "--require-url",
+  "--require-https",
+  "--expect-mode=readonly",
+  "https://10.0.0.5",
+], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero when required external URL is private",
+  privateRequiredExternalUrl.status,
+  1);
+
+check("CLI prints concise private external URL failure without stack trace",
+  privateRequiredExternalUrl.stderr.trim(),
+  "FAIL external_readonly_url must not point to a local or private network target");
 
 const invalidBaseUrl = spawnSync(process.execPath, [
   smokePath,

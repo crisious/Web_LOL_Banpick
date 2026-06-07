@@ -3,8 +3,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { redactUrlForEvidence } from "../lib/qa-evidence-redaction.mjs";
+import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 
-function parseSmokeArgs(argv, env = {}) {
+function parseSmokeArgs(argv, env = {}, deps = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
   const args = argv.slice(2);
   const explicitBaseUrl = args.find((arg) => !arg.startsWith("--"));
@@ -26,6 +27,10 @@ function parseSmokeArgs(argv, env = {}) {
   }
   if (requireHttps && parsedBaseUrl.protocol !== "https:") {
     throw new Error("--require-https needs an https:// base URL");
+  }
+  if (requireUrl && requireHttps) {
+    const modeForLabel = args.find((arg) => arg.startsWith("--expect-mode="))?.slice("--expect-mode=".length).trim().toLowerCase();
+    deps.validateExternalUrl?.(modeForLabel === "protected" ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
   const tokenArg = args.find((arg) => arg.startsWith("--token="));
   const demoToken = (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim();
@@ -120,7 +125,7 @@ function parseSmokeArgs(argv, env = {}) {
 
 let parsedArgs;
 try {
-  parsedArgs = parseSmokeArgs(process.argv, process.env);
+  parsedArgs = parseSmokeArgs(process.argv, process.env, { validateExternalUrl: validateExternalSmokeUrl });
 } catch (error) {
   console.error(`FAIL ${error.message || error}`);
   process.exit(1);
