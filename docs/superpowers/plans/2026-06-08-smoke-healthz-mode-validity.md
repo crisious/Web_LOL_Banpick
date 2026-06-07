@@ -93,7 +93,7 @@ Expected: focused smoke tests pass and the full suite reports zero failures.
 
 Observed: `node --check scripts/external-demo-smoke.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && npm test && git diff --check` exited 0. Focused smoke tests reported `103 passed, 0 failed`; the full suite reported `702 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -103,7 +103,9 @@ git commit -m "ci: validate healthz demo mode in smoke"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify remote QA artifact**
+Observed: committed and pushed `be98d0d ci: validate healthz demo mode in smoke` to `origin/main`.
+
+- [x] **Step 4: Verify remote QA artifact**
 
 Run:
 
@@ -114,3 +116,5 @@ gh run download <run-id> -n qa-automation-<run-id> -D <tmp-dir>
 ```
 
 Expected: run conclusion `success`, artifact contains `qa-summary.json`, and the read-only smoke summary is `150 passed / 0 failed` with no sensitive token/header matches.
+
+Observed: GitHub Actions QA run `27104451579` completed with conclusion `success` for head SHA `be98d0dae55d46af43c8884bf633a46ccb34f3cf`. Artifact `qa-automation-27104451579` / id `7467861662` downloaded to `/tmp/lol-ai-coach-smoke-healthz-validity.60NlbJ`; `qa-summary.json` recorded read-only smoke `150 passed / 0 failed`, and the sensitive scan returned no matches.
