@@ -88,7 +88,7 @@ Expected: all commands exit 0.
 
 Observed: workflow contract test reported 25 passed / 0 failed, `npm test` reported 546 passed / 0 failed across 23 test files, and `git diff --check` exited 0.
 
-- [ ] **Step 3: Commit, push, and verify remote QA**
+- [x] **Step 3: Commit, push, and verify remote QA**
 
 Run:
 
@@ -100,3 +100,5 @@ gh run watch <run-id> --exit-status
 ```
 
 Expected: push-triggered `QA` still passes; the new guard is skipped unless manual dispatch supplies `external_protected_url` without `PUBLIC_DEMO_TOKEN`.
+
+Observed: commit `d09e6d1` pushed to `origin/main`; remote `QA` run `27098318459` passed. Push-triggered protected/external smoke steps, including `Require token for external protected smoke`, were skipped as expected. Artifact `qa-automation-27098318459` included `qa-summary.json`, readonly `smoke-report.json`, and readonly `smoke-run.json`; summary reported 150 passed / 0 failed and sensitive pattern search found no matches.
