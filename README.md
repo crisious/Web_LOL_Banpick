@@ -177,6 +177,8 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 요청에는 입력한 원본 URL을 사용하지만, 리포트에 남는 `baseUrl`은 URL userinfo, query string, fragment를 redacted 값으로 바꿉니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
+Direct smoke의 `--report-json=<path>`는 `test-artifacts/.../*.json` 아래 상대 경로만 허용합니다. 절대 경로, `..` traversal, artifact tree 밖의 경로, `.json`이 아닌 대상은 네트워크 요청이나 리포트 파일 쓰기 전에 `FAIL --report-json must be a relative .json path under test-artifacts`로 종료합니다.
+
 Direct smoke와 `smoke:report:*` runner는 positional base URL을 최대 1개만 받습니다. URL을 두 개 이상 넘기면 첫 번째 URL만 사용해 잘못된 QA 근거를 만들지 않고, 네트워크 요청 전에 즉시 실패합니다.
 
 `--expect-mode=<mode>`, `--report-json=<path>` 같은 direct smoke singleton 옵션과 runner의 `--mode=<mode>`, `--output-root=<path>`는 한 번만 지정할 수 있습니다. 같은 옵션을 두 번 넘기면 첫 번째 값만 사용해 잘못된 QA 산출물을 만들지 않고 즉시 실패합니다.

@@ -96,6 +96,8 @@ npm run smoke:external:readonly -- https://demo.example.com --report-json=test-a
 
 The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. It does not store the demo token, Authorization header, or API response bodies.
 
+Direct smoke `--report-json=<path>` accepts only relative `test-artifacts/.../*.json` paths. Absolute paths, `..` traversal, paths outside the artifact tree, or non-JSON targets fail before any network request or report write with `FAIL --report-json must be a relative .json path under test-artifacts`.
+
 Direct smoke and `smoke:report:*` commands accept at most one positional base URL. Extra positional URL arguments fail before any network request or report artifact creation, so operators do not accidentally collect evidence for the wrong URL.
 
 Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json=<path>`, plus runner-owned singleton options such as `--mode=<mode>` and `--output-root=<path>`, accept only one value. Duplicate singleton options fail before network requests or artifact creation, so the first value cannot silently win over a later operator correction.

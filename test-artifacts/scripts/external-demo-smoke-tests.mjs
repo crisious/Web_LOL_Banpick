@@ -3,7 +3,6 @@
 import { spawn, spawnSync } from "node:child_process";
 import fs from "fs";
 import http from "node:http";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -180,6 +179,22 @@ checkThrows("parseSmokeArgs rejects invalid expected mode",
 checkThrows("parseSmokeArgs rejects empty report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json="], {}),
   "--report-json needs a file path");
+
+checkThrows("parseSmokeArgs rejects absolute report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=/tmp/smoke-report.json"], {}),
+  "--report-json must be a relative .json path under test-artifacts");
+
+checkThrows("parseSmokeArgs rejects non-artifact report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=smoke-report.json"], {}),
+  "--report-json must be a relative .json path under test-artifacts");
+
+checkThrows("parseSmokeArgs rejects traversal report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/../smoke-report.json"], {}),
+  "--report-json must be a relative .json path under test-artifacts");
+
+checkThrows("parseSmokeArgs rejects non-json report path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.txt"], {}),
+  "--report-json must be a relative .json path under test-artifacts");
 
 checkThrows("parseSmokeArgs requires an explicit URL when requested",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--expect-mode=readonly"], {}),
@@ -853,7 +868,8 @@ check("CLI reports unexpected sample list error code",
   wrongSampleListErrorCode.stderr.includes("FAIL sample list error returns SAMPLE_MANIFEST_INVALID"),
   true);
 
-const reportDir = fs.mkdtempSync(path.join(os.tmpdir(), "lol-smoke-report-"));
+const reportDir = path.join("test-artifacts", "tmp", `lol-smoke-report-${process.pid}-${Date.now()}`);
+fs.rmSync(reportDir, { recursive: true, force: true });
 const passedReportPath = path.join(reportDir, "passed", "smoke.json");
 const failedReportPath = path.join(reportDir, "failed", "smoke.json");
 
@@ -948,6 +964,7 @@ const failingSampleListReport = await runNode([
 await new Promise((resolve) => failingSampleListReportServer.close(resolve));
 
 const failedReport = readJsonFileIfExists(failedReportPath);
+fs.rmSync(reportDir, { recursive: true, force: true });
 
 check("CLI exits non-zero when writing failed smoke report JSON",
   failingSampleListReport.status,
@@ -972,6 +989,27 @@ const closedPort = await new Promise((resolve) => {
     server.close(() => resolve(port));
   });
 });
+
+const unsafeReportJsonPath = "smoke-report-unsafe.json";
+fs.rmSync(unsafeReportJsonPath, { force: true });
+const unsafeReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  `--report-json=${unsafeReportJsonPath}`,
+]);
+
+check("CLI exits non-zero for unsafe report JSON path",
+  unsafeReportJson.status,
+  1);
+
+check("CLI reports unsafe report JSON path without network request",
+  unsafeReportJson.stderr.includes("FAIL --report-json must be a relative .json path under test-artifacts"),
+  true);
+
+check("CLI unsafe report JSON path does not create file",
+  fs.existsSync(unsafeReportJsonPath),
+  false);
 
 const unreachableDemo = await runNode([
   smokePath,

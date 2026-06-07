@@ -16,6 +16,22 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     return matches[0];
   }
 
+  function normalizeReportJsonPath(reportPath) {
+    const raw = reportPath.trim();
+    if (!raw) {
+      throw new Error("--report-json needs a file path");
+    }
+    const comparable = raw.replace(/\\/g, "/");
+    if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || comparable.split("/").includes("..")) {
+      throw new Error("--report-json must be a relative .json path under test-artifacts");
+    }
+    const normalized = comparable.split("/").filter(Boolean).join("/");
+    if (!normalized.startsWith("test-artifacts/") || !normalized.toLowerCase().endsWith(".json")) {
+      throw new Error("--report-json must be a relative .json path under test-artifacts");
+    }
+    return normalized;
+  }
+
   const booleanOptions = new Set(["--require-url", "--require-https", "--require-token"]);
   const valueOptionPrefixes = [
     "--token=",
@@ -85,7 +101,9 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
   const sampleListErrorStatusArg = singleOptionArg(args, "--expect-sample-list-error-status=");
   const sampleListErrorMessageArg = singleOptionArg(args, "--expect-sample-list-error-message=");
   const reportJsonArg = singleOptionArg(args, "--report-json=");
-  const reportJsonPath = reportJsonArg ? reportJsonArg.slice("--report-json=".length).trim() : "";
+  const reportJsonPath = reportJsonArg
+    ? normalizeReportJsonPath(reportJsonArg.slice("--report-json=".length))
+    : "";
   const hasSampleDetailErrorArg = Boolean(
     sampleDetailErrorIdArg ||
       sampleDetailErrorCodeArg ||
@@ -121,9 +139,6 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
   }
   if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1) {
     throw new Error("--timeout-ms must be a positive integer");
-  }
-  if (reportJsonArg && !reportJsonPath) {
-    throw new Error("--report-json needs a file path");
   }
   if (expectedSampleDetailError) {
     if (!expectedSampleDetailError.id) {
