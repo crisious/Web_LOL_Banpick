@@ -123,7 +123,7 @@ Expected: syntax check, focused external smoke suite, full test suite, and white
 
 Observed: `node --check scripts/external-demo-smoke.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && npm test && git diff --check` exited 0. External demo smoke tests reported `117 passed, 0 failed`; full suite reported `725 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -135,7 +135,9 @@ git push origin main
 
 Expected: commit lands on `main` and push triggers GitHub Actions QA.
 
-- [ ] **Step 4: Verify remote QA and artifact**
+Observed: committed `c28b778` (`ci: reject unknown smoke options`) on `main` and pushed it to `origin/main`.
+
+- [x] **Step 4: Verify remote QA and artifact**
 
 Run:
 
@@ -146,3 +148,5 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 ```
 
 Expected: latest run for the pushed head SHA succeeds, uploaded artifact contains `qa-summary.json`, read-only smoke reports zero failures, and sensitive-value search has no matches.
+
+Observed: GitHub Actions QA run `27105869992` for head SHA `c28b7785966566449b3a951ea7c601b1e0076dcb` completed with conclusion `success`. Artifact `qa-automation-27105869992` (ID `7468329641`) contained `qa-summary.json`, `smoke-report.json`, and `smoke-run.json`; `qa-summary.json` reported read-only smoke `155 passed, 0 failed`. Sensitive-value scan over the downloaded artifact had no matches for token, Riot key, match id, URL credential/query, Authorization, or lock key patterns.
