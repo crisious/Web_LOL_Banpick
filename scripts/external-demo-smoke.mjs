@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import fs from "node:fs";
+import path from "node:path";
+
 function parseSmokeArgs(argv, env = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
   const args = argv.slice(2);
@@ -41,6 +44,8 @@ function parseSmokeArgs(argv, env = {}) {
   const sampleListErrorCodeArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-code="));
   const sampleListErrorStatusArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-status="));
   const sampleListErrorMessageArg = args.find((arg) => arg.startsWith("--expect-sample-list-error-message="));
+  const reportJsonArg = args.find((arg) => arg.startsWith("--report-json="));
+  const reportJsonPath = reportJsonArg ? reportJsonArg.slice("--report-json=".length).trim() : "";
   const hasSampleDetailErrorArg = Boolean(
     sampleDetailErrorIdArg ||
       sampleDetailErrorCodeArg ||
@@ -77,6 +82,9 @@ function parseSmokeArgs(argv, env = {}) {
   if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1) {
     throw new Error("--timeout-ms must be a positive integer");
   }
+  if (reportJsonArg && !reportJsonPath) {
+    throw new Error("--report-json needs a file path");
+  }
   if (expectedSampleDetailError) {
     if (!expectedSampleDetailError.id) {
       throw new Error("--expect-sample-detail-error-id is required when sample detail error options are set");
@@ -105,6 +113,7 @@ function parseSmokeArgs(argv, env = {}) {
     requestTimeoutMs,
     ...(expectedSampleDetailError ? { expectedSampleDetailError } : {}),
     ...(expectedSampleListError ? { expectedSampleListError } : {}),
+    ...(reportJsonPath ? { reportJsonPath } : {}),
   };
 }
 
@@ -116,8 +125,12 @@ try {
   process.exit(1);
 }
 
-const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError, expectedSampleListError } = parsedArgs;
+const { baseUrl, demoToken, expectedMode, minSamples, requestTimeoutMs, expectedSampleDetailError, expectedSampleListError, reportJsonPath } = parsedArgs;
 const baseOrigin = new URL(baseUrl).origin;
+const startedAt = new Date().toISOString();
+const reportChecks = [];
+let observedMode = "";
+let reportWritten = false;
 
 function url(path) {
   return new URL(path, baseUrl).toString();
@@ -204,10 +217,12 @@ async function request(path, options = {}) {
 }
 
 function pass(label) {
+  recordCheck("pass", label);
   console.log(`PASS ${label}`);
 }
 
 function fail(label, detail) {
+  recordCheck("fail", label, detail);
   console.error(`FAIL ${label}`);
   if (detail) console.error(`  ${detail}`);
   process.exitCode = 1;
@@ -215,7 +230,34 @@ function fail(label, detail) {
 
 function fatal(label, detail) {
   fail(label, detail);
+  writeReport(process.exitCode || 1);
   process.exit(process.exitCode || 1);
+}
+
+function recordCheck(status, label, detail = "") {
+  reportChecks.push(detail ? { status, label, detail } : { status, label });
+}
+
+function writeReport(exitCode) {
+  if (!reportJsonPath || reportWritten) return;
+  reportWritten = true;
+  const passed = reportChecks.filter((item) => item.status === "pass").length;
+  const failed = reportChecks.filter((item) => item.status === "fail").length;
+  const reportPath = path.resolve(reportJsonPath);
+  const payload = {
+    schemaVersion: 1,
+    baseUrl,
+    expectedMode,
+    actualMode: observedMode,
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    status: exitCode ? "failed" : "passed",
+    exitCode,
+    summary: { passed, failed },
+    checks: reportChecks,
+  };
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
 function expect(condition, label, detail) {
@@ -243,6 +285,7 @@ expectFatal(contentType(health.response).includes("application/json"), "GET /hea
 expect(headerValue(health.response, "x-content-type-options") === "nosniff", "GET /healthz has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(health.response, "x-content-type-options") || "(missing)"}`);
 expectFatal(health.body?.ok === true, "healthz ok=true");
 const actualMode = demoModeFromHealth(health.body);
+observedMode = actualMode;
 expectFatal(["full", "protected", "readonly"].includes(actualMode), "public demo mode is known", `actual=${actualMode}`);
 if (expectedMode) {
   if (actualMode === expectedMode) {
@@ -256,9 +299,11 @@ if (expectedSampleListError) {
   const samplesOut = await request("/api/samples");
   expectStructuredErrorResponse(samplesOut, "sample list error", expectedSampleListError);
   if (process.exitCode) {
+    writeReport(process.exitCode);
     process.exit(process.exitCode);
   }
   console.log(`External demo sample list error smoke passed for ${baseUrl}`);
+  writeReport(0);
   process.exit(0);
 }
 
@@ -271,9 +316,11 @@ if (expectedSampleDetailError) {
     expectedSampleDetailError,
   );
   if (process.exitCode) {
+    writeReport(process.exitCode);
     process.exit(process.exitCode);
   }
   console.log(`External demo sample detail error smoke passed for ${baseUrl}`);
+  writeReport(0);
   process.exit(0);
 }
 
@@ -391,7 +438,9 @@ for (const probe of liveApiProbes) {
 }
 
 if (process.exitCode) {
+  writeReport(process.exitCode);
   process.exit(process.exitCode);
 }
 
 console.log(`External demo smoke passed for ${baseUrl}`);
+writeReport(0);

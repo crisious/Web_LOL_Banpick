@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 490건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 502건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -158,6 +158,8 @@ npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:protected  # 로컬 protected 외부 데모 안전성/API smoke
 npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 상세 기준 read-only smoke
 npm run smoke:external:protected -- https://your-demo-url.example --token=your-demo-token  # 외부 HTTPS URL + 토큰 기준 protected smoke
+npm run smoke:readonly -- --report-json=test-artifacts/qa-automation/smoke-readonly.json  # 콘솔 PASS/FAIL과 동일한 체크 결과를 JSON으로 저장
+npm run smoke:external:readonly -- https://your-demo-url.example --report-json=test-artifacts/qa-automation/external-readonly.json
 
 # invalid manifest의 샘플 상세 구조화 오류 smoke
 npm run smoke:manifest:detail-error
@@ -167,6 +169,8 @@ npm run smoke:manifest:list-error
 npm run smoke:external:manifest:detail-error -- https://your-demo-url.example
 npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 ```
+
+`--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
 테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하거나, `lib/sample-manifest.js`처럼 side-effect 없는 공통 모듈을 직접 import하는 방식으로 실행합니다. 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
 

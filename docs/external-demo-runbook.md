@@ -83,6 +83,14 @@ npm run smoke:external:readonly -- https://your-tunnel-url.trycloudflare.com
 
 If the external URL is unreachable, the smoke should fail fast on the first network request with `FAIL request /healthz failed` rather than a Node stack trace or a long cascade of endpoint failures.
 Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>` only when debugging slow tunnels.
+Append `--report-json=<path>` when the QA result needs to be shared or archived:
+
+```bash
+npm run smoke:readonly -- --report-json=test-artifacts/qa-automation/smoke-readonly.json
+npm run smoke:external:readonly -- https://demo.example.com --report-json=test-artifacts/qa-automation/external-readonly.json
+```
+
+The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. It does not store the demo token, Authorization header, or API response bodies.
 
 4. Share URL only after smoke passes.
 

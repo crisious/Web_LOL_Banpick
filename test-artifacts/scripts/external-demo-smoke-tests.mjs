@@ -3,6 +3,8 @@
 import { spawn, spawnSync } from "node:child_process";
 import fs from "fs";
 import http from "node:http";
+import os from "node:os";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const smokePath = fileURLToPath(new URL("../../scripts/external-demo-smoke.mjs", import.meta.url));
@@ -80,6 +82,11 @@ function completeSampleDetail() {
   };
 }
 
+function readJsonFileIfExists(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
 check("parseSmokeArgs reads base URL, token, and expected mode",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--token=abc", "--expect-mode=readonly", "--min-samples=19", "--timeout-ms=5000"], {}),
   { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "readonly", minSamples: 19, requestTimeoutMs: 5000 });
@@ -140,6 +147,10 @@ check("parseSmokeArgs reads expected sample list error probe",
     },
   });
 
+check("parseSmokeArgs reads report JSON path",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "https://demo.example", "--expect-mode=readonly", "--report-json=test-artifacts/tmp/smoke-report.json"], {}),
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly", minSamples: 1, requestTimeoutMs: 10000, reportJsonPath: "test-artifacts/tmp/smoke-report.json" });
+
 checkThrows("parseSmokeArgs rejects invalid base URL",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "not-a-url"], {}),
   "base URL must be an http(s) URL");
@@ -151,6 +162,10 @@ checkThrows("parseSmokeArgs rejects non-http base URL",
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");
+
+checkThrows("parseSmokeArgs rejects empty report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json="], {}),
+  "--report-json needs a file path");
 
 checkThrows("parseSmokeArgs requires an explicit URL when requested",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--expect-mode=readonly"], {}),
@@ -601,6 +616,113 @@ check("CLI exits non-zero when sample list error code differs",
 
 check("CLI reports unexpected sample list error code",
   wrongSampleListErrorCode.stderr.includes("FAIL sample list error returns SAMPLE_MANIFEST_INVALID"),
+  true);
+
+const reportDir = fs.mkdtempSync(path.join(os.tmpdir(), "lol-smoke-report-"));
+const passedReportPath = path.join(reportDir, "passed", "smoke.json");
+const failedReportPath = path.join(reportDir, "failed", "smoke.json");
+
+const sampleListReportServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples") {
+    return sendJson(500, {
+      ok: false,
+      code: "SAMPLE_MANIFEST_INVALID",
+      error: "Sample manifest entry missing required field: label.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => sampleListReportServer.listen(0, "127.0.0.1", resolve));
+const sampleListReportUrl = `http://127.0.0.1:${sampleListReportServer.address().port}`;
+const sampleListReport = await runNode([
+  smokePath,
+  sampleListReportUrl,
+  "--expect-mode=readonly",
+  "--token=secret-smoke-token",
+  "--expect-sample-list-error-status=500",
+  "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+  `--report-json=${passedReportPath}`,
+]);
+await new Promise((resolve) => sampleListReportServer.close(resolve));
+
+const passedReport = readJsonFileIfExists(passedReportPath);
+
+check("CLI succeeds when writing passed smoke report JSON",
+  sampleListReport.status,
+  0);
+
+check("CLI writes passed smoke report JSON",
+  passedReport?.status,
+  "passed");
+
+check("passed smoke report records summary counts",
+  passedReport?.summary?.failed === 0 && passedReport?.summary?.passed > 0,
+  true);
+
+check("passed smoke report records observed mode",
+  passedReport?.actualMode,
+  "readonly");
+
+check("passed smoke report records checked labels",
+  Array.isArray(passedReport?.checks) && passedReport.checks.some((item) => item.status === "pass" && item.label === "sample list error returns SAMPLE_MANIFEST_INVALID"),
+  true);
+
+check("passed smoke report excludes demo token",
+  JSON.stringify(passedReport).includes("secret-smoke-token"),
+  false);
+
+const failingSampleListReportServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/api/samples") {
+    return sendJson(500, {
+      ok: false,
+      code: "WRONG_MANIFEST_CODE",
+      error: "Sample manifest entry missing required field: label.",
+    });
+  }
+  return sendJson(404, { ok: false, error: "not found" });
+});
+
+await new Promise((resolve) => failingSampleListReportServer.listen(0, "127.0.0.1", resolve));
+const failingSampleListReportUrl = `http://127.0.0.1:${failingSampleListReportServer.address().port}`;
+const failingSampleListReport = await runNode([
+  smokePath,
+  failingSampleListReportUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-list-error-status=500",
+  "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+  `--report-json=${failedReportPath}`,
+]);
+await new Promise((resolve) => failingSampleListReportServer.close(resolve));
+
+const failedReport = readJsonFileIfExists(failedReportPath);
+
+check("CLI exits non-zero when writing failed smoke report JSON",
+  failingSampleListReport.status,
+  1);
+
+check("CLI writes failed smoke report JSON",
+  failedReport?.status,
+  "failed");
+
+check("failed smoke report records exit code",
+  failedReport?.exitCode,
+  1);
+
+check("failed smoke report records failing check",
+  Array.isArray(failedReport?.checks) && failedReport.checks.some((item) => item.status === "fail" && item.label === "sample list error returns SAMPLE_MANIFEST_INVALID"),
   true);
 
 const closedPort = await new Promise((resolve) => {
