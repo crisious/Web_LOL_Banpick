@@ -140,8 +140,11 @@ export function parseRunnerArgs(argv, env = {}) {
   if (isExternal) {
     validateExternalSmokeUrl(isProtected ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
+  const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
+  if (!isProtected && tokenArg) {
+    throw new Error("--token is only accepted for protected smoke reports");
+  }
   if (isProtected) {
-    const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
     const demoToken = tokenArg ? inlineTokenValue(extraSmokeArgs) : (env.PUBLIC_DEMO_TOKEN || "").trim();
     if (!demoToken) {
       throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");

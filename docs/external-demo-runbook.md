@@ -106,6 +106,8 @@ The `smoke:report:*` runner only forwards allowlisted smoke pass-through options
 
 Protected report runners, `smoke:report:protected` and `smoke:report:external:protected`, require a non-empty `--token=<value>` or `PUBLIC_DEMO_TOKEN` before artifact creation. An empty inline `--token=` does not fall back to the environment token and fails immediately with `FAIL --require-token needs --token or PUBLIC_DEMO_TOKEN`.
 
+Read-only report runners, `smoke:report:readonly` and `smoke:report:external:readonly`, reject `--token` pass-through options before artifact creation. Tokens are meaningful only for protected report modes; passing one to a read-only report fails with `FAIL --token is only accepted for protected smoke reports`.
+
 For repeatable QA evidence, prefer the report runner commands. They create a top-level `test-artifacts/qa-automation/qa-summary.json`, plus `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
 
 ```bash

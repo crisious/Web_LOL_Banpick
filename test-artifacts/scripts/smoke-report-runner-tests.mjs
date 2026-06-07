@@ -138,6 +138,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected", "--token=   "], { PUBLIC_DEMO_TOKEN: "env-token" }),
     "--require-token needs --token or PUBLIC_DEMO_TOKEN");
 
+  checkThrows("parseRunnerArgs rejects readonly mode with token pass-through",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--token=secret"], {}),
+    "--token is only accepted for protected smoke reports");
+
+  checkThrows("parseRunnerArgs rejects external readonly mode with token pass-through",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly", "https://demo.example.com", "--token=secret"], {}),
+    "--token is only accepted for protected smoke reports");
+
   checkThrows("parseRunnerArgs rejects non-https external URL",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
     "external-protected smoke report needs an https:// base URL");
@@ -209,6 +217,15 @@ if (fs.existsSync(runnerPath)) {
     "--require-token needs --token or PUBLIC_DEMO_TOKEN");
   check("missing protected token does not create output root",
     fs.existsSync(missingTokenOutputRoot),
+    false);
+
+  const readonlyTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-readonly-token");
+  fs.rmSync(readonlyTokenOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects readonly token before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", `--output-root=${readonlyTokenOutputRoot}`, "--token=secret"], {}),
+    "--token is only accepted for protected smoke reports");
+  check("readonly token rejection does not create output root",
+    fs.existsSync(readonlyTokenOutputRoot),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
