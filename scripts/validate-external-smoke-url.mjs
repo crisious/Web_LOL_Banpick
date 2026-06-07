@@ -32,6 +32,10 @@ function isPathDotSegment(segment) {
   return dotDecoded === "." || dotDecoded === "..";
 }
 
+function hasUnicodeWhitespace(value) {
+  return /[\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/u.test(value);
+}
+
 function isPrivateOrLocalIpv4(host) {
   const parts = ipv4Parts(host);
   if (!parts) return false;
@@ -211,6 +215,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   const value = rawValue.trim();
   if (/[\u0000-\u001f\u007f]/.test(rawValue)) {
     throw new Error(`${safeLabel} must not include ASCII control characters`);
+  }
+  if (hasUnicodeWhitespace(rawValue)) {
+    throw new Error(`${safeLabel} must not include Unicode whitespace`);
   }
   if (value.includes(" ")) {
     throw new Error(`${safeLabel} must not include unencoded spaces`);
