@@ -14,6 +14,12 @@ function extractFunctionSource(source, name) {
   return extractSourceFromStart(source, startIdx, `function ${name}`);
 }
 
+function extractOptionalFunctionSource(source, name, fallbackSource) {
+  const startIdx = source.indexOf(`function ${name}(`);
+  if (startIdx < 0) return fallbackSource;
+  return extractSourceFromStart(source, startIdx, `function ${name}`);
+}
+
 function extractAsyncFunctionSource(source, name) {
   const startIdx = source.indexOf(`async function ${name}(`);
   if (startIdx < 0) throw new Error(`async function ${name} not found`);
@@ -53,6 +59,18 @@ function extractRequiredEntryFieldsDeclaration(source) {
   return match[0];
 }
 
+function extractManifestPathFieldsDeclaration(source) {
+  const match = source.match(/const MANIFEST_ENTRY_PATH_FIELDS = \[[\s\S]*?\];/);
+  if (match) return match[0];
+  return "const MANIFEST_ENTRY_PATH_FIELDS = [\"normalizedPath\", \"analysisPath\", \"notesPath\"];";
+}
+
+function extractManifestRawPathPatternDeclaration(source) {
+  const match = source.match(/const MANIFEST_ENTRY_RAW_PATH_PATTERN = [^\n]+;/);
+  if (match) return match[0];
+  return "const MANIFEST_ENTRY_RAW_PATH_PATTERN = /(?:^|\\/)(?:raw-|manifest\\.json$)/;";
+}
+
 function makeHelpers(readJson, writeJson, events) {
   return new Function(
     "readJson",
@@ -62,7 +80,10 @@ function makeHelpers(readJson, writeJson, events) {
       "const manifestPath = '/samples/manifest.json';",
       "const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;",
       extractRequiredEntryFieldsDeclaration(serverSrc),
+      extractManifestPathFieldsDeclaration(serverSrc),
+      extractManifestRawPathPatternDeclaration(serverSrc),
       extractFunctionSource(serverSrc, "manifestValidationError"),
+      extractOptionalFunctionSource(serverSrc, "validateManifestEntryPaths", "function validateManifestEntryPaths() { return null; }"),
       extractFunctionSource(serverSrc, "validateManifest"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
       extractAsyncFunctionSource(serverSrc, "saveManifest"),
@@ -129,6 +150,10 @@ if (helpers) {
     ["manifest with null entry is rejected", { samples: [null] }, "Sample manifest contains an invalid sample entry."],
     ["manifest with missing metadata field is rejected", { samples: [{ ...validSample, label: "" }] }, "Sample manifest entry missing required field: label."],
     ["manifest with missing notes path is rejected", { samples: [{ ...validSample, notesPath: "" }] }, "Sample manifest entry missing required field: notesPath."],
+    ["manifest path outside sample directory is rejected", { samples: [{ ...validSample, normalizedPath: "/data/samples/other-sample/normalized-match.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: normalizedPath."],
+    ["manifest path without public prefix is rejected", { samples: [{ ...validSample, analysisPath: "data/samples/sample-kr-1/analysis-result.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: analysisPath."],
+    ["manifest raw path exposure is rejected", { samples: [{ ...validSample, analysisPath: "/data/samples/sample-kr-1/raw-match.json" }] }, "Sample manifest entry path must not expose raw/internal files: analysisPath."],
+    ["manifest manifest-file exposure is rejected", { samples: [{ ...validSample, notesPath: "/data/samples/sample-kr-1/manifest.json" }] }, "Sample manifest entry path must not expose raw/internal files: notesPath."],
     ["manifest with unsupported schemaVersion is rejected", { schemaVersion: 2, samples: [] }, "Unsupported sample manifest schemaVersion: 2."],
   ]) {
     let caught = null;
@@ -215,6 +240,12 @@ checkTrue("server declares sample manifest schema version",
   /const SAMPLE_MANIFEST_SCHEMA_VERSION = 1;/.test(serverSrc));
 checkTrue("server declares required manifest entry fields",
   /const REQUIRED_MANIFEST_ENTRY_FIELDS = \[/.test(serverSrc));
+checkTrue("server declares manifest entry path fields",
+  /const MANIFEST_ENTRY_PATH_FIELDS = \[/.test(serverSrc));
+checkTrue("server declares manifest raw path exposure pattern",
+  /const MANIFEST_ENTRY_RAW_PATH_PATTERN = /.test(serverSrc));
+checkTrue("server declares manifest entry path validator",
+  /function validateManifestEntryPaths\(/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error status",
   /sendJson\(res,\s*error\?\.statusCode\s*\|\|\s*500/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error payload",

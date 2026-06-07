@@ -51,6 +51,8 @@ const REQUIRED_MANIFEST_ENTRY_FIELDS = [
   "analysisPath",
   "notesPath",
 ];
+const MANIFEST_ENTRY_PATH_FIELDS = ["normalizedPath", "analysisPath", "notesPath"];
+const MANIFEST_ENTRY_RAW_PATH_PATTERN = /(?:^|\/)(?:raw-|manifest\.json$)/;
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
@@ -2244,6 +2246,21 @@ function manifestValidationError(message) {
   return error;
 }
 
+function validateManifestEntryPaths(sample) {
+  const expectedPrefix = `/data/samples/${sample.id}/`;
+  for (const field of MANIFEST_ENTRY_PATH_FIELDS) {
+    const publicPath = sample[field].trim();
+    if (!publicPath.startsWith(expectedPrefix)) {
+      return `Sample manifest entry path must stay under ${expectedPrefix}: ${field}.`;
+    }
+    const relativePath = publicPath.slice(expectedPrefix.length);
+    if (MANIFEST_ENTRY_RAW_PATH_PATTERN.test(relativePath)) {
+      return `Sample manifest entry path must not expose raw/internal files: ${field}.`;
+    }
+  }
+  return null;
+}
+
 function validateManifest(manifest) {
   if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
     throw manifestValidationError("Sample manifest must be a JSON object.");
@@ -2259,7 +2276,7 @@ function validateManifest(manifest) {
     throw manifestValidationError("Sample manifest must include a samples array.");
   }
 
-  let missingEntryField = null;
+  let invalidEntryMessage = null;
   const hasInvalidEntry = versionedManifest.samples.some((sample) => {
     if (!sample || typeof sample !== "object") {
       return true;
@@ -2268,15 +2285,18 @@ function validateManifest(manifest) {
       typeof sample[field] !== "string" || sample[field].trim() === ""
     );
     if (missingField) {
-      missingEntryField = missingField;
+      invalidEntryMessage = `Sample manifest entry missing required field: ${missingField}.`;
+      return true;
+    }
+    const pathError = validateManifestEntryPaths(sample);
+    if (pathError) {
+      invalidEntryMessage = pathError;
       return true;
     }
     return false;
   });
   if (hasInvalidEntry) {
-    throw manifestValidationError(missingEntryField
-      ? `Sample manifest entry missing required field: ${missingEntryField}.`
-      : "Sample manifest contains an invalid sample entry.");
+    throw manifestValidationError(invalidEntryMessage || "Sample manifest contains an invalid sample entry.");
   }
 
   return versionedManifest;
