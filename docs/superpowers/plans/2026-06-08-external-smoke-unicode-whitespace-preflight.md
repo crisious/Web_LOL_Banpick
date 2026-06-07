@@ -118,7 +118,7 @@ Expected: syntax check passes, validator tests report `94 passed, 0 failed`, ful
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` exited 0. Validator tests reported `94 passed, 0 failed`; full suite reported `655 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -128,7 +128,9 @@ git commit -m "ci: reject unicode whitespace smoke urls"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed and pushed `66a45dd ci: reject unicode whitespace smoke urls` to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -141,6 +143,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions QA run `27102723803` succeeded for `66a45dd`; artifact `qa-automation-27102723803` uploaded with id `7467318448` and expires at `2026-06-21T19:39:03Z`. Downloaded artifact summary reported `smokeSummary.passed = 150`, `smokeSummary.failed = 0`; sensitive-value scan returned no matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local RED/GREEN/full QA, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: appended Obsidian log at `2026-06-08 04:40 KST` with local RED/GREEN/full QA, code commit `66a45dd`, remote QA run `27102723803`, artifact id `7467318448`, and no-match sensitive scan result.
