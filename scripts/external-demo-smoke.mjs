@@ -248,6 +248,11 @@ for (const probe of liveApiProbes) {
       `protected mode without token blocks ${probe.label}`,
       `status=${liveProbe.response.status}`,
     );
+    expect(
+      ["PUBLIC_DEMO_UNAUTHORIZED", "PUBLIC_DEMO_TOKEN_REQUIRED"].includes(liveProbe.body?.code),
+      `${probe.label} protected block returns public demo auth code`,
+      `code=${liveProbe.body?.code || "(missing)"}`,
+    );
   } else {
     expect(liveProbe.response.status !== 404, `${probe.label} route exists`);
   }

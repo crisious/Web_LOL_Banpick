@@ -420,6 +420,55 @@ check("CLI only sends Authorization to same-origin live/write API probes",
     : request.authorization === ""),
   true);
 
+const wrongProtectedCodeServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, protected: true, publicDemoMode: "protected" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html", "X-Content-Type-Options": "nosniff" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?v=20260419">
+      <script src="./main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/styles.css?v=20260419") {
+    res.writeHead(200, { "Content-Type": "text/css", "X-Content-Type-Options": "nosniff" });
+    return res.end("body { color: black; }");
+  }
+  if (req.url === "/main.js?v=20260419") {
+    res.writeHead(200, { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff" });
+    return res.end("console.log('ok');");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { ok: false, code: "WRONG_PROTECTED_CODE" });
+  }
+  res.writeHead(403, { "Content-Type": "text/plain", "X-Content-Type-Options": "nosniff" });
+  return res.end("Forbidden");
+});
+
+await new Promise((resolve) => wrongProtectedCodeServer.listen(0, "127.0.0.1", resolve));
+const wrongProtectedCodeUrl = `http://127.0.0.1:${wrongProtectedCodeServer.address().port}`;
+const wrongProtectedCode = await runNode([
+  smokePath,
+  wrongProtectedCodeUrl,
+  "--expect-mode=protected",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => wrongProtectedCodeServer.close(resolve));
+
+check("CLI exits non-zero when protected no-token APIs return an unexpected auth code",
+  wrongProtectedCode.status,
+  1);
+
+check("CLI reports unexpected protected no-token auth code",
+  wrongProtectedCode.stderr.includes("FAIL /api/recent-matches protected block returns public demo auth code"),
+  true);
+
 const htmlAssetServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
     res.writeHead(status, { "Content-Type": "application/json" });
