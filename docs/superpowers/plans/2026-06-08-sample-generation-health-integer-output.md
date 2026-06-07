@@ -100,6 +100,8 @@ git push origin main
 
 Expected: commit lands on `main` and push triggers GitHub Actions QA.
 
+Observed: committed and pushed `1cc39e9 fix: return integer sample generation age` to `origin/main`.
+
 - [ ] **Step 4: Verify remote QA and artifact**
 
 Run:
@@ -111,3 +113,5 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 ```
 
 Expected: latest run for the pushed head SHA succeeds, the uploaded `qa-automation-*` artifact contains `qa-summary.json`, read-only smoke reports `0` failures, and sensitive-value search has no matches.
+
+Observed: GitHub Actions QA run `27105301410` completed with conclusion `success` for head SHA `1cc39e9e8b53d1cab0a3f8164352d6a46231a596`. Artifact `qa-automation-27105301410` uploaded as artifact id `7468141565` and expires at `2026-06-21T21:27:27Z`; downloaded artifact `qa-summary.json` reported read-only smoke `155 passed / 0 failed`, and sensitive-value search for `Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY_URL=[^[:space:]]|EXTERNAL_PROTECTED_URL=[^[:space:]]|access_token=|token=secret|user:pass@|RIOT_API_KEY|RGAPI-|KR_[0-9]{8,}|NA1_[0-9]{8,}|lockKey` returned no matches.
