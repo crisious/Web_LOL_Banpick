@@ -57,7 +57,17 @@ async function request(path, options = {}) {
   if (demoToken && !headers.Authorization) {
     headers.Authorization = `Bearer ${demoToken}`;
   }
-  const response = await fetch(url(path), { ...options, headers });
+  let response;
+  try {
+    response = await fetch(url(path), { ...options, headers });
+  } catch (error) {
+    fail(`request ${path} failed`, error?.message || String(error));
+    return {
+      response: { status: 0 },
+      body: null,
+      text: "",
+    };
+  }
   const text = await response.text();
   let body = null;
   try {

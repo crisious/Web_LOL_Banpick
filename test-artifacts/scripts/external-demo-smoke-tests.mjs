@@ -146,6 +146,28 @@ check("CLI prints concise non-https URL failure without stack trace",
   nonHttpsRequiredUrl.stderr.trim(),
   "FAIL --require-https needs an https:// base URL");
 
+const closedPort = await new Promise((resolve) => {
+  const server = http.createServer();
+  server.listen(0, "127.0.0.1", () => {
+    const { port } = server.address();
+    server.close(() => resolve(port));
+  });
+});
+
+const unreachableDemo = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+]);
+
+check("CLI exits non-zero when the demo URL is unreachable",
+  unreachableDemo.status,
+  1);
+
+check("CLI reports unreachable demo URL without stack trace",
+  unreachableDemo.stderr.includes("FAIL request /healthz failed") && !unreachableDemo.stderr.includes("TypeError: fetch failed"),
+  true);
+
 const oneSampleServer = http.createServer((req, res) => {
   const sendJson = (status, body) => {
     res.writeHead(status, { "Content-Type": "application/json" });
