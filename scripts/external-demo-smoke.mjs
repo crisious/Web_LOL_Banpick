@@ -142,6 +142,11 @@ function expect(condition, label, detail) {
   else fail(label, detail);
 }
 
+function expectFatal(condition, label, detail) {
+  if (condition) pass(label);
+  else fatal(label, detail);
+}
+
 function demoModeFromHealth(body) {
   if (typeof body?.publicDemoMode === "string" && body.publicDemoMode.trim()) {
     return body.publicDemoMode.trim().toLowerCase();
@@ -152,9 +157,10 @@ function demoModeFromHealth(body) {
 }
 
 const health = await request("/healthz");
-expect(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
-expectJsonResponse(health, "GET /healthz");
-expect(health.body?.ok === true, "healthz ok=true");
+expectFatal(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
+expectFatal(contentType(health.response).includes("application/json"), "GET /healthz content-type is JSON", `content-type=${contentType(health.response) || "(missing)"}`);
+expect(headerValue(health.response, "x-content-type-options") === "nosniff", "GET /healthz has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(health.response, "x-content-type-options") || "(missing)"}`);
+expectFatal(health.body?.ok === true, "healthz ok=true");
 const actualMode = demoModeFromHealth(health.body);
 if (expectedMode) {
   if (actualMode === expectedMode) {
