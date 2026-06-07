@@ -81,6 +81,11 @@ function headerValue(response, name) {
   return response.headers?.get?.(name)?.toLowerCase() || "";
 }
 
+function expectJsonResponse(out, label) {
+  expect(contentType(out.response).includes("application/json"), `${label} content-type is JSON`, `content-type=${contentType(out.response) || "(missing)"}`);
+  expect(headerValue(out.response, "x-content-type-options") === "nosniff", `${label} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`);
+}
+
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   const requestOrigin = new URL(path, baseUrl).origin;
@@ -142,6 +147,7 @@ function demoModeFromHealth(body) {
 
 const health = await request("/healthz");
 expect(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
+expectJsonResponse(health, "GET /healthz");
 expect(health.body?.ok === true, "healthz ok=true");
 const actualMode = demoModeFromHealth(health.body);
 if (expectedMode) {
@@ -176,6 +182,7 @@ expect(headerValue(appScript.response, "x-content-type-options") === "nosniff", 
 
 const samples = await request("/api/samples");
 expect(samples.response.status === 200, "GET /api/samples returns 200", `status=${samples.response.status}`);
+expectJsonResponse(samples, "GET /api/samples");
 expect(Array.isArray(samples.body?.samples), "/api/samples returns samples array");
 expect((samples.body?.samples?.length || 0) >= minSamples, `/api/samples has at least ${minSamples} samples`, `count=${samples.body?.samples?.length || 0}`);
 
@@ -195,6 +202,7 @@ for (const sample of samplesToCheck) {
   if (!sample?.id) continue;
   const detail = await request(`/api/samples/${encodeURIComponent(sample.id)}`);
   expect(detail.response.status === 200, `GET /api/samples/:id returns 200 for ${sample.id}`, `status=${detail.response.status}`);
+  expectJsonResponse(detail, `sample detail ${sample.id}`);
   expect(detail.body?.normalized && detail.body?.analysis, `sample detail ${sample.id} includes normalized + analysis`);
   const analysis = detail.body?.analysis || {};
   expect(hasReportEssentials(analysis), `sample detail ${sample.id} includes report essentials`);
@@ -226,6 +234,7 @@ for (const probe of liveApiProbes) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
   });
+  expectJsonResponse(liveProbe, probe.label);
 
   if (actualMode === "readonly") {
     expect(liveProbe.response.status === 403, `readonly mode blocks ${probe.label}`, `status=${liveProbe.response.status}`);

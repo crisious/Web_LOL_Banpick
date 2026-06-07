@@ -44,6 +44,7 @@ Expected:
 - referenced `styles.css` and `main.js` return `X-Content-Type-Options: nosniff`
 - smoke tokens are sent only to the demo origin, not to cross-origin client assets
 - `/api/samples` 200
+- `/healthz`, `/api/samples`, sample details, and live/write API responses use a JSON content type and return `X-Content-Type-Options: nosniff`
 - `/api/samples` includes at least 19 stored samples
 - first 19 sample details return 200
 - first 19 sample details include `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
