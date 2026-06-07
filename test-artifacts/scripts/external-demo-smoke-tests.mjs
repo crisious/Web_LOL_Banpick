@@ -216,6 +216,14 @@ checkThrows("parseSmokeArgs rejects child dot-segment report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/./smoke-report.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
+checkThrows("parseSmokeArgs rejects repeated trailing slash report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json//"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects traversal report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/../smoke-report.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1115,6 +1123,22 @@ check("CLI exits non-zero for dot-segment report JSON path",
 
 check("CLI reports dot-segment report JSON path without network request",
   dotSegmentReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";
+const trailingSlashReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  `--report-json=${trailingSlashReportJsonPath}`,
+]);
+
+check("CLI exits non-zero for trailing slash report JSON path",
+  trailingSlashReportJson.status,
+  1);
+
+check("CLI reports trailing slash report JSON path without network request",
+  trailingSlashReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
   true);
 
 const readonlyToken = await runNode([

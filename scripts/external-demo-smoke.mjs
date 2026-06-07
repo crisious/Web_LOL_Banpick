@@ -23,7 +23,7 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
     const comparable = raw.replace(/\\/g, "/");
     const rawSegments = comparable.split("/");
-    if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || rawSegments.includes(".") || rawSegments.includes("..")) {
+    if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || comparable.endsWith("/") || rawSegments.includes(".") || rawSegments.includes("..")) {
       throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
     const normalized = comparable.split("/").filter(Boolean).join("/");
