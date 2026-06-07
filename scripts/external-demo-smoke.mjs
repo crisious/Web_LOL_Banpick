@@ -150,6 +150,7 @@ if (expectedMode) {
 
 const home = await request("/");
 expect(home.response.status === 200, "GET / returns 200", `status=${home.response.status}`);
+expect(headerValue(home.response, "x-content-type-options") === "nosniff", "GET / has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(home.response, "x-content-type-options") || "(missing)"}`);
 expect(home.text.includes("LoL Replay Coach"), "home contains app title");
 expect(home.text.includes("styles.css"), "home references styles.css");
 expect(home.text.includes("main.js"), "home references main.js");

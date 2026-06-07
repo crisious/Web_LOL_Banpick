@@ -37,6 +37,7 @@ Expected:
 
 - `/healthz` 200
 - `/` exposes stored sample entry UI in read-only mode
+- `/` returns `X-Content-Type-Options: nosniff`
 - `/` references `styles.css` and `main.js`
 - the exact referenced `styles.css` and `main.js` URLs, including cache query strings, return 200
 - referenced `styles.css` returns a CSS content type and `main.js` returns a JavaScript content type

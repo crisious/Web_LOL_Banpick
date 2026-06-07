@@ -322,7 +322,7 @@ const crossOriginAppServer = http.createServer((req, res) => {
   };
   if (req.url === "/healthz") return sendJson(200, { ok: true, protected: true, publicDemoMode: "protected" });
   if (req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/html" });
+    res.writeHead(200, { "Content-Type": "text/html", "X-Content-Type-Options": "nosniff" });
     return res.end(`
       <title>LoL Replay Coach</title>
       <link rel="stylesheet" href="${crossOriginAssetUrl}/styles.css?v=20260419">
@@ -453,6 +453,56 @@ check("CLI exits non-zero when client assets omit nosniff",
 check("CLI reports missing client asset nosniff",
   missingNosniffAssets.stderr.includes("FAIL /styles.css?v=20260419 has X-Content-Type-Options nosniff") ||
     missingNosniffAssets.stderr.includes("FAIL /main.js?v=20260419 has X-Content-Type-Options nosniff"),
+  true);
+
+const missingHomeNosniffServer = http.createServer((req, res) => {
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") return sendJson(200, { ok: true, readonly: true, publicDemoMode: "readonly" });
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?v=20260419">
+      <button data-login-sample-button>저장 샘플 열기</button>
+      <div data-sample-switcher>저장된 샘플</div>
+      <script src="./main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/styles.css?v=20260419") {
+    res.writeHead(200, { "Content-Type": "text/css", "X-Content-Type-Options": "nosniff" });
+    return res.end("body { color: black; }");
+  }
+  if (req.url === "/main.js?v=20260419") {
+    res.writeHead(200, { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff" });
+    return res.end("console.log('ok');");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(403, { code: "PUBLIC_DEMO_READONLY" });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => missingHomeNosniffServer.listen(0, "127.0.0.1", resolve));
+const missingHomeNosniffUrl = `http://127.0.0.1:${missingHomeNosniffServer.address().port}`;
+const missingHomeNosniff = await runNode([
+  smokePath,
+  missingHomeNosniffUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => missingHomeNosniffServer.close(resolve));
+
+check("CLI exits non-zero when home omits nosniff",
+  missingHomeNosniff.status,
+  1);
+
+check("CLI reports missing home nosniff",
+  missingHomeNosniff.stderr.includes("FAIL GET / has X-Content-Type-Options nosniff"),
   true);
 
 const oneSampleServer = http.createServer((req, res) => {
