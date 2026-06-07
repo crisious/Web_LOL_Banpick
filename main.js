@@ -3250,7 +3250,8 @@ function isNonRetryablePublicDemoMessage(message) {
 }
 
 function formatRetryMessage(error) {
-  const baseMessage = String(error?.message || "알 수 없는 오류가 발생했습니다.").trim();
+  const rawMessage = String(error?.message || "");
+  const baseMessage = rawMessage.trim() || "알 수 없는 오류가 발생했습니다.";
   if (isNonRetryablePublicDemoMessage(baseMessage)) {
     return baseMessage;
   }

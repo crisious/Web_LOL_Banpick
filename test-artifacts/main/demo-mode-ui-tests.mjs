@@ -64,6 +64,10 @@ check("generic lookup errors still include retry hint",
   formatRetryMessage(new Error("네트워크 연결이 불안정합니다.")),
   "네트워크 연결이 불안정합니다. 잠시 후 다시 시도하세요.");
 
+check("blank error messages fall back to unknown error copy",
+  formatRetryMessage({ message: "   " }),
+  "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도하세요.");
+
 check("already actionable retry messages are not duplicated",
   formatRetryMessage(new Error("샘플 생성이 이미 진행 중입니다. 잠시 후 다시 시도하세요.")),
   "샘플 생성이 이미 진행 중입니다. 잠시 후 다시 시도하세요.");
