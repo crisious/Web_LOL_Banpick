@@ -1,8 +1,25 @@
 #!/usr/bin/env node
 
-const baseUrl = process.argv[2] || "http://127.0.0.1:8123";
-const tokenArg = process.argv.find((arg) => arg.startsWith("--token="));
-const demoToken = tokenArg ? tokenArg.slice("--token=".length) : process.env.PUBLIC_DEMO_TOKEN || "";
+function parseSmokeArgs(argv, env = {}) {
+  const validExpectedModes = ["full", "protected", "readonly"];
+  const args = argv.slice(2);
+  const baseUrl = args.find((arg) => !arg.startsWith("--")) || "http://127.0.0.1:8123";
+  const tokenArg = args.find((arg) => arg.startsWith("--token="));
+  const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
+  const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
+
+  if (expectedMode && !validExpectedModes.includes(expectedMode)) {
+    throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
+  }
+
+  return {
+    baseUrl,
+    demoToken: tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "",
+    expectedMode,
+  };
+}
+
+const { baseUrl, demoToken, expectedMode } = parseSmokeArgs(process.argv, process.env);
 
 function url(path) {
   return new URL(path, baseUrl).toString();
@@ -39,9 +56,22 @@ function expect(condition, label, detail) {
   else fail(label, detail);
 }
 
+function demoModeFromHealth(body) {
+  if (typeof body?.publicDemoMode === "string" && body.publicDemoMode.trim()) {
+    return body.publicDemoMode.trim().toLowerCase();
+  }
+  if (body?.readonly) return "readonly";
+  if (body?.protected) return "protected";
+  return "full";
+}
+
 const health = await request("/healthz");
 expect(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
 expect(health.body?.ok === true, "healthz ok=true");
+if (expectedMode) {
+  const actualMode = demoModeFromHealth(health.body);
+  expect(actualMode === expectedMode, `public demo mode is ${expectedMode}`, `actual=${actualMode}`);
+}
 
 const home = await request("/");
 expect(home.response.status === 200, "GET / returns 200", `status=${home.response.status}`);

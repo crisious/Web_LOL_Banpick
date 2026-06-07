@@ -30,7 +30,7 @@ read-only 모드에서 차단:
 npm test
 node --check server.js
 node --check main.js
-npm run smoke:external -- http://127.0.0.1:8123
+npm run smoke:external -- http://127.0.0.1:8123 --expect-mode=readonly
 ```
 
 Expected:
@@ -58,7 +58,7 @@ cloudflared tunnel --url http://localhost:8123
 3. Run smoke against the issued HTTPS URL:
 
 ```bash
-npm run smoke:external -- https://your-tunnel-url.trycloudflare.com
+npm run smoke:external -- https://your-tunnel-url.trycloudflare.com --expect-mode=readonly
 ```
 
 4. Share URL only after smoke passes.
@@ -74,7 +74,7 @@ PUBLIC_DEMO_MODE=protected PUBLIC_DEMO_TOKEN='replace-with-long-random-token' TR
 Smoke with token:
 
 ```bash
-npm run smoke:external -- https://demo.example.com --token=replace-with-long-random-token
+npm run smoke:external -- https://demo.example.com --token=replace-with-long-random-token --expect-mode=protected
 ```
 
 Client/API callers must send:
@@ -105,7 +105,7 @@ The first cloud deploy should stay read-only. Writable sample generation needs p
 ## Pre-Share Checklist
 
 - [ ] `npm test` passes
-- [ ] `npm run smoke:external -- <url>` passes
+- [ ] `npm run smoke:external -- <url> --expect-mode=readonly` passes
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404
 - [ ] `curl <url>/data/samples/manifest.json` returns 403 or 404
