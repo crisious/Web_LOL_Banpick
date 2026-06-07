@@ -217,7 +217,19 @@ async function readJson(filePath) {
 }
 
 async function writeJson(filePath, payload) {
-  await fsp.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  const body = `${JSON.stringify(payload, null, 2)}\n`;
+  const dir = path.dirname(filePath);
+  const base = path.basename(filePath);
+  const suffix = `${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}`;
+  const tempPath = path.join(dir, `.${base}.${suffix}.tmp`);
+
+  try {
+    await fsp.writeFile(tempPath, body, "utf8");
+    await fsp.rename(tempPath, filePath);
+  } catch (error) {
+    try { await fsp.unlink(tempPath); } catch {}
+    throw error;
+  }
 }
 
 function durationLabel(seconds) {
