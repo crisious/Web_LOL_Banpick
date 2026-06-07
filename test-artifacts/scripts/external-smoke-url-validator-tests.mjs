@@ -45,6 +45,14 @@ if (fs.existsSync(validatorPath)) {
     validateExternalSmokeUrl("external_readonly_url", "  https://demo.example.com/path  "),
     "https://demo.example.com/path");
 
+  checkThrows("validateExternalSmokeUrl rejects unencoded path space",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa th"),
+    "external_readonly_url must not include unencoded spaces");
+
+  checkThrows("validateExternalSmokeUrl rejects unencoded nested path space",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/a b/c"),
+    "external_readonly_url must not include unencoded spaces");
+
   checkThrows("validateExternalSmokeUrl rejects embedded newline",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa\nth"),
     "external_readonly_url must not include ASCII control characters");

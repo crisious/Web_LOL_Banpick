@@ -196,6 +196,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   if (/[\u0000-\u001f\u007f]/.test(rawValue)) {
     throw new Error(`${safeLabel} must not include ASCII control characters`);
   }
+  if (value.includes(" ")) {
+    throw new Error(`${safeLabel} must not include unencoded spaces`);
+  }
   if (value.includes("\\")) {
     throw new Error(`${safeLabel} must not include backslashes`);
   }
