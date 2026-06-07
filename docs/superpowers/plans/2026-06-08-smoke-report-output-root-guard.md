@@ -133,7 +133,7 @@ Expected: command exits 0, focused runner tests pass, full suite passes, and dif
 
 Observed: `node --check scripts/run-smoke-report.mjs && node test-artifacts/scripts/smoke-report-runner-tests.mjs && npm test && git diff --check` exited 0. Focused runner tests reported `41 passed, 0 failed`; full suite reported `747 passed, 0 failed across 25 test file(s)`; diff whitespace check had no output.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -145,9 +145,9 @@ git push origin main
 
 Expected: commit lands on `main` and pushes to `origin/main`.
 
-Observed:
+Observed: commit `931aa56 ci: restrict smoke report output roots` pushed to `origin/main`.
 
-- [ ] **Step 4: Verify remote QA and artifact**
+- [x] **Step 4: Verify remote QA and artifact**
 
 Run:
 
@@ -162,7 +162,7 @@ Download the uploaded `qa-automation-<run-id>` artifact, inspect `qa-summary.jso
 
 Expected: latest run for the pushed head SHA succeeds, uploaded artifact contains `qa-summary.json`, read-only smoke reports zero failures, and sensitive-value search has no matches.
 
-Observed:
+Observed: GitHub Actions QA run `27106736985` completed successfully for head SHA `931aa5629ce1341f9ba11f621f2e9d1f5fb84584`. Artifact `qa-automation-27106736985` / ID `7468607690` contained `qa-summary.json`, `smoke-run.json`, and `smoke-report.json`; `qa-summary.json` recorded read-only smoke `155 passed, 0 failed`. Sensitive-value search across the downloaded artifact directory found no matches.
 
 - [ ] **Step 5: Update Obsidian project log**
 
