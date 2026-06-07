@@ -126,6 +126,18 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts//"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects root repeated separator output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts//qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects child repeated separator output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp//qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects repeated trailing slash child output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/qa-automation//"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects root dot-segment output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -291,6 +303,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("dot-segment env output root rejection does not create output root",
     fs.existsSync(dotSegmentEnvCreatedPath),
+    false);
+
+  const repeatedSeparatorEnvOutputRoot = "test-artifacts/tmp//smoke-report-repeated-separator-root";
+  const repeatedSeparatorEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-repeated-separator-root");
+  fs.rmSync(repeatedSeparatorEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects repeated separator env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: repeatedSeparatorEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("repeated separator env output root rejection does not create output root",
+    fs.existsSync(repeatedSeparatorEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([

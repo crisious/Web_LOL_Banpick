@@ -57,7 +57,7 @@ function normalizeOutputRoot(outputRoot) {
   }
   const comparable = raw.replace(/\\/g, "/");
   const rawSegments = comparable.split("/");
-  if (path.isAbsolute(raw) || path.win32.isAbsolute(raw) || rawSegments.includes(".") || rawSegments.includes("..")) {
+  if (path.isAbsolute(raw) || path.win32.isAbsolute(raw) || comparable.includes("//") || rawSegments.includes(".") || rawSegments.includes("..")) {
     throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
   const normalized = path.posix.normalize(comparable);

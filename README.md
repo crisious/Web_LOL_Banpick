@@ -177,7 +177,7 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 요청에는 입력한 원본 URL을 사용하지만, 리포트에 남는 `baseUrl`과 체크 라벨/상세의 URL evidence는 URL userinfo, query string, fragment를 redacted 값으로 바꿉니다. 상대 asset path도 `/styles.css?redacted`처럼 기록하므로 asset query 값이 QA artifact에 남지 않습니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
-Direct smoke의 `--report-json=<path>`는 `test-artifacts/<subdir>/.../*.json` 아래 상대 경로만 허용합니다. 절대 경로, `.` / `..` path segment, artifact tree 밖의 경로, `test-artifacts/*.json`처럼 artifact root에 직접 쓰는 경로, trailing slash가 붙은 파일 경로, `.json`이 아닌 대상은 네트워크 요청이나 리포트 파일 쓰기 전에 `FAIL --report-json must be a relative .json path under a test-artifacts subdirectory`로 종료합니다.
+Direct smoke의 `--report-json=<path>`는 `test-artifacts/<subdir>/.../*.json` 아래 상대 경로만 허용합니다. 절대 경로, `.` / `..` path segment, `test-artifacts//tmp/...` 같은 repeated slash separator, artifact tree 밖의 경로, `test-artifacts/*.json`처럼 artifact root에 직접 쓰는 경로, trailing slash가 붙은 파일 경로, `.json`이 아닌 대상은 네트워크 요청이나 리포트 파일 쓰기 전에 `FAIL --report-json must be a relative .json path under a test-artifacts subdirectory`로 종료합니다.
 
 Direct smoke와 `smoke:report:*` runner는 positional base URL을 최대 1개만 받습니다. URL을 두 개 이상 넘기면 첫 번째 URL만 사용해 잘못된 QA 근거를 만들지 않고, 네트워크 요청 전에 즉시 실패합니다.
 
@@ -187,7 +187,7 @@ Direct smoke는 알 수 없는 `--...` 옵션도 즉시 실패합니다. 예를 
 
 Direct smoke의 token material은 `--require-token --expect-mode=protected` 조합에서만 사용합니다. Read-only/full smoke에 inline `--token=...`을 넘기면 네트워크 요청 전에 `FAIL --token is only accepted with --require-token and --expect-mode=protected`로 종료하고, ambient `PUBLIC_DEMO_TOKEN`은 protected token-required smoke가 아니면 무시합니다. `--require-token`도 `--expect-mode=protected` 밖에서는 `FAIL --require-token is only accepted with --expect-mode=protected`로 실패합니다.
 
-`smoke:report:*`의 `--output-root=<path>`와 `SMOKE_REPORT_OUTPUT_ROOT`는 `test-artifacts/<subdir>` 아래 상대 경로만 허용합니다. 절대 경로, `.` / `..` path segment, `.github/...`처럼 artifact tree 밖의 경로, root-level `test-artifacts`, `test-artifacts/`, `test-artifacts//`는 report 디렉터리나 `qa-summary.json`을 만들기 전에 `FAIL --output-root must be a relative path under a test-artifacts subdirectory`로 종료합니다. 유효한 하위 디렉터리에 붙은 trailing slash는 canonical path로 정규화됩니다.
+`smoke:report:*`의 `--output-root=<path>`와 `SMOKE_REPORT_OUTPUT_ROOT`는 `test-artifacts/<subdir>` 아래 상대 경로만 허용합니다. 절대 경로, `.` / `..` path segment, `test-artifacts//qa-automation` 같은 repeated slash separator, `.github/...`처럼 artifact tree 밖의 경로, root-level `test-artifacts`, `test-artifacts/`, `test-artifacts//`는 report 디렉터리나 `qa-summary.json`을 만들기 전에 `FAIL --output-root must be a relative path under a test-artifacts subdirectory`로 종료합니다. 유효한 하위 디렉터리에 붙은 단일 trailing slash는 canonical path로 정규화됩니다.
 
 `smoke:report:*` runner는 `--token=`, `--timeout-ms=`, sample manifest error expectation 계열만 smoke pass-through 옵션으로 허용합니다. `--expectmode=readonly` 같은 오타나 runner가 직접 생성하는 `--expect-mode=<mode>`를 수동으로 넘기면 report 디렉터리나 메타데이터를 만들기 전에 `FAIL unknown smoke report option: ...`로 종료합니다. 허용된 pass-through 옵션도 runner 단계에서 singleton/value/필수 조합을 검증하므로 `--timeout-ms=0`, 중복 `--timeout-ms=...`, sample manifest expectation의 누락된 id/code/status 오류 역시 artifact 생성 전에 실패합니다.
 

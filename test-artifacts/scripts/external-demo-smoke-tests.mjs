@@ -216,6 +216,14 @@ checkThrows("parseSmokeArgs rejects child dot-segment report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/./smoke-report.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects root repeated separator report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts//tmp/smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
+checkThrows("parseSmokeArgs rejects child repeated separator report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp//smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1124,6 +1132,27 @@ check("CLI exits non-zero for dot-segment report JSON path",
 check("CLI reports dot-segment report JSON path without network request",
   dotSegmentReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
   true);
+
+const repeatedSeparatorReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-repeated-separator.json");
+fs.rmSync(repeatedSeparatorReportJsonPath, { force: true });
+const repeatedSeparatorReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts/tmp//smoke-report-repeated-separator.json",
+]);
+
+check("CLI exits non-zero for repeated separator report JSON path",
+  repeatedSeparatorReportJson.status,
+  1);
+
+check("CLI reports repeated separator report JSON path without network request",
+  repeatedSeparatorReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI repeated separator report JSON path does not create file",
+  fs.existsSync(repeatedSeparatorReportJsonPath),
+  false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";
 const trailingSlashReportJson = await runNode([
