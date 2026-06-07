@@ -4,7 +4,7 @@
 
 **Goal:** Add a GitHub Actions QA workflow that runs the zero-dependency test suite, performs read-only smoke with the report runner, and uploads generated QA evidence as a workflow artifact.
 
-**Architecture:** Keep local QA commands as the source of truth. The workflow starts a read-only demo server in the CI runner, waits for `/healthz`, runs `npm run smoke:report:readonly`, uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v4`, and always tears down the background server.
+**Architecture:** Keep local QA commands as the source of truth. The workflow starts a read-only demo server in the CI runner, waits for `/healthz`, runs `npm run smoke:report:readonly`, uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v7`, and always tears down the background server.
 
 **Tech Stack:** GitHub Actions, Node.js 20, built-in shell commands, existing `npm test`, existing `smoke:report:readonly`.
 
@@ -50,7 +50,7 @@ if (exists) {
   check("QA workflow pins Node 20", /node-version:\s*"20"/.test(workflow), workflow);
   check("QA workflow runs npm test", /run:\s*npm test/.test(workflow), workflow);
   check("QA workflow runs read-only smoke report", /run:\s*npm run smoke:report:readonly/.test(workflow), workflow);
-  check("QA workflow uploads QA automation artifacts", /uses:\s*actions\/upload-artifact@v4/.test(workflow) && /path:\s*test-artifacts\/qa-automation\//.test(workflow), workflow);
+  check("QA workflow uploads QA automation artifacts", /uses:\s*actions\/upload-artifact@v7/.test(workflow) && /path:\s*test-artifacts\/qa-automation\//.test(workflow), workflow);
   check("QA workflow uploads artifacts even after failure", /if:\s*always\(\)/.test(workflow), workflow);
   check("QA workflow does not require a demo token secret", !/PUBLIC_DEMO_TOKEN|secrets\./.test(workflow), workflow);
 }
@@ -92,10 +92,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload QA automation artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: qa-automation-${{ github.run_id }}
           path: test-artifacts/qa-automation/

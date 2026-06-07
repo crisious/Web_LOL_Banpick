@@ -92,7 +92,7 @@ npm run smoke:external:readonly -- https://demo.example.com --report-json=test-a
 
 The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. It does not store the demo token, Authorization header, or API response bodies.
 
-For repeatable QA evidence, prefer the report runner commands. They create `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
+For repeatable QA evidence, prefer the report runner commands. They create a top-level `test-artifacts/qa-automation/qa-summary.json`, plus `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
 
 ```bash
 npm run smoke:report:readonly
@@ -101,9 +101,9 @@ npm run smoke:report:external:readonly -- https://demo.example.com
 npm run smoke:report:external:protected -- https://demo.example.com --token=replace-with-long-random-token
 ```
 
-`smoke-run.json` redacts inline `--token=<value>` arguments before writing command metadata.
+`qa-summary.json` records the latest run's mode, URL, status, exit code, pass/fail counts, check count, and artifact paths. `smoke-run.json` redacts inline `--token=<value>` arguments before writing command metadata.
 
-The GitHub Actions `QA` workflow runs `npm test` and `npm run smoke:report:readonly` on `main` pushes, pull requests, and manual dispatch. It uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v4`, so the read-only smoke report can be inspected from the workflow run without rerunning the demo locally.
+The GitHub Actions `QA` workflow runs `npm test` and `npm run smoke:report:readonly` on `main` pushes, pull requests, and manual dispatch. It uploads `test-artifacts/qa-automation/` with `actions/upload-artifact@v7`, so the read-only smoke report can be inspected from the workflow run without rerunning the demo locally.
 
 4. Share URL only after smoke passes.
 

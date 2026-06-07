@@ -150,7 +150,7 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 534건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 536건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
@@ -158,7 +158,7 @@ npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:protected  # 로컬 protected 외부 데모 안전성/API smoke
 npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 상세 기준 read-only smoke
 npm run smoke:external:protected -- https://your-demo-url.example --token=your-demo-token  # 외부 HTTPS URL + 토큰 기준 protected smoke
-npm run smoke:report:readonly  # timestamp 디렉터리에 smoke-report.json + smoke-run.json 저장
+npm run smoke:report:readonly  # qa-summary.json + timestamp 디렉터리에 smoke-report.json/smoke-run.json 저장
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:report:protected
 npm run smoke:report:external:readonly -- https://your-demo-url.example
 npm run smoke:report:external:protected -- https://your-demo-url.example --token=your-demo-token
@@ -176,9 +176,9 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
-`smoke:report:*` 명령은 `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `smoke-run.json`의 command 필드는 `--token=<redacted>`로 기록되어 토큰 값을 남기지 않습니다.
+`smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`로 기록되어 토큰 값을 남기지 않습니다.
 
-GitHub Actions `QA` workflow는 `main` push, pull request, manual dispatch에서 `npm test`와 `npm run smoke:report:readonly`를 실행하고, 생성된 `test-artifacts/qa-automation/`를 workflow artifact로 업로드합니다.
+GitHub Actions `QA` workflow는 `main` push, pull request, manual dispatch에서 `npm test`와 `npm run smoke:report:readonly`를 실행하고, 생성된 `test-artifacts/qa-automation/`를 `actions/upload-artifact@v7` workflow artifact로 업로드합니다.
 
 테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하거나, `lib/sample-manifest.js`처럼 side-effect 없는 공통 모듈을 직접 import하는 방식으로 실행합니다. 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
 

@@ -103,6 +103,54 @@ if (fs.existsSync(runnerPath)) {
   check("redactSmokeArgs removes inline token value",
     runner.redactSmokeArgs(["scripts/external-demo-smoke.mjs", "--token=secret", "--timeout-ms=15000"]),
     ["scripts/external-demo-smoke.mjs", "--token=<redacted>", "--timeout-ms=15000"]);
+
+  const protectedConfig = runner.parseRunnerArgs([
+    "node",
+    "scripts/run-smoke-report.mjs",
+    "--mode=external-protected",
+    "https://demo.example.com",
+    "--token=secret",
+  ], {});
+  const qaSummary = runner.buildQaSummary?.({
+    config: protectedConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
+    startedAt: "2026-06-08T01:15:30.000Z",
+    finishedAt: "2026-06-08T01:15:45.000Z",
+    exitCode: 0,
+    smokeReport: {
+      status: "passed",
+      actualMode: "protected",
+      summary: { passed: 42, failed: 0 },
+      checks: [{ status: "pass", label: "GET /healthz returns 200" }],
+    },
+  });
+  check("buildQaSummary records latest run evidence without token values",
+    qaSummary,
+    {
+      schemaVersion: 1,
+      generatedAt: "2026-06-08T01:15:45.000Z",
+      latestRun: {
+        mode: "external-protected",
+        baseUrl: "https://demo.example.com",
+        expectedMode: "protected",
+        actualMode: "protected",
+        status: "passed",
+        exitCode: 0,
+        startedAt: "2026-06-08T01:15:30.000Z",
+        finishedAt: "2026-06-08T01:15:45.000Z",
+        reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
+        reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
+        smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
+        smokeSummary: { passed: 42, failed: 0 },
+        checkCount: 1,
+      },
+    });
+
+  check("buildQaSummary omits demo token material",
+    JSON.stringify(qaSummary || {}).includes("secret"),
+    false);
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

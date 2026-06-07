@@ -90,8 +90,51 @@ export function redactSmokeArgs(args) {
   return args.map((arg) => arg.startsWith("--token=") ? "--token=<redacted>" : arg);
 }
 
+export function qaSummaryPathFor(outputRoot) {
+  return path.join(outputRoot, "qa-summary.json");
+}
+
+export function buildQaSummary({
+  config,
+  reportDir,
+  reportJsonPath,
+  metadataPath,
+  startedAt,
+  finishedAt,
+  exitCode,
+  smokeReport = null,
+}) {
+  return {
+    schemaVersion: 1,
+    generatedAt: finishedAt,
+    latestRun: {
+      mode: config.mode,
+      baseUrl: config.baseUrl,
+      expectedMode: config.expectedMode,
+      actualMode: smokeReport?.actualMode || "",
+      status: smokeReport?.status || (exitCode ? "failed" : "passed"),
+      exitCode,
+      startedAt,
+      finishedAt,
+      reportDir,
+      reportJsonPath,
+      smokeRunJsonPath: metadataPath,
+      smokeSummary: smokeReport?.summary || null,
+      checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
+    },
+  };
+}
+
 function writeRunMetadata(metadataPath, payload) {
   fs.writeFileSync(metadataPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+}
+
+function readJsonIfExists(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 export async function runSmokeReport(argv = process.argv, env = process.env) {
@@ -100,6 +143,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
   const reportDir = reportDirectoryFor(config.outputRoot, config.mode, new Date(startedAt));
   const reportJsonPath = path.join(reportDir, "smoke-report.json");
   const metadataPath = path.join(reportDir, "smoke-run.json");
+  const qaSummaryPath = qaSummaryPathFor(config.outputRoot);
   const smokeArgs = smokeArgsFor(config, reportJsonPath);
 
   fs.mkdirSync(reportDir, { recursive: true });
@@ -113,16 +157,27 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     child.on("close", (status) => resolve(status ?? 1));
   });
 
+  const finishedAt = new Date().toISOString();
   writeRunMetadata(metadataPath, {
     schemaVersion: 1,
     mode: config.mode,
     baseUrl: config.baseUrl,
     reportJsonPath,
     startedAt,
-    finishedAt: new Date().toISOString(),
+    finishedAt,
     exitCode,
     command: [process.execPath, ...redactSmokeArgs(smokeArgs)],
   });
+  writeRunMetadata(qaSummaryPath, buildQaSummary({
+    config,
+    reportDir,
+    reportJsonPath,
+    metadataPath,
+    startedAt,
+    finishedAt,
+    exitCode,
+    smokeReport: readJsonIfExists(reportJsonPath),
+  }));
 
   console.log(`Smoke report directory: ${reportDir}`);
   return exitCode;
