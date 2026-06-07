@@ -85,6 +85,34 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo/path"),
     "external_readonly_url must use a fully qualified public hostname or IP address");
 
+  checkThrows("validateExternalSmokeUrl rejects hostname label underscore",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://bad_host.example.com/path"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects hostname label leading hyphen",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://-demo.example.com/path"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects hostname label trailing hyphen",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo-.example.com/path"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects empty hostname label",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo..example.com/path"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  checkThrows("validateExternalSmokeUrl rejects trailing root dot",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com./path"),
+    "external_readonly_url must use DNS-compatible public hostname labels");
+
+  check("validateExternalSmokeUrl accepts hyphenated hostname labels",
+    validateExternalSmokeUrl("external_readonly_url", "https://demo-edge.example.com/path"),
+    "https://demo-edge.example.com/path");
+
+  check("validateExternalSmokeUrl accepts punycoded hostname labels",
+    validateExternalSmokeUrl("external_readonly_url", "https://xn--bcher-kva.example/path"),
+    "https://xn--bcher-kva.example/path");
+
   check("validateExternalSmokeUrl accepts public IPv4 literal",
     validateExternalSmokeUrl("external_readonly_url", "https://8.8.8.8/path"),
     "https://8.8.8.8/path");

@@ -61,6 +61,19 @@ function isSingleLabelHostname(host) {
   return !isIpLiteralHost(host) && !host.includes(".");
 }
 
+function isDnsCompatibleHostname(host) {
+  if (isIpLiteralHost(host)) return true;
+  if (host.length > 253) return false;
+  const labels = host.split(".");
+  return labels.every((label) => (
+    label.length >= 1 &&
+    label.length <= 63 &&
+    /^[a-z0-9-]+$/.test(label) &&
+    !label.startsWith("-") &&
+    !label.endsWith("-")
+  ));
+}
+
 function isLocalOrPrivateHost(host) {
   return (
     host === "localhost" ||
@@ -91,6 +104,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   }
   if (isSingleLabelHostname(host)) {
     throw new Error(`${safeLabel} must use a fully qualified public hostname or IP address`);
+  }
+  if (!isDnsCompatibleHostname(host)) {
+    throw new Error(`${safeLabel} must use DNS-compatible public hostname labels`);
   }
   return parsed.toString();
 }
