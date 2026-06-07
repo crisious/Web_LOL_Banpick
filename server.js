@@ -2257,7 +2257,7 @@ async function loadManifest() {
 }
 
 async function saveManifest(manifest) {
-  await writeJson(manifestPath, manifest);
+  await writeJson(manifestPath, validateManifest(manifest));
 }
 
 async function loadSampleBundle(sampleId) {

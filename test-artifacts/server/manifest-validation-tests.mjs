@@ -47,18 +47,20 @@ function extractSourceFromStart(source, startIdx, label) {
   throw new Error(`${label} not closed`);
 }
 
-function makeHelpers(readJson, events) {
+function makeHelpers(readJson, writeJson, events) {
   return new Function(
     "readJson",
+    "writeJson",
     "events",
     [
       "const manifestPath = '/samples/manifest.json';",
       extractFunctionSource(serverSrc, "manifestValidationError"),
       extractFunctionSource(serverSrc, "validateManifest"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
-      "return { manifestValidationError, validateManifest, loadManifest };",
+      extractAsyncFunctionSource(serverSrc, "saveManifest"),
+      "return { manifestValidationError, validateManifest, loadManifest, saveManifest };",
     ].join("\n"),
-  )(readJson, events);
+  )(readJson, writeJson, events);
 }
 
 let pass = 0, fail = 0;
@@ -78,14 +80,14 @@ function checkTrue(label, condition, detail = "") {
 
 let helpers = null;
 try {
-  helpers = makeHelpers(async () => ({ samples: [] }), []);
+  helpers = makeHelpers(async () => ({ samples: [] }), async () => {}, []);
   checkTrue("manifest validation helpers exist", true);
 } catch (error) {
   checkTrue("manifest validation helpers exist", false, error.message);
 }
 
 if (helpers) {
-  const { validateManifest, loadManifest } = helpers;
+  const { validateManifest } = helpers;
   const validManifest = {
     samples: [{
       id: "sample-kr-1",
@@ -119,7 +121,7 @@ if (helpers) {
     const { loadManifest: loadValidManifest } = makeHelpers(async (filePath) => {
       events.push({ op: "readJson", filePath });
       return validManifest;
-    }, events);
+    }, async () => {}, events);
     check("loadManifest reads configured manifest path",
       await loadValidManifest(),
       validManifest);
@@ -129,7 +131,7 @@ if (helpers) {
   }
 
   {
-    const { loadManifest: loadInvalidManifest } = makeHelpers(async () => ({ samples: [null] }), []);
+    const { loadManifest: loadInvalidManifest } = makeHelpers(async () => ({ samples: [null] }), async () => {}, []);
     let caught = null;
     try {
       await loadInvalidManifest();
@@ -139,6 +141,36 @@ if (helpers) {
     check("loadManifest propagates validation code",
       caught?.payload?.code,
       "SAMPLE_MANIFEST_INVALID");
+  }
+
+  {
+    const events = [];
+    const { saveManifest } = makeHelpers(async () => validManifest, async (filePath, data) => {
+      events.push({ op: "writeJson", filePath, data });
+    }, events);
+    await saveManifest(validManifest);
+    check("saveManifest writes valid manifest",
+      events,
+      [{ op: "writeJson", filePath: "/samples/manifest.json", data: validManifest }]);
+  }
+
+  {
+    const events = [];
+    const { saveManifest } = makeHelpers(async () => validManifest, async (filePath, data) => {
+      events.push({ op: "writeJson", filePath, data });
+    }, events);
+    let caught = null;
+    try {
+      await saveManifest({ samples: [{ id: "sample-kr-1" }] });
+    } catch (error) {
+      caught = error;
+    }
+    check("saveManifest rejects invalid manifest before write",
+      caught?.payload?.code,
+      "SAMPLE_MANIFEST_INVALID");
+    check("saveManifest does not write invalid manifest",
+      events,
+      []);
   }
 }
 
