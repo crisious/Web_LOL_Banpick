@@ -477,6 +477,52 @@ check("CLI stops after healthz when publicDemoModeValid is false",
   invalidModeValidityRequests.map((request) => request.url),
   ["/healthz"]);
 
+const unsafeSampleGenerationHealthRequests = [];
+const unsafeSampleGenerationHealthServer = http.createServer((req, res) => {
+  unsafeSampleGenerationHealthRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") {
+    return sendJson(200, {
+      ok: true,
+      publicDemoMode: "readonly",
+      sampleGeneration: {
+        activeCount: 1,
+        oldestAgeMs: 1200,
+        lockKey: "KR:KR_8242613150",
+      },
+    });
+  }
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => unsafeSampleGenerationHealthServer.listen(0, "127.0.0.1", resolve));
+const unsafeSampleGenerationHealthUrl = `http://127.0.0.1:${unsafeSampleGenerationHealthServer.address().port}`;
+const unsafeSampleGenerationHealth = await runNode([
+  smokePath,
+  unsafeSampleGenerationHealthUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => unsafeSampleGenerationHealthServer.close(resolve));
+
+check("CLI exits non-zero when healthz sampleGeneration exposes identifiers",
+  unsafeSampleGenerationHealth.status,
+  1);
+
+check("CLI reports unsafe sampleGeneration health shape",
+  unsafeSampleGenerationHealth.stderr.includes("FAIL healthz sampleGeneration exposes only aggregate fields"),
+  true);
+
+check("CLI stops after healthz when sampleGeneration health is unsafe",
+  unsafeSampleGenerationHealthRequests.map((request) => request.url),
+  ["/healthz"]);
+
 const modeMismatchRequests = [];
 const modeMismatchServer = http.createServer((req, res) => {
   modeMismatchRequests.push({ method: req.method, url: req.url });

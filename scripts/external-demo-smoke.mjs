@@ -286,11 +286,42 @@ function demoModeFromHealth(body) {
   return "full";
 }
 
+function validateSampleGenerationHealth(body) {
+  if (!Object.prototype.hasOwnProperty.call(body || {}, "sampleGeneration")) return;
+
+  const sampleGeneration = body.sampleGeneration;
+  const keys = Object.keys(sampleGeneration || {});
+  const allowedKeys = ["activeCount", "oldestAgeMs"];
+  const hasOnlyAllowedKeys = keys.every((key) => allowedKeys.includes(key));
+
+  expectFatal(
+    sampleGeneration && typeof sampleGeneration === "object" && !Array.isArray(sampleGeneration),
+    "healthz sampleGeneration is an object",
+    `type=${Array.isArray(sampleGeneration) ? "array" : typeof sampleGeneration}`,
+  );
+  expectFatal(
+    hasOnlyAllowedKeys && allowedKeys.every((key) => keys.includes(key)),
+    "healthz sampleGeneration exposes only aggregate fields",
+    `keys=${keys.length ? keys.join(",") : "(none)"}`,
+  );
+  expectFatal(
+    Number.isInteger(sampleGeneration.activeCount) && sampleGeneration.activeCount >= 0,
+    "healthz sampleGeneration activeCount is a non-negative integer",
+    `activeCount=${sampleGeneration.activeCount}`,
+  );
+  expectFatal(
+    Number.isFinite(sampleGeneration.oldestAgeMs) && sampleGeneration.oldestAgeMs >= 0,
+    "healthz sampleGeneration oldestAgeMs is non-negative",
+    `oldestAgeMs=${sampleGeneration.oldestAgeMs}`,
+  );
+}
+
 const health = await request("/healthz");
 expectFatal(health.response.status === 200, "GET /healthz returns 200", `status=${health.response.status}`);
 expectFatal(contentType(health.response).includes("application/json"), "GET /healthz content-type is JSON", `content-type=${contentType(health.response) || "(missing)"}`);
 expect(headerValue(health.response, "x-content-type-options") === "nosniff", "GET /healthz has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(health.response, "x-content-type-options") || "(missing)"}`);
 expectFatal(health.body?.ok === true, "healthz ok=true");
+validateSampleGenerationHealth(health.body);
 if (health.body?.publicDemoModeValid === false) {
   fatal("public demo mode config is valid", `publicDemoMode=${health.body?.publicDemoMode || "(missing)"}`);
 }
