@@ -17,9 +17,13 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
   }
 
   function normalizeReportJsonPath(reportPath) {
-    const raw = reportPath.trim();
-    if (!raw) {
+    const raw = reportPath;
+    const trimmed = raw.trim();
+    if (!trimmed) {
       throw new Error("--report-json needs a file path");
+    }
+    if (trimmed !== raw) {
+      throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
     const comparable = raw.replace(/\\/g, "/");
     const rawSegments = comparable.split("/");

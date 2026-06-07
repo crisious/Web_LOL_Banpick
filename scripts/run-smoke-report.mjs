@@ -51,9 +51,13 @@ function passThroughOptionArg(args, prefix) {
 }
 
 function normalizeOutputRoot(outputRoot) {
-  const raw = outputRoot.trim();
-  if (!raw) {
+  const raw = outputRoot;
+  const trimmed = raw.trim();
+  if (!trimmed) {
     throw new Error("--output-root needs a directory path");
+  }
+  if (trimmed !== raw) {
+    throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
   const comparable = raw.replace(/\\/g, "/");
   const rawSegments = comparable.split("/");

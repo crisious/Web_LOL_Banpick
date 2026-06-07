@@ -138,6 +138,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/qa-automation//"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects leading whitespace output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root= test-artifacts/qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects trailing whitespace output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/qa-automation "], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects root dot-segment output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -313,6 +321,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("repeated separator env output root rejection does not create output root",
     fs.existsSync(repeatedSeparatorEnvCreatedPath),
+    false);
+
+  const whitespaceEnvOutputRoot = " test-artifacts/tmp/smoke-report-whitespace-root";
+  const whitespaceEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-whitespace-root");
+  fs.rmSync(whitespaceEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects whitespace env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: whitespaceEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("whitespace env output root rejection does not create output root",
+    fs.existsSync(whitespaceEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
