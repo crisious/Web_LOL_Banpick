@@ -81,6 +81,18 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.localhost"),
     "external_readonly_url must not point to a local or private network target");
 
+  checkThrows("validateExternalSmokeUrl rejects single-label hostname",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo/path"),
+    "external_readonly_url must use a fully qualified public hostname or IP address");
+
+  check("validateExternalSmokeUrl accepts public IPv4 literal",
+    validateExternalSmokeUrl("external_readonly_url", "https://8.8.8.8/path"),
+    "https://8.8.8.8/path");
+
+  check("validateExternalSmokeUrl accepts public IPv6 literal",
+    validateExternalSmokeUrl("external_readonly_url", "https://[2001:4860:4860::8888]/path"),
+    "https://[2001:4860:4860::8888]/path");
+
   checkThrows("validateExternalSmokeUrl rejects private IPv4 10/8",
     () => validateExternalSmokeUrl("external_readonly_url", "https://10.0.0.5"),
     "external_readonly_url must not point to a local or private network target");

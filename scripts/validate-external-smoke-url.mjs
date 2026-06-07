@@ -52,6 +52,15 @@ function isPrivateOrLocalIpv6(host) {
   );
 }
 
+function isIpLiteralHost(host) {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  return Boolean(ipv4Parts(host)) || normalized.includes(":");
+}
+
+function isSingleLabelHostname(host) {
+  return !isIpLiteralHost(host) && !host.includes(".");
+}
+
 function isLocalOrPrivateHost(host) {
   return (
     host === "localhost" ||
@@ -79,6 +88,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   const host = parsed.hostname.toLowerCase();
   if (isLocalOrPrivateHost(host)) {
     throw new Error(`${safeLabel} must not point to a local or private network target`);
+  }
+  if (isSingleLabelHostname(host)) {
+    throw new Error(`${safeLabel} must use a fully qualified public hostname or IP address`);
   }
   return parsed.toString();
 }
