@@ -20,6 +20,18 @@ function rawHostFromUrlValue(value) {
   return hostPort.split(":")[0].toLowerCase();
 }
 
+function rawPathFromUrlValue(value) {
+  const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
+  const pathStartIndex = withoutScheme.search(/[/?#]/);
+  if (pathStartIndex < 0 || withoutScheme[pathStartIndex] !== "/") return "";
+  return withoutScheme.slice(pathStartIndex).split(/[?#]/, 1)[0] || "";
+}
+
+function isPathDotSegment(segment) {
+  const dotDecoded = segment.toLowerCase().replace(/%2e/g, ".");
+  return dotDecoded === "." || dotDecoded === "..";
+}
+
 function isPrivateOrLocalIpv4(host) {
   const parts = ipv4Parts(host);
   if (!parts) return false;
@@ -201,6 +213,9 @@ export function validateExternalSmokeUrl(label, rawUrl) {
   }
   if (value.includes("\\")) {
     throw new Error(`${safeLabel} must not include backslashes`);
+  }
+  if (rawPathFromUrlValue(value).split("/").some(isPathDotSegment)) {
+    throw new Error(`${safeLabel} must not include path dot segments`);
   }
   let parsed;
   try {

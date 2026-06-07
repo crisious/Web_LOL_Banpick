@@ -53,6 +53,26 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/a b/c"),
     "external_readonly_url must not include unencoded spaces");
 
+  checkThrows("validateExternalSmokeUrl rejects parent path segment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/a/../admin"),
+    "external_readonly_url must not include path dot segments");
+
+  checkThrows("validateExternalSmokeUrl rejects current path segment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/a/./admin"),
+    "external_readonly_url must not include path dot segments");
+
+  checkThrows("validateExternalSmokeUrl rejects encoded parent path segment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/%2e%2e/admin"),
+    "external_readonly_url must not include path dot segments");
+
+  checkThrows("validateExternalSmokeUrl rejects mixed encoded parent path segment",
+    () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/.%2e/admin"),
+    "external_readonly_url must not include path dot segments");
+
+  check("validateExternalSmokeUrl accepts non-dot ellipsis path segment",
+    validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/.../admin"),
+    "https://demo.example.com/.../admin");
+
   checkThrows("validateExternalSmokeUrl rejects embedded newline",
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com/pa\nth"),
     "external_readonly_url must not include ASCII control characters");
