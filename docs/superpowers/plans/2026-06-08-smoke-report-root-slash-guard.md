@@ -120,7 +120,7 @@ node --check scripts/run-smoke-report.mjs && node --check test-artifacts/scripts
 
 Result: exit 0. Focused runner tests `45 passed, 0 failed`; full suite `768 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 3: Commit and push main**
+- [x] **Step 3: Commit and push main**
 
 ```bash
 git add scripts/run-smoke-report.mjs test-artifacts/scripts/smoke-report-runner-tests.mjs README.md docs/external-demo-runbook.md docs/superpowers/plans/2026-06-08-smoke-report-root-slash-guard.md
@@ -128,9 +128,25 @@ git commit -m "ci: reject root slash smoke report output"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify remote QA and artifact**
+Observed implementation commit and push:
+
+- Commit: `162e486 ci: reject root slash smoke report output`
+- Branch: `main`
+- Push target: `origin/main`
+
+- [x] **Step 4: Verify remote QA and artifact**
 
 Use `gh run list`, `gh run watch`, and `gh run download` for the pushed SHA. Confirm `qa-summary.json` reports read-only smoke success and no sensitive token patterns appear in the downloaded artifact.
+
+Observed implementation remote QA:
+
+- GitHub Actions run: `27107724910`
+- Head SHA: `162e48656041146cfc57480650655c4930aab157`
+- Conclusion: `success`
+- Artifact: `qa-automation-27107724910`
+- Artifact id: `7468920662`
+- `qa-summary.json`: read-only smoke `155 passed / 0 failed`, `actualMode=readonly`, `expectedMode=readonly`, `checkCount=155`
+- Sensitive artifact search: no matches for `Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY_URL=[^[:space:]]|EXTERNAL_PROTECTED_URL=[^[:space:]]|access_token=|token=secret|asset-secret|script-secret|user:pass@|RIOT_API_KEY|RGAPI-|KR_[0-9]{8,}|NA1_[0-9]{8,}|lockKey`
 
 - [ ] **Step 5: Update Obsidian**
 
