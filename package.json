@@ -9,7 +9,8 @@
     "test": "node test-artifacts/run-tests.mjs",
     "test:schema": "node test-artifacts/schema/schema-tests.mjs",
     "test:champions": "node test-artifacts/champions-tab/aggregate-tests.mjs",
-    "test:llm-payload": "node test-artifacts/server/llm-payload-tests.mjs"
+    "test:llm-payload": "node test-artifacts/server/llm-payload-tests.mjs",
+    "smoke:external": "node scripts/external-demo-smoke.mjs"
   },
   "engines": {
     "node": ">=20"

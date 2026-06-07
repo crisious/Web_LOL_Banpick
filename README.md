@@ -150,10 +150,11 @@
 핵심 순수 함수에 대한 회귀 테스트 — 외부 의존 없음, Node 20+면 즉시 실행:
 
 ```bash
-npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 224건)
+npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs · 총 253건)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 18건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 34건
+npm run smoke:external -- http://127.0.0.1:8123  # 외부 데모 안전성/API smoke
 ```
 
 테스트는 `server.js` / `main.js` 함수 본체를 텍스트로 추출 → `new Function`으로 평가하는 방식 (소스 변경 0). 새 테스트는 `test-artifacts/**/*-tests.mjs` 글롭으로 자동 발견.
@@ -177,7 +178,13 @@ cp .env.example .env
 ```
 RIOT_API_KEY=RGAPI-your-development-key
 PORT=8123
+# HOST=0.0.0.0
+# PUBLIC_DEMO_MODE=readonly
+# PUBLIC_DEMO_TOKEN=change-me
+# TRUST_PROXY=1
 ```
+
+외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
 
 ### 2. 서버 실행
 
@@ -230,6 +237,7 @@ payload
 - 프론트엔드 Riot API Key 입력 시 서버 키 대신 사용 (선택)
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
+- 외부 데모 모드: 정적 파일 allowlist만 서빙하며 `.env`, `server.js`, `data/**`, `test-artifacts/**`, 문서 파일 직접 접근은 차단
 
 ## 현재 한계
 

@@ -22,8 +22,22 @@
 
     <section class="login-overlay" data-login-overlay role="region" aria-labelledby="login-title">
       <div class="login-card">
-        <h1 class="login-title" id="login-title">LoL Replay Coach</h1>
-        <p class="login-subtitle">Riot ID를 입력하면 최근 10게임 요약을 바로 확인합니다.</p>
+        <div class="login-card__intro">
+          <span class="login-eyebrow">Replay Review</span>
+          <h1 class="login-title" id="login-title">LoL Replay Coach</h1>
+          <p class="login-subtitle">저장된 분석 리포트와 Riot ID 최근 경기 조회를 한 화면에서 시작합니다.</p>
+
+          <div class="login-mode-panel" aria-live="polite">
+            <span class="login-mode-pill" data-demo-mode-pill data-mode="checking">서버 확인 중</span>
+            <span class="login-mode-note" data-login-demo-note>샘플 목록을 불러오고 있습니다.</span>
+          </div>
+
+          <div class="login-demo-actions">
+            <button type="button" class="login-demo-button" data-login-sample-button disabled>저장 샘플 열기</button>
+            <span class="login-sample-meta" data-login-sample-meta>샘플 확인 중</span>
+          </div>
+        </div>
+
         <form class="login-form" data-login-form>
           <label for="login-gameName">
             <span>게임명 <span class="required" aria-hidden="true">*</span><span class="sr-only">필수</span></span>
@@ -53,8 +67,8 @@
             <span>이 계정 기억하기</span>
           </label>
           <button type="submit" class="login-submit">최근 10게임 분석 시작</button>
+          <p class="login-status" data-login-status></p>
         </form>
-        <p class="login-status" data-login-status></p>
       </div>
     </section>
 

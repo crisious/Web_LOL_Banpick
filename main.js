@@ -41,6 +41,10 @@ const dom = {
   loginOverlay: document.querySelector("[data-login-overlay]"),
   loginForm: document.querySelector("[data-login-form]"),
   loginStatus: document.querySelector("[data-login-status]"),
+  loginDemoMode: document.querySelector("[data-demo-mode-pill]"),
+  loginDemoNote: document.querySelector("[data-login-demo-note]"),
+  loginSampleButton: document.querySelector("[data-login-sample-button]"),
+  loginSampleMeta: document.querySelector("[data-login-sample-meta]"),
   matchListView: document.querySelector("[data-match-list-view]"),
   matchListGrid: document.querySelector("[data-match-list-grid]"),
   matchListHeader: document.querySelector("[data-match-list-header]"),
@@ -97,9 +101,12 @@ const state = {
   currentSample: null,
   currentSampleId: null,
   view: "LOGGED_OUT",
+  serverStatus: null,
+  serverStatusError: null,
   account: null,
   recentMatches: [],
   recentMatchesHasMore: false,
+  isSampleLoginPending: false,
   isLoadMorePending: false,
   prefetchedSamples: new Map(),
   riotApiKey: "",
@@ -1685,6 +1692,88 @@ async function loadSampleBundle(sampleId) {
   }
 }
 
+function firstManifestSample() {
+  return Array.isArray(state.manifest) && state.manifest.length > 0 ? state.manifest[0] : null;
+}
+
+function serverModeUi(status, error) {
+  if (error) {
+    return {
+      mode: "offline",
+      label: "상태 확인 실패",
+      note: "저장 샘플은 서버 연결이 복구되면 다시 시도할 수 있습니다.",
+    };
+  }
+
+  if (!status) {
+    return {
+      mode: "checking",
+      label: "서버 확인 중",
+      note: "샘플 목록을 불러오고 있습니다.",
+    };
+  }
+
+  if (status.readonly) {
+    return {
+      mode: "readonly",
+      label: "샘플 전용",
+      note: "외부 데모 모드에서는 저장된 분석 리포트만 열람합니다.",
+    };
+  }
+
+  if (status.protected) {
+    return {
+      mode: "protected",
+      label: "보호 모드",
+      note: "접속 토큰이 확인되면 라이브 Riot 조회와 샘플 열람을 사용할 수 있습니다.",
+    };
+  }
+
+  return {
+    mode: "full",
+    label: "라이브 조회 가능",
+    note: "Riot ID 조회와 저장 샘플 열람을 사용할 수 있습니다.",
+  };
+}
+
+function renderLoginDemoStatus() {
+  const sample = firstManifestSample();
+  const sampleCount = Array.isArray(state.manifest) ? state.manifest.length : 0;
+  const mode = serverModeUi(state.serverStatus, state.serverStatusError);
+
+  if (dom.loginDemoMode) {
+    dom.loginDemoMode.dataset.mode = mode.mode;
+    dom.loginDemoMode.textContent = mode.label;
+  }
+  if (dom.loginDemoNote) {
+    dom.loginDemoNote.textContent = mode.note;
+  }
+  if (dom.loginSampleButton) {
+    dom.loginSampleButton.textContent = state.isSampleLoginPending
+      ? "저장 샘플 여는 중..."
+      : sample
+        ? "저장 샘플 열기"
+        : "저장 샘플 없음";
+  }
+  if (dom.loginSampleMeta) {
+    dom.loginSampleMeta.textContent = sample
+      ? `${sampleCount}개 보관 · ${sample.publicAlias || sample.label || sample.id}`
+      : "샘플 대기 중";
+  }
+}
+
+async function loadServerStatus() {
+  try {
+    state.serverStatus = await fetchJson("/healthz");
+    state.serverStatusError = null;
+  } catch (error) {
+    state.serverStatus = null;
+    state.serverStatusError = error;
+  }
+  renderLoginDemoStatus();
+  applyPendingUi();
+}
+
 function evidenceMap(sample) {
   return new Map(
     (sample.normalized.timelineEvents || []).map((entry) => [
@@ -2201,22 +2290,66 @@ function renderEvidence(sample) {
     return;
   }
 
-  dom.evidence.innerHTML = evidenceEntries
-    .map(
-      (entry) => `
-        <article class="evidence-item">
-          <div class="evidence-stamp">
-            <span>${escapeHtml(entry.timestamp || entry.timestampLabel || "—")}</span>
-            <strong>${escapeHtml(entry.eventType || "—")}</strong>
-          </div>
-          <div class="evidence-copy">
-            <p>${escapeHtml(entry.summary || "")}</p>
-            <span>${escapeHtml(entry.statNote || entry.laneHint || "")}</span>
-          </div>
-        </article>
-      `,
-    )
-    .join("");
+  dom.evidence.innerHTML = `
+    <div class="evidence-list__summary" aria-label="근거 이벤트 요약">
+      <span>근거 이벤트 ${evidenceEntries.length}건</span>
+      <span>시간순 정렬</span>
+    </div>
+    ${evidenceEntries.map((entry, index) => renderEvidenceItem(entry, index)).join("")}
+  `;
+}
+
+function compactEventTypeLabel(eventType) {
+  const labels = {
+    CHAMPION_KILL: "킬 관여",
+    PLAYER_DEATH: "데스",
+    DRAGON_FIGHT: "드래곤 교전",
+    BARON_FIGHT: "바론 교전",
+    TOWER_TAKE: "타워",
+    SKIRMISH_WIN: "소규모 교전 승리",
+    SKIRMISH_LOSS: "소규모 교전 패배",
+    TEAMFIGHT_FOLLOWUP: "한타 후속",
+    OBJECTIVE_SETUP_WIN: "오브젝트 준비 성공",
+    OBJECTIVE_SETUP_FAIL: "오브젝트 준비 실패",
+    ROAM_SUCCESS: "로밍 성공",
+    ROAM_FAIL: "로밍 실패",
+    BAD_ENGAGE: "불리한 진입",
+    LANE_PRIORITY: "라인 주도권",
+  };
+  return labels[eventType] || String(eventType || "—").replace(/_/g, " ");
+}
+
+function evidenceTone(eventType) {
+  if (ENEMY_EVENT_TYPES.has(eventType) || /DEATH|FAIL|LOSS|BAD/.test(eventType)) return "danger";
+  if (ALLY_EVENT_TYPES.has(eventType) || /KILL|WIN|TAKE|SUCCESS|PRIORITY/.test(eventType)) return "good";
+  if (/DRAGON|BARON|OBJECTIVE|TOWER/.test(eventType)) return "objective";
+  return "neutral";
+}
+
+function renderEvidenceItem(entry, index) {
+  const timestamp = entry.timestamp || entry.timestampLabel || "—";
+  const eventType = entry.eventType || "—";
+  const summary = entry.summary || "";
+  const note = entry.statNote || entry.laneHint || "";
+  const eventId = entry.eventId || "";
+  const tone = evidenceTone(eventType);
+
+  return `
+    <article class="evidence-item" data-tone="${tone}">
+      <div class="evidence-stamp">
+        <span class="evidence-index">${String(index + 1).padStart(2, "0")}</span>
+        <strong>${escapeHtml(timestamp)}</strong>
+      </div>
+      <div class="evidence-copy">
+        <div class="evidence-copy__top">
+          <span class="evidence-type">${escapeHtml(compactEventTypeLabel(eventType))}</span>
+          ${eventId ? `<code class="evidence-event-id">${escapeHtml(eventId)}</code>` : ""}
+        </div>
+        <p>${escapeHtml(summary)}</p>
+        ${note ? `<div class="evidence-meta-row"><span>${escapeHtml(note)}</span></div>` : ""}
+      </div>
+    </article>
+  `;
 }
 
 // Track H: analysisMeta.schemaViolations를 ".data-quality-pill"로 노출.
@@ -3008,7 +3141,8 @@ async function selectSample(sampleId) {
   dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
 
   try {
-    state.manifest = (await fetchJson("/api/samples")).samples;
+    state.manifest = await loadManifest();
+    renderLoginDemoStatus();
     const sample = await loadSampleBundle(sampleId);
     const match = sampleMatchSummary(sample);
     renderSample(sample);
@@ -3090,14 +3224,17 @@ function applyPendingUi() {
   const loginDisabled = Boolean(state.isLoginPending);
   const recentDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending);
   const detailDisabled = Boolean(state.isDetailPending || state.isGeneratePending);
+  const sampleLoginDisabled = Boolean(state.isLoginPending || state.isSampleLoginPending || !firstManifestSample());
 
   toggleDisabled(Array.from(dom.loginForm.querySelectorAll("input, select, button")), loginDisabled);
+  toggleDisabled([dom.loginSampleButton], sampleLoginDisabled);
   toggleDisabled(Array.from(dom.recentForm.querySelectorAll("input, select, button")), recentDisabled);
   toggleDisabled(Array.from(dom.candidateList.querySelectorAll("[data-generate-match]")), recentDisabled);
   toggleDisabled(Array.from(dom.sampleSwitcher.querySelectorAll("[data-sample-button]")), recentDisabled);
   toggleDisabled(Array.from(dom.matchListGrid.querySelectorAll("[data-match-detail]")), detailDisabled);
   toggleDisabled(Array.from(dom.matchListHeader.querySelectorAll("button")), detailDisabled);
   toggleDisabled([dom.backToListBtn], detailDisabled);
+  renderLoginDemoStatus();
 }
 
 async function handleRecentMatchesSubmit(event) {
@@ -3190,6 +3327,44 @@ async function handleGenerateSample(matchId) {
     throw error;
   } finally {
     state.isGeneratePending = false;
+    applyPendingUi();
+  }
+}
+
+async function handleLoginSampleOpen() {
+  if (state.isSampleLoginPending || state.isLoginPending) return;
+
+  state.isSampleLoginPending = true;
+  applyPendingUi();
+  dom.loginStatus.textContent = "저장 샘플을 여는 중입니다.";
+
+  try {
+    if (!firstManifestSample()) {
+      state.manifest = await loadManifest();
+      renderLoginDemoStatus();
+    }
+
+    const sample = firstManifestSample();
+    if (!sample) {
+      throw new Error("열 수 있는 저장 샘플이 없습니다.");
+    }
+
+    setDetailProgress("lookup", {
+      message: `${sample.id} 저장 분석을 불러오고 있습니다.`,
+      progress: 32,
+      skippedSteps: ["riot", "ai"],
+    });
+    setView("LOADING_DETAIL");
+    await selectSample(sample.id);
+    setView("DETAIL_VIEW");
+    completeDetailProgress("저장된 분석 리포트를 열었습니다.");
+    dom.loginStatus.textContent = "";
+  } catch (error) {
+    failDetailProgress(formatRetryMessage(error));
+    setView("LOGGED_OUT");
+    dom.loginStatus.textContent = `샘플 열기 실패: ${formatRetryMessage(error)}`;
+  } finally {
+    state.isSampleLoginPending = false;
     applyPendingUi();
   }
 }
@@ -3612,13 +3787,17 @@ async function startDetailAnalysis(matchId) {
 // ─── Init ─────────────────────────────────────────────────────────────────
 
 async function init() {
+  loadServerStatus();
+
   // manifest 로드 (실패해도 계속 진행)
   try {
     state.manifest = await loadManifest();
   } catch {}
+  renderLoginDemoStatus();
 
   // 이벤트 리스너 등록
   dom.loginForm.addEventListener("submit", handleLogin);
+  dom.loginSampleButton?.addEventListener("click", handleLoginSampleOpen);
   dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
 
   // Track B: Riot 키 배너 닫기 버튼

@@ -1,0 +1,327 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-06-02T11:24:50.140Z",
+  "sampleId": "sample-kr-8242213528",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8242213528_1780399490140",
+      "generatedAt": "2026-06-02T11:24:50.140Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "초반 안정적인 서포팅으로 팀을 리드했으나, 중·후반 포지셔닝 실수로 반복 데스가 발생하며 경기를 내줬다."
+    },
+    "coachSummary": {
+      "overallSummary": "모르가나 서포터로 초반(1/0/7) 뛰어난 어시스트 참여와 시야 점수 110을 기록하며 팀 운영의 축 역할을 수행했다. 그러나 중반 이후 4데스가 집중되며 오브젝트 구도에서 수적 열세를 자초했고, 후반 결정적 한타에서도 생존하지 못해 바론·타워 주도권을 상대에게 넘겼다. 킬 관여율 55%와 딜량 19,576은 서포터 치고 공격적인 기여를 보여주지만, 데스 타이밍 관리가 다음 게임의 핵심 과제다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "1/0/7로 초반 라인전과 로밍에서 팀에 확실한 기여를 했다. 다만 7분, 13분 오브젝트를 상대에게 내주면서 초반 리드를 구조물로 전환하지 못했다."
+      },
+      {
+        "phase": "MID",
+        "summary": "3/4/8로 킬 참여는 활발했으나 17분·22분·26분·28분 연속 데스가 치명적이었다. 드래곤 합류와 타워 압박에 관여했지만, 바론을 상대에게 내주며 중반 주도권이 흔들렸다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "1/2/1로 후반 기여도가 급감했다. 31분·35분 결정적 구도에서 생존하지 못해 팀이 최종 오브젝트를 지키지 못했고 패배로 이어졌다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "초반 어시스트 주도력",
+        "description": "초반 1/0/7 라인으로 팀 킬의 상당 부분에 관여하며 모르가나의 CC와 실드를 효과적으로 활용했다. 데스 없이 안정적으로 초반을 마무리한 점이 인상적이다.",
+        "relatedEventIds": [
+          "evt_008"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "높은 시야 점수",
+        "description": "36분 경기에서 시야 점수 110은 매우 우수하다. 꾸준한 와딩과 디와딩으로 팀에 정보 우위를 제공했다.",
+        "relatedEventIds": [
+          "evt_026"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "드래곤 합류 타이밍",
+        "description": "24분 드래곤 교전에 적극적으로 합류해 킬을 따내며 오브젝트 템포를 챙겼다. 오브젝트 주변에서의 위치 선정이 좋았다.",
+        "relatedEventIds": [
+          "evt_026",
+          "evt_027"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "중반 반복 데스",
+        "description": "17분부터 28분까지 4데스가 집중됐다. 특히 22분과 26분 단독 데스는 팀 수적 열세를 만들어 오브젝트 분쟁에서 불리한 구도를 초래했다.",
+        "relatedEventIds": [
+          "evt_016",
+          "evt_021",
+          "evt_029",
+          "evt_037"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "후반 생존력 부족",
+        "description": "31분과 35분 후반 결정적 교전에서 모두 사망했다. 모르가나의 존야 활용이나 포지셔닝으로 생존할 수 있는 구간이었을 가능성이 높다.",
+        "relatedEventIds": [
+          "evt_041",
+          "evt_044"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "오브젝트 주도권 전환 실패",
+        "description": "팀 드래곤 3, 바론 1을 확보했지만 상대 타워 10 vs 아군 타워 7로 구조물 격차가 벌어졌다. 오브젝트 확보 후 압박 전환이 부족했다.",
+        "relatedEventIds": [
+          "evt_032",
+          "evt_045"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "중반 이후 교전 진입 전 팀원 위치를 미니맵으로 확인하고, 혼자 앞서지 않는다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "존야의 모래시계 타이밍을 더 적극적으로 활용해 후반 핵심 교전에서 생존율을 높인다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "드래곤·바론 확보 직후 팀과 함께 타워 압박으로 전환하는 루틴을 만든다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 직전 자신의 위치를 복기해 '왜 거기 있었는지' 패턴을 파악한다.",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "12:55",
+        "title": "초반 솔로킬 성공",
+        "description": "초반 교전에서 1킬을 올리며 데스 없이 라인 주도권을 확보했다. 모르가나의 Q 적중률이 높았던 구간이다.",
+        "relatedEventIds": [
+          "evt_008"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "17:32~17:44",
+        "title": "중반 첫 데스 — 1:1 교환",
+        "description": "킬을 하나 따냈지만 곧바로 데스를 내줬다. 이후 연속 데스의 시작점이 된 교전으로, 교환 후 이탈 판단이 아쉬웠다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_016"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "26:10~26:36",
+        "title": "바론 구도 데스 + 바론 헌납",
+        "description": "26분 데스 이후 수적 열세로 바론을 상대에게 내줬다. 바론 구도 직전 사망이 경기 흐름을 크게 흔들었다.",
+        "relatedEventIds": [
+          "evt_029",
+          "evt_032"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "35:36~36:00",
+        "title": "최후반 데스 → 넥서스 위기",
+        "description": "35분 결정적 교전에서 사망한 뒤 36분 구조물을 상대에게 내주며 패배가 확정됐다. 후반 한 번의 데스가 경기를 결정지은 장면이다.",
+        "relatedEventIds": [
+          "evt_044",
+          "evt_045"
+        ]
+      }
+    ],
+    "combatAnalysis": [
+      {
+        "encounterId": "enc_001",
+        "situationLabel": "초반 라인전 솔로킬 확보",
+        "playerDecision": "12분 55초 교전에서 적극적으로 CC를 걸어 킬을 따내며 데스 없이 이탈했다.",
+        "takeaway": "초반 유리한 구도에서 공격적으로 플레이한 좋은 판단이다. 이런 성공 패턴을 유지하자.",
+        "relatedEventIds": [
+          "evt_008"
+        ]
+      },
+      {
+        "encounterId": "enc_002",
+        "situationLabel": "중반 1:1 교환 — 킬 후 역킬",
+        "playerDecision": "17분 32초 킬을 따냈지만 12초 후 반격에 사망했다. 킬 후 이탈 타이밍을 놓쳤다.",
+        "takeaway": "킬 성공 후 즉시 후퇴 경로를 확보하고, 추가 딜 욕심을 줄인다.",
+        "relatedEventIds": [
+          "evt_015",
+          "evt_016"
+        ]
+      },
+      {
+        "encounterId": "enc_003",
+        "situationLabel": "중반 단독 데스 — 포지셔닝 실수",
+        "playerDecision": "22분 40초 팀 합류 없이 위험 지역에서 단독으로 사망했다.",
+        "takeaway": "중반 이후 혼자 시야가 없는 구역에 진입하지 않는다. 항상 팀원 근처에서 행동한다.",
+        "relatedEventIds": [
+          "evt_021"
+        ]
+      },
+      {
+        "encounterId": "enc_004",
+        "situationLabel": "드래곤 교전 킬 확보",
+        "playerDecision": "24분 45초 드래곤 구도에서 적절한 포지셔닝으로 킬을 따냈다.",
+        "takeaway": "오브젝트 주변에서의 CC 활용과 포지셔닝이 잘 된 사례. 이 거리감을 기억하자.",
+        "relatedEventIds": [
+          "evt_027"
+        ]
+      },
+      {
+        "encounterId": "enc_005",
+        "situationLabel": "바론 구도 전 단독 사망",
+        "playerDecision": "26분 10초 바론 셋업 구간에서 사망하며 수적 열세를 만들었다.",
+        "takeaway": "바론 스폰 1분 전부터는 절대 혼자 움직이지 않는다. 팀과 함께 시야 확보 후 이동한다.",
+        "relatedEventIds": [
+          "evt_029"
+        ]
+      },
+      {
+        "encounterId": "enc_006",
+        "situationLabel": "중반 교전 킬 성공",
+        "playerDecision": "27분 59초 팀 교전에서 CC를 적중시켜 킬을 확보했다.",
+        "takeaway": "팀과 함께하는 교전에서 모르가나의 가치가 극대화된다. 단독 행동보다 팀 합류를 우선한다.",
+        "relatedEventIds": [
+          "evt_034"
+        ]
+      },
+      {
+        "encounterId": "enc_007",
+        "situationLabel": "타워 압박 중 역습 사망",
+        "playerDecision": "28분 54초 타워 압박 상황에서 상대 역습에 사망했다. 압박 후 이탈이 늦었다.",
+        "takeaway": "타워 다이브나 압박 후 반드시 후퇴 타이밍을 정해두고, 존야를 방어적으로 활용한다.",
+        "relatedEventIds": [
+          "evt_037"
+        ]
+      },
+      {
+        "encounterId": "enc_008",
+        "situationLabel": "후반 결정적 교전 사망",
+        "playerDecision": "31분 48초 후반 교전에서 생존하지 못했다. 모르가나의 궁극기+존야 콤보 타이밍이 적절하지 않았을 가능성이 있다.",
+        "takeaway": "후반 교전에서는 R+존야 진입보다 후방에서 Q로 이니시 보조 역할을 고려한다.",
+        "relatedEventIds": [
+          "evt_041"
+        ]
+      }
+    ],
+    "teamfightPhaseAnalysis": [],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_008",
+        "shortNote": "12:55 초반 교전 킬 확보"
+      },
+      {
+        "eventId": "evt_015",
+        "shortNote": "17:32 중반 교전 킬"
+      },
+      {
+        "eventId": "evt_016",
+        "shortNote": "17:44 중반 교전 후 역킬 데스"
+      },
+      {
+        "eventId": "evt_021",
+        "shortNote": "22:40 중반 단독 사망"
+      },
+      {
+        "eventId": "evt_026",
+        "shortNote": "24:41 드래곤 교전 참여"
+      },
+      {
+        "eventId": "evt_027",
+        "shortNote": "24:45 드래곤 구도 킬 확보"
+      },
+      {
+        "eventId": "evt_029",
+        "shortNote": "26:10 바론 구도 전 사망"
+      },
+      {
+        "eventId": "evt_032",
+        "shortNote": "26:36 바론 상대에게 헌납"
+      },
+      {
+        "eventId": "evt_034",
+        "shortNote": "27:59 팀 교전 킬"
+      },
+      {
+        "eventId": "evt_037",
+        "shortNote": "28:54 타워 압박 중 사망"
+      },
+      {
+        "eventId": "evt_041",
+        "shortNote": "31:48 후반 결정적 교전 사망"
+      },
+      {
+        "eventId": "evt_044",
+        "shortNote": "35:36 최후반 결정적 사망"
+      },
+      {
+        "eventId": "evt_045",
+        "shortNote": "36:00 구조물 상실 — 패배 확정"
+      }
+    ]
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "초반 어시스트 주도력",
+        "note": "초반 1/0/7 라인으로 팀 킬의 상당 부분에 관여하며 모르가나의 CC와 실드를 효과적으로 활용했다. 데스 없이 안정적으로 초반을 마무리한 점이 인상적이다."
+      },
+      {
+        "category": "strength",
+        "topic": "높은 시야 점수",
+        "note": "36분 경기에서 시야 점수 110은 매우 우수하다. 꾸준한 와딩과 디와딩으로 팀에 정보 우위를 제공했다."
+      },
+      {
+        "category": "strength",
+        "topic": "드래곤 합류 타이밍",
+        "note": "24분 드래곤 교전에 적극적으로 합류해 킬을 따내며 오브젝트 템포를 챙겼다. 오브젝트 주변에서의 위치 선정이 좋았다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 반복 데스",
+        "note": "17분부터 28분까지 4데스가 집중됐다. 특히 22분과 26분 단독 데스는 팀 수적 열세를 만들어 오브젝트 분쟁에서 불리한 구도를 초래했다."
+      },
+      {
+        "category": "weakness",
+        "topic": "후반 생존력 부족",
+        "note": "31분과 35분 후반 결정적 교전에서 모두 사망했다. 모르가나의 존야 활용이나 포지셔닝으로 생존할 수 있는 구간이었을 가능성이 높다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 주도권 전환 실패",
+        "note": "팀 드래곤 3, 바론 1을 확보했지만 상대 타워 10 vs 아군 타워 7로 구조물 격차가 벌어졌다. 오브젝트 확보 후 압박 전환이 부족했다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

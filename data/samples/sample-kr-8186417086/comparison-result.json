@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-04-26T15:31:35.814Z",
+  "sampleId": "sample-kr-8186417086",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-04-26T15:31:35.814Z",
+      "matchId": "KR_8186417086",
+      "playerRiotId": "매운맛 비스킷#KR1",
+      "champion": "Pantheon",
+      "position": "SUPPORT",
+      "result": "LOSS",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8186417086_1777217495814"
+    },
+    "matchSummary": {
+      "headline": "판테온 서포터로 초반 공격적 플레이를 시도했으나 중반 연속 데스로 주도권을 잃고, 바론 3회 확보에도 오브젝트 전환 실패로 패배한 경기."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 4킬을 올리며 공격적 로밍 의지를 보여줬지만, 16~28분 구간에서 8데스가 집중되며 팀 운영이 무너졌습니다. 바론을 3회나 확보하고도 드래곤 1개에 그친 점은 오브젝트 우선순위 판단에 아쉬움이 남습니다. 판테온 특성상 중후반 체급이 떨어지므로, 중반 이니시에이트 타이밍을 더 신중하게 고르는 연습이 필요합니다."
+    },
+    "phaseSummaries": [],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "높은 시야 점수와 서포터 기본기",
+        "description": "39분 경기에서 시야 점수 130을 기록했습니다. 분당 약 3.3의 시야 점수는 서포터 역할에 충실했다는 의미이며, 와드 배치와 디와딩에 꾸준히 신경 썼음을 보여줍니다.",
+        "relatedEventIds": [
+          "evt_030",
+          "evt_041"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "초반 킬 압박력",
+        "description": "초반 구간에서 4킬 3어시스트를 기록하며 판테온의 초반 강점을 적극 활용했습니다. 레인 단계에서 공격적 이니시에이트 능력을 잘 발휘한 구간입니다.",
+        "relatedEventIds": [
+          "evt_010"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "바론 파이트 참여와 오브젝트 기여",
+        "description": "팀이 바론 3회를 확보하는 데 기여했으며, 특히 31:55 바론 파이트에 직접 관여해 후반 역전 기회를 만들었습니다. 오브젝트 타이밍에 합류하려는 의지가 좋았습니다.",
+        "relatedEventIds": [
+          "evt_030",
+          "evt_041"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "weak_1",
+        "title": "중반 연속 데스로 인한 운영 붕괴",
+        "description": "16:09~19:18 사이 약 3분 동안 4번 사망했습니다. 부활 후 즉시 교전에 복귀하며 같은 패턴으로 잡힌 것으로 보입니다. 데스 후에는 한 템포 쉬어가며 팀 합류 타이밍을 재설정하는 것이 중요합니다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_015",
+          "evt_017",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "weak_2",
+        "title": "바론 확보 후 전환 실패",
+        "description": "바론 3회 확보에도 타워는 5개에 그쳤고, 25:21 바론 직후 26:43·27:55에 다시 잡히며 버프를 낭비했습니다. 바론 후에는 무리한 이니시보다 안전한 시즈 운영이 필요합니다.",
+        "relatedEventIds": [
+          "evt_030",
+          "evt_031",
+          "evt_035",
+          "evt_038"
+        ]
+      },
+      {
+        "id": "weak_3",
+        "title": "후반 생존력 부족과 포지셔닝",
+        "description": "후반 5데스 전원이 교전 진입 후 생존하지 못한 패턴입니다. 판테온은 후반 탱킹이 어려우므로, 궁극기 진입 후 즉시 빠지거나 팀 후방에서 W로 필링하는 역할 전환이 필요합니다.",
+        "relatedEventIds": [
+          "evt_043",
+          "evt_039"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "chk_1",
+        "text": "데스 후 복귀 시 미니맵을 5초간 확인하고, 적 위치가 불명확하면 합류를 1웨이브 늦추기",
+        "priority": "high"
+      },
+      {
+        "id": "chk_2",
+        "text": "바론 확보 직후 30초간 교전 자제 — 미니언 웨이브가 밀려올 때까지 시즈 포지션 잡기",
+        "priority": "high"
+      },
+      {
+        "id": "chk_3",
+        "text": "25분 이후 판테온 궁극기는 이니시보다 사이드 압박·합류용으로 사용하기",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_4",
+        "text": "드래곤 스폰 1분 전 하단 시야 선점 — 이번 경기 드래곤 1개는 시야 주도권 부족이 원인",
+        "priority": "medium"
+      },
+      {
+        "id": "chk_5",
+        "text": "중반 이후 교전 시 W 스턴을 적 캐리 대상이 아닌 아군 캐리 보호용으로 전환 검토",
+        "priority": "low"
+      }
+    ],
+    "keyMoments": [
+      {
+        "eventId": "evt_014",
+        "timestampLabel": "16:09",
+        "phase": "MID",
+        "title": "중반 연속 데스의 시작",
+        "description": "첫 중반 데스가 발생한 시점입니다. 이후 3분간 3번 더 사망하며 팀 골드 격차가 벌어지는 기점이 되었습니다."
+      },
+      {
+        "eventId": "evt_030",
+        "timestampLabel": "25:21",
+        "phase": "MID",
+        "title": "첫 바론 확보",
+        "description": "팀이 바론을 확보하며 역전 가능성을 열었지만, 이후 오브젝트 전환에 실패해 바론 버프가 낭비되었습니다."
+      },
+      {
+        "eventId": "evt_035",
+        "timestampLabel": "26:43",
+        "phase": "MID",
+        "title": "바론 버프 중 사망",
+        "description": "바론 버프가 있는 상태에서 사망하며 팀의 시즈 능력이 크게 감소했습니다. 버프 활용 타이밍 관리의 중요성을 보여주는 장면입니다."
+      },
+      {
+        "eventId": "evt_041",
+        "timestampLabel": "31:55",
+        "phase": "LATE",
+        "title": "두 번째 바론 파이트 관여",
+        "description": "후반 바론 파이트에 직접 참여해 확보에 기여했으나, 32:03에 바로 사망하며 후속 운영에 참여하지 못했습니다."
+      },
+      {
+        "eventId": "evt_043",
+        "timestampLabel": "32:03",
+        "phase": "LATE",
+        "title": "바론 직후 즉사",
+        "description": "바론 확보 8초 후 사망한 장면으로, 오브젝트 확보 후 즉시 후퇴하는 습관의 필요성을 보여줍니다."
+      }
+    ],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_010",
+        "usedIn": [
+          "str_2"
+        ]
+      },
+      {
+        "eventId": "evt_014",
+        "usedIn": [
+          "weak_1",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_015",
+        "usedIn": [
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_017",
+        "usedIn": [
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_019",
+        "usedIn": [
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_025",
+        "usedIn": [
+          "weak_1"
+        ]
+      },
+      {
+        "eventId": "evt_030",
+        "usedIn": [
+          "str_1",
+          "str_3",
+          "weak_2",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_031",
+        "usedIn": [
+          "weak_2"
+        ]
+      },
+      {
+        "eventId": "evt_035",
+        "usedIn": [
+          "weak_2",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_037",
+        "usedIn": [
+          "weak_2"
+        ]
+      },
+      {
+        "eventId": "evt_038",
+        "usedIn": [
+          "weak_2"
+        ]
+      },
+      {
+        "eventId": "evt_039",
+        "usedIn": [
+          "weak_3"
+        ]
+      },
+      {
+        "eventId": "evt_041",
+        "usedIn": [
+          "str_1",
+          "str_3",
+          "keyMoments"
+        ]
+      },
+      {
+        "eventId": "evt_043",
+        "usedIn": [
+          "weak_3",
+          "keyMoments"
+        ]
+      }
+    ],
+    "schemaVersion": "1.0"
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "높은 시야 점수와 서포터 기본기",
+        "note": "39분 경기에서 시야 점수 130을 기록했습니다. 분당 약 3.3의 시야 점수는 서포터 역할에 충실했다는 의미이며, 와드 배치와 디와딩에 꾸준히 신경 썼음을 보여줍니다."
+      },
+      {
+        "category": "strength",
+        "topic": "초반 킬 압박력",
+        "note": "초반 구간에서 4킬 3어시스트를 기록하며 판테온의 초반 강점을 적극 활용했습니다. 레인 단계에서 공격적 이니시에이트 능력을 잘 발휘한 구간입니다."
+      },
+      {
+        "category": "strength",
+        "topic": "바론 파이트 참여와 오브젝트 기여",
+        "note": "팀이 바론 3회를 확보하는 데 기여했으며, 특히 31:55 바론 파이트에 직접 관여해 후반 역전 기회를 만들었습니다. 오브젝트 타이밍에 합류하려는 의지가 좋았습니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "중반 연속 데스로 인한 운영 붕괴",
+        "note": "16:09~19:18 사이 약 3분 동안 4번 사망했습니다. 부활 후 즉시 교전에 복귀하며 같은 패턴으로 잡힌 것으로 보입니다. 데스 후에는 한 템포 쉬어가며 팀 합류 타이밍을 재설정하는 것이 중요합니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "바론 확보 후 전환 실패",
+        "note": "바론 3회 확보에도 타워는 5개에 그쳤고, 25:21 바론 직후 26:43·27:55에 다시 잡히며 버프를 낭비했습니다. 바론 후에는 무리한 이니시보다 안전한 시즈 운영이 필요합니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "후반 생존력 부족과 포지셔닝",
+        "note": "후반 5데스 전원이 교전 진입 후 생존하지 못한 패턴입니다. 판테온은 후반 탱킹이 어려우므로, 궁극기 진입 후 즉시 빠지거나 팀 후방에서 W로 필링하는 역할 전환이 필요합니다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8240894781_1780332192375",
+    "generatedAt": "2026-06-01T16:43:12.375Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "렐 서포터로 1/9/31 기록하며 높은 어시스트 참여로 팀 승리를 이끌었으나, 중반 반복 데스가 경기를 불필요하게 길게 만들었다."
+  },
+  "coachSummary": {
+    "overallSummary": "킬 참여율 52%, 시야 점수 121로 팀 파이트와 시야 장악에서 뛰어난 기여를 보여줬습니다. 초반 솔로킬 창출과 드래곤 합류 타이밍도 좋았습니다. 다만 중반(15~29분) 구간에서 6데스가 집중되며 상대에게 바론과 타워를 허용하는 빌미를 제공했습니다. 렐의 이니시에이트 타이밍과 후퇴 판단을 다듬으면 데스를 절반 이하로 줄이면서도 같은 수준의 어시스트를 유지할 수 있습니다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2:36 첫 데스로 템포가 흔들렸지만 8:56 직접 킬을 만들며 반등했습니다. 어시스트 10개로 초반 교전 참여는 우수했으나, 12:55 오브젝트 상실이 아쉬운 포인트입니다."
+    },
+    {
+      "phase": "MID",
+      "summary": "15분~29분 사이 6데스가 집중된 가장 취약한 구간이었습니다. 드래곤 파이트(21:18) 합류는 좋았지만, 교전 후 생존율이 극도로 낮아 상대에게 골드와 오브젝트를 반복 허용했습니다. 26:33 오브젝트 상실도 이 흐름의 연장선입니다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "31:59 드래곤 파이트에 합류하며 오브젝트를 확보했고, 데스가 1회로 줄어 안정감을 되찾았습니다. 다만 32:27 데스 직후 바론을 상대에게 내준 점은 후반 생존의 중요성을 보여줍니다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "압도적인 팀 파이트 참여와 어시스트",
+      "description": "31어시스트, 킬 참여율 52%로 팀의 61킬 중 절반 이상에 관여했습니다. 렐의 CC와 이니시에이트를 적극적으로 활용해 팀원에게 킬 기회를 꾸준히 제공한 점이 승리의 핵심이었습니다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_028",
+        "evt_048"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "우수한 시야 장악력",
+      "description": "시야 점수 121은 35분 경기에서 분당 3.4 이상으로, 서포터로서 매우 높은 수치입니다. 오라클 렌즈 활용과 와드 배치가 팀의 오브젝트 컨트롤에 기여했습니다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_028",
+        "evt_048"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "드래곤 파이트 합류 타이밍",
+      "description": "5:45, 21:18, 31:59 드래곤 타이밍에 빠짐없이 합류하며 팀 드래곤 3개 확보에 기여했습니다. 오브젝트 타이밍 인식과 로테이션 판단이 좋았습니다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_028",
+        "evt_048"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 반복 데스로 인한 골드 출혈",
+      "description": "15~29분 사이 6회 데스가 집중되었습니다. 교전 이니시에이트 후 후퇴 타이밍을 잡지 못하거나, 팀원과 분리된 상태에서 잡히는 패턴이 반복되었습니다. 이로 인해 상대에게 불필요한 골드와 시간을 허용했습니다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_026",
+        "evt_030",
+        "evt_032",
+        "evt_039",
+        "evt_043"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "교전 후 생존율 부족",
+      "description": "이니시에이트 성공 후에도 생존하지 못하는 경우가 많았습니다. 렐은 진입 후 W로 이탈할 수 있지만, 너무 깊이 들어가 쿨타임 전에 집중 공격을 받는 상황이 반복되었습니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_032",
+        "evt_049"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "오브젝트 상실 시 포지셔닝 문제",
+      "description": "12:55와 26:33에 주요 오브젝트를 상대에게 내줬으며, 32:27 데스 직후 바론까지 허용했습니다. 오브젝트 싸움 전후 포지셔닝과 생존이 오브젝트 확보에 직결된다는 점을 인식해야 합니다.",
+      "relatedEventIds": [
+        "evt_016",
+        "evt_040",
+        "evt_049",
+        "evt_050"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "중반 교전 시 이니시에이트 전 팀원 위치를 미니맵으로 확인하고, 최소 2명 이상 합류 가능할 때만 진입한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "렐 W(언마운트→마운트) 쿨타임을 항상 의식하고, 쿨타임이 돌아오기 전에는 추가 진입하지 않는다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "오브젝트 스폰 30초 전부터 생존을 최우선으로 두고, 불필요한 교전을 피한다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "데스 후 같은 위치에서 다시 잡히는 패턴을 방지하기 위해, 부활 후 안전한 경로로 합류한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_5",
+      "text": "중반 이후 이니시에이트 성공 시 즉시 후퇴 경로를 확보하고, CC 연계가 끝나면 백라인으로 빠진다.",
+      "linkedWeaknessId": "wk_2"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "2:36",
+      "title": "초반 첫 데스로 라인 템포 손실",
+      "description": "레벨 2~3 타이밍에서 먼저 데스를 당하며 바텀 라인 주도권을 상대에게 넘겼습니다. 초반 레벨링 구간에서는 상대 CC와 점화 타이밍을 존중하는 것이 중요합니다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "8:56",
+      "title": "솔로킬 창출로 반등",
+      "description": "직접 킬을 만들며 초반 데스의 불리함을 만회했습니다. 렐의 CC 체인을 정확하게 연결해 팀에 골드 어드밴티지를 되돌려준 좋은 플레이입니다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "21:18",
+      "title": "중반 드래곤 파이트 합류",
+      "description": "드래곤 타이밍에 정확히 합류하며 오브젝트를 확보했습니다. 중반 6데스 구간에서도 오브젝트 감각은 유지한 점이 인상적입니다.",
+      "relatedEventIds": [
+        "evt_028"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "15:16~25:36",
+      "title": "중반 연속 데스 구간 (6회)",
+      "description": "약 10분간 6번의 데스가 집중된 경기의 가장 위험한 구간이었습니다. 이니시에이트 후 생존 실패, 또는 분리된 상태에서 캐치당하는 패턴이 반복되었습니다. 팀이 킬 어드밴티지를 유지했기에 승리했지만, 이 구간의 데스를 절반으로 줄였다면 훨씬 빠른 게임 종료가 가능했습니다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_026",
+        "evt_030",
+        "evt_032",
+        "evt_039"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "32:27",
+      "title": "후반 데스 후 바론 상실",
+      "description": "후반 결정적 구도에서 생존하지 못해 상대에게 바론을 허용했습니다. 후반에는 서포터 한 명의 생존이 오브젝트 확보/방어에 직결됩니다.",
+      "relatedEventIds": [
+        "evt_049",
+        "evt_050"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situationLabel": "초반 라인전 첫 교전 데스",
+      "playerDecision": "레벨 2~3 타이밍에 공격적으로 진입했으나 상대의 반격에 먼저 쓰러졌다.",
+      "takeaway": "초반 레벨링 구간에서는 상대 스킬 쿨타임과 소환사 주문을 확인한 뒤 교전을 시도한다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situationLabel": "초반 라인전 솔로킬 창출",
+      "playerDecision": "렐의 CC 체인을 정확하게 연결해 상대를 잡아내며 킬을 만들었다.",
+      "takeaway": "CC 연계가 확실할 때 공격적으로 진입하는 판단은 정확했다. 이 타이밍 감각을 유지한다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situationLabel": "초반 킬 직후 역습 데스",
+      "playerDecision": "8:56 킬 이후 약 30초 만에 다시 교전에 휘말리며 데스를 당했다.",
+      "takeaway": "킬 획득 후에는 체력/쿨타임을 점검하고 무리한 추가 교전을 피한다.",
+      "relatedEventIds": [
+        "evt_011"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situationLabel": "중반 전환기 첫 데스",
+      "playerDecision": "15분대 중반 진입 시점에서 포지셔닝이 노출되며 캐치당했다.",
+      "takeaway": "중반 전환기에는 시야가 부족한 구간을 혼자 이동하지 않는다.",
+      "relatedEventIds": [
+        "evt_019"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situationLabel": "중반 분리 상태 캐치",
+      "playerDecision": "팀원과 분리된 상태에서 상대에게 잡혔다.",
+      "takeaway": "로테이션 시 팀원과의 거리를 항상 확인하고, 2인 이상 동행한다.",
+      "relatedEventIds": [
+        "evt_026"
+      ]
+    },
+    {
+      "encounterId": "enc_006",
+      "situationLabel": "중반 교전 후 생존 실패",
+      "playerDecision": "이니시에이트 후 W 쿨타임이 돌아오기 전에 집중 공격을 받아 쓰러졌다.",
+      "takeaway": "진입 깊이를 W 이탈 가능 범위 내로 제한한다.",
+      "relatedEventIds": [
+        "evt_030"
+      ]
+    },
+    {
+      "encounterId": "enc_007",
+      "situationLabel": "연속 데스 — 부활 후 재교전",
+      "playerDecision": "이전 데스 직후 부활하여 바로 교전에 합류했으나 다시 쓰러졌다.",
+      "takeaway": "부활 후 바로 전선에 복귀하기보다 팀 상황을 파악한 뒤 안전하게 합류한다.",
+      "relatedEventIds": [
+        "evt_032"
+      ]
+    },
+    {
+      "encounterId": "enc_008",
+      "situationLabel": "중반 후반 전환기 캐치",
+      "playerDecision": "25분대 시야가 부족한 구간에서 상대에게 포착되었다.",
+      "takeaway": "25분 이후에는 혼자 와딩하러 가지 않고, 팀원의 엄호 하에 시야를 설치한다.",
+      "relatedEventIds": [
+        "evt_039"
+      ]
+    }
+  ],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "2:36 초반 첫 데스"
+    },
+    {
+      "eventId": "evt_005",
+      "shortNote": "5:45 드래곤 파이트 합류"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "8:56 직접 킬 창출"
+    },
+    {
+      "eventId": "evt_011",
+      "shortNote": "9:32 킬 직후 역습 데스"
+    },
+    {
+      "eventId": "evt_016",
+      "shortNote": "12:55 오브젝트 상실"
+    },
+    {
+      "eventId": "evt_019",
+      "shortNote": "15:16 중반 첫 데스"
+    },
+    {
+      "eventId": "evt_026",
+      "shortNote": "19:48 분리 상태 데스"
+    },
+    {
+      "eventId": "evt_028",
+      "shortNote": "21:18 드래곤 파이트 합류"
+    },
+    {
+      "eventId": "evt_030",
+      "shortNote": "22:12 교전 후 생존 실패"
+    },
+    {
+      "eventId": "evt_032",
+      "shortNote": "23:03 연속 데스"
+    },
+    {
+      "eventId": "evt_039",
+      "shortNote": "25:36 캐치 데스"
+    },
+    {
+      "eventId": "evt_040",
+      "shortNote": "26:33 오브젝트 상실"
+    },
+    {
+      "eventId": "evt_043",
+      "shortNote": "28:52 중반 마지막 데스"
+    },
+    {
+      "eventId": "evt_048",
+      "shortNote": "31:59 드래곤 파이트 합류"
+    },
+    {
+      "eventId": "evt_049",
+      "shortNote": "32:27 후반 데스"
+    },
+    {
+      "eventId": "evt_050",
+      "shortNote": "32:58 바론 상실"
+    }
+  ]
+}

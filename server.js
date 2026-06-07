@@ -9,6 +9,10 @@ const { spawn } = require("child_process");
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
 const port = Number(process.env.PORT || 8123);
+const host = process.env.HOST || "127.0.0.1";
+const publicDemoMode = String(process.env.PUBLIC_DEMO_MODE || "full").trim().toLowerCase();
+const publicDemoToken = String(process.env.PUBLIC_DEMO_TOKEN || "").trim();
+const trustProxy = String(process.env.TRUST_PROXY || "").trim() === "1";
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
 // S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
 const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000;
@@ -24,6 +28,36 @@ const TEAMFIGHT_MIN_EVENTS = 3;
 const CLEANUP_GAP_MS = 8000;
 const manifestPath = path.join(root, "data", "samples", "manifest.json");
 
+const publicStaticPaths = new Set([
+  "/",
+  "/index.html",
+  "/admin.html",
+  "/styles.css",
+  "/admin.css",
+  "/main.js",
+  "/admin.js",
+  "/draft-state.js",
+  "/favicon.ico",
+]);
+
+const blockedStaticPrefixes = [
+  "/.",
+  "/data/",
+  "/docs/",
+  "/scripts/",
+  "/test-artifacts/",
+  "/node_modules/",
+  "/_design-mockups/",
+];
+
+const blockedStaticSuffixes = [
+  ".md",
+  ".ps1",
+  ".mjs",
+  ".log",
+  ".env",
+];
+
 // ─── Simple in-memory rate limiter ───────────────────────────────────────────
 const rateBuckets = new Map();
 function rateLimit(key, windowMs) {
@@ -31,6 +65,83 @@ function rateLimit(key, windowMs) {
   const last = rateBuckets.get(key) || 0;
   if (now - last < windowMs) return false;
   rateBuckets.set(key, now);
+  return true;
+}
+
+function firstHeaderValue(value) {
+  if (Array.isArray(value)) return value[0] || "";
+  return String(value || "");
+}
+
+function getClientIp(req) {
+  if (!trustProxy) {
+    return req.socket.remoteAddress || "unknown";
+  }
+
+  const cfConnectingIp = firstHeaderValue(req.headers["cf-connecting-ip"]).trim();
+  if (cfConnectingIp) return cfConnectingIp;
+
+  const forwardedFor = firstHeaderValue(req.headers["x-forwarded-for"])
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (forwardedFor.length > 0) return forwardedFor[0];
+
+  const realIp = firstHeaderValue(req.headers["x-real-ip"]).trim();
+  if (realIp) return realIp;
+
+  return req.socket.remoteAddress || "unknown";
+}
+
+function isReadOnlyDemoMode() {
+  return publicDemoMode === "readonly";
+}
+
+function isProtectedDemoMode() {
+  return publicDemoMode === "protected";
+}
+
+function tokenFromRequest(req) {
+  const auth = firstHeaderValue(req.headers.authorization).trim();
+  const bearerMatch = auth.match(/^Bearer\s+(.+)$/i);
+  if (bearerMatch) return bearerMatch[1].trim();
+  return firstHeaderValue(req.headers["x-demo-token"]).trim();
+}
+
+function sendDemoModeBlocked(res) {
+  sendJson(res, 403, {
+    ok: false,
+    code: "PUBLIC_DEMO_READONLY",
+    error: "외부 데모 모드에서는 라이브 Riot API/샘플 생성 기능이 비활성화되어 있습니다.",
+  });
+}
+
+function requireLiveApiAccess(req, res) {
+  if (isReadOnlyDemoMode()) {
+    sendDemoModeBlocked(res);
+    return false;
+  }
+
+  if (isProtectedDemoMode()) {
+    if (!publicDemoToken) {
+      sendJson(res, 403, {
+        ok: false,
+        code: "PUBLIC_DEMO_TOKEN_REQUIRED",
+        error: "보호 모드가 켜져 있지만 서버의 PUBLIC_DEMO_TOKEN이 설정되어 있지 않습니다.",
+      });
+      return false;
+    }
+
+    if (tokenFromRequest(req) !== publicDemoToken) {
+      sendJson(res, 401, {
+        ok: false,
+        code: "PUBLIC_DEMO_UNAUTHORIZED",
+        error: "외부 데모 보호 토큰이 필요합니다.",
+      });
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -2243,7 +2354,7 @@ function summarizeMatch(match, puuid) {
 }
 
 async function handleRecentMatches(req, res) {
-  const ip = req.socket.remoteAddress || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit(`recent:${ip}`, 10000)) {
     sendJson(res, 429, { ok: false, error: "요청이 너무 빠릅니다. 10초 후 다시 시도하세요." });
     return;
@@ -2361,7 +2472,7 @@ async function handleRecentMatches(req, res) {
 }
 
 async function handleChampionHistory(req, res) {
-  const ip = req.socket.remoteAddress || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit(`championHistory:${ip}`, 60000)) {
     sendJson(res, 429, { ok: false, error: "60초 후 다시 시도해주세요." });
     return;
@@ -2501,7 +2612,7 @@ function inferMatchIdFromSampleEntry(entry) {
 }
 
 async function handleGenerateSample(req, res) {
-  const ip = req.socket.remoteAddress || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit(`generate:${ip}`, 60000)) {
     sendJson(res, 429, { ok: false, error: "샘플 생성은 1분에 1회만 가능합니다." });
     return;
@@ -2614,6 +2725,18 @@ async function handleGenerateSample(req, res) {
 }
 
 async function handleApi(req, res, url) {
+  if (req.method === "GET" && url.pathname === "/healthz") {
+    sendJson(res, 200, {
+      ok: true,
+      service: "lol-replay-coach",
+      publicDemoMode,
+      readonly: isReadOnlyDemoMode(),
+      protected: isProtectedDemoMode(),
+      timestamp: new Date().toISOString(),
+    });
+    return true;
+  }
+
   if (req.method === "GET" && url.pathname === "/api/samples") {
     const manifest = await loadManifest();
     sendJson(res, 200, {
@@ -2638,16 +2761,25 @@ async function handleApi(req, res, url) {
   }
 
   if (req.method === "POST" && url.pathname === "/api/recent-matches") {
+    if (!requireLiveApiAccess(req, res)) {
+      return true;
+    }
     await handleRecentMatches(req, res);
     return true;
   }
 
   if (req.method === "POST" && url.pathname === "/api/champion-history") {
+    if (!requireLiveApiAccess(req, res)) {
+      return true;
+    }
     await handleChampionHistory(req, res);
     return true;
   }
 
   if (req.method === "POST" && url.pathname === "/api/generate-sample") {
+    if (!requireLiveApiAccess(req, res)) {
+      return true;
+    }
     await handleGenerateSample(req, res);
     return true;
   }
@@ -2655,8 +2787,42 @@ async function handleApi(req, res, url) {
   return false;
 }
 
+function decodeUrlPath(urlPath) {
+  try {
+    return decodeURIComponent(urlPath);
+  } catch {
+    return "";
+  }
+}
+
+function isAllowedStaticPath(urlPath) {
+  const decoded = decodeUrlPath(urlPath);
+  if (!decoded || decoded.includes("\0")) return false;
+  if (!decoded.startsWith("/")) return false;
+  if (decoded.includes("..")) return false;
+
+  if (publicStaticPaths.has(decoded)) {
+    return true;
+  }
+
+  if (blockedStaticPrefixes.some((prefix) => decoded === prefix.slice(0, -1) || decoded.startsWith(prefix))) {
+    return false;
+  }
+
+  if (blockedStaticSuffixes.some((suffix) => decoded.toLowerCase().endsWith(suffix))) {
+    return false;
+  }
+
+  return false;
+}
+
 function staticFilePath(urlPath) {
-  const requested = urlPath === "/" ? "/index.html" : urlPath;
+  if (!isAllowedStaticPath(urlPath)) {
+    return null;
+  }
+
+  const decoded = decodeUrlPath(urlPath);
+  const requested = decoded === "/" ? "/index.html" : decoded;
   const filePath = path.normalize(path.join(root, requested));
   if (!filePath.startsWith(root)) {
     return null;
@@ -2665,6 +2831,11 @@ function staticFilePath(urlPath) {
 }
 
 async function handleStatic(req, res, url) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    sendText(res, 405, "Method Not Allowed");
+    return;
+  }
+
   const filePath = staticFilePath(url.pathname);
   if (!filePath) {
     sendText(res, 403, "Forbidden");
@@ -2676,6 +2847,11 @@ async function handleStatic(req, res, url) {
     const finalPath = stat.isDirectory() ? path.join(filePath, "index.html") : filePath;
     const ext = path.extname(finalPath).toLowerCase();
     const contentType = mimeTypes[ext] || "application/octet-stream";
+    if (req.method === "HEAD") {
+      res.writeHead(200, { "Content-Type": contentType });
+      res.end();
+      return;
+    }
     const stream = fs.createReadStream(finalPath);
     res.writeHead(200, { "Content-Type": contentType });
     stream.pipe(res);
@@ -2701,6 +2877,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log(`Server listening on http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`Server listening on http://${host}:${port}`);
 });

@@ -1,0 +1,254 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8242613150_1780463096540",
+    "generatedAt": "2026-06-03T05:04:56.540Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "노틸러스 서포트로 킬 관여와 시야 점수는 우수했으나, 초반 두 번의 데스와 오브젝트 주도권 상실이 패배로 이어진 24분 경기"
+  },
+  "coachSummary": {
+    "overallSummary": "초반 교전 합류와 시야 장악(비전 스코어 84)은 서포트 역할을 충실히 수행한 부분이다. 그러나 4분과 14분의 연속 데스로 바텀 주도권이 흔들렸고, 팀 전체적으로 타워 1개 vs 8개, 바론 0 vs 1이라는 오브젝트 격차가 벌어졌다. 중반 교전 승리(15~17분)로 반등 기회가 있었지만, 오브젝트 전환으로 연결하지 못한 채 바론을 내주며 경기가 마무리되었다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "3분 합류 킬 관여로 시작은 좋았으나, 4:46과 14:38 두 차례 데스가 발생했다. 드래곤 합류와 11:33 솔로킬로 균형을 맞추려 했지만 8:42, 12:44 오브젝트 손실이 누적되어 초반 흐름을 상대에게 넘겼다."
+    },
+    {
+      "phase": "MID",
+      "summary": "15~17분 구간에서 교전 승리와 킬을 연속으로 만들며 반등 흐름을 잡았다. 타워 1개를 확보했지만 18:46 바론과 추가 오브젝트를 상대에게 내주며 격차가 벌어졌다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "후반 이벤트가 기록되지 않았으며, 이미 오브젝트 격차(타워 1:8, 바론 0:1)가 심화된 상태에서 경기가 종료되었다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "뛰어난 시야 장악력",
+      "description": "24분 경기에서 비전 스코어 84를 기록하며 서포트 핵심 임무인 시야 제어를 충실히 수행했다. 분당 3.5 비전 스코어는 해당 게임 시간 대비 높은 수치다.",
+      "relatedEventIds": [
+        "evt_003",
+        "evt_014"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "중반 교전 합류와 킬 관여",
+      "description": "15:27~17:30 구간에서 연속 교전에 합류하며 어시스트와 킬을 만들어냈다. 노틸러스의 CC 체인을 활용한 이니시에이트가 팀 교전 승리에 기여했다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_013",
+        "evt_016"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "초반 합류 타이밍",
+      "description": "3:17 교전 후속 합류와 7:20 합류로 킬 관여를 꾸준히 만들었다. 서포트로서 맵 합류 의식이 좋았다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_004"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "초반 포지셔닝으로 인한 반복 데스",
+      "description": "4:46과 14:38 두 차례 초반 교전에서 먼저 끊기며 바텀 주도권이 흔들렸다. 노틸러스 특성상 진입 후 빠지기 어려우므로, 진입 타이밍 판단이 더 신중해야 한다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_011"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 전환 실패",
+      "description": "중반 교전 승리(15~17분) 이후 타워 1개만 확보했고, 이후 바론을 포함한 주요 오브젝트를 상대에게 연속으로 내줬다. 교전 승리를 구조물·오브젝트로 전환하는 콜이 부족했다.",
+      "relatedEventIds": [
+        "evt_017",
+        "evt_018"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "킬 참여율 아쉬움",
+      "description": "팀 총 22킬 중 킬 참여율 41%로, 서포트 기대치(50~60%)에 미치지 못했다. 일부 교전에 합류하지 못한 구간이 존재한다.",
+      "relatedEventIds": [
+        "evt_006",
+        "evt_010"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "노틸러스 Q 진입 전 아군 후속 딜러 위치를 반드시 확인하고, 후속이 없으면 진입을 보류한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "교전 승리 직후 팀원에게 타워/드래곤/바론 콜을 즉시 핑으로 알려 오브젝트 전환을 유도한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "미니맵을 5초 간격으로 확인하여 다른 라인 교전 발생 시 즉시 로밍 판단을 내린다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "초반(2~6분) 상대 정글러 위치가 불확실할 때는 리버 부쉬에 핑크 와드를 우선 배치한다.",
+      "linkedWeaknessId": "wk_1"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "4:46",
+      "title": "초반 첫 데스 — 템포 손실",
+      "description": "초반 교전에서 먼저 끊기며 바텀 라인 주도권이 상대에게 넘어갔다. 이 데스가 이후 오브젝트 손실(8:42)의 원인이 되었다.",
+      "relatedEventIds": [
+        "evt_002"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "11:33",
+      "title": "솔로킬로 반등 시도",
+      "description": "직접 킬을 만들며 초반 불리했던 흐름을 되돌리려 했다. 노틸러스의 CC와 기본 딜을 잘 활용한 장면이다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "15:27~17:30",
+      "title": "중반 연속 교전 승리",
+      "description": "3연속 교전에서 합류·킬을 만들며 팀 반등 기회를 창출했다. 타워 1개도 확보하며 가장 좋은 구간이었다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_013",
+        "evt_015",
+        "evt_016"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "22:08",
+      "title": "바론 주도권 상실 — 경기 결정적 분기점",
+      "description": "바론 구도에서 상대에게 바론을 내주며 경기 흐름이 완전히 기울었다. 이전 오브젝트 손실 누적으로 시야·포지션 우위를 확보하지 못한 결과다.",
+      "relatedEventIds": [
+        "evt_018"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situationLabel": "초반 라인전 교전 중 먼저 끊김",
+      "playerDecision": "4:46 시점에 전방으로 진입했으나 아군 후속이 따라오지 못해 단독으로 집중 공격을 받았다.",
+      "takeaway": "노틸러스 Q 진입 전 ADC 위치와 스킬 쿨타임을 확인하고, 아군이 따라올 수 없는 상황이면 진입을 참는다.",
+      "relatedEventIds": [
+        "evt_002"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situationLabel": "중반 진입 전 솔로킬 성공",
+      "playerDecision": "11:33 시점에 CC 체인을 정확히 연결하며 상대를 단독으로 처치했다. 아군 정글러 근처에서의 교전으로 리스크가 낮았다.",
+      "takeaway": "아군이 근처에 있는 상황에서의 적극적 진입은 효과적이다. 이런 조건을 만들어 진입하는 습관을 유지한다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situationLabel": "초반 후반부 교전에서 재차 데스",
+      "playerDecision": "14:38 시점에 교전에서 다시 먼저 끊겼다. 첫 데스와 유사한 패턴으로 전방 진입 후 고립되었다.",
+      "takeaway": "같은 패턴의 데스가 반복되고 있다. 진입 전 '아군이 2명 이상 근처에 있는가'를 체크리스트로 삼는다.",
+      "relatedEventIds": [
+        "evt_011"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situationLabel": "중반 교전 승리 후 추가 킬 확보",
+      "playerDecision": "17:30 시점에 교전에서 직접 킬을 만들었다. 이전 교전 승리 모멘텀을 이어가며 적극적으로 CC를 활용했다.",
+      "takeaway": "교전 승리 후 추가 킬까지 만든 좋은 판단이었다. 이후 오브젝트 전환(타워·드래곤)까지 연결하면 완벽하다.",
+      "relatedEventIds": [
+        "evt_016"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "3:17 교전 후속 합류 킬 관여"
+    },
+    {
+      "eventId": "evt_002",
+      "shortNote": "4:46 초반 교전 첫 데스"
+    },
+    {
+      "eventId": "evt_003",
+      "shortNote": "6:52 드래곤 타이밍 합류"
+    },
+    {
+      "eventId": "evt_004",
+      "shortNote": "7:20 교전 후속 합류 킬 관여"
+    },
+    {
+      "eventId": "evt_006",
+      "shortNote": "8:42 오브젝트 손실"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "11:33 솔로킬 성공"
+    },
+    {
+      "eventId": "evt_010",
+      "shortNote": "12:44 주요 오브젝트 손실"
+    },
+    {
+      "eventId": "evt_011",
+      "shortNote": "14:38 두 번째 데스"
+    },
+    {
+      "eventId": "evt_012",
+      "shortNote": "15:27 중반 교전 합류"
+    },
+    {
+      "eventId": "evt_013",
+      "shortNote": "16:18 소규모 교전 승리"
+    },
+    {
+      "eventId": "evt_014",
+      "shortNote": "16:48 오브젝트 확보"
+    },
+    {
+      "eventId": "evt_015",
+      "shortNote": "17:21 타워 파괴 관여"
+    },
+    {
+      "eventId": "evt_016",
+      "shortNote": "17:30 킬 확보"
+    },
+    {
+      "eventId": "evt_017",
+      "shortNote": "18:46 오브젝트 손실"
+    },
+    {
+      "eventId": "evt_018",
+      "shortNote": "22:08 바론 상실"
+    }
+  ]
+}

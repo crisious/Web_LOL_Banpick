@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-06-03T03:40:19.845Z",
+  "sampleId": "sample-kr-8242047350",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8242047350_1780458019845",
+      "generatedAt": "2026-06-03T03:40:19.845Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "세나 서포터로 1/1/13 KDA 14를 기록하며 오브젝트·구조물 중심 운영으로 29분 승리를 이끌었다."
+    },
+    "coachSummary": {
+      "overallSummary": "초반 안정적인 라인전을 바탕으로 중반 드래곤 3개와 타워 9개를 확보하는 오브젝트 중심 플레이를 펼쳤다. 킬 관여율 44%와 시야 점수 65는 팀 합류와 맵 컨트롤에 꾸준히 기여했음을 보여준다. 다만 24분경 단독 데스는 오브젝트 확보 직후 생존 관리의 아쉬움을 남겼고, 이 부분만 보완하면 운영 완성도가 한 단계 올라갈 수 있다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "데스 없이 어시스트 2개를 챙기며 안정적으로 라인전을 마무리했다. 팀 차원에서 정글 오브젝트 2개를 선점하며 중반 주도권의 토대를 마련했다."
+      },
+      {
+        "phase": "MID",
+        "summary": "1킬 1데스 11어시스트로 팀 교전에 적극 합류했다. 드래곤 3개 확보와 타워 다수 파괴에 관여하며 구조물 압박을 주도했으나, 24:49 데스로 순간적인 운영 공백이 발생했다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "29분 게임 종료로 후반 구간이 사실상 발생하지 않았다. 중반의 압도적 오브젝트 우위가 조기 마무리로 이어졌다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "오브젝트 템포 장악",
+        "description": "드래곤 3개를 모두 확보하고 상대 드래곤 0개를 허용하지 않았다. 16:39, 22:05, 27:23 드래곤 파이트에 꾸준히 합류하며 오브젝트 타이밍을 놓치지 않았다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_013",
+          "evt_024"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "구조물 압박 전환력",
+        "description": "팀 타워 9개 대 상대 1개로 압도적인 구조물 차이를 만들었다. 특히 20:26, 28:31~28:49 구간에서 직접 타워 파괴에 관여하며 승리 조건을 구조물로 전환하는 판단이 돋보였다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_028",
+          "evt_029",
+          "evt_031"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "높은 시야 점수와 맵 기여",
+        "description": "29분 게임에서 시야 점수 65는 서포터로서 우수한 와딩 기여도를 보여준다. 팀이 오브젝트를 안전하게 확보할 수 있었던 배경에는 시야 장악이 있었다.",
+        "relatedEventIds": [
+          "evt_008",
+          "evt_013"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "오브젝트 확보 후 생존 관리 부족",
+        "description": "24:49에 중반 핵심 구도에서 데스를 허용했다. 오브젝트 확보 직후 포지셔닝이 느슨해지면서 상대에게 캐치 기회를 내준 것으로 보인다.",
+        "relatedEventIds": [
+          "evt_020"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "킬 관여율 44%로 합류 타이밍 개선 여지",
+        "description": "팀 총 32킬 중 14킬에만 관여했다. 세나의 긴 사거리와 글로벌 궁극기를 고려하면 원거리에서라도 더 많은 교전에 기여할 수 있었다.",
+        "relatedEventIds": [
+          "evt_007"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "초반 라인전 존재감 미미",
+        "description": "초반 구간에서 킬·데스 없이 어시스트 2개만 기록했다. 세나는 스택 수급이 중요한 챔피언이므로 초반 라인 주도권을 좀 더 적극적으로 가져가면 중반 화력이 한층 올라간다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_002"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "오브젝트 확보 직후 30초간 안전 포지션으로 후퇴하는 습관을 들인다. 확보 후 흥분 상태에서 전진하지 않기.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "미니맵을 5초 간격으로 확인하고 팀 교전 징조가 보이면 세나 궁극기 사용을 미리 준비한다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "레벨 1~6 구간에서 세나 Q 포크와 AA 스택 수급을 의식적으로 늘려 초반 존재감을 높인다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 발생 시 직전 10초의 미니맵 정보를 리플레이로 복기해 어떤 시야 정보를 놓쳤는지 점검한다.",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "16:39",
+        "title": "첫 드래곤 확보 – 오브젝트 주도권 선점",
+        "description": "첫 드래곤 파이트에서 팀이 성공적으로 오브젝트를 확보하며 이후 연속 드래곤의 발판을 마련했다.",
+        "relatedEventIds": [
+          "evt_005"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "20:26",
+        "title": "연속 타워 파괴 – 구조물 압박 극대화",
+        "description": "20분대 연속 타워 파괴에 직접 관여하며 맵 압박을 극대화했다. 이 구간이 상대의 자원 접근을 차단하는 결정적 전환점이었다.",
+        "relatedEventIds": [
+          "evt_011",
+          "evt_009",
+          "evt_010"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "24:49",
+        "title": "중반 단독 데스 – 유일한 운영 공백",
+        "description": "게임 내 유일한 데스로, 오브젝트 확보 후 포지셔닝이 풀린 타이밍에 잡혔다. 이 데스가 없었다면 더 빠른 마무리가 가능했을 수 있다.",
+        "relatedEventIds": [
+          "evt_020"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "28:31",
+        "title": "최종 구조물 러시 – 게임 마무리",
+        "description": "28분대 연속 타워 3개 파괴에 관여하며 게임을 마무리 지었다. 팀의 오브젝트 우위를 구조물로 전환하는 타이밍 판단이 정확했다.",
+        "relatedEventIds": [
+          "evt_028",
+          "evt_029",
+          "evt_031"
+        ]
+      }
+    ],
+    "combatAnalysis": [
+      {
+        "encounterId": "enc_001",
+        "situationLabel": "중반 오브젝트 후 단독 캐치 데스",
+        "playerDecision": "오브젝트 확보 이후 전진 포지션을 유지하다 상대에게 잡혔다. 팀원과의 거리가 벌어진 상태에서 위험 지역에 노출되었다.",
+        "takeaway": "오브젝트 확보 직후에는 반드시 팀 합류 거리를 유지하고, 시야가 없는 방향으로 전진하지 않는다.",
+        "relatedEventIds": [
+          "evt_020"
+        ]
+      },
+      {
+        "encounterId": "enc_002",
+        "situationLabel": "중반 솔로킬 – 우세 교전",
+        "playerDecision": "유리한 포지션에서 교전을 잡아 1킬을 챙겼다. 상대를 처치하며 이후 오브젝트 셋업으로 연결할 수 있는 수적 우위를 만들었다.",
+        "takeaway": "이처럼 유리한 상황에서의 적극적 교전 참여를 꾸준히 유지하되, 킬 후 즉시 다음 오브젝트 콜을 연결한다.",
+        "relatedEventIds": [
+          "evt_023"
+        ]
+      }
+    ],
+    "teamfightPhaseAnalysis": [],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "shortNote": "9:00 정글 오브젝트 선점"
+      },
+      {
+        "eventId": "evt_002",
+        "shortNote": "10:21 정글 오브젝트 추가 확보"
+      },
+      {
+        "eventId": "evt_005",
+        "shortNote": "16:39 드래곤 파이트 합류"
+      },
+      {
+        "eventId": "evt_006",
+        "shortNote": "16:44 타워 파괴"
+      },
+      {
+        "eventId": "evt_007",
+        "shortNote": "18:13 교전 후속 합류 킬 관여"
+      },
+      {
+        "eventId": "evt_008",
+        "shortNote": "18:45 오브젝트 셋업 관여"
+      },
+      {
+        "eventId": "evt_009",
+        "shortNote": "19:21 타워 파괴"
+      },
+      {
+        "eventId": "evt_010",
+        "shortNote": "20:06 타워 파괴"
+      },
+      {
+        "eventId": "evt_011",
+        "shortNote": "20:26 타워 파괴 직접 관여"
+      },
+      {
+        "eventId": "evt_013",
+        "shortNote": "22:05 드래곤 파이트 직접 관여"
+      },
+      {
+        "eventId": "evt_020",
+        "shortNote": "24:49 중반 데스 허용"
+      },
+      {
+        "eventId": "evt_023",
+        "shortNote": "26:22 솔로킬 획득"
+      },
+      {
+        "eventId": "evt_024",
+        "shortNote": "27:23 드래곤 파이트"
+      },
+      {
+        "eventId": "evt_028",
+        "shortNote": "28:31 타워 파괴 관여"
+      },
+      {
+        "eventId": "evt_029",
+        "shortNote": "28:38 타워 파괴 관여"
+      },
+      {
+        "eventId": "evt_031",
+        "shortNote": "28:49 타워 파괴 관여"
+      }
+    ]
+  },
+  "codexAnalysis": null,
+  "comparison": {
+    "agreements": [],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "오브젝트 템포 장악",
+        "note": "드래곤 3개를 모두 확보하고 상대 드래곤 0개를 허용하지 않았다. 16:39, 22:05, 27:23 드래곤 파이트에 꾸준히 합류하며 오브젝트 타이밍을 놓치지 않았다."
+      },
+      {
+        "category": "strength",
+        "topic": "구조물 압박 전환력",
+        "note": "팀 타워 9개 대 상대 1개로 압도적인 구조물 차이를 만들었다. 특히 20:26, 28:31~28:49 구간에서 직접 타워 파괴에 관여하며 승리 조건을 구조물로 전환하는 판단이 돋보였다."
+      },
+      {
+        "category": "strength",
+        "topic": "높은 시야 점수와 맵 기여",
+        "note": "29분 게임에서 시야 점수 65는 서포터로서 우수한 와딩 기여도를 보여준다. 팀이 오브젝트를 안전하게 확보할 수 있었던 배경에는 시야 장악이 있었다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 확보 후 생존 관리 부족",
+        "note": "24:49에 중반 핵심 구도에서 데스를 허용했다. 오브젝트 확보 직후 포지셔닝이 느슨해지면서 상대에게 캐치 기회를 내준 것으로 보인다."
+      },
+      {
+        "category": "weakness",
+        "topic": "킬 관여율 44%로 합류 타이밍 개선 여지",
+        "note": "팀 총 32킬 중 14킬에만 관여했다. 세나의 긴 사거리와 글로벌 궁극기를 고려하면 원거리에서라도 더 많은 교전에 기여할 수 있었다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 라인전 존재감 미미",
+        "note": "초반 구간에서 킬·데스 없이 어시스트 2개만 기록했다. 세나는 스택 수급이 중요한 챔피언이므로 초반 라인 주도권을 좀 더 적극적으로 가져가면 중반 화력이 한층 올라간다."
+      }
+    ],
+    "codexOnly": [],
+    "agreementRate": 0
+  }
+}
