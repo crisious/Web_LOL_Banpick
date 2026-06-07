@@ -96,9 +96,11 @@ PUBLIC_DEMO_TOKEN='replace-with-long-random-token' TRUST_PROXY=1 npm run start:p
 Smoke with token:
 
 ```bash
+PUBLIC_DEMO_TOKEN='replace-with-long-random-token' npm run smoke:protected
 npm run smoke:external:protected -- https://demo.example.com --token=replace-with-long-random-token
 ```
 
+`smoke:protected` targets local `http://127.0.0.1:8123`; use it after starting `npm run start:protected`.
 `smoke:external:protected` requires an explicit `https://` URL and a token from `--token` or `PUBLIC_DEMO_TOKEN` before it makes any network request.
 The smoke CLI sends the token only to the demo origin. If `index.html` references cross-origin client assets, those requests must remain unauthenticated.
 

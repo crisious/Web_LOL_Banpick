@@ -44,6 +44,18 @@ check("smoke:readonly pins local URL and expected mode",
     /--min-samples=19/.test(scripts["smoke:readonly"] || ""),
   scripts["smoke:readonly"] || "(missing)");
 
+check("smoke:protected script exists",
+  typeof scripts["smoke:protected"] === "string",
+  "missing package script smoke:protected");
+
+check("smoke:protected pins local URL, token requirement, and protected mode",
+  /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:protected"] || "") &&
+    /http:\/\/127\.0\.0\.1:8123/.test(scripts["smoke:protected"] || "") &&
+    /--require-token/.test(scripts["smoke:protected"] || "") &&
+    /--expect-mode=protected/.test(scripts["smoke:protected"] || "") &&
+    /--min-samples=19/.test(scripts["smoke:protected"] || ""),
+  scripts["smoke:protected"] || "(missing)");
+
 check("smoke:external:readonly script exists",
   typeof scripts["smoke:external:readonly"] === "string",
   "missing package script smoke:external:readonly");
