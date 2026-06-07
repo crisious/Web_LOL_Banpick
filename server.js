@@ -2804,7 +2804,7 @@ function sampleGenerationHealth(nowMs = Date.now()) {
   }
   return {
     activeCount: sampleGenerationLocks.size,
-    oldestAgeMs: oldestStartedAt === null ? 0 : Math.max(0, nowMs - oldestStartedAt),
+    oldestAgeMs: oldestStartedAt === null ? 0 : Math.floor(Math.max(0, nowMs - oldestStartedAt)),
   };
 }
 

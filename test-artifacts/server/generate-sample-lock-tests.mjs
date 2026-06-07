@@ -120,6 +120,11 @@ if (helpers) {
   check("sample generation health reports oldest age",
     sampleGenerationHealth(4000).oldestAgeMs,
     3000);
+  sampleGenerationLocks.set("KR:KR_FRACTIONAL", 1000.25);
+  check("sample generation health floors fractional age to integer milliseconds",
+    sampleGenerationHealth(4000.75).oldestAgeMs,
+    3000);
+  sampleGenerationLocks.delete("KR:KR_FRACTIONAL");
   check("sample generation health does not expose lock keys",
     Object.keys(sampleGenerationHealth(4000)).sort(),
     ["activeCount", "oldestAgeMs"]);
