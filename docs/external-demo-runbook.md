@@ -96,7 +96,7 @@ npm run smoke:external:readonly -- https://demo.example.com --report-json=test-a
 
 The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. URL evidence inside `baseUrl`, check labels, and check details redacts userinfo, query strings, and fragments; relative asset paths are persisted with markers such as `/styles.css?redacted` instead of raw query values. It does not store the demo token, Authorization header, or API response bodies.
 
-Direct smoke `--report-json=<path>` accepts only relative `test-artifacts/<subdir>/.../*.json` paths. Absolute paths, `..` traversal, paths outside the artifact tree, root-level `test-artifacts/*.json` targets, or non-JSON targets fail before any network request or report write with `FAIL --report-json must be a relative .json path under a test-artifacts subdirectory`.
+Direct smoke `--report-json=<path>` accepts only relative `test-artifacts/<subdir>/.../*.json` paths. Absolute paths, `.` / `..` path segments, paths outside the artifact tree, root-level `test-artifacts/*.json` targets, or non-JSON targets fail before any network request or report write with `FAIL --report-json must be a relative .json path under a test-artifacts subdirectory`.
 
 Direct smoke and `smoke:report:*` commands accept at most one positional base URL. Extra positional URL arguments fail before any network request or report artifact creation, so operators do not accidentally collect evidence for the wrong URL.
 

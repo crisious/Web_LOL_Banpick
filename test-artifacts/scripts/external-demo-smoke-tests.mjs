@@ -208,6 +208,14 @@ checkThrows("parseSmokeArgs rejects root artifact report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/smoke-report.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects root dot-segment report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/./smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
+checkThrows("parseSmokeArgs rejects child dot-segment report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/./smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects traversal report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/../smoke-report.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1092,6 +1100,22 @@ check("CLI reports unsafe report JSON path without network request",
 check("CLI unsafe report JSON path does not create file",
   fs.existsSync(unsafeReportJsonPath),
   false);
+
+const dotSegmentReportJsonPath = "test-artifacts/./smoke-report.json";
+const dotSegmentReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  `--report-json=${dotSegmentReportJsonPath}`,
+]);
+
+check("CLI exits non-zero for dot-segment report JSON path",
+  dotSegmentReportJson.status,
+  1);
+
+check("CLI reports dot-segment report JSON path without network request",
+  dotSegmentReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
 
 const readonlyToken = await runNode([
   smokePath,
