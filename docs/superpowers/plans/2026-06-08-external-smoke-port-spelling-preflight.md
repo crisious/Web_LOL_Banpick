@@ -137,7 +137,7 @@ Expected: syntax check passes, validator tests report `100 passed, 0 failed`, fu
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` exited 0. Validator tests reported `100 passed, 0 failed`; full suite reported `661 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -147,7 +147,9 @@ git commit -m "ci: reject normalized smoke url ports"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed `724e934 ci: reject normalized smoke url ports` and pushed `main` to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -160,6 +162,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: `gh run watch 27103108371 --exit-status` passed for `724e934`. Artifact `qa-automation-27103108371` / id `7467439989` / expires `2026-06-21T19:55:28Z` downloaded to `/tmp/lol-ai-coach-port-spelling.N5AFWc`; `qa-summary.json` reported read-only smoke `150 passed / 0 failed`, and sensitive-value scan found no Authorization/Bearer/token/credential URL matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local RED/GREEN/full QA, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: Obsidian project log was updated with the raw port spelling preflight background, commit, local RED/GREEN/full QA, remote run URL, artifact id, smoke summary, and sensitive-value search result.
