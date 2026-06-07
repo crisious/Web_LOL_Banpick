@@ -177,7 +177,7 @@ npm run smoke:external:manifest:list-error -- https://your-demo-url.example
 
 `--report-json=<path>` 리포트는 `schemaVersion`, `baseUrl`, 기대/관측 demo mode, 시작/종료 시각, exit code, PASS/FAIL 요약, 체크 라벨/상세만 저장합니다. 요청에는 입력한 원본 URL을 사용하지만, 리포트에 남는 `baseUrl`은 URL userinfo, query string, fragment를 redacted 값으로 바꿉니다. 데모 토큰, Authorization 헤더, API 응답 본문은 저장하지 않으므로 외부 smoke 실행 근거 공유용으로 사용할 수 있습니다.
 
-`PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다.
+`PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보면 live/write probe 전에 `FAIL public demo mode config is valid`로 즉시 실패합니다.
 
 `smoke:report:*` 명령은 `test-artifacts/qa-automation/qa-summary.json`에 최신 실행 요약을 쓰고, `test-artifacts/qa-automation/<timestamp>-<mode>/` 아래에 `smoke-report.json`과 실행 메타데이터 `smoke-run.json`을 함께 저장합니다. `qa-summary.json`은 mode, redacted URL, 상태, exit code, smoke pass/fail 요약, 산출물 경로만 담으며, `smoke-run.json`의 command 필드는 `--token=<redacted>`와 redacted URL로 기록되어 토큰/URL secret 값을 남기지 않습니다.
 

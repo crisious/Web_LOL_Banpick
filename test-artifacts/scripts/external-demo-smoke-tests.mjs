@@ -430,6 +430,53 @@ check("CLI stops before live/write probes when publicDemoMode is unknown",
     ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(request.url)),
   false);
 
+const invalidModeValidityRequests = [];
+const invalidModeValidityServer = http.createServer((req, res) => {
+  invalidModeValidityRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") {
+    return sendJson(200, { ok: true, publicDemoMode: "readonly", publicDemoModeValid: false });
+  }
+  if (req.url === "/api/samples") {
+    return sendJson(500, {
+      ok: false,
+      code: "SAMPLE_MANIFEST_INVALID",
+      error: "Sample manifest entry missing required field: label.",
+    });
+  }
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => invalidModeValidityServer.listen(0, "127.0.0.1", resolve));
+const invalidModeValidityUrl = `http://127.0.0.1:${invalidModeValidityServer.address().port}`;
+const invalidModeValidity = await runNode([
+  smokePath,
+  invalidModeValidityUrl,
+  "--expect-mode=readonly",
+  "--expect-sample-list-error-status=500",
+  "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  "--expect-sample-list-error-message=Sample manifest entry missing required field: label.",
+]);
+await new Promise((resolve) => invalidModeValidityServer.close(resolve));
+
+check("CLI exits non-zero when healthz marks publicDemoMode invalid",
+  invalidModeValidity.status,
+  1);
+
+check("CLI reports invalid public demo mode validity",
+  invalidModeValidity.stderr.includes("FAIL public demo mode config is valid"),
+  true);
+
+check("CLI stops after healthz when publicDemoModeValid is false",
+  invalidModeValidityRequests.map((request) => request.url),
+  ["/healthz"]);
+
 const modeMismatchRequests = [];
 const modeMismatchServer = http.createServer((req, res) => {
   modeMismatchRequests.push({ method: req.method, url: req.url });

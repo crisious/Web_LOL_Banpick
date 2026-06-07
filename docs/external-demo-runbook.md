@@ -44,6 +44,7 @@ Expected:
 - referenced `styles.css` and `main.js` return `X-Content-Type-Options: nosniff`
 - smoke stops immediately when `/healthz` does not return a 200 JSON `ok=true` response before it can touch live/write API probes
 - smoke accepts only known public demo modes: `full`, `protected`, or `readonly`
+- smoke treats `publicDemoModeValid: false` as a fatal mode configuration failure before sample or live/write probes
 - unknown `PUBLIC_DEMO_MODE` values remain visible in `/healthz` with `publicDemoModeValid: false` for diagnostics but live/write APIs fail closed with 403 `PUBLIC_DEMO_MODE_INVALID`
 - smoke tokens are sent only to same-origin live/write API probes, not to page, asset, sample, blocked static, or cross-origin asset requests
 - smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes

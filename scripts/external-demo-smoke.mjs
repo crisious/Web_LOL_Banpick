@@ -291,6 +291,9 @@ expectFatal(health.response.status === 200, "GET /healthz returns 200", `status=
 expectFatal(contentType(health.response).includes("application/json"), "GET /healthz content-type is JSON", `content-type=${contentType(health.response) || "(missing)"}`);
 expect(headerValue(health.response, "x-content-type-options") === "nosniff", "GET /healthz has X-Content-Type-Options nosniff", `x-content-type-options=${headerValue(health.response, "x-content-type-options") || "(missing)"}`);
 expectFatal(health.body?.ok === true, "healthz ok=true");
+if (health.body?.publicDemoModeValid === false) {
+  fatal("public demo mode config is valid", `publicDemoMode=${health.body?.publicDemoMode || "(missing)"}`);
+}
 const actualMode = demoModeFromHealth(health.body);
 observedMode = actualMode;
 expectFatal(["full", "protected", "readonly"].includes(actualMode), "public demo mode is known", `actual=${actualMode}`);
