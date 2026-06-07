@@ -1,0 +1,109 @@
+// smoke report runner tests.
+
+import fs from "fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const runnerPath = fileURLToPath(new URL("../../scripts/run-smoke-report.mjs", import.meta.url));
+
+let pass = 0;
+let fail = 0;
+
+function check(label, got, expected) {
+  const ok = JSON.stringify(got) === JSON.stringify(expected);
+  console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
+  if (!ok) console.log(`  expected ${JSON.stringify(expected)}\n  got      ${JSON.stringify(got)}`);
+  ok ? pass++ : fail++;
+}
+
+function checkThrows(label, fn, expectedMessage) {
+  try {
+    fn();
+    console.log(`FAIL  ${label}`);
+    console.log(`  expected throw ${JSON.stringify(expectedMessage)}`);
+    fail++;
+  } catch (error) {
+    const ok = String(error.message) === expectedMessage;
+    console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
+    if (!ok) console.log(`  expected ${JSON.stringify(expectedMessage)}\n  got      ${JSON.stringify(error.message)}`);
+    ok ? pass++ : fail++;
+  }
+}
+
+check("smoke report runner script exists",
+  fs.existsSync(runnerPath),
+  true);
+
+if (fs.existsSync(runnerPath)) {
+  const runner = await import(runnerPath);
+
+  check("parseRunnerArgs defaults to local readonly",
+    runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}),
+    {
+      mode: "readonly",
+      baseUrl: "http://127.0.0.1:8123",
+      expectedMode: "readonly",
+      outputRoot: "test-artifacts/qa-automation",
+      requiresUrl: false,
+      requiresHttps: false,
+      requiresToken: false,
+      extraSmokeArgs: [],
+    });
+
+  check("parseRunnerArgs reads external readonly URL and forwards smoke flags",
+    runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly", "https://demo.example.com", "--timeout-ms=15000"], {}),
+    {
+      mode: "external-readonly",
+      baseUrl: "https://demo.example.com",
+      expectedMode: "readonly",
+      outputRoot: "test-artifacts/qa-automation",
+      requiresUrl: true,
+      requiresHttps: true,
+      requiresToken: false,
+      extraSmokeArgs: ["--timeout-ms=15000"],
+    });
+
+  checkThrows("parseRunnerArgs rejects external mode without URL",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-readonly"], {}),
+    "external-readonly smoke report needs an explicit base URL");
+
+  checkThrows("parseRunnerArgs rejects non-https external URL",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "http://demo.example.com"], {}),
+    "external-protected smoke report needs an https:// base URL");
+
+  const reportDir = runner.reportDirectoryFor("test-artifacts/qa-automation", "readonly", new Date("2026-06-08T00:45:30.123Z"));
+  check("reportDirectoryFor builds timestamped mode directory",
+    reportDir,
+    path.join("test-artifacts/qa-automation", "2026-06-08T00-45-30Z-readonly"));
+
+  check("smokeArgsFor builds local readonly smoke command",
+    runner.smokeArgsFor(runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}), "/tmp/smoke-report.json"),
+    [
+      "scripts/external-demo-smoke.mjs",
+      "http://127.0.0.1:8123",
+      "--expect-mode=readonly",
+      "--min-samples=19",
+      "--report-json=/tmp/smoke-report.json",
+    ]);
+
+  check("smokeArgsFor builds external protected smoke command",
+    runner.smokeArgsFor(runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=external-protected", "https://demo.example.com", "--token=secret"], {}), "/tmp/smoke-report.json"),
+    [
+      "scripts/external-demo-smoke.mjs",
+      "https://demo.example.com",
+      "--require-url",
+      "--require-https",
+      "--require-token",
+      "--expect-mode=protected",
+      "--min-samples=19",
+      "--token=secret",
+      "--report-json=/tmp/smoke-report.json",
+    ]);
+
+  check("redactSmokeArgs removes inline token value",
+    runner.redactSmokeArgs(["scripts/external-demo-smoke.mjs", "--token=secret", "--timeout-ms=15000"]),
+    ["scripts/external-demo-smoke.mjs", "--token=<redacted>", "--timeout-ms=15000"]);
+}
+
+console.log(`\n${pass} passed, ${fail} failed`);
+process.exit(fail > 0 ? 1 : 0);

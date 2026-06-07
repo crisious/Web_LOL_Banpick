@@ -81,6 +81,42 @@ check("smoke:external:protected requires explicit external URL, token, and prote
     /--min-samples=19/.test(scripts["smoke:external:protected"] || ""),
   scripts["smoke:external:protected"] || "(missing)");
 
+check("smoke:report:readonly script exists",
+  typeof scripts["smoke:report:readonly"] === "string",
+  "missing package script smoke:report:readonly");
+
+check("smoke:report:readonly runs readonly report runner",
+  /scripts\/run-smoke-report\.mjs/.test(scripts["smoke:report:readonly"] || "") &&
+    /--mode=readonly/.test(scripts["smoke:report:readonly"] || ""),
+  scripts["smoke:report:readonly"] || "(missing)");
+
+check("smoke:report:protected script exists",
+  typeof scripts["smoke:report:protected"] === "string",
+  "missing package script smoke:report:protected");
+
+check("smoke:report:protected runs protected report runner",
+  /scripts\/run-smoke-report\.mjs/.test(scripts["smoke:report:protected"] || "") &&
+    /--mode=protected/.test(scripts["smoke:report:protected"] || ""),
+  scripts["smoke:report:protected"] || "(missing)");
+
+check("smoke:report:external:readonly script exists",
+  typeof scripts["smoke:report:external:readonly"] === "string",
+  "missing package script smoke:report:external:readonly");
+
+check("smoke:report:external:readonly runs external readonly report runner",
+  /scripts\/run-smoke-report\.mjs/.test(scripts["smoke:report:external:readonly"] || "") &&
+    /--mode=external-readonly/.test(scripts["smoke:report:external:readonly"] || ""),
+  scripts["smoke:report:external:readonly"] || "(missing)");
+
+check("smoke:report:external:protected script exists",
+  typeof scripts["smoke:report:external:protected"] === "string",
+  "missing package script smoke:report:external:protected");
+
+check("smoke:report:external:protected runs external protected report runner",
+  /scripts\/run-smoke-report\.mjs/.test(scripts["smoke:report:external:protected"] || "") &&
+    /--mode=external-protected/.test(scripts["smoke:report:external:protected"] || ""),
+  scripts["smoke:report:external:protected"] || "(missing)");
+
 check("smoke:manifest:list-error script exists",
   typeof scripts["smoke:manifest:list-error"] === "string",
   "missing package script smoke:manifest:list-error");

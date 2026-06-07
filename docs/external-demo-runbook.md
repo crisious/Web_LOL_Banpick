@@ -92,6 +92,17 @@ npm run smoke:external:readonly -- https://demo.example.com --report-json=test-a
 
 The JSON report contains the same PASS/FAIL check labels used in console output, summary counts, expected/actual public demo mode, timestamps, and exit code. It does not store the demo token, Authorization header, or API response bodies.
 
+For repeatable QA evidence, prefer the report runner commands. They create `test-artifacts/qa-automation/<timestamp>-<mode>/smoke-report.json` and a sanitized `smoke-run.json` automatically:
+
+```bash
+npm run smoke:report:readonly
+PUBLIC_DEMO_TOKEN='replace-with-long-random-token' npm run smoke:report:protected
+npm run smoke:report:external:readonly -- https://demo.example.com
+npm run smoke:report:external:protected -- https://demo.example.com --token=replace-with-long-random-token
+```
+
+`smoke-run.json` redacts inline `--token=<value>` arguments before writing command metadata.
+
 4. Share URL only after smoke passes.
 
 ## Manifest Error Probe
