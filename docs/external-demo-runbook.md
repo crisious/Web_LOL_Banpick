@@ -88,25 +88,20 @@ Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>
 
 ## Manifest Error Probe
 
-Use this when a persistent sample volume or copied `manifest.json` is suspected to be invalid and `/api/samples` cannot complete the normal list flow. The probe runs `/healthz`, validates the expected public demo mode, calls the target sample detail endpoint directly, checks the structured JSON error, and exits before home/assets/live API probes:
+Use this when a persistent sample volume or copied `manifest.json` is suspected to be invalid and `/api/samples` cannot complete the normal list flow. The probes run `/healthz`, validate the expected public demo mode, call the target sample endpoint directly, check the structured JSON error, and exit before home/assets/live API probes.
+
+Local presets:
 
 ```bash
-node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 \
-  --expect-mode=readonly \
-  --expect-sample-detail-error-id=sample-kr-1 \
-  --expect-sample-detail-error-status=500 \
-  --expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID \
-  --expect-sample-detail-error-message="Sample manifest entry path must not contain traversal segments: normalizedPath."
+npm run smoke:manifest:list-error
+npm run smoke:manifest:detail-error
 ```
 
-Use the list variant when the manifest should fail during `/api/samples` loading itself:
+External HTTPS presets:
 
 ```bash
-node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 \
-  --expect-mode=readonly \
-  --expect-sample-list-error-status=500 \
-  --expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID \
-  --expect-sample-list-error-message="Sample manifest entry missing required field: label."
+npm run smoke:external:manifest:list-error -- https://demo.example.com
+npm run smoke:external:manifest:detail-error -- https://demo.example.com
 ```
 
 ## Protected Live Demo

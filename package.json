@@ -16,7 +16,11 @@
     "smoke:readonly": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly --min-samples=19",
     "smoke:protected": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --require-token --expect-mode=protected --min-samples=19",
     "smoke:external:readonly": "node scripts/external-demo-smoke.mjs --require-url --require-https --expect-mode=readonly --min-samples=19",
-    "smoke:external:protected": "node scripts/external-demo-smoke.mjs --require-url --require-https --require-token --expect-mode=protected --min-samples=19"
+    "smoke:external:protected": "node scripts/external-demo-smoke.mjs --require-url --require-https --require-token --expect-mode=protected --min-samples=19",
+    "smoke:manifest:list-error": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly --expect-sample-list-error-status=500 --expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID --expect-sample-list-error-message=\"Sample manifest entry missing required field: label.\"",
+    "smoke:manifest:detail-error": "node scripts/external-demo-smoke.mjs http://127.0.0.1:8123 --expect-mode=readonly --expect-sample-detail-error-id=sample-kr-1 --expect-sample-detail-error-status=500 --expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID --expect-sample-detail-error-message=\"Sample manifest entry path must not contain traversal segments: normalizedPath.\"",
+    "smoke:external:manifest:list-error": "node scripts/external-demo-smoke.mjs --require-url --require-https --expect-mode=readonly --expect-sample-list-error-status=500 --expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID --expect-sample-list-error-message=\"Sample manifest entry missing required field: label.\"",
+    "smoke:external:manifest:detail-error": "node scripts/external-demo-smoke.mjs --require-url --require-https --expect-mode=readonly --expect-sample-detail-error-id=sample-kr-1 --expect-sample-detail-error-status=500 --expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID --expect-sample-detail-error-message=\"Sample manifest entry path must not contain traversal segments: normalizedPath.\""
   },
   "engines": {
     "node": ">=20"
