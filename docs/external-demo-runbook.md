@@ -127,7 +127,7 @@ PUBLIC_DEMO_MODE=readonly
 TRUST_PROXY=1
 ```
 
-The first cloud deploy should stay read-only. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work, and local JSON writes use a temp file plus rename to reduce partial-write corruption. Persistent storage and cross-process queue/lock verification are still required before multi-instance protected demos.
+The first cloud deploy should stay read-only. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work, local JSON writes use a temp file plus rename to reduce partial-write corruption, and manifest read-modify-write operations are queued inside a single process. Persistent storage and cross-process queue/lock verification are still required before multi-instance protected demos.
 
 ## Pre-Share Checklist
 

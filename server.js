@@ -2600,13 +2600,23 @@ async function handleChampionHistory(req, res) {
   }
 }
 
+let manifestMutationQueue = Promise.resolve();
+
+function withManifestMutationLock(work) {
+  const run = manifestMutationQueue.catch(() => {}).then(work);
+  manifestMutationQueue = run.catch(() => {});
+  return run;
+}
+
 async function upsertManifestEntry(entry) {
-  const manifest = await loadManifest();
-  const nextSamples = manifest.samples.filter((sample) => sample.id !== entry.id);
-  nextSamples.unshift(entry);
-  manifest.samples = nextSamples;
-  await saveManifest(manifest);
-  return manifest;
+  return withManifestMutationLock(async () => {
+    const manifest = await loadManifest();
+    const nextSamples = manifest.samples.filter((sample) => sample.id !== entry.id);
+    nextSamples.unshift(entry);
+    manifest.samples = nextSamples;
+    await saveManifest(manifest);
+    return manifest;
+  });
 }
 
 function inferMatchIdFromSampleEntry(entry) {
