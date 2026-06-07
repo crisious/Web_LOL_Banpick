@@ -1,8 +1,11 @@
 // external-demo-smoke CLI option parsing tests.
 
+import { spawnSync } from "node:child_process";
 import fs from "fs";
+import { fileURLToPath } from "node:url";
 
-const smokeSrc = fs.readFileSync(new URL("../../scripts/external-demo-smoke.mjs", import.meta.url), "utf8");
+const smokePath = fileURLToPath(new URL("../../scripts/external-demo-smoke.mjs", import.meta.url));
+const smokeSrc = fs.readFileSync(smokePath, "utf8");
 
 function extractFunctionSource(source, name) {
   const startIdx = source.indexOf(`function ${name}(`);
@@ -64,6 +67,26 @@ check("parseSmokeArgs omits expected mode when not provided",
 checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");
+
+checkThrows("parseSmokeArgs requires an explicit URL when requested",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "--expect-mode=readonly"], {}),
+  "--require-url needs an explicit base URL argument");
+
+check("parseSmokeArgs accepts an explicit URL when required",
+  parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-url", "https://demo.example", "--expect-mode=readonly"], {}),
+  { baseUrl: "https://demo.example", demoToken: "", expectedMode: "readonly" });
+
+const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
+  encoding: "utf8",
+});
+
+check("CLI exits non-zero when --require-url has no URL",
+  missingRequiredUrl.status,
+  1);
+
+check("CLI prints concise missing URL failure without stack trace",
+  missingRequiredUrl.stderr.trim(),
+  "FAIL --require-url needs an explicit base URL argument");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

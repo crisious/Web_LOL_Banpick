@@ -3,7 +3,12 @@
 function parseSmokeArgs(argv, env = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
   const args = argv.slice(2);
-  const baseUrl = args.find((arg) => !arg.startsWith("--")) || "http://127.0.0.1:8123";
+  const explicitBaseUrl = args.find((arg) => !arg.startsWith("--"));
+  const requireUrl = args.includes("--require-url");
+  if (requireUrl && !explicitBaseUrl) {
+    throw new Error("--require-url needs an explicit base URL argument");
+  }
+  const baseUrl = explicitBaseUrl || "http://127.0.0.1:8123";
   const tokenArg = args.find((arg) => arg.startsWith("--token="));
   const modeArg = args.find((arg) => arg.startsWith("--expect-mode="));
   const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
@@ -19,7 +24,15 @@ function parseSmokeArgs(argv, env = {}) {
   };
 }
 
-const { baseUrl, demoToken, expectedMode } = parseSmokeArgs(process.argv, process.env);
+let parsedArgs;
+try {
+  parsedArgs = parseSmokeArgs(process.argv, process.env);
+} catch (error) {
+  console.error(`FAIL ${error.message || error}`);
+  process.exit(1);
+}
+
+const { baseUrl, demoToken, expectedMode } = parsedArgs;
 
 function url(path) {
   return new URL(path, baseUrl).toString();
