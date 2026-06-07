@@ -223,8 +223,13 @@ function isLocalOrPrivateHost(host) {
   );
 }
 
+function safeExternalSmokeUrlLabel(label) {
+  const value = String(label || "");
+  return /^[a-z][a-z0-9_]*$/.test(value) ? value : "external_url";
+}
+
 export function validateExternalSmokeUrl(label, rawUrl) {
-  const safeLabel = label && !String(label).startsWith("--") ? String(label) : "external_url";
+  const safeLabel = safeExternalSmokeUrlLabel(label);
   const rawValue = String(rawUrl || "");
   const value = rawValue.trim();
   if (/[\u0000-\u001f\u007f]/.test(rawValue)) {
@@ -293,9 +298,10 @@ export function validateExternalSmokeUrl(label, rawUrl) {
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const label = process.argv[2] || "external_url";
   const rawUrl = process.argv[3] || "";
+  const safeLabel = safeExternalSmokeUrlLabel(label);
   try {
-    const normalizedUrl = validateExternalSmokeUrl(label, rawUrl);
-    console.log(`OK ${label} ${normalizedUrl}`);
+    const normalizedUrl = validateExternalSmokeUrl(safeLabel, rawUrl);
+    console.log(`OK ${safeLabel} ${normalizedUrl}`);
   } catch (error) {
     console.error(`FAIL ${error.message || error}`);
     process.exit(1);

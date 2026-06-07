@@ -173,6 +173,18 @@ if (fs.existsSync(validatorPath)) {
     () => validateExternalSmokeUrl("external_readonly_url", "https://demo.example.com#secret"),
     "external_readonly_url must not include username/password, query string, or fragment");
 
+  checkThrows("validateExternalSmokeUrl falls back for label with spaces",
+    () => validateExternalSmokeUrl("bad label", "https://demo.example.com?token=secret"),
+    "external_url must not include username/password, query string, or fragment");
+
+  checkThrows("validateExternalSmokeUrl falls back for label with newline",
+    () => validateExternalSmokeUrl("bad\nlabel", "https://demo.example.com?token=secret"),
+    "external_url must not include username/password, query string, or fragment");
+
+  checkThrows("validateExternalSmokeUrl falls back for label with escape character",
+    () => validateExternalSmokeUrl("\u001b[31mred", "https://demo.example.com?token=secret"),
+    "external_url must not include username/password, query string, or fragment");
+
   checkThrows("validateExternalSmokeUrl rejects localhost",
     () => validateExternalSmokeUrl("external_readonly_url", "https://localhost"),
     "external_readonly_url must not point to a local or private network target");
@@ -431,6 +443,20 @@ if (fs.existsSync(validatorPath)) {
     badCli.stderr.trim(),
     "FAIL external_readonly_url must not include username/password, query string, or fragment");
 
+  const badLabelCli = spawnSync(process.execPath, [
+    validatorPath,
+    "bad\nlabel",
+    "https://demo.example.com/?token=secret",
+  ], { encoding: "utf8" });
+
+  check("CLI unsafe label exits non-zero for URL with query string",
+    badLabelCli.status,
+    1);
+
+  check("CLI unsafe label prints sanitized URL preflight failure",
+    badLabelCli.stderr.trim(),
+    "FAIL external_url must not include username/password, query string, or fragment");
+
   const goodCli = spawnSync(process.execPath, [
     validatorPath,
     "external_readonly_url",
@@ -444,6 +470,20 @@ if (fs.existsSync(validatorPath)) {
   check("CLI prints normalized valid URL",
     goodCli.stdout.trim(),
     "OK external_readonly_url https://demo.example.com/");
+
+  const goodBadLabelCli = spawnSync(process.execPath, [
+    validatorPath,
+    "bad\nlabel",
+    "https://demo.example.com",
+  ], { encoding: "utf8" });
+
+  check("CLI unsafe label exits zero for valid URL",
+    goodBadLabelCli.status,
+    0);
+
+  check("CLI unsafe label prints sanitized normalized valid URL",
+    goodBadLabelCli.stdout.trim(),
+    "OK external_url https://demo.example.com/");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
