@@ -50,6 +50,47 @@ jobs:
           fi
           cat /tmp/lol-ai-coach-readonly.log 2>/dev/null || true
 
+      - name: Detect protected smoke token
+        id: protected-smoke-token
+        env:
+          PUBLIC_DEMO_TOKEN: ${{ secrets.PUBLIC_DEMO_TOKEN }}
+        run: |
+          if [ -n "$PUBLIC_DEMO_TOKEN" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start protected demo
+        if: ${{ steps.protected-smoke-token.outputs.available == 'true' }}
+        env:
+          PUBLIC_DEMO_TOKEN: ${{ secrets.PUBLIC_DEMO_TOKEN }}
+        run: |
+          HOST=127.0.0.1 npm run start:protected > /tmp/lol-ai-coach-protected.log 2>&1 &
+          echo $! > /tmp/lol-ai-coach-protected.pid
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:8123/healthz >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/lol-ai-coach-protected.log
+          exit 1
+
+      - name: Run protected smoke report
+        if: ${{ steps.protected-smoke-token.outputs.available == 'true' }}
+        env:
+          PUBLIC_DEMO_TOKEN: ${{ secrets.PUBLIC_DEMO_TOKEN }}
+        run: npm run smoke:report:protected
+
+      - name: Stop protected demo
+        if: ${{ always() && steps.protected-smoke-token.outputs.available == 'true' }}
+        run: |
+          if [ -f /tmp/lol-ai-coach-protected.pid ]; then
+            kill "$(cat /tmp/lol-ai-coach-protected.pid)" 2>/dev/null || true
+          fi
+          cat /tmp/lol-ai-coach-protected.log 2>/dev/null || true
+
       - name: Upload QA automation artifacts
         if: always()
         uses: actions/upload-artifact@v7

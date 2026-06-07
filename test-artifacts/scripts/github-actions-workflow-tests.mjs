@@ -66,6 +66,25 @@ if (exists) {
     /run:\s*npm run smoke:report:readonly/.test(workflow),
     workflow);
 
+  check("QA workflow detects optional protected smoke token",
+    /id:\s*protected-smoke-token/.test(workflow) &&
+      /PUBLIC_DEMO_TOKEN:\s*\$\{\{\s*secrets\.PUBLIC_DEMO_TOKEN\s*\}\}/.test(workflow) &&
+      /available=true/.test(workflow) &&
+      /available=false/.test(workflow),
+    workflow);
+
+  check("QA workflow gates protected smoke on token availability",
+    /if:\s*\$\{\{\s*steps\.protected-smoke-token\.outputs\.available\s*==\s*'true'\s*\}\}/.test(workflow),
+    workflow);
+
+  check("QA workflow runs protected smoke report when token is available",
+    /run:\s*npm run smoke:report:protected/.test(workflow),
+    workflow);
+
+  check("QA workflow does not pass the demo token in command arguments",
+    !/--token=.*PUBLIC_DEMO_TOKEN/.test(workflow),
+    workflow);
+
   check("QA workflow uploads QA automation artifacts",
     /uses:\s*actions\/upload-artifact@v7/.test(workflow) &&
       /path:\s*test-artifacts\/qa-automation\//.test(workflow),
@@ -75,9 +94,10 @@ if (exists) {
     /if:\s*always\(\)/.test(workflow),
     workflow);
 
-  check("QA workflow does not require a demo token secret",
-    !/PUBLIC_DEMO_TOKEN|secrets\./.test(workflow),
-    workflow);
+  const secretRefs = workflow.match(/secrets\.[A-Z0-9_]+/g) || [];
+  check("QA workflow only references the optional public demo token secret",
+    secretRefs.every((ref) => ref === "secrets.PUBLIC_DEMO_TOKEN"),
+    secretRefs.join(", "));
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
