@@ -109,7 +109,7 @@ Expected:
 
 Observed: `node --check main.js && node test-artifacts/main/demo-mode-ui-tests.mjs && npm test && git diff --check` exited 0. Focused demo-mode UI tests reported `8 passed, 0 failed`; the full suite reported `674 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -119,7 +119,9 @@ git commit -m "fix: fallback blank retry messages"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions QA artifact**
+Observed: committed and pushed `418b799 fix: fallback blank retry messages` to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA artifact**
 
 Run:
 
@@ -135,7 +137,9 @@ Expected:
 "conclusion": "success"
 ```
 
-- [ ] **Step 4: Download and scan the QA artifact**
+Observed: GitHub Actions QA run `27103863001` completed with conclusion `success` for head SHA `418b79927de13a7ac2fb0b48053ff4425c3c5938`.
+
+- [x] **Step 4: Download and scan the QA artifact**
 
 Run:
 
@@ -153,6 +157,8 @@ Expected:
 150 passed / 0 failed
 no sensitive scan matches
 ```
+
+Observed: artifact `qa-automation-27103863001` / id `7467671338` downloaded to `/tmp/lol-ai-coach-blank-message.iU4gcT`. `qa-summary.json` recorded read-only smoke `150 passed / 0 failed`, and the sensitive scan returned no matches.
 
 - [ ] **Step 5: Commit and push documentation evidence**
 
