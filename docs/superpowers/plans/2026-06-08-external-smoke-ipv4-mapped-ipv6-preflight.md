@@ -132,7 +132,7 @@ Expected: syntax check passes, validator tests pass, full test suite passes, and
 
 Observed: `node --check scripts/validate-external-smoke-url.mjs && node test-artifacts/scripts/external-smoke-url-validator-tests.mjs && npm test && git diff --check` exited 0; validator tests reported `30 passed, 0 failed` and full suite reported `584 passed, 0 failed across 24 test file(s)`.
 
-- [ ] **Step 2: Commit and push to main**
+- [x] **Step 2: Commit and push to main**
 
 Run:
 
@@ -142,7 +142,9 @@ git commit -m "ci: reject mapped private smoke targets"
 git push origin main
 ```
 
-- [ ] **Step 3: Confirm remote QA and artifact**
+Observed: committed `701585a ci: reject mapped private smoke targets` and pushed to `origin/main`.
+
+- [x] **Step 3: Confirm remote QA and artifact**
 
 Run:
 
@@ -154,6 +156,10 @@ gh api repos/crisious/Web_LOL_Banpick/actions/runs/<run-id>/artifacts
 
 Expected: GitHub Actions QA succeeds, read-only smoke artifact uploads, and artifact summary reports `150 passed / 0 failed`.
 
-- [ ] **Step 4: Update Obsidian project log**
+Observed: GitHub Actions run `27099315724` succeeded for `701585a`; artifact `qa-automation-27099315724` uploaded as artifact id `7466249774`, expires `2026-06-21T17:13:45Z`. Downloaded artifact contained `qa-summary.json`, `2026-06-07T17-13-44Z-readonly/smoke-report.json`, and `2026-06-07T17-13-44Z-readonly/smoke-run.json`; `qa-summary.json` reported `150 passed / 0 failed`. Sensitive-value search for `Authorization`, `Bearer`, non-empty `PUBLIC_DEMO_TOKEN`, non-empty external URL env, `access_token=`, `token=secret`, and `user:pass@` returned no matches.
+
+- [x] **Step 4: Update Obsidian project log**
 
 Append a QA log under `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` before `## 리스크 관리` with commit, local test count, remote run URL, artifact id, and sensitive-value search result.
+
+Observed: Obsidian project note updated with `584 passed / 0 failed`, run `27099315724`, artifact `7466249774`, and sensitive-value search result.
