@@ -55,6 +55,13 @@ const actionChecklistCountConstantsSrc = [
 const { ACTION_CHECKLIST_MIN, ACTION_CHECKLIST_MAX } = new Function(
   `${actionChecklistCountConstantsSrc}\nreturn { ACTION_CHECKLIST_MIN, ACTION_CHECKLIST_MAX };`,
 )();
+const insightListCountConstantsSrc = [
+  extractConstSource(serverSrc, "INSIGHT_LIST_MIN"),
+  extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
+].join("\n");
+const { INSIGHT_LIST_MIN, INSIGHT_LIST_MAX } = new Function(
+  `${insightListCountConstantsSrc}\nreturn { INSIGHT_LIST_MIN, INSIGHT_LIST_MAX };`,
+)();
 
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
@@ -66,7 +73,7 @@ const tfConstants = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
   extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
   actionChecklistCountConstantsSrc,
-  extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
+  insightListCountConstantsSrc,
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
@@ -195,6 +202,8 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   check("outputContract.schemaVersion = 1.0", out.outputContract.schemaVersion, "1.0");
   check("taskMeta.checklistCountMin mirrors ACTION_CHECKLIST_MIN", out.taskMeta.checklistCountMin, ACTION_CHECKLIST_MIN);
   check("taskMeta.checklistCountMax mirrors ACTION_CHECKLIST_MAX", out.taskMeta.checklistCountMax, ACTION_CHECKLIST_MAX);
+  check("taskMeta.strengthCount mirrors INSIGHT_LIST_MIN", out.taskMeta.strengthCount, INSIGHT_LIST_MIN);
+  check("taskMeta.weaknessCount mirrors INSIGHT_LIST_MIN", out.taskMeta.weaknessCount, INSIGHT_LIST_MIN);
   check("requiredTopLevelFields list",
     out.outputContract.requiredTopLevelFields,
     ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"]);
@@ -202,10 +211,10 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.phaseSummariesMin", out.outputContract.requiredArrayCounts.phaseSummariesMin, 3);
   check("requiredArrayCounts.evidenceIndexMin", out.outputContract.requiredArrayCounts.evidenceIndexMin, 1);
-  check("requiredArrayCounts.strengthsMax", out.outputContract.requiredArrayCounts.strengthsMax, 3);
-  check("requiredArrayCounts.weaknessesMax", out.outputContract.requiredArrayCounts.weaknessesMax, 3);
-  check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
-  check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
+  check("requiredArrayCounts.strengthsMax mirrors INSIGHT_LIST_MAX", out.outputContract.requiredArrayCounts.strengthsMax, INSIGHT_LIST_MAX);
+  check("requiredArrayCounts.weaknessesMax mirrors INSIGHT_LIST_MAX", out.outputContract.requiredArrayCounts.weaknessesMax, INSIGHT_LIST_MAX);
+  check("requiredArrayCounts.strengths mirrors INSIGHT_LIST_MIN", out.outputContract.requiredArrayCounts.strengths, INSIGHT_LIST_MIN);
+  check("requiredArrayCounts.weaknesses mirrors INSIGHT_LIST_MIN", out.outputContract.requiredArrayCounts.weaknesses, INSIGHT_LIST_MIN);
   check("requiredArrayCounts.actionChecklistMin mirrors ACTION_CHECKLIST_MIN", out.outputContract.requiredArrayCounts.actionChecklistMin, ACTION_CHECKLIST_MIN);
   check("requiredArrayCounts.actionChecklistMax mirrors ACTION_CHECKLIST_MAX", out.outputContract.requiredArrayCounts.actionChecklistMax, ACTION_CHECKLIST_MAX);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);
@@ -213,6 +222,12 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   checkTrue("buildLlmPayload taskMeta uses ACTION_CHECKLIST_MAX", buildSrc.includes("checklistCountMax: ACTION_CHECKLIST_MAX"));
   checkTrue("buildLlmPayload requiredArrayCounts uses ACTION_CHECKLIST_MIN", buildSrc.includes("actionChecklistMin: ACTION_CHECKLIST_MIN"));
   checkTrue("buildLlmPayload requiredArrayCounts uses ACTION_CHECKLIST_MAX", buildSrc.includes("actionChecklistMax: ACTION_CHECKLIST_MAX"));
+  checkTrue("buildLlmPayload taskMeta uses INSIGHT_LIST_MIN for strengthCount", buildSrc.includes("strengthCount: INSIGHT_LIST_MIN"));
+  checkTrue("buildLlmPayload taskMeta uses INSIGHT_LIST_MIN for weaknessCount", buildSrc.includes("weaknessCount: INSIGHT_LIST_MIN"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses INSIGHT_LIST_MIN for strengths", buildSrc.includes("strengths: INSIGHT_LIST_MIN"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses INSIGHT_LIST_MIN for weaknesses", buildSrc.includes("weaknesses: INSIGHT_LIST_MIN"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses INSIGHT_LIST_MAX for strengthsMax", buildSrc.includes("strengthsMax: INSIGHT_LIST_MAX"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses INSIGHT_LIST_MAX for weaknessesMax", buildSrc.includes("weaknessesMax: INSIGHT_LIST_MAX"));
 }
 
 // ─── 케이스 6: phaseContext는 4개 필드만 추출 ───────────────────────────────
