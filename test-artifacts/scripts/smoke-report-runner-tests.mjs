@@ -146,6 +146,10 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/qa-automation "], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects backslash output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts\\qa-automation"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects root dot-segment output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -331,6 +335,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("whitespace env output root rejection does not create output root",
     fs.existsSync(whitespaceEnvCreatedPath),
+    false);
+
+  const backslashEnvOutputRoot = "test-artifacts\\tmp\\smoke-report-backslash-root";
+  const backslashEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-backslash-root");
+  fs.rmSync(backslashEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects backslash env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: backslashEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("backslash env output root rejection does not create output root",
+    fs.existsSync(backslashEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([

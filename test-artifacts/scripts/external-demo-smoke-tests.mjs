@@ -232,6 +232,10 @@ checkThrows("parseSmokeArgs rejects trailing whitespace report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json "], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects backslash report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts\\tmp\\smoke-report.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1181,6 +1185,27 @@ check("CLI reports whitespace report JSON path without network request",
 
 check("CLI whitespace report JSON path does not create file",
   fs.existsSync(whitespaceReportJsonPath),
+  false);
+
+const backslashReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-backslash.json");
+fs.rmSync(backslashReportJsonPath, { force: true });
+const backslashReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts\\tmp\\smoke-report-backslash.json",
+]);
+
+check("CLI exits non-zero for backslash report JSON path",
+  backslashReportJson.status,
+  1);
+
+check("CLI reports backslash report JSON path without network request",
+  backslashReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI backslash report JSON path does not create file",
+  fs.existsSync(backslashReportJsonPath),
   false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";
