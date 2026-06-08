@@ -294,6 +294,30 @@ if (fs.existsSync(runnerPath)) {
       "https://demo.example/path?redacted#redacted",
     ]);
 
+  const sampleMessageRedactedArgs = runner.redactSmokeArgs([
+    "--expect-sample-detail-error-message=see https://user:pass@demo.example/path?token=secret#secret token=secret",
+    "--expect-sample-list-error-message=Authorization: Bearer secret access_token=secret",
+  ]);
+  const sampleMessageRedactedText = JSON.stringify(sampleMessageRedactedArgs);
+  check("redactSmokeArgs keeps sample detail message prefix after redaction",
+    sampleMessageRedactedArgs[0].startsWith("--expect-sample-detail-error-message="),
+    true);
+  check("redactSmokeArgs keeps sample list message prefix after redaction",
+    sampleMessageRedactedArgs[1].startsWith("--expect-sample-list-error-message="),
+    true);
+  check("redactSmokeArgs removes sample message URL credentials",
+    sampleMessageRedactedText.includes("user:pass@"),
+    false);
+  check("redactSmokeArgs removes sample message token query material",
+    sampleMessageRedactedText.includes("token=secret"),
+    false);
+  check("redactSmokeArgs removes sample message access token material",
+    sampleMessageRedactedText.includes("access_token=secret"),
+    false);
+  check("redactSmokeArgs removes sample message bearer material",
+    sampleMessageRedactedText.includes("Bearer secret"),
+    false);
+
   const invalidOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-invalid-timeout");
   fs.rmSync(invalidOutputRoot, { recursive: true, force: true });
   await checkRejects("runSmokeReport rejects invalid pass-through before artifact creation",

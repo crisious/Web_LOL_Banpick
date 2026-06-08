@@ -33,6 +33,10 @@ const SAMPLE_LIST_ERROR_OPTIONS = [
   "--expect-sample-list-error-code=",
   "--expect-sample-list-error-message=",
 ];
+const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
+  "--expect-sample-detail-error-message=",
+  "--expect-sample-list-error-message=",
+];
 
 function singleOptionArg(args, prefix) {
   const matches = args.filter((arg) => arg.startsWith(prefix));
@@ -223,8 +227,19 @@ export function redactSmokeArgs(args) {
   return args.map((arg) => {
     if (arg.startsWith("--token=")) return "--token=<redacted>";
     if (/^https?:\/\//.test(arg)) return redactUrlForEvidence(arg);
+    if (SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES.some((prefix) => arg.startsWith(prefix))) {
+      return redactSmokeMessageArg(arg);
+    }
     return arg;
   });
+}
+
+function redactSmokeMessageArg(arg) {
+  return arg
+    .replace(/https?:\/\/[^\s"'<>]+/gi, (url) => redactUrlForEvidence(url))
+    .replace(/access_token=[^\s"'<>]+/gi, "access_token=<redacted>")
+    .replace(/token=[^\s"'<>]+/gi, "token=<redacted>")
+    .replace(/Bearer\s+[^\s"'<>]+/gi, "Bearer <redacted>");
 }
 
 export function qaSummaryPathFor(outputRoot) {
