@@ -254,7 +254,7 @@ git diff --cached --check exits 0
 
 Observed: command exited 0 with `set -e`. Cached name-status contained the six expected files; syntax checks passed; `top-level-error-payload-tests.mjs` reported `5 passed, 0 failed`; `manifest-validation-tests.mjs` reported `62 passed, 0 failed`; full `npm test` reported `1112 passed, 0 failed across 37 test file(s)`; `git diff --cached --check` exited 0.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Run:
 
@@ -263,6 +263,8 @@ git commit -m "ci: hide unstructured server errors"
 git push origin main
 ```
 
-- [ ] **Step 4: Confirm GitHub Actions and Obsidian**
+- [x] **Step 4: Confirm GitHub Actions and Obsidian**
 
 Use `gh run list`, `gh run watch`, `gh run download`, and the read-only smoke summary to confirm the pushed `main` run passes. Update the Obsidian project note with commit, local QA, GitHub Actions run, artifact id, smoke result, sensitive/path scan result, and sync status.
+
+Observed: commit `dcbfba6 ci: hide unstructured server errors` pushed to `origin/main`. GitHub Actions QA run `27117083420` completed successfully for head SHA `dcbfba6ef58e78476aea50b0f97abb9d09a783ef`. Downloaded artifact `7471999165` (`qa-automation-27117083420`) and confirmed read-only smoke `155 passed, 0 failed`; artifact scan found no `RGAPI-`, token, Authorization, credential URL, local path, `/runtime/samples`, `ENOENT`, `Unexpected token`, `secret.json`, or `error.message` matches.
