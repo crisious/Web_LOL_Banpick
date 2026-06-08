@@ -151,7 +151,7 @@ Evidence, 2026-06-09 07:19 KST:
 - Local smoke report directory: `test-artifacts/tmp/teamfight-timestamp-policy-local/2026-06-08T22-18-45Z-readonly`.
 - Local high-risk sensitive pattern scan over `test-artifacts/tmp/teamfight-timestamp-policy-local` returned no matches.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -162,6 +162,13 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 07:21 KST:
+- Implementation commit: `fe4fa3dec66099f93ee28b19592863d875177bf7` (`test: guard teamfight timestamps`) pushed to `origin/main`.
+- GitHub QA run: `27170658574`, conclusion `success`, URL `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27170658574`.
+- QA artifact: `qa-automation-27170658574`, artifact ID `7493830071`, size `3548 bytes`, digest `sha256:a933a379bd7d14a73ac7d961536a0febc4b1ccac5e9c9076411b20fb1e55ceae`.
+- Downloaded artifact summary: QA `passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `218ms`, mode `readonly`, git `fe4fa3d`, dirty `false`.
+- High-risk sensitive pattern scan over the downloaded artifact returned no matches.
 
 ## Self-Review
 
