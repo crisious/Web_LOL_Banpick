@@ -424,6 +424,50 @@ export function gitContextFor(cwd = process.cwd()) {
   }
 }
 
+function emptyCiContext() {
+  return {
+    provider: "",
+    repository: "",
+    workflow: "",
+    job: "",
+    runId: "",
+    runAttempt: "",
+    refName: "",
+    sha: "",
+    serverUrl: "",
+    runUrl: "",
+  };
+}
+
+function ciText(value) {
+  if (typeof value !== "string" || !value) return "";
+  return redactSmokeMessageArg(value).replace(/[\u0000-\u001f\u007f]/g, "");
+}
+
+function githubRunUrlFor(serverUrl, repository, runId) {
+  if (!/^https?:\/\//.test(serverUrl) || !repository || !runId) return "";
+  return `${serverUrl.replace(/\/$/, "")}/${repository}/actions/runs/${runId}`;
+}
+
+export function ciContextFor(env = process.env) {
+  if (env?.GITHUB_ACTIONS !== "true") return emptyCiContext();
+  const serverUrl = redactUrlForEvidence(env.GITHUB_SERVER_URL || "https://github.com");
+  const repository = ciText(env.GITHUB_REPOSITORY);
+  const runId = ciText(env.GITHUB_RUN_ID);
+  return {
+    provider: "github-actions",
+    repository,
+    workflow: ciText(env.GITHUB_WORKFLOW),
+    job: ciText(env.GITHUB_JOB),
+    runId,
+    runAttempt: ciText(env.GITHUB_RUN_ATTEMPT),
+    refName: ciText(env.GITHUB_REF_NAME),
+    sha: ciText(env.GITHUB_SHA),
+    serverUrl,
+    runUrl: githubRunUrlFor(serverUrl, repository, runId),
+  };
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -433,6 +477,7 @@ export function buildQaSummary({
   finishedAt,
   exitCode,
   gitContext = null,
+  ciContext = null,
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
@@ -455,6 +500,7 @@ export function buildQaSummary({
         fullSha: "",
         dirty: false,
       },
+      ci: ciContext || emptyCiContext(),
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
@@ -530,6 +576,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     finishedAt,
     exitCode: finalExitCode,
     gitContext: gitContextFor(process.cwd()),
+    ciContext: ciContextFor(env),
     smokeReport,
   }));
 
