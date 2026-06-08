@@ -472,6 +472,9 @@ validateSampleGenerationHealth(health.body);
 if (health.body?.publicDemoModeValid === false) {
   fatal("public demo mode config is valid", `publicDemoMode=${health.body?.publicDemoMode || "(missing)"}`);
 }
+if (health.body?.publicDemoTokenValid === false) {
+  fatal("public demo token config is valid", `publicDemoMode=${health.body?.publicDemoMode || "(missing)"}`);
+}
 const actualMode = demoModeFromHealth(health.body);
 observedMode = actualMode;
 expectFatal(["full", "protected", "readonly"].includes(actualMode), "public demo mode is known", `actual=${actualMode}`);

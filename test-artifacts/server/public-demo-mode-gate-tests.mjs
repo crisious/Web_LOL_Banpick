@@ -25,13 +25,25 @@ function extractFunctionSource(source, name) {
   throw new Error(`function ${name} not closed`);
 }
 
+const parsePublicDemoTokenConfigSource = serverSrc.includes("function parsePublicDemoTokenConfig(")
+  ? extractFunctionSource(serverSrc, "parsePublicDemoTokenConfig")
+  : [
+      "function parsePublicDemoTokenConfig(rawToken) {",
+      "  return { value: String(rawToken || '').trim(), valid: true };",
+      "}",
+    ].join("\n");
+
 function makeGate({ publicDemoMode, publicDemoToken }) {
   return new Function(
     "publicDemoMode",
-    "publicDemoToken",
+    "rawPublicDemoToken",
     [
       "function sendJson(res, status, body) { res.status = status; res.body = body; }",
       "const validPublicDemoModes = new Set(['full', 'readonly', 'protected']);",
+      parsePublicDemoTokenConfigSource,
+      "const publicDemoTokenConfig = parsePublicDemoTokenConfig(rawPublicDemoToken);",
+      "const publicDemoToken = publicDemoTokenConfig.value;",
+      "const publicDemoTokenValid = publicDemoTokenConfig.valid;",
       extractFunctionSource(serverSrc, "firstHeaderValue"),
       extractFunctionSource(serverSrc, "isReadOnlyDemoMode"),
       extractFunctionSource(serverSrc, "isProtectedDemoMode"),
@@ -131,6 +143,9 @@ if (invalidModeGate) {
   check("protected mode health marks protected true",
     protectedGate.publicDemoModeHealth().protected,
     true);
+  check("protected mode health marks token config valid",
+    protectedGate.publicDemoModeHealth().publicDemoTokenValid,
+    true);
   check("protected mode without request token blocks live API access",
     protectedGate.requireLiveApiAccess({ headers: {} }, missingTokenRes),
     false);
@@ -145,6 +160,53 @@ if (invalidModeGate) {
   check("protected mode success does not write an error response",
     authorizedRes.body,
     null);
+
+  const trailingBearerRes = makeResponseRecorder();
+  check("protected mode rejects bearer token with trailing whitespace",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer demo-secret " } }, trailingBearerRes),
+    false);
+  check("protected mode trailing bearer returns unauthorized code",
+    trailingBearerRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const trailingHeaderRes = makeResponseRecorder();
+  check("protected mode rejects x-demo-token with trailing whitespace",
+    protectedGate.requireLiveApiAccess({ headers: { "x-demo-token": "demo-secret " } }, trailingHeaderRes),
+    false);
+  check("protected mode trailing x-demo-token returns unauthorized code",
+    trailingHeaderRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+}
+
+if (invalidModeGate) {
+  const invalidTokenGate = makeGate({ publicDemoMode: "protected", publicDemoToken: " demo-secret" });
+  const invalidTokenRes = makeResponseRecorder();
+  check("protected mode health marks whitespace token config invalid",
+    invalidTokenGate.publicDemoModeHealth().publicDemoTokenValid,
+    false);
+  check("protected mode blocks live API when token config is invalid",
+    invalidTokenGate.requireLiveApiAccess({ headers: { authorization: "Bearer demo-secret" } }, invalidTokenRes),
+    false);
+  check("protected mode invalid token config returns 403",
+    invalidTokenRes.status,
+    403);
+  check("protected mode invalid token config returns stable code",
+    invalidTokenRes.body?.code,
+    "PUBLIC_DEMO_TOKEN_INVALID");
+}
+
+if (invalidModeGate) {
+  const whitespaceOnlyTokenGate = makeGate({ publicDemoMode: "protected", publicDemoToken: "   " });
+  const whitespaceOnlyTokenRes = makeResponseRecorder();
+  check("protected mode whitespace-only token config remains valid but missing",
+    whitespaceOnlyTokenGate.publicDemoModeHealth().publicDemoTokenValid,
+    true);
+  check("protected mode whitespace-only token blocks live API",
+    whitespaceOnlyTokenGate.requireLiveApiAccess({ headers: { authorization: "Bearer demo-secret" } }, whitespaceOnlyTokenRes),
+    false);
+  check("protected mode whitespace-only token keeps missing-token code",
+    whitespaceOnlyTokenRes.body?.code,
+    "PUBLIC_DEMO_TOKEN_REQUIRED");
 }
 
 if (invalidModeGate) {

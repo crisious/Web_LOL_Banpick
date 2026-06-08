@@ -713,6 +713,64 @@ check("CLI stops after healthz when publicDemoModeValid is false",
   invalidModeValidityRequests.map((request) => request.url),
   ["/healthz"]);
 
+const invalidTokenValidityRequests = [];
+const invalidTokenValidityServer = http.createServer((req, res) => {
+  invalidTokenValidityRequests.push({ method: req.method, url: req.url });
+  const sendJson = (status, body) => {
+    res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+    res.end(JSON.stringify(body));
+  };
+  if (req.url === "/healthz") {
+    return sendJson(200, { ok: true, publicDemoMode: "protected", publicDemoTokenValid: false });
+  }
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html", "X-Content-Type-Options": "nosniff" });
+    return res.end(`
+      <title>LoL Replay Coach</title>
+      <link rel="stylesheet" href="./styles.css?v=20260419">
+      <script src="./main.js?v=20260419"></script>
+    `);
+  }
+  if (req.url === "/styles.css?v=20260419") {
+    res.writeHead(200, { "Content-Type": "text/css", "X-Content-Type-Options": "nosniff" });
+    return res.end("body { color: black; }");
+  }
+  if (req.url === "/main.js?v=20260419") {
+    res.writeHead(200, { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff" });
+    return res.end("console.log('ok');");
+  }
+  if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+  if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+  if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+    return sendJson(200, { ok: true });
+  }
+  return sendJson(404, { error: "not found" });
+});
+
+await new Promise((resolve) => invalidTokenValidityServer.listen(0, "127.0.0.1", resolve));
+const invalidTokenValidityUrl = `http://127.0.0.1:${invalidTokenValidityServer.address().port}`;
+const invalidTokenValidity = await runNode([
+  smokePath,
+  invalidTokenValidityUrl,
+  "--require-token",
+  "--token=demo-secret",
+  "--expect-mode=protected",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => invalidTokenValidityServer.close(resolve));
+
+check("CLI exits non-zero when healthz marks publicDemoToken invalid",
+  invalidTokenValidity.status,
+  1);
+
+check("CLI reports invalid public demo token validity",
+  invalidTokenValidity.stderr.includes("FAIL public demo token config is valid"),
+  true);
+
+check("CLI stops after healthz when publicDemoTokenValid is false",
+  invalidTokenValidityRequests.map((request) => request.url),
+  ["/healthz"]);
+
 const unsafeSampleGenerationHealthRequests = [];
 const unsafeSampleGenerationHealthServer = http.createServer((req, res) => {
   unsafeSampleGenerationHealthRequests.push({ method: req.method, url: req.url });

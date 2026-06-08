@@ -15,7 +15,9 @@ loadEnvFile(path.join(root, ".env"));
 const port = Number(process.env.PORT || 8123);
 const host = process.env.HOST || "127.0.0.1";
 const publicDemoMode = String(process.env.PUBLIC_DEMO_MODE || "full").trim().toLowerCase();
-const publicDemoToken = String(process.env.PUBLIC_DEMO_TOKEN || "").trim();
+const publicDemoTokenConfig = parsePublicDemoTokenConfig(process.env.PUBLIC_DEMO_TOKEN);
+const publicDemoToken = publicDemoTokenConfig.value;
+const publicDemoTokenValid = publicDemoTokenConfig.valid;
 const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
 const trustProxy = String(process.env.TRUST_PROXY || "").trim() === "1";
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
@@ -113,6 +115,17 @@ function firstHeaderValue(value) {
   return String(value || "");
 }
 
+function parsePublicDemoTokenConfig(rawToken) {
+  const value = String(rawToken || "");
+  if (!value || value.trim() === "") {
+    return { value: "", valid: true };
+  }
+  if (value.trim() !== value || /\s/u.test(value)) {
+    return { value: "", valid: false };
+  }
+  return { value, valid: true };
+}
+
 function getClientIp(req) {
   if (!trustProxy) {
     return req.socket.remoteAddress || "unknown";
@@ -149,16 +162,17 @@ function publicDemoModeHealth() {
   return {
     publicDemoMode,
     publicDemoModeValid: !isInvalidDemoMode(),
+    publicDemoTokenValid,
     readonly: isReadOnlyDemoMode(),
     protected: isProtectedDemoMode(),
   };
 }
 
 function tokenFromRequest(req) {
-  const auth = firstHeaderValue(req.headers.authorization).trim();
+  const auth = firstHeaderValue(req.headers.authorization);
   const bearerMatch = auth.match(/^Bearer\s+(.+)$/i);
-  if (bearerMatch) return bearerMatch[1].trim();
-  return firstHeaderValue(req.headers["x-demo-token"]).trim();
+  if (bearerMatch) return bearerMatch[1];
+  return firstHeaderValue(req.headers["x-demo-token"]);
 }
 
 function sendDemoModeBlocked(res) {
@@ -189,6 +203,15 @@ function requireLiveApiAccess(req, res) {
   }
 
   if (isProtectedDemoMode()) {
+    if (!publicDemoTokenValid) {
+      sendJson(res, 403, {
+        ok: false,
+        code: "PUBLIC_DEMO_TOKEN_INVALID",
+        error: "보호 모드 PUBLIC_DEMO_TOKEN 값에 공백이 포함되어 live API를 차단했습니다.",
+      });
+      return false;
+    }
+
     if (!publicDemoToken) {
       sendJson(res, 403, {
         ok: false,
