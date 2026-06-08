@@ -576,6 +576,17 @@ function isSupportedRawTimelineEvent(rawEvent) {
   return SUPPORTED_RAW_TIMELINE_EVENT_TYPES.has(rawEvent.type);
 }
 
+function isRawPlayerInvolved(rawEvent, targetParticipantId) {
+  const assistingParticipantIds = Array.isArray(rawEvent.assistingParticipantIds)
+    ? rawEvent.assistingParticipantIds
+    : [];
+  return (
+    rawEvent.killerId === targetParticipantId ||
+    rawEvent.victimId === targetParticipantId ||
+    assistingParticipantIds.includes(targetParticipantId)
+  );
+}
+
 function laneHintForEvent(event) {
   if (event.monsterType === "DRAGON") {
     return "DRAGON_RIVER";
@@ -693,10 +704,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
 }
 
 function shouldKeepEvent(rawEvent, targetParticipantId, targetTeamId) {
-  const playerInvolved =
-    rawEvent.killerId === targetParticipantId ||
-    rawEvent.victimId === targetParticipantId ||
-    rawEvent.assistingParticipantIds.includes(targetParticipantId);
+  const playerInvolved = isRawPlayerInvolved(rawEvent, targetParticipantId);
 
   if (isRawChampionKillEvent(rawEvent)) {
     return playerInvolved;
@@ -783,10 +791,7 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
         phase,
         eventType,
         importance: importanceForEvent(eventType, phase, rawEvent),
-        isPlayerInvolved:
-          rawEvent.killerId === targetParticipantId ||
-          rawEvent.victimId === targetParticipantId ||
-          rawEvent.assistingParticipantIds.includes(targetParticipantId),
+        isPlayerInvolved: isRawPlayerInvolved(rawEvent, targetParticipantId),
         laneHint: laneHintForEvent(rawEvent),
         summary: summaryForEvent(eventType, phase, rawEvent, playerWonObjective),
         rawRef: {
