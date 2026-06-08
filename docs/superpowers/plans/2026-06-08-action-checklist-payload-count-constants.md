@@ -186,7 +186,7 @@ no sensitive matches
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-08-action-checklist-payload-count-constants.md`
 
-- [ ] **Step 1: Update Obsidian project log**
+- [x] **Step 1: Update Obsidian project log**
 
 Record the intent, changed files, RED/GREEN output, full test count, local smoke result, commits, GitHub run, and artifact id in:
 
@@ -194,7 +194,7 @@ Record the intent, changed files, RED/GREEN output, full test count, local smoke
 /Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md
 ```
 
-- [ ] **Step 2: Commit implementation**
+- [x] **Step 2: Commit implementation**
 
 Run:
 
@@ -204,7 +204,7 @@ git commit -m "test: mirror action checklist payload counts"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA artifact**
+- [x] **Step 3: Verify GitHub QA artifact**
 
 Run:
 
@@ -216,6 +216,17 @@ jq '{status: .latestRun.status, durationMs: .latestRun.durationMs, smokeSummary:
 ```
 
 Expected: workflow conclusion is success, `latestRun.status` is `passed`, `smokeSummary.failed` is `0`, and `latestRun.git.shortSha` matches the pushed commit.
+
+### Completion Evidence
+
+- Focused RED: `node test-artifacts/server/llm-payload-tests.mjs` reported `70 passed, 4 failed` before implementation.
+- Focused GREEN: `node test-artifacts/server/llm-payload-tests.mjs` reported `74 passed, 0 failed` after implementation.
+- Static checks: `node --check server.js`, `node --check test-artifacts/server/llm-payload-tests.mjs`, `git diff --check`, and placeholder scan passed.
+- Full test: `npm test` reported `1440 passed, 0 failed across 40 test file(s)`.
+- Local smoke: read-only smoke report passed with `156 passed, 0 failed`, `durationMs: 203`, and required checks `13/13`.
+- Implementation commit: `0e91294 test: mirror action checklist payload counts`.
+- GitHub QA: run `27145470996` completed successfully for SHA `0e91294db2c0f263f084e6bc4f207a44c3b1840d`.
+- GitHub artifact: `7483582871` (`qa-automation-27145470996`) passed with read-only smoke `156 passed, 0 failed`, `durationMs: 224`, required checks `13/13`, and no sensitive pattern matches.
 
 ---
 
