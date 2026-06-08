@@ -55,6 +55,16 @@ const structureTakePolicySources = serverSrc.includes("const STRUCTURE_TAKE_EVEN
       'function isStructureTakeEvent(event) { return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType); }',
     ];
 
+const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
+    ]
+  : [
+      'const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);',
+      'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const env = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
@@ -64,6 +74,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     ...objectiveFailPolicySources,
     ...structureTakePolicySources,
+    ...playerDeathPolicySources,
     extractConstSource(serverSrc, "MACRO_OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isMacroObjectiveWinEvent"),
     extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
@@ -156,6 +167,18 @@ checkTrue(
 checkTrue(
   "buildDerivedSignals late structure uses isStructureTakeEvent",
   buildDerivedSignalsSrc.includes('event.phase === "LATE" && isStructureTakeEvent(event)'),
+);
+checkTrue(
+  "server defines PLAYER_DEATH_EVENT_TYPES",
+  serverSrc.includes('const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);'),
+);
+checkTrue(
+  "server defines isPlayerDeathEvent",
+  serverSrc.includes("function isPlayerDeathEvent(event)"),
+);
+checkTrue(
+  "buildDerivedSignals uses isPlayerDeathEvent",
+  buildDerivedSignalsSrc.includes("events.filter(isPlayerDeathEvent)"),
 );
 checkTrue(
   "buildPhaseSummaries uses isMacroObjectiveWinEvent",
@@ -309,6 +332,10 @@ check("buildWeaknesses A titles", wkA.map((w) => w.title), [
 checkTrue(
   "buildWeaknesses objective wins use isObjectiveWinEvent",
   buildWeaknessesSrc.includes("const objectiveWins = events.filter(isObjectiveWinEvent);"),
+);
+checkTrue(
+  "buildWeaknesses deaths use isPlayerDeathEvent",
+  buildWeaknessesSrc.includes("const deaths = events.filter(isPlayerDeathEvent);"),
 );
 
 // B) SUPPORT는 CS 약점 안 만듦(임계 0). 모든 분기 skip → fallback 3개로 패딩.

@@ -44,6 +44,16 @@ const objectiveFailPolicySources = serverSrc.includes("const OBJECTIVE_FAIL_EVEN
       'function isObjectiveFailEvent(event) { return OBJECTIVE_FAIL_EVENT_TYPES.has(event.eventType); }',
     ];
 
+const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
+    ]
+  : [
+      'const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);',
+      'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const buildCoachSummarySrc = extractFunctionSource(serverSrc, "buildCoachSummary");
 const calcObjectiveScoreSrc = extractFunctionSource(serverSrc, "calcObjectiveScore");
 
@@ -53,6 +63,7 @@ const { buildCoachSummary, calcObjectiveScore } = new Function(
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     ...objectiveFailPolicySources,
+    ...playerDeathPolicySources,
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractFunctionSource(serverSrc, "clamp10"),
     extractFunctionSource(serverSrc, "calcObjectiveScore"),
@@ -99,6 +110,10 @@ check("calcObjectiveScore ignores tower take as objective win", calcObjectiveSco
 checkTrue(
   "buildCoachSummary uses isObjectiveWinEvent",
   buildCoachSummarySrc.includes("timelineEvents.filter(isObjectiveWinEvent)"),
+);
+checkTrue(
+  "buildCoachSummary deaths use isPlayerDeathEvent",
+  buildCoachSummarySrc.includes("timelineEvents.filter(isPlayerDeathEvent)"),
 );
 checkTrue(
   "calcObjectiveScore uses isObjectiveWinEvent",

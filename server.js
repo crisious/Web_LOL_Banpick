@@ -35,6 +35,7 @@ const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJEC
 const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
 const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);
+const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);
 const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
@@ -846,7 +847,7 @@ function buildDerivedSignals(normalized) {
   const events = normalized.timelineEvents;
   const objectiveWins = events.filter(isMacroObjectiveWinEvent);
   const objectiveFails = events.filter(isObjectiveFailEvent);
-  const playerDeaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
+  const playerDeaths = events.filter(isPlayerDeathEvent);
   const earlyDeaths = playerDeaths.filter((event) => event.phase === "EARLY");
   const lateTowers = events.filter((event) => event.phase === "LATE" && isStructureTakeEvent(event));
   const postObjectiveDeaths = filterPostObjectiveDeaths(playerDeaths, objectiveWins);
@@ -1064,6 +1065,10 @@ function isStructureTakeEvent(event) {
   return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType);
 }
 
+function isPlayerDeathEvent(event) {
+  return PLAYER_DEATH_EVENT_TYPES.has(event.eventType);
+}
+
 function isFightContributionEvent(event) {
   return FIGHT_CONTRIBUTION_EVENT_TYPES.has(event.eventType);
 }
@@ -1156,7 +1161,7 @@ function buildStrengths(normalized) {
 function buildWeaknesses(normalized) {
   const weaknesses = [];
   const events = normalized.timelineEvents;
-  const deaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
+  const deaths = events.filter(isPlayerDeathEvent);
   const earlyDeaths = deaths.filter((event) => event.phase === "EARLY");
   const objectiveWins = events.filter(isObjectiveWinEvent);
   const objectiveFailEvents = events.filter(isObjectiveFailEvent);
@@ -1554,7 +1559,7 @@ function labelForMoment(event) {
 }
 
 function impactForMoment(event, result) {
-  if (event.eventType === "PLAYER_DEATH") {
+  if (isPlayerDeathEvent(event)) {
     return result === "WIN" ? "이기는 흐름을 다소 늦췄다." : "팀 운영이 크게 흔들렸다.";
   }
   if (event.eventType === "DRAGON_FIGHT" || event.eventType === "BARON_FIGHT") {
@@ -1625,7 +1630,7 @@ function buildEvidenceIndex(normalized) {
 function buildCoachSummary(normalized) {
   const isWin = normalized.matchInfo.result === "WIN";
   const objectiveEvents = normalized.timelineEvents.filter(isObjectiveWinEvent);
-  const deaths = normalized.timelineEvents.filter((event) => event.eventType === "PLAYER_DEATH");
+  const deaths = normalized.timelineEvents.filter(isPlayerDeathEvent);
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveEvents);
 
   const overallSummary = isWin
