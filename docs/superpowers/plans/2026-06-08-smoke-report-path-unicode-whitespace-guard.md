@@ -162,7 +162,7 @@ Expected: focused tests pass, full suite passes, and Unicode whitespace check pa
 
 Observed: `node --check scripts/external-demo-smoke.mjs && node --check scripts/run-smoke-report.mjs && node --check test-artifacts/scripts/external-demo-smoke-tests.mjs && node --check test-artifacts/scripts/smoke-report-runner-tests.mjs && node test-artifacts/scripts/external-demo-smoke-tests.mjs && node test-artifacts/scripts/smoke-report-runner-tests.mjs && npm test && git diff --check` exited 0. Focused direct smoke tests reported `164 passed, 0 failed`; smoke report runner tests reported `67 passed, 0 failed`; the full suite reported `820 passed, 0 failed across 25 test file(s)`.
 
-- [ ] **Step 2: Commit and push implementation evidence**
+- [x] **Step 2: Commit and push implementation evidence**
 
 Run:
 
@@ -172,7 +172,9 @@ git commit -m "ci: reject unicode whitespace smoke report paths"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions artifact**
+Observed: implementation commit `d84aee3 ci: reject unicode whitespace smoke report paths` was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions artifact**
 
 Run:
 
@@ -184,6 +186,10 @@ gh run download <run-id> --name qa-automation-<run-id> --dir /tmp/<download-dir>
 
 Expected: GitHub Actions QA succeeds, `qa-summary.json` reports read-only smoke `155 passed / 0 failed` or higher, and artifact sensitive-value scan has no matches.
 
+Observed: GitHub Actions QA run `27109355011` completed successfully for `d84aee3`. Artifact `7469406458` / `qa-automation-27109355011` contained `qa-summary.json` with read-only `actualMode=readonly`, `checkCount=155`, and `155 passed / 0 failed`. Sensitive-value scan over the downloaded artifact found no matches for token, Authorization, Riot key, match id, or lock-key patterns.
+
 - [ ] **Step 4: Update Obsidian**
 
 Append a cycle log before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with commit, local QA, remote run, artifact id, and sensitive-value scan result.
+
+Deferred: Obsidian update is applied after the final docs evidence run so the project note can reference the final `main` hash and final QA artifact.
