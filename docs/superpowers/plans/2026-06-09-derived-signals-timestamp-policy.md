@@ -150,7 +150,7 @@ Evidence, 2026-06-09 07:51 KST:
 - Local `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `211ms`, mode `readonly`, git short SHA `4ae8db3`, dirty `true` because this implementation was intentionally uncommitted.
 - Local artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -161,6 +161,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 07:53 KST:
+- Staged only `docs/superpowers/plans/2026-06-09-derived-signals-timestamp-policy.md`, `server.js`, `test-artifacts/server/coach-summary-tests.mjs`, `test-artifacts/server/strength-weakness-tests.mjs`, and `test-artifacts/server/derived-signals-timestamp-policy-tests.mjs`.
+- Commit `d989db6` (`test: guard derived signal timestamps`) pushed to `origin/main`.
+- GitHub QA run `27171653760` completed with conclusion `success` for SHA `d989db6552bae5a76b2299af8f7e5237dbffa0fd`.
+- GitHub artifact `qa-automation-27171653760` id `7494215004`, size `3551`, digest `sha256:1ec71b1b4dcf73b61216f5f6814eaeb42cc037af79c23c77f261ace3447b166c`.
+- Downloaded artifact `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `204ms`, mode `readonly`, git short SHA `d989db6`, dirty `false`.
+- Downloaded artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
 ## Self-Review
 
