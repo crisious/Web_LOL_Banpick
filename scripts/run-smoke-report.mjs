@@ -433,6 +433,32 @@ export function artifactFileHashesFor(reportJsonPath, metadataPath) {
   };
 }
 
+const SHA256_HEX_PATTERN = /^[a-f0-9]{64}$/;
+
+function artifactIntegrityFor(artifactFileSizes, artifactFileHashes) {
+  const smokeReportBytesPresent = Number.isSafeInteger(artifactFileSizes?.smokeReportBytes) && artifactFileSizes.smokeReportBytes > 0;
+  const smokeRunBytesPresent = Number.isSafeInteger(artifactFileSizes?.smokeRunBytes) && artifactFileSizes.smokeRunBytes > 0;
+  const smokeReportSha256Present = SHA256_HEX_PATTERN.test(artifactFileHashes?.smokeReportSha256 || "");
+  const smokeRunSha256Present = SHA256_HEX_PATTERN.test(artifactFileHashes?.smokeRunSha256 || "");
+  const failures = [];
+  if (!smokeReportBytesPresent) failures.push("smoke-report artifact is empty or missing");
+  if (!smokeReportSha256Present) failures.push("smoke-report artifact SHA-256 is missing");
+  if (!smokeRunBytesPresent) failures.push("smoke-run artifact is empty or missing");
+  if (!smokeRunSha256Present) failures.push("smoke-run artifact SHA-256 is missing");
+  return {
+    status: failures.length ? "failed" : "passed",
+    smokeReport: {
+      bytesPresent: smokeReportBytesPresent,
+      sha256Present: smokeReportSha256Present,
+    },
+    smokeRun: {
+      bytesPresent: smokeRunBytesPresent,
+      sha256Present: smokeRunSha256Present,
+    },
+    failures,
+  };
+}
+
 function runDurationMs(startedAt, finishedAt) {
   const started = Date.parse(startedAt);
   const finished = Date.parse(finishedAt);
@@ -557,6 +583,8 @@ export function buildQaSummary({
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
+  const resolvedArtifactFileSizes = artifactFileSizes || emptyArtifactFileSizes();
+  const resolvedArtifactFileHashes = artifactFileHashes || emptyArtifactFileHashes();
   return {
     schemaVersion: 1,
     generatedAt: finishedAt,
@@ -583,8 +611,9 @@ export function buildQaSummary({
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
       artifactRelativePaths: artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath),
-      artifactFileSizes: artifactFileSizes || emptyArtifactFileSizes(),
-      artifactFileHashes: artifactFileHashes || emptyArtifactFileHashes(),
+      artifactFileSizes: resolvedArtifactFileSizes,
+      artifactFileHashes: resolvedArtifactFileHashes,
+      artifactIntegrity: artifactIntegrityFor(resolvedArtifactFileSizes, resolvedArtifactFileHashes),
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,

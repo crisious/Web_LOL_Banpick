@@ -705,6 +705,18 @@ if (fs.existsSync(runnerPath)) {
           smokeReportSha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
           smokeRunSha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         },
+        artifactIntegrity: {
+          status: "passed",
+          smokeReport: {
+            bytesPresent: true,
+            sha256Present: true,
+          },
+          smokeRun: {
+            bytesPresent: true,
+            sha256Present: true,
+          },
+          failures: [],
+        },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
         requiredChecks: commonMissingFullRequiredChecks,
@@ -857,6 +869,21 @@ if (fs.existsSync(runnerPath)) {
       smokeRunSha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     });
 
+  check("buildQaSummary records passing artifact integrity",
+    passingRequiredSummary?.latestRun?.artifactIntegrity,
+    {
+      status: "passed",
+      smokeReport: {
+        bytesPresent: true,
+        sha256Present: true,
+      },
+      smokeRun: {
+        bytesPresent: true,
+        sha256Present: true,
+      },
+      failures: [],
+    });
+
   check("buildQaSummary records generator metadata",
     passingRequiredSummary?.latestRun?.generator,
     {
@@ -1006,6 +1033,37 @@ if (fs.existsSync(runnerPath)) {
     exitCode: 0,
     smokeReport: missingRequiredCheckReport,
   });
+
+  const missingArtifactSummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:40:00.000Z",
+    finishedAt: "2026-06-08T06:40:10.000Z",
+    exitCode: 0,
+    smokeReport: passingRequiredCheckReport,
+  });
+
+  check("buildQaSummary records failed artifact integrity when artifact metadata is missing",
+    missingArtifactSummary?.latestRun?.artifactIntegrity,
+    {
+      status: "failed",
+      smokeReport: {
+        bytesPresent: false,
+        sha256Present: false,
+      },
+      smokeRun: {
+        bytesPresent: false,
+        sha256Present: false,
+      },
+      failures: [
+        "smoke-report artifact is empty or missing",
+        "smoke-report artifact SHA-256 is missing",
+        "smoke-run artifact is empty or missing",
+        "smoke-run artifact SHA-256 is missing",
+      ],
+    });
 
   check("buildQaSummary records missing required smoke checks",
     missingRequiredSummary?.latestRun?.requiredChecks,
