@@ -143,6 +143,10 @@ function parseTrustProxyConfig(rawTrustProxy) {
   return String(rawTrustProxy || "") === "1";
 }
 
+function parseAgentDisableCodexConfig(rawFlag) {
+  return String(rawFlag || "") === "1";
+}
+
 function parsePortConfig(rawPort, defaultPort = 8123) {
   const value = rawPort === undefined || rawPort === null ? "" : String(rawPort);
   if (value === "") {
@@ -2088,7 +2092,7 @@ async function buildAnalysis(normalized, sampleId) {
   // 노후 CLI / 모델 미호환 / 인증 부재 등으로 Codex가 매번 실패하는 환경에서는
   // 이 hook을 켜 깨끗한 single-agent 모드로 운용. Track C 측정은 Claude 단독으로
   // 유지되며 fallback 체인은 Claude 실패 시 rule-based로 직행.
-  const codexDisabled = String(process.env.AGENT_DISABLE_CODEX || "").trim() === "1";
+  const codexDisabled = parseAgentDisableCodexConfig(process.env.AGENT_DISABLE_CODEX);
   if (codexDisabled) {
     console.log(`[AI] Codex disabled via AGENT_DISABLE_CODEX=1 — Claude only for ${sampleId}`);
   }

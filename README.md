@@ -288,6 +288,7 @@ payload
 
 - API 키 불필요 — 두 CLI 모두 자체 세션 인증 사용
 - Fallback 체인: Claude → Codex → 규칙 기반 분석
+- `AGENT_DISABLE_CODEX=1`은 Codex 레드팀 에이전트만 정확히 비활성화합니다. 공백이 섞인 `AGENT_DISABLE_CODEX= 1`이나 `1 `, `true`, `yes`는 보정하지 않으며 Codex를 비활성화하지 않습니다.
 
 ## 보안
 
