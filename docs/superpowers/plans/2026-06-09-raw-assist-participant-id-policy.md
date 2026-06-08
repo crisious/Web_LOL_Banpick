@@ -287,11 +287,11 @@ Expected: `npm test` exits `0`, smoke report `latestRun.qaVerdict.status` is `pa
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-09-raw-assist-participant-id-policy.md`
 
-- [ ] **Step 1: Update docs with QA evidence**
+- [x] **Step 1: Update docs with QA evidence**
 
 Record RED, GREEN, full local QA, smoke report, Git commit SHA, GitHub Actions run ID, artifact ID, and final `main...origin/main` sync evidence.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -305,7 +305,10 @@ git commit -m "test: guard raw assist participant ids"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions QA**
+Evidence:
+- Implementation commit `0890f15` (`test: guard raw assist participant ids`) was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA**
 
 Run:
 
@@ -315,6 +318,12 @@ gh run watch <run-id> --exit-status
 ```
 
 Download and inspect the smoke artifact for pass/fail counts and sensitive pattern matches.
+
+Evidence:
+- GitHub Actions QA run `27162519563` passed for head SHA `0890f15d677e1cc8c8d95ec51dfea3bc76d2dec1`.
+- Workflow artifact `7490643246` (`qa-automation-27162519563`, 3546 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 200`, `latestRun.git.shortSha: "0890f15"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 4: Commit final documentation and sync**
 
@@ -357,3 +366,17 @@ Expected: final status is `## main...origin/main` and `0 0`.
   - Smoke summary: `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 238`, mode `readonly`.
   - Local smoke artifact high-risk sensitive pattern scan: no matches for Riot key, Authorization/Bearer, Riot host, local user path, `api_key`, or `secret.json`.
   - `git diff --check`: exit 0.
+
+### 2026-06-09 04:44 KST - Implementation Push QA
+
+- Implementation commit `0890f15` (`test: guard raw assist participant ids`) pushed to `origin/main`.
+- GitHub Actions QA run `27162519563` passed for head SHA `0890f15d677e1cc8c8d95ec51dfea3bc76d2dec1`.
+- GitHub artifact `7490643246` (`qa-automation-27162519563`, 3546 bytes) inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 200`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "0890f15"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
+
+## Self-Review
+
+- Spec coverage: The plan covers helper behavior, source-shape checks, existing extracted-helper harness compatibility, RED/GREEN proof, full local QA, GitHub QA, Obsidian docs, and final sync.
+- Placeholder scan: No blocked placeholder wording is used.
+- Type consistency: `rawParticipantId(value)` returns a numeric participant id or `null`; `rawAssistingParticipantIds(rawEvent)` consumes it and returns only valid numeric assist participant IDs.
