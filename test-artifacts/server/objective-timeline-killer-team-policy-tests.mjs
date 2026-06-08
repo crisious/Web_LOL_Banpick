@@ -37,6 +37,7 @@ const { objectiveKillerTeamId, buildObjectiveTimeline } = new Function(
   [
     extractFunctionSource(serverSrc, "timestampLabel"),
     extractFunctionSource(serverSrc, "phaseFor"),
+    extractFunctionSource(serverSrc, "rawEventTimestampMs"),
     extractFunctionSource(serverSrc, "rawParticipantId"),
     extractFunctionSource(serverSrc, "isKnownRawTeamId"),
     extractFunctionSource(serverSrc, "buildStructureLabel"),

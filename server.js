@@ -1501,11 +1501,12 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
   const events = [];
   timeline.info.frames.forEach((frame) => {
     frame.events.forEach((event) => {
+      const time = rawEventTimestampMs(event);
       if (event.type === "BUILDING_KILL") {
         events.push({
-          time: event.timestamp,
-          timeLabel: timestampLabel(event.timestamp),
-          phase: phaseFor(event.timestamp),
+          time,
+          timeLabel: timestampLabel(time),
+          phase: phaseFor(time),
           type: "STRUCTURE",
           subtype: event.towerType || event.buildingType,
           lane: event.laneType || "",
@@ -1516,9 +1517,9 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
       if (event.type === "ELITE_MONSTER_KILL") {
         const killerTeam = objectiveKillerTeamId(event, participantTeamMap);
         events.push({
-          time: event.timestamp,
-          timeLabel: timestampLabel(event.timestamp),
-          phase: phaseFor(event.timestamp),
+          time,
+          timeLabel: timestampLabel(time),
+          phase: phaseFor(time),
           type: "OBJECTIVE",
           subtype: event.monsterType,
           lane: "",
