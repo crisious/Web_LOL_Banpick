@@ -230,6 +230,30 @@ if (invalidModeGate) {
     authorizedRes.body,
     null);
 
+  const doubleSpaceBearerRes = makeResponseRecorder();
+  check("protected mode rejects bearer token with double-space separator",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer  demo-secret" } }, doubleSpaceBearerRes),
+    false);
+  check("protected mode double-space bearer returns unauthorized code",
+    doubleSpaceBearerRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const tabBearerRes = makeResponseRecorder();
+  check("protected mode rejects bearer token with tab separator",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer\tdemo-secret" } }, tabBearerRes),
+    false);
+  check("protected mode tab bearer returns unauthorized code",
+    tabBearerRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const lowercaseBearerRes = makeResponseRecorder();
+  check("protected mode rejects lowercase bearer scheme",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "bearer demo-secret" } }, lowercaseBearerRes),
+    false);
+  check("protected mode lowercase bearer returns unauthorized code",
+    lowercaseBearerRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
   const trailingBearerRes = makeResponseRecorder();
   check("protected mode rejects bearer token with trailing whitespace",
     protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer demo-secret " } }, trailingBearerRes),

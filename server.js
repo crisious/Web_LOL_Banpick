@@ -252,8 +252,8 @@ function publicDemoModeHealth() {
 
 function tokenFromRequest(req) {
   const auth = firstHeaderValue(req.headers.authorization);
-  const bearerMatch = auth.match(/^Bearer\s+(.+)$/i);
-  if (bearerMatch) return bearerMatch[1];
+  const bearerPrefix = "Bearer ";
+  if (auth.startsWith(bearerPrefix)) return auth.slice(bearerPrefix.length);
   return firstHeaderValue(req.headers["x-demo-token"]);
 }
 
