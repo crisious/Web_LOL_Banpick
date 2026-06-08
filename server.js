@@ -40,8 +40,8 @@ const CLEANUP_GAP_MS = 8000;
 const KEY_MOMENTS_MIN = 4;
 // AI 출력 계약과 최종 validator가 공유하는 단계 요약 최소 개수.
 const PHASE_SUMMARIES_MIN = 3;
-// actionChecklist는 legacy rule-based fallback 호환을 위해 최소 1개, LLM 계약 상한 5개를 검증한다.
-const ACTION_CHECKLIST_MIN = 1;
+// actionChecklist는 LLM 출력 계약과 코칭 체크리스트 UI에 맞춰 3~5개를 검증한다.
+const ACTION_CHECKLIST_MIN = 3;
 const ACTION_CHECKLIST_MAX = 5;
 // strengths/weaknesses는 LLM 출력 계약과 리포트 카드 구조에 맞춰 정확히 3개를 검증한다.
 const INSIGHT_LIST_MIN = 3;

@@ -145,7 +145,11 @@ function validFixture() {
       { id: "wk_2", title: "t2", description: "d2", relatedEventIds: [] },
       { id: "wk_3", title: "t3", description: "d3", relatedEventIds: [] },
     ],
-    actionChecklist: [{ id: "act_1", text: "t" }],
+    actionChecklist: [
+      { id: "act_1", text: "t1" },
+      { id: "act_2", text: "t2" },
+      { id: "act_3", text: "t3" },
+    ],
     keyMoments: [
       { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "t", description: "d", relatedEventIds: ["evt_001"] },
       { id: "km_2", timestampLabel: "12:00", phase: "MID", title: "t", description: "d", relatedEventIds: ["evt_001"] },
@@ -347,6 +351,12 @@ expectThrows("weaknesses over 3 throws", () => {
 
 expectThrows("actionChecklist empty throws", () => {
   const f = validFixture(); f.actionChecklist = [];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist only 2 throws", () => {
+  const f = validFixture();
+  f.actionChecklist = f.actionChecklist.slice(0, 2);
   validateAnalysisOutput(f);
 }, "actionChecklist");
 
