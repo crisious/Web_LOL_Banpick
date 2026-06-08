@@ -294,6 +294,7 @@ payload
 
 - `RIOT_API_KEY`는 서버에서만 사용, 브라우저에 노출하지 않음
 - 프론트엔드 Riot API Key 입력 시 서버 키 대신 사용 (선택)
+- 서버의 `RIOT_API_KEY`와 direct API `riotApiKey` override는 공백/control character가 없는 exact `RGAPI-...` 문자열이어야 합니다. 브라우저 로그인 폼은 전송 전에 입력값을 trim하지만, 서버는 `.env`나 direct API secret material을 보정하지 않습니다.
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
 - 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음

@@ -176,6 +176,20 @@ function parsePortConfig(rawPort, defaultPort = 8123) {
   return portNumber;
 }
 
+function parseRiotApiKeyConfig(rawKey) {
+  const value = rawKey === undefined || rawKey === null ? "" : String(rawKey);
+  if (value === "") {
+    return "";
+  }
+  if (value.trim() !== value || /\s/u.test(value) || /[\u0000-\u001F\u007F]/u.test(value)) {
+    return "";
+  }
+  if (!value.startsWith("RGAPI-") || value.length <= 20) {
+    return "";
+  }
+  return value;
+}
+
 function getClientIp(req) {
   if (!trustProxy) {
     return req.socket.remoteAddress || "unknown";
@@ -2420,10 +2434,11 @@ async function loadSampleBundle(sampleId) {
 }
 
 function resolveApiKey(userKey) {
-  if (typeof userKey === "string" && userKey.startsWith("RGAPI-") && userKey.length > 20) {
-    return userKey.trim();
+  const userApiKey = parseRiotApiKeyConfig(userKey);
+  if (userApiKey) {
+    return userApiKey;
   }
-  return process.env.RIOT_API_KEY || null;
+  return parseRiotApiKeyConfig(process.env.RIOT_API_KEY) || null;
 }
 
 const MAX_BODY_BYTES = 1 << 20; // 1MB — 본 API JSON 페이로드에 충분, 메모리 고갈 방지용 상한.
