@@ -74,6 +74,11 @@ const playerCombatPolicySources = [
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
 const teamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
+const timestampPolicySources = [
+  extractFunctionSource(serverSrc, "timestampLabel"),
+  extractFunctionSource(serverSrc, "phaseFor"),
+  extractFunctionSource(serverSrc, "rawEventTimestampMs"),
+].join("\n") + "\n";
 // buildTeamfightPhases가 참조하는 모듈 레벨 상수를 server.js에서 라이브 추출
 const tfConstants = [
   extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
@@ -86,7 +91,7 @@ const tfConstants = [
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
-  `${tfConstants}${playerCombatPolicySources}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
+  `${tfConstants}${playerCombatPolicySources}${timestampPolicySources}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
 )();
 
 let pass = 0, fail = 0;

@@ -2018,10 +2018,23 @@ function buildLlmPayload(normalized) {
     .filter((e) => e.importance >= 3)
     .sort((a, b) => b.importance - a.importance)
     .slice(0, 15)
-    .sort((a, b) => a.timestampMs - b.timestampMs)
-    .map(({ eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved }) => ({
-      eventId, timestampLabel, phase, eventType, importance, summary, isPlayerInvolved,
-    }));
+    .sort((a, b) => {
+      const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
+      const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
+      return aTime - bTime;
+    })
+    .map((event) => {
+      const time = rawEventTimestampMs({ timestamp: event.timestampMs });
+      return {
+        eventId: event.eventId,
+        timestampLabel: timestampLabel(time),
+        phase: phaseFor(time),
+        eventType: event.eventType,
+        importance: event.importance,
+        summary: event.summary,
+        isPlayerInvolved: event.isPlayerInvolved,
+      };
+    });
 
   const combatEncounters = detectCombatEncounters(normalized.timelineEvents);
   const teamfightPhases = buildTeamfightPhases(combatEncounters, normalized.timelineEvents);
