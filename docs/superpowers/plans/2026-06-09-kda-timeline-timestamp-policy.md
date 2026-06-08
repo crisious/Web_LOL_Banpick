@@ -136,7 +136,7 @@ Evidence, 2026-06-09 06:39 KST:
 - Local read-only smoke summary: QA verdict `passed`, required checks `13/13`, smoke `156 passed, 0 failed`, duration `226ms`.
 - Local smoke artifact sensitive scan found no high-risk sensitive patterns.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -147,6 +147,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 06:41 KST:
+- Commit `6cb87eb` (`test: guard kda timeline timestamps`) pushed to `origin/main`.
+- GitHub Actions `QA` run `27168675298` completed with conclusion `success`.
+- Artifact `qa-automation-27168675298` id `7493089973`, size `3547` bytes, expired `false`.
+- Downloaded `qa-summary.json`, `smoke-report.json`, and `smoke-run.json`.
+- Remote smoke summary: QA verdict `passed`, required checks `13/13`, smoke `156 passed, 0 failed`, duration `207ms`, git dirty `false`.
+- Remote artifact sensitive scan found no high-risk sensitive patterns.
 
 ## Self-Review
 
