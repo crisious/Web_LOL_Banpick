@@ -33,7 +33,7 @@ const SAMPLE_LIST_ERROR_OPTIONS = [
   "--expect-sample-list-error-code=",
   "--expect-sample-list-error-message=",
 ];
-const REQUIRED_FULL_SMOKE_CHECK_LABELS = [
+const COMMON_REQUIRED_FULL_SMOKE_CHECK_LABELS = [
   "/api/samples list entries omit explicit matchId",
   "/.env is not publicly served",
   "/.env has X-Content-Type-Options nosniff",
@@ -41,6 +41,14 @@ const REQUIRED_FULL_SMOKE_CHECK_LABELS = [
   "/server.js has X-Content-Type-Options nosniff",
   "/data/samples/manifest.json is not publicly served",
   "/data/samples/manifest.json has X-Content-Type-Options nosniff",
+];
+const READONLY_REQUIRED_FULL_SMOKE_CHECK_LABELS = [
+  "readonly mode blocks /api/recent-matches",
+  "/api/recent-matches readonly block returns PUBLIC_DEMO_READONLY",
+  "readonly mode blocks /api/champion-history",
+  "/api/champion-history readonly block returns PUBLIC_DEMO_READONLY",
+  "readonly mode blocks /api/generate-sample",
+  "/api/generate-sample readonly block returns PUBLIC_DEMO_READONLY",
 ];
 const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
@@ -310,10 +318,17 @@ function isEarlySampleErrorProbe(config) {
   );
 }
 
-export function requiredSmokeCheckResults(config, smokeReport) {
+function requiredFullSmokeCheckLabelsFor(config) {
   if (isEarlySampleErrorProbe(config)) return [];
+  return [
+    ...COMMON_REQUIRED_FULL_SMOKE_CHECK_LABELS,
+    ...(config?.expectedMode === "readonly" ? READONLY_REQUIRED_FULL_SMOKE_CHECK_LABELS : []),
+  ];
+}
+
+export function requiredSmokeCheckResults(config, smokeReport) {
   const checks = Array.isArray(smokeReport?.checks) ? smokeReport.checks : [];
-  return REQUIRED_FULL_SMOKE_CHECK_LABELS.map((label) => {
+  return requiredFullSmokeCheckLabelsFor(config).map((label) => {
     const check = checks.find((item) => item?.label === label);
     if (!check) return { label, status: "missing" };
     return { label, status: check.status === "pass" ? "pass" : "fail" };

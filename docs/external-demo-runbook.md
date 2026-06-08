@@ -55,7 +55,7 @@ Expected:
 - `/api/samples` includes at least 19 stored samples
 - first 19 sample details return 200
 - first 19 sample details include `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
-- `/api/samples` list entries omit explicit `matchId`; smoke fails on any list entry that reintroduces the field, while sample detail fetches continue to use public `sample-*` ids and must not require match IDs from the list payload. Smoke report summaries must include the required sample-list privacy, core sensitive static block, and static block `nosniff` check results so CI artifacts prove those gates were part of the run.
+- `/api/samples` list entries omit explicit `matchId`; smoke fails on any list entry that reintroduces the field, while sample detail fetches continue to use public `sample-*` ids and must not require match IDs from the list payload. Smoke report summaries must include the required sample-list privacy, core sensitive static block, static block `nosniff`, and read-only live/write block check results so CI artifacts prove those gates were part of the run.
 - sensitive static paths and encoded variants 403/404
 - sensitive static path block responses return `X-Content-Type-Options: nosniff`
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`

@@ -50,7 +50,7 @@ check("smoke report runner script exists",
 
 if (fs.existsSync(runnerPath)) {
   const runner = await import(runnerPath);
-  const missingFullRequiredChecks = [
+  const commonMissingFullRequiredChecks = [
     { label: "/api/samples list entries omit explicit matchId", status: "missing" },
     { label: "/.env is not publicly served", status: "missing" },
     { label: "/.env has X-Content-Type-Options nosniff", status: "missing" },
@@ -58,6 +58,15 @@ if (fs.existsSync(runnerPath)) {
     { label: "/server.js has X-Content-Type-Options nosniff", status: "missing" },
     { label: "/data/samples/manifest.json is not publicly served", status: "missing" },
     { label: "/data/samples/manifest.json has X-Content-Type-Options nosniff", status: "missing" },
+  ];
+  const readonlyMissingFullRequiredChecks = [
+    ...commonMissingFullRequiredChecks,
+    { label: "readonly mode blocks /api/recent-matches", status: "missing" },
+    { label: "/api/recent-matches readonly block returns PUBLIC_DEMO_READONLY", status: "missing" },
+    { label: "readonly mode blocks /api/champion-history", status: "missing" },
+    { label: "/api/champion-history readonly block returns PUBLIC_DEMO_READONLY", status: "missing" },
+    { label: "readonly mode blocks /api/generate-sample", status: "missing" },
+    { label: "/api/generate-sample readonly block returns PUBLIC_DEMO_READONLY", status: "missing" },
   ];
 
   check("parseRunnerArgs defaults to local readonly",
@@ -619,9 +628,13 @@ if (fs.existsSync(runnerPath)) {
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
-        requiredChecks: missingFullRequiredChecks,
+        requiredChecks: commonMissingFullRequiredChecks,
       },
     });
+
+  check("protected smoke reports require common checks only",
+    runner.requiredSmokeCheckResults?.(protectedConfig, { checks: [] }),
+    commonMissingFullRequiredChecks);
 
   check("buildQaSummary omits demo token material",
     JSON.stringify(qaSummary || {}).includes("secret"),
@@ -673,6 +686,12 @@ if (fs.existsSync(runnerPath)) {
       "missing required smoke check: /server.js has X-Content-Type-Options nosniff",
       "missing required smoke check: /data/samples/manifest.json is not publicly served",
       "missing required smoke check: /data/samples/manifest.json has X-Content-Type-Options nosniff",
+      "missing required smoke check: readonly mode blocks /api/recent-matches",
+      "missing required smoke check: /api/recent-matches readonly block returns PUBLIC_DEMO_READONLY",
+      "missing required smoke check: readonly mode blocks /api/champion-history",
+      "missing required smoke check: /api/champion-history readonly block returns PUBLIC_DEMO_READONLY",
+      "missing required smoke check: readonly mode blocks /api/generate-sample",
+      "missing required smoke check: /api/generate-sample readonly block returns PUBLIC_DEMO_READONLY",
     ]);
 
   const passingRequiredCheckReport = {
@@ -688,6 +707,12 @@ if (fs.existsSync(runnerPath)) {
       { status: "pass", label: "/server.js has X-Content-Type-Options nosniff" },
       { status: "pass", label: "/data/samples/manifest.json is not publicly served" },
       { status: "pass", label: "/data/samples/manifest.json has X-Content-Type-Options nosniff" },
+      { status: "pass", label: "readonly mode blocks /api/recent-matches" },
+      { status: "pass", label: "/api/recent-matches readonly block returns PUBLIC_DEMO_READONLY" },
+      { status: "pass", label: "readonly mode blocks /api/champion-history" },
+      { status: "pass", label: "/api/champion-history readonly block returns PUBLIC_DEMO_READONLY" },
+      { status: "pass", label: "readonly mode blocks /api/generate-sample" },
+      { status: "pass", label: "/api/generate-sample readonly block returns PUBLIC_DEMO_READONLY" },
     ],
   };
 
@@ -708,7 +733,7 @@ if (fs.existsSync(runnerPath)) {
 
   check("buildQaSummary records missing required smoke checks",
     missingRequiredSummary?.latestRun?.requiredChecks,
-    missingFullRequiredChecks);
+    readonlyMissingFullRequiredChecks);
 
   const sampleListErrorConfig = runner.parseRunnerArgs([
     "node",
