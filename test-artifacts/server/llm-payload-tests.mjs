@@ -185,7 +185,8 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   check("outputContract.schemaVersion = 1.0", out.outputContract.schemaVersion, "1.0");
   check("requiredTopLevelFields list",
     out.outputContract.requiredTopLevelFields,
-    ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis"]);
+    ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"]);
+  checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
   check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);
