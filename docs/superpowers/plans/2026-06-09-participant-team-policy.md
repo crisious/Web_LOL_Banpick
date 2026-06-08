@@ -185,11 +185,11 @@ Expected: `npm test` exits `0`, smoke report `latestRun.qaVerdict.status` is `pa
 - Modify: `docs/superpowers/plans/2026-06-09-participant-team-policy.md`
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Update docs with QA evidence**
+- [x] **Step 1: Update docs with QA evidence**
 
 Record RED, GREEN, full local QA, smoke report, Git commit SHA, GitHub Actions run ID, artifact ID, and final `main...origin/main` sync evidence.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -203,7 +203,10 @@ git commit -m "test: guard participant team mapping"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions QA**
+Evidence:
+- Implementation commit `359c903` (`test: guard participant team mapping`) was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA**
 
 Run:
 
@@ -213,6 +216,12 @@ gh run watch <run-id> --exit-status
 ```
 
 Download and inspect the smoke artifact for pass/fail counts and sensitive pattern matches.
+
+Evidence:
+- GitHub Actions QA run `27163073742` passed for head SHA `359c9038014d2bafd4c527cba9704e5a85fb250a`.
+- Workflow artifact `7490872007` (`qa-automation-27163073742`, 3556 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 229`, `latestRun.git.shortSha: "359c903"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 4: Commit final documentation and sync**
 
@@ -262,3 +271,11 @@ Expected: final status is `## main...origin/main` and `0 0`.
   - Smoke summary: `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 205`, mode `readonly`.
   - Local smoke artifact high-risk sensitive pattern scan: no matches for Riot key, Authorization/Bearer, Riot host, local user path, `api_key`, or `secret.json`.
   - `git diff --check`: exit 0.
+
+### 2026-06-09 04:54 KST - Implementation Push QA
+
+- Implementation commit `359c903` (`test: guard participant team mapping`) pushed to `origin/main`.
+- GitHub Actions QA run `27163073742` passed for head SHA `359c9038014d2bafd4c527cba9704e5a85fb250a`.
+- GitHub artifact `7490872007` (`qa-automation-27163073742`, 3556 bytes) inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 229`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "359c903"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
