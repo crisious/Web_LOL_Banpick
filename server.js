@@ -40,6 +40,9 @@ const CLEANUP_GAP_MS = 8000;
 const KEY_MOMENTS_MIN = 4;
 // AI 출력 계약과 최종 validator가 공유하는 단계 요약 최소 개수.
 const PHASE_SUMMARIES_MIN = 3;
+// actionChecklist는 legacy rule-based fallback 호환을 위해 최소 1개, LLM 계약 상한 5개를 검증한다.
+const ACTION_CHECKLIST_MIN = 1;
+const ACTION_CHECKLIST_MAX = 5;
 
 function resolveSamplesDir(configuredDir, appRoot) {
   const value = configuredDir === undefined || configuredDir === null ? "" : String(configuredDir);
@@ -2103,6 +2106,21 @@ function hasValidEvidenceIndex(evidenceIndex) {
     );
 }
 
+function hasValidActionChecklist(actionChecklist) {
+  return Array.isArray(actionChecklist) &&
+    actionChecklist.length >= ACTION_CHECKLIST_MIN &&
+    actionChecklist.length <= ACTION_CHECKLIST_MAX &&
+    actionChecklist.every((item) =>
+      item &&
+      typeof item.id === "string" &&
+      item.id &&
+      (
+        (typeof item.text === "string" && item.text) ||
+        (typeof item.action === "string" && item.action)
+      )
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
@@ -2113,7 +2131,7 @@ function validateAnalysisOutput(json) {
   if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);
   if (!Array.isArray(json?.strengths) || json.strengths.length < 1) throw new Error("strengths empty");
   if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
-  if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
+  if (!hasValidActionChecklist(json?.actionChecklist)) throw new Error("actionChecklist invalid");
   if (!hasMinimumKeyMoments(json?.keyMoments)) throw new Error(`keyMoments < ${KEY_MOMENTS_MIN}`);
   if (!hasValidEvidenceIndex(json?.evidenceIndex)) throw new Error("evidenceIndex invalid");
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
@@ -2298,9 +2316,12 @@ async function buildAnalysis(normalized, sampleId) {
     primary.evidenceIndex = buildEvidenceIndex(normalized);
     violations.push("missing.evidenceIndex");
   }
-  if (!Array.isArray(primary.actionChecklist) || primary.actionChecklist.length < 1) {
-    primary.actionChecklist = buildActionChecklist(normalized, primary.weaknesses ?? []);
-    violations.push("count.actionChecklist<1");
+  if (!hasValidActionChecklist(primary.actionChecklist)) {
+    const checklistWeaknesses = Array.isArray(primary.weaknesses) && primary.weaknesses.length > 0
+      ? primary.weaknesses
+      : buildWeaknesses(normalized);
+    primary.actionChecklist = buildActionChecklist(normalized, checklistWeaknesses);
+    violations.push("shape.actionChecklist.invalid");
   }
   // Phase 32: combatAnalysis 정규화 — 누락 시 빈 배열, 비배열이면 빈 배열로 강제.
   // 형태 오류는 violation에 등재하되 fallback 트리거하지 않음 (선택적 필드).

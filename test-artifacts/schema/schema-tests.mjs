@@ -55,6 +55,15 @@ if (serverSrc.includes("function hasAnalysisMetaObject(")) {
 if (serverSrc.includes("function hasValidEvidenceIndex(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidEvidenceIndex"));
 }
+if (serverSrc.includes("const ACTION_CHECKLIST_MIN =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"));
+}
+if (serverSrc.includes("const ACTION_CHECKLIST_MAX =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"));
+}
+if (serverSrc.includes("function hasValidActionChecklist(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidActionChecklist"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -179,6 +188,39 @@ expectThrows("weaknesses empty throws", () => {
 
 expectThrows("actionChecklist empty throws", () => {
   const f = validFixture(); f.actionChecklist = [];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item empty id throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "", text: "준비하기" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item missing id throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ text: "준비하기" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item missing text/action throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "act_1", reason: "근거" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item empty text/action throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "act_1", text: "" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist over 5 throws", () => {
+  const f = validFixture();
+  f.actionChecklist = Array.from({ length: 6 }, (_, index) => ({
+    id: `act_${index + 1}`,
+    text: `체크 ${index + 1}`,
+  }));
   validateAnalysisOutput(f);
 }, "actionChecklist");
 
