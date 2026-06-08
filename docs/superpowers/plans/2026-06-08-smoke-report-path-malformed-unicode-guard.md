@@ -252,3 +252,21 @@ Expected: `main` and `origin/main` are synchronized and the working tree is clea
   - Direct smoke tests: `177 passed, 0 failed`
   - Smoke report runner tests: `77 passed, 0 failed`
   - Full suite: `843 passed, 0 failed across 25 test file(s)`
+
+### Implementation Commit and Remote QA
+
+- Implementation commit:
+  - Commit: `c449ea1 ci: reject malformed unicode smoke report paths`
+  - Push target: `origin/main`
+- GitHub Actions:
+  - Run: `27110039756`
+  - Head SHA: `c449ea1f6095efbdc191c88d4cb2affd03b60eeb`
+  - Conclusion: `success`
+- Artifact:
+  - Name: `qa-automation-27110039756`
+  - ID: `7469639371`
+  - Download path: `/tmp/lol-ai-coach-path-malformed-27110039756`
+  - `qa-summary.json`: `actualMode=readonly`, `status=passed`, `exitCode=0`, `passed=155`, `failed=0`, `checkCount=155`
+- Sensitive value scan:
+  - Command: `rg -n "Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY_URL=[^[:space:]]|EXTERNAL_PROTECTED_URL=[^[:space:]]|access_token=|token=secret|asset-secret|script-secret|user:pass@|RIOT_API_KEY|RGAPI-|KR_[0-9]{8,}|NA1_[0-9]{8,}|lockKey" /tmp/lol-ai-coach-path-malformed-27110039756`
+  - Result: no matches
