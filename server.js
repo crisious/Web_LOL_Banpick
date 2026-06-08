@@ -608,6 +608,14 @@ function isKnownRawTeamId(teamId) {
   return teamId === 100 || teamId === 200;
 }
 
+function rawObjectiveTeamId(rawEvent) {
+  if (isKnownRawTeamId(rawEvent.killerTeamId)) {
+    return rawEvent.killerTeamId;
+  }
+  const mappedTeamId = participantTeam(rawEvent.killerId);
+  return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null;
+}
+
 function isRawEnemyBuildingKill(rawEvent, targetTeamId) {
   return isKnownRawTeamId(rawEvent.teamId) && rawEvent.teamId !== targetTeamId;
 }
@@ -774,6 +782,7 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
         type: event.type,
         timestamp: rawEventTimestampMs(event),
         killerId: rawParticipantId(event.killerId),
+        killerTeamId: event.killerTeamId ?? null,
         victimId: rawParticipantId(event.victimId),
         assistingParticipantIds: event.assistingParticipantIds || [],
         monsterType: event.monsterType || null,
@@ -804,7 +813,7 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
         lastHordeTimestamp = rawEvent.timestamp;
       }
 
-      const objectiveTeam = participantTeam(rawEvent.killerId);
+      const objectiveTeam = rawObjectiveTeamId(rawEvent);
       const playerWonObjective = objectiveTeam === targetTeamId;
       const phase = phaseFor(rawEvent.timestamp);
       const eventType = buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonObjective);

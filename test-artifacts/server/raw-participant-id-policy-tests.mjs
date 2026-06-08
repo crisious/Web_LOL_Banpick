@@ -44,6 +44,12 @@ const rawTimestampSource = functionSourceOrFallback(
   "function rawEventTimestampMs(event) { return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0; }",
 );
 
+const rawObjectiveTeamSource = functionSourceOrFallback(
+  serverSrc,
+  "rawObjectiveTeamId",
+  "function rawObjectiveTeamId(rawEvent) { const mappedTeamId = participantTeam(rawEvent.killerId); return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null; }",
+);
+
 const rawTimelinePolicySources = [
   extractConstSource(serverSrc, "RAW_CHAMPION_KILL_EVENT_TYPES"),
   extractConstSource(serverSrc, "RAW_ELITE_MONSTER_KILL_EVENT_TYPES"),
@@ -65,6 +71,7 @@ const rawTimelinePolicySources = [
     "isRawEnemyBuildingKill",
     "function isRawEnemyBuildingKill(rawEvent, targetTeamId) { return isKnownRawTeamId(rawEvent.teamId) && rawEvent.teamId !== targetTeamId; }",
   ),
+  rawObjectiveTeamSource,
 ];
 
 const eventTypePolicySources = [

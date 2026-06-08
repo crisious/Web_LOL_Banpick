@@ -26,6 +26,24 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+function functionSourceOrFallback(source, name, fallback) {
+  return source.includes(`function ${name}(`)
+    ? extractFunctionSource(source, name)
+    : fallback;
+}
+
+const isKnownRawTeamIdSource = functionSourceOrFallback(
+  serverSrc,
+  "isKnownRawTeamId",
+  "function isKnownRawTeamId(teamId) { return teamId === 100 || teamId === 200; }",
+);
+
+const rawObjectiveTeamSource = functionSourceOrFallback(
+  serverSrc,
+  "rawObjectiveTeamId",
+  "function rawObjectiveTeamId(rawEvent) { const mappedTeamId = participantTeam(rawEvent.killerId); return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null; }",
+);
+
 const timelineTypePolicySources = [
   extractConstSource(serverSrc, "RAW_CHAMPION_KILL_EVENT_TYPES"),
   extractConstSource(serverSrc, "RAW_ELITE_MONSTER_KILL_EVENT_TYPES"),
@@ -37,6 +55,8 @@ const timelineTypePolicySources = [
   extractFunctionSource(serverSrc, "isSupportedRawTimelineEvent"),
   extractFunctionSource(serverSrc, "rawAssistingParticipantIds"),
   extractFunctionSource(serverSrc, "isRawPlayerInvolved"),
+  isKnownRawTeamIdSource,
+  rawObjectiveTeamSource,
 ];
 
 const eventTypePolicySources = [

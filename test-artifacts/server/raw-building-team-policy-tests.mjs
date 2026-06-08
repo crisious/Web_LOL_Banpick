@@ -80,6 +80,12 @@ const rawParticipantSource = functionSourceOrFallback(
   "function rawParticipantId(value) { return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null; }",
 );
 
+const rawObjectiveTeamSource = functionSourceOrFallback(
+  serverSrc,
+  "rawObjectiveTeamId",
+  "function rawObjectiveTeamId(rawEvent) { const mappedTeamId = participantTeam(rawEvent.killerId); return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null; }",
+);
+
 const buildEventTypeSrc = extractFunctionSource(serverSrc, "buildEventType");
 const shouldKeepEventSrc = extractFunctionSource(serverSrc, "shouldKeepEvent");
 const extractTimelineEventsSrc = extractFunctionSource(serverSrc, "extractTimelineEvents");
@@ -102,6 +108,7 @@ const {
     extractFunctionSource(serverSrc, "laneHintForEvent"),
     extractFunctionSource(serverSrc, "importanceForEvent"),
     extractFunctionSource(serverSrc, "summaryForEvent"),
+    rawObjectiveTeamSource,
     buildEventTypeSrc,
     shouldKeepEventSrc,
     extractFunctionSource(serverSrc, "dedupeEvents"),
