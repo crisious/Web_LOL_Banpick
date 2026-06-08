@@ -325,7 +325,7 @@ Evidence:
 - Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 200`, `latestRun.git.shortSha: "0890f15"`, `dirty: false`.
 - GitHub artifact high-risk sensitive pattern scan: no matches.
 
-- [ ] **Step 4: Commit final documentation and sync**
+- [x] **Step 4: Commit final documentation and sync**
 
 Run:
 
@@ -341,6 +341,13 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final status is `## main...origin/main` and `0 0`.
+
+Docs checkpoint evidence:
+- Docs checkpoint commit `2d0f778` (`docs: mark raw assist participant id plan complete`) was pushed to `origin/main`.
+- GitHub Actions QA run `27162619319` passed for head SHA `2d0f77833606df4b9a47fb49df5f842861eb06f3`.
+- Workflow artifact `7490683179` (`qa-automation-27162619319`, 3550 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 188`, `latestRun.git.shortSha: "2d0f778"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 ## Execution Evidence
 
@@ -373,6 +380,14 @@ Expected: final status is `## main...origin/main` and `0 0`.
 - GitHub Actions QA run `27162519563` passed for head SHA `0890f15d677e1cc8c8d95ec51dfea3bc76d2dec1`.
 - GitHub artifact `7490643246` (`qa-automation-27162519563`, 3546 bytes) inspected.
 - Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 200`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "0890f15"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
+
+### 2026-06-09 04:46 KST - Docs Checkpoint QA
+
+- Docs checkpoint commit `2d0f778` (`docs: mark raw assist participant id plan complete`) pushed to `origin/main`.
+- GitHub Actions QA run `27162619319` passed for head SHA `2d0f77833606df4b9a47fb49df5f842861eb06f3`.
+- GitHub artifact `7490683179` (`qa-automation-27162619319`, 3550 bytes) inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 188`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "2d0f778"`, `dirty: false`.
 - GitHub artifact high-risk sensitive pattern scan: no matches.
 
 ## Self-Review
