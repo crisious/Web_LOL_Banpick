@@ -87,6 +87,11 @@ check("loadEnvFile does not overwrite existing env values",
   existingEnv.PUBLIC_DEMO_MODE,
   "protected");
 
+const emptyExistingEnv = loadEnvFromString("PUBLIC_DEMO_MODE=readonly\n", { PUBLIC_DEMO_MODE: "" });
+check("loadEnvFile does not overwrite existing empty env values",
+  emptyExistingEnv.PUBLIC_DEMO_MODE,
+  "");
+
 const missingFileFakeFs = {
   existsSync: () => false,
   readFileSync: () => {

@@ -283,7 +283,7 @@ function loadEnvFile(filePath) {
     }
 
     const [, key, rawValue] = match;
-    if (process.env[key]) {
+    if (Object.prototype.hasOwnProperty.call(process.env, key)) {
       continue;
     }
 
