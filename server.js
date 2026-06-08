@@ -2748,7 +2748,8 @@ async function handleChampionHistory(req, res) {
   try {
     body = await parseBody(req);
   } catch (error) {
-    sendJson(res, 400, { ok: false, error: error.message || "invalid body" });
+    const { status, body: errorBody } = riotErrorPayload(error);
+    sendJson(res, status, errorBody);
     return;
   }
 

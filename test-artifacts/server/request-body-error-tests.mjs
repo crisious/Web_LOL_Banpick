@@ -41,6 +41,7 @@ const harness = new Function([
   extractFunctionSource(serverSrc, "riotErrorPayload"),
   "return { MAX_BODY_BYTES, parseBody, riotErrorPayload };",
 ].join("\n"))();
+const championHistoryHandlerSrc = extractFunctionSource(serverSrc, "handleChampionHistory");
 
 function reqFromChunks(chunks) {
   return {
@@ -121,6 +122,13 @@ check("oversized body maps to stable response",
       error: "요청 본문이 너무 큽니다.",
     },
   });
+
+checkTrue("champion history body parse errors use stable payload mapper",
+  championHistoryHandlerSrc.includes("const { status, body: errorBody } = riotErrorPayload(error);") &&
+  championHistoryHandlerSrc.includes("sendJson(res, status, errorBody);"));
+
+checkTrue("champion history body parse errors no longer expose raw error.message",
+  !championHistoryHandlerSrc.includes('sendJson(res, 400, { ok: false, error: error.message || "invalid body" });'));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

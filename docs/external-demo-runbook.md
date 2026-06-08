@@ -65,7 +65,7 @@ Expected:
 - champion history partial match failures emit `match-error` progress with fixed copy; responses/events must not contain `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, or parser text
 - frontend status/error text should not display raw `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, parser text, bearer fragments, or token URL fragments even when a client fetch fails before structured server JSON is available
 - malformed, absolute-form, protocol-relative request targets or invalid Host headers fail as HTTP 400 `INVALID_REQUEST_TARGET` instead of escaping the request handler
-- malformed live API JSON bodies fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details
+- malformed live API JSON bodies, including `/api/champion-history`, fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
 - targeted sample list/detail error smoke can verify `/api/samples` or `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample flow
 - malformed `/api/samples/:id` values, including empty ids, encoded slashes, spaces, or uppercase ids, fail as HTTP 400 `INVALID_SAMPLE_ID` before manifest lookup
