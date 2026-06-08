@@ -137,7 +137,7 @@ Evidence, 2026-06-09 07:53 KST:
 - Local `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `194ms`, mode `readonly`, git short SHA `81943de`, dirty `true` because this implementation was intentionally uncommitted.
 - Local artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -148,6 +148,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 07:56 KST:
+- Staged only `docs/superpowers/plans/2026-06-09-insight-evidence-timestamp-policy.md`, `server.js`, `test-artifacts/server/derived-signals-timestamp-policy-tests.mjs`, `test-artifacts/server/strength-weakness-tests.mjs`, and `test-artifacts/server/insight-evidence-timestamp-policy-tests.mjs`.
+- Commit `c4b4e9d` (`test: guard insight evidence timestamps`) pushed to `origin/main`.
+- GitHub QA run `27172144737` completed with conclusion `success` for SHA `c4b4e9d18310c5d213302350630e303bf1231daa`.
+- GitHub artifact `qa-automation-27172144737` id `7494405251`, size `3545`, digest `sha256:0ec1171717b0a29e9a098815dd7fad2085ed996e4b9e74b323be07fa98e490d8`.
+- Downloaded artifact `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `230ms`, mode `readonly`, git short SHA `c4b4e9d`, dirty `false`.
+- Downloaded artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
 ## Self-Review
 
