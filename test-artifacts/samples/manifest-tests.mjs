@@ -44,6 +44,7 @@ const missingFiles = [];
 const invalidPublicPaths = [];
 const rawExposures = [];
 const invalidBundles = [];
+const invalidPhaseSummaries = [];
 
 try {
   validateManifest(manifest);
@@ -81,6 +82,18 @@ for (const sample of samples) {
     if (!analysis.matchSummary || !analysis.coachSummary) {
       invalidBundles.push(`${sample.id}:analysis summary`);
     }
+    if (
+      !Array.isArray(analysis.phaseSummaries) ||
+      analysis.phaseSummaries.some((item) =>
+        !item ||
+        typeof item.phase !== "string" ||
+        item.phase.trim() === "" ||
+        typeof item.summary !== "string" ||
+        item.summary.trim() === ""
+      )
+    ) {
+      invalidPhaseSummaries.push(`${sample.id}:analysis.phaseSummaries`);
+    }
   } catch (error) {
     invalidBundles.push(`${sample.id}:${error.message}`);
   }
@@ -96,6 +109,9 @@ check("manifest paths stay under each sample directory", invalidPublicPaths.leng
 check("manifest does not expose raw payload paths", rawExposures.length === 0, rawExposures.slice(0, 10).join(", "));
 check("manifest referenced files exist", missingFiles.length === 0, missingFiles.slice(0, 10).join(", "));
 check("normalized and analysis bundles have report essentials", invalidBundles.length === 0, invalidBundles.slice(0, 10).join(", "));
+check("analysis phase summaries match UI display contract",
+  invalidPhaseSummaries.length === 0,
+  invalidPhaseSummaries.slice(0, 10).join(", "));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
