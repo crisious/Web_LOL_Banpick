@@ -560,6 +560,10 @@ function phaseFor(timestampMs) {
   return "LATE";
 }
 
+function rawEventTimestampMs(event) {
+  return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0;
+}
+
 function isRawChampionKillEvent(rawEvent) {
   return RAW_CHAMPION_KILL_EVENT_TYPES.has(rawEvent.type);
 }
@@ -751,7 +755,7 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
     frame.events.forEach((event, innerIndex) => {
       const rawEvent = {
         type: event.type,
-        timestamp: event.timestamp || 0,
+        timestamp: rawEventTimestampMs(event),
         killerId: event.killerId || null,
         victimId: event.victimId || null,
         assistingParticipantIds: event.assistingParticipantIds || [],
