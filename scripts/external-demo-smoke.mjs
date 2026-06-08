@@ -34,6 +34,9 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     if (/[\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/u.test(raw)) {
       throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
+    if (/[\u200b-\u200f\u202a-\u202e\u2060-\u206f]/u.test(raw)) {
+      throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
+    }
     const comparable = raw.replace(/\\/g, "/");
     const rawSegments = comparable.split("/");
     if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || comparable.includes("//") || comparable.endsWith("/") || rawSegments.includes(".") || rawSegments.includes("..")) {

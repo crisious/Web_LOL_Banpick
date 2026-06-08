@@ -244,6 +244,10 @@ checkThrows("parseSmokeArgs rejects unicode whitespace report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u00a0unicode.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects unicode format report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u200bformat.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1256,6 +1260,27 @@ check("CLI reports unicode whitespace report JSON path without network request",
 
 check("CLI unicode whitespace report JSON path does not create file",
   fs.existsSync(unicodeWhitespaceReportJsonPath),
+  false);
+
+const unicodeFormatReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-\u200bformat.json");
+fs.rmSync(unicodeFormatReportJsonPath, { force: true });
+const unicodeFormatReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts/tmp/smoke-report-\u200bformat.json",
+]);
+
+check("CLI exits non-zero for unicode format report JSON path",
+  unicodeFormatReportJson.status,
+  1);
+
+check("CLI reports unicode format report JSON path without network request",
+  unicodeFormatReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI unicode format report JSON path does not create file",
+  fs.existsSync(unicodeFormatReportJsonPath),
   false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";

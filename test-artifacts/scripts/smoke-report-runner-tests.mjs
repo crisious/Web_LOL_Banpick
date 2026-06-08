@@ -158,6 +158,10 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/smoke-report-\u00a0unicode-root"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects unicode format output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/smoke-report-\u200bformat-root"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects root dot-segment output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -373,6 +377,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("unicode whitespace env output root rejection does not create output root",
     fs.existsSync(unicodeWhitespaceEnvCreatedPath),
+    false);
+
+  const unicodeFormatEnvOutputRoot = "test-artifacts/tmp/smoke-report-\u200bformat-root";
+  const unicodeFormatEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-\u200bformat-root");
+  fs.rmSync(unicodeFormatEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects unicode format env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: unicodeFormatEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("unicode format env output root rejection does not create output root",
+    fs.existsSync(unicodeFormatEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
