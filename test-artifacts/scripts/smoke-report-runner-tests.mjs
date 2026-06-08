@@ -210,6 +210,35 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID", "--expect-sample-list-error-status=0"], {}),
     "--expect-sample-list-error-status must be a positive integer");
 
+  checkThrows("parseRunnerArgs rejects unsafe sample detail error id before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=https://user:pass@demo.example/path?token=secret",
+      "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    ], {}),
+    "--expect-sample-detail-error-id must match sample-[a-z0-9-]+");
+
+  checkThrows("parseRunnerArgs rejects unsafe sample detail error code before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=sample-kr-1",
+      "--expect-sample-detail-error-code=sample manifest invalid",
+    ], {}),
+    "--expect-sample-detail-error-code must match [A-Z0-9_]+");
+
+  checkThrows("parseRunnerArgs rejects unsafe sample list error code before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-list-error-code=sample manifest invalid",
+    ], {}),
+    "--expect-sample-list-error-code must match [A-Z0-9_]+");
+
   checkThrows("parseRunnerArgs rejects protected mode without token source",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected"], {}),
     "--require-token needs --token or PUBLIC_DEMO_TOKEN");

@@ -37,6 +37,20 @@ const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
   "--expect-sample-list-error-message=",
 ];
+const SAMPLE_ERROR_ID_PATTERN = /^sample-[a-z0-9-]+$/;
+const SAMPLE_ERROR_CODE_PATTERN = /^[A-Z0-9_]+$/;
+
+function assertSampleErrorId(value, optionName) {
+  if (!SAMPLE_ERROR_ID_PATTERN.test(value)) {
+    throw new Error(`${optionName} must match sample-[a-z0-9-]+`);
+  }
+}
+
+function assertSampleErrorCode(value, optionName) {
+  if (!SAMPLE_ERROR_CODE_PATTERN.test(value)) {
+    throw new Error(`${optionName} must match [A-Z0-9_]+`);
+  }
+}
 
 function singleOptionArg(args, prefix) {
   const matches = args.filter((arg) => arg.startsWith(prefix));
@@ -124,12 +138,15 @@ function validateExtraSmokeArgs(extraSmokeArgs) {
     const code = passThroughOptionArg(extraSmokeArgs, "--expect-sample-detail-error-code=")?.slice("--expect-sample-detail-error-code=".length).trim() || "";
     if (!id) throw new Error("--expect-sample-detail-error-id is required when sample detail error options are set");
     if (!code) throw new Error("--expect-sample-detail-error-code is required when --expect-sample-detail-error-id is set");
+    assertSampleErrorId(id, "--expect-sample-detail-error-id");
+    assertSampleErrorCode(code, "--expect-sample-detail-error-code");
   }
 
   const hasSampleListErrorArg = SAMPLE_LIST_ERROR_OPTIONS.some((prefix) => extraSmokeArgs.some((arg) => arg.startsWith(prefix)));
   if (hasSampleListErrorArg) {
     const code = passThroughOptionArg(extraSmokeArgs, "--expect-sample-list-error-code=")?.slice("--expect-sample-list-error-code=".length).trim() || "";
     if (!code) throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
+    assertSampleErrorCode(code, "--expect-sample-list-error-code");
   }
 }
 

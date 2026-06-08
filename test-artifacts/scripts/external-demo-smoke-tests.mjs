@@ -351,6 +351,32 @@ checkThrows("parseSmokeArgs rejects invalid sample list error status",
   ], {}),
   "--expect-sample-list-error-status must be a positive integer");
 
+checkThrows("parseSmokeArgs rejects unsafe sample detail error id",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=https://user:pass@demo.example/path?token=secret",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+  ], {}),
+  "--expect-sample-detail-error-id must match sample-[a-z0-9-]+");
+
+checkThrows("parseSmokeArgs rejects unsafe sample detail error code",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-kr-1",
+    "--expect-sample-detail-error-code=sample manifest invalid",
+  ], {}),
+  "--expect-sample-detail-error-code must match [A-Z0-9_]+");
+
+checkThrows("parseSmokeArgs rejects unsafe sample list error code",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-list-error-code=sample manifest invalid",
+  ], {}),
+  "--expect-sample-list-error-code must match [A-Z0-9_]+");
+
 const missingRequiredUrl = spawnSync(process.execPath, [smokePath, "--require-url", "--expect-mode=readonly"], {
   encoding: "utf8",
 });

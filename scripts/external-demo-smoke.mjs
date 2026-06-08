@@ -7,6 +7,8 @@ import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 
 function parseSmokeArgs(argv, env = {}, deps = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
+  const sampleErrorIdPattern = /^sample-[a-z0-9-]+$/;
+  const sampleErrorCodePattern = /^[A-Z0-9_]+$/;
   const args = argv.slice(2);
   function singleOptionArg(args, prefix) {
     const matches = args.filter((arg) => arg.startsWith(prefix));
@@ -14,6 +16,18 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
       throw new Error(`${prefix.slice(0, -1)} accepts only one value`);
     }
     return matches[0];
+  }
+
+  function assertSampleErrorId(value, optionName) {
+    if (!sampleErrorIdPattern.test(value)) {
+      throw new Error(`${optionName} must match sample-[a-z0-9-]+`);
+    }
+  }
+
+  function assertSampleErrorCode(value, optionName) {
+    if (!sampleErrorCodePattern.test(value)) {
+      throw new Error(`${optionName} must match [A-Z0-9_]+`);
+    }
   }
 
   function normalizeReportJsonPath(reportPath) {
@@ -176,6 +190,8 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     if (!expectedSampleDetailError.code) {
       throw new Error("--expect-sample-detail-error-code is required when --expect-sample-detail-error-id is set");
     }
+    assertSampleErrorId(expectedSampleDetailError.id, "--expect-sample-detail-error-id");
+    assertSampleErrorCode(expectedSampleDetailError.code, "--expect-sample-detail-error-code");
     if (!Number.isInteger(expectedSampleDetailError.status) || expectedSampleDetailError.status < 1) {
       throw new Error("--expect-sample-detail-error-status must be a positive integer");
     }
@@ -184,6 +200,7 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     if (!expectedSampleListError.code) {
       throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
     }
+    assertSampleErrorCode(expectedSampleListError.code, "--expect-sample-list-error-code");
     if (!Number.isInteger(expectedSampleListError.status) || expectedSampleListError.status < 1) {
       throw new Error("--expect-sample-list-error-status must be a positive integer");
     }
