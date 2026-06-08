@@ -186,7 +186,7 @@ rg sensitive-output scan over test-artifacts/tmp/insight-list-nonblank-policy-lo
 # no matches
 ```
 
-- [ ] **Step 6: Commit and push implementation**
+- [x] **Step 6: Commit and push implementation**
 
 Run:
 
@@ -196,9 +196,43 @@ git commit -m "test: guard insight list strings"
 git push origin main
 ```
 
-- [ ] **Step 7: Verify GitHub QA and finalize docs**
+Actual implementation publish evidence:
+
+```text
+git commit -m "test: guard insight list strings"
+# 2fdb208 test: guard insight list strings
+git push origin main
+# pushed 06a5af1..2fdb208 main -> main
+```
+
+- [x] **Step 7: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the final evidence.
+
+Actual implementation GitHub QA evidence:
+
+```text
+gh run watch 27173984052 --exit-status
+# success
+
+artifact: qa-automation-27173984052
+artifact id: 7495060352
+artifact size: 3554 bytes
+artifact digest: sha256:3c9d2afa2262fc1ab8aabd7279e40c1bd2d622c36bdd831f69c7d1de1d13ab6b
+
+qa-summary.json
+# qaVerdict.status=passed
+# requiredChecks=13/13
+# smoke=156 passed / 0 failed
+# durationMs=197
+# mode=readonly
+# ci.sha=2fdb2089c3e285b7513f5c53099db97b23bbc08e
+# git.shortSha=2fdb208
+# git.dirty=false
+
+rg sensitive-output scan over test-artifacts/tmp/gh-run-27173984052
+# no matches
+```
 
 - [ ] **Step 8: Commit final documentation and sync main**
 
