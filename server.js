@@ -850,6 +850,11 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
 }
 
 function buildPhaseContext(events) {
+  const timelineEndMs = events.reduce((maxTime, event) => {
+    const time = rawEventTimestampMs({ timestamp: event.timestampMs });
+    return Math.max(maxTime, time);
+  }, 1800001);
+
   const phases = {
     EARLY: { startMs: 0, endMs: 900000, kills: 0, deaths: 0, assists: 0, notableEventCount: 0 },
     MID: {
@@ -862,7 +867,7 @@ function buildPhaseContext(events) {
     },
     LATE: {
       startMs: 1800001,
-      endMs: events.length ? events[events.length - 1].timestampMs : 1800001,
+      endMs: timelineEndMs,
       kills: 0,
       deaths: 0,
       assists: 0,
