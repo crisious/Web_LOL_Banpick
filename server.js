@@ -2205,6 +2205,33 @@ function hasValidCombatAnalysis(combatAnalysis) {
     );
 }
 
+function hasValidTeamfightPhaseAnalysis(teamfightPhaseAnalysis) {
+  return teamfightPhaseAnalysis === undefined ||
+    teamfightPhaseAnalysis === null ||
+    (
+      Array.isArray(teamfightPhaseAnalysis) &&
+      teamfightPhaseAnalysis.every((tf) =>
+        tf &&
+        isNonBlankString(tf.teamfightId) &&
+        isNonBlankString(tf.takeaway) &&
+        Array.isArray(tf.phases) &&
+        tf.phases.length > 0 &&
+        tf.phases.every((phase) =>
+          phase &&
+          isNonBlankString(phase.phase) &&
+          isNonBlankString(phase.outcomeTag) &&
+          Number.isInteger(phase.playerKills) &&
+          phase.playerKills >= 0 &&
+          Number.isInteger(phase.playerDeaths) &&
+          phase.playerDeaths >= 0 &&
+          isNonBlankString(phase.coaching) &&
+          Array.isArray(phase.relatedEventIds) &&
+          phase.relatedEventIds.every((id) => isNonBlankString(id))
+        )
+      )
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
@@ -2232,12 +2259,23 @@ function validateAnalysisOutput(json) {
       }
     }
   }
-  // 한타 단계별 분석은 선택적 — 있으면 배열 + 각 항목 형태만 검증.
-  if (json.teamfightPhaseAnalysis !== undefined && json.teamfightPhaseAnalysis !== null) {
+  // 한타 단계별 분석은 선택적 — 있으면 UI가 렌더링하는 phase/coaching shape까지 검증.
+  if (!hasValidTeamfightPhaseAnalysis(json.teamfightPhaseAnalysis)) {
     if (!Array.isArray(json.teamfightPhaseAnalysis)) throw new Error("teamfightPhaseAnalysis not array");
     for (const tf of json.teamfightPhaseAnalysis) {
-      if (!tf || typeof tf.teamfightId !== "string") throw new Error("teamfightPhaseAnalysis item missing teamfightId");
-      if (!Array.isArray(tf.phases)) throw new Error("teamfightPhaseAnalysis item phases not array");
+      if (!tf || !isNonBlankString(tf.teamfightId)) throw new Error("teamfightPhaseAnalysis item missing teamfightId");
+      if (!isNonBlankString(tf.takeaway)) throw new Error("teamfightPhaseAnalysis item missing takeaway");
+      if (!Array.isArray(tf.phases) || tf.phases.length === 0) throw new Error("teamfightPhaseAnalysis item phases not array");
+      for (const phase of tf.phases) {
+        if (!phase || !isNonBlankString(phase.phase)) throw new Error("teamfightPhaseAnalysis phase missing phase");
+        if (!isNonBlankString(phase.outcomeTag)) throw new Error("teamfightPhaseAnalysis phase missing outcomeTag");
+        if (!Number.isInteger(phase.playerKills) || phase.playerKills < 0) throw new Error("teamfightPhaseAnalysis phase missing playerKills");
+        if (!Number.isInteger(phase.playerDeaths) || phase.playerDeaths < 0) throw new Error("teamfightPhaseAnalysis phase missing playerDeaths");
+        if (!isNonBlankString(phase.coaching)) throw new Error("teamfightPhaseAnalysis phase missing coaching");
+        if (!Array.isArray(phase.relatedEventIds) || !phase.relatedEventIds.every((id) => isNonBlankString(id))) {
+          throw new Error("teamfightPhaseAnalysis phase missing relatedEventIds");
+        }
+      }
     }
   }
 }

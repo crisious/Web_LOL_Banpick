@@ -88,6 +88,9 @@ if (serverSrc.includes("function hasValidInsightList(")) {
 if (serverSrc.includes("function hasValidCombatAnalysis(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidCombatAnalysis"));
 }
+if (serverSrc.includes("function hasValidTeamfightPhaseAnalysis(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidTeamfightPhaseAnalysis"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -593,6 +596,103 @@ expectThrows("combatAnalysis: invalid relatedEventIds throws",
 expectThrows("combatAnalysis: empty string situationLabel throws",
   () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "", takeaway: "y" }])),
   "situationLabel");
+
+// ─── teamfightPhaseAnalysis 검증 (선택적 필드, shape contract) ───────────────
+
+function teamfightPhaseItem(overrides = {}) {
+  return {
+    teamfightId: "enc_001",
+    gamePhase: "MID",
+    startLabel: "18:10",
+    endLabel: "18:56",
+    takeaway: "한타 전 시야와 포지션을 먼저 잡자.",
+    phases: [
+      {
+        phase: "ENGAGE",
+        outcomeTag: "INITIATED_KILL",
+        playerKills: 1,
+        playerDeaths: 0,
+        coaching: "선제 진입은 좋았다.",
+        relatedEventIds: ["evt_001"],
+      },
+    ],
+    ...overrides,
+  };
+}
+
+function withTeamfightPhaseAnalysis(items) {
+  const f = validFixture();
+  f.teamfightPhaseAnalysis = items;
+  return f;
+}
+
+expectOk("teamfightPhaseAnalysis: undefined → tolerated", () => {
+  const f = validFixture();
+  delete f.teamfightPhaseAnalysis;
+  validateAnalysisOutput(f);
+});
+
+expectOk("teamfightPhaseAnalysis: null → tolerated", () => {
+  const f = validFixture();
+  f.teamfightPhaseAnalysis = null;
+  validateAnalysisOutput(f);
+});
+
+expectOk("teamfightPhaseAnalysis: empty array → tolerated", () => {
+  validateAnalysisOutput(withTeamfightPhaseAnalysis([]));
+});
+
+expectOk("teamfightPhaseAnalysis: valid item passes", () => {
+  validateAnalysisOutput(withTeamfightPhaseAnalysis([teamfightPhaseItem()]));
+});
+
+expectThrows("teamfightPhaseAnalysis: object instead of array throws",
+  () => validateAnalysisOutput(withTeamfightPhaseAnalysis({ enc_001: teamfightPhaseItem() })),
+  "teamfightPhaseAnalysis not array");
+
+expectThrows("teamfightPhaseAnalysis: blank teamfightId throws",
+  () => validateAnalysisOutput(withTeamfightPhaseAnalysis([teamfightPhaseItem({ teamfightId: "   " })])),
+  "teamfightId");
+
+expectThrows("teamfightPhaseAnalysis: missing takeaway throws",
+  () => {
+    const item = teamfightPhaseItem();
+    delete item.takeaway;
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "takeaway");
+
+expectThrows("teamfightPhaseAnalysis: blank takeaway throws",
+  () => validateAnalysisOutput(withTeamfightPhaseAnalysis([teamfightPhaseItem({ takeaway: "   " })])),
+  "takeaway");
+
+expectThrows("teamfightPhaseAnalysis: phases empty throws",
+  () => validateAnalysisOutput(withTeamfightPhaseAnalysis([teamfightPhaseItem({ phases: [] })])),
+  "phases");
+
+expectThrows("teamfightPhaseAnalysis: phase row missing coaching throws",
+  () => {
+    const item = teamfightPhaseItem();
+    delete item.phases[0].coaching;
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "coaching");
+
+expectThrows("teamfightPhaseAnalysis: phase row invalid kills throws",
+  () => {
+    const item = teamfightPhaseItem();
+    item.phases[0].playerKills = "1";
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "playerKills");
+
+expectThrows("teamfightPhaseAnalysis: phase row invalid relatedEventIds throws",
+  () => {
+    const item = teamfightPhaseItem();
+    item.phases[0].relatedEventIds = ["evt_001", ""];
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "relatedEventIds");
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
 
