@@ -58,6 +58,7 @@ const tfConstants = [
   extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
   extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
+  extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
@@ -191,6 +192,8 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.phaseSummariesMin", out.outputContract.requiredArrayCounts.phaseSummariesMin, 3);
   check("requiredArrayCounts.evidenceIndexMin", out.outputContract.requiredArrayCounts.evidenceIndexMin, 1);
+  check("requiredArrayCounts.strengthsMax", out.outputContract.requiredArrayCounts.strengthsMax, 3);
+  check("requiredArrayCounts.weaknessesMax", out.outputContract.requiredArrayCounts.weaknessesMax, 3);
   check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
   check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);
