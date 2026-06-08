@@ -2963,6 +2963,11 @@ function inferMatchIdFromSampleEntry(entry) {
   return null;
 }
 
+function publicSampleListEntry(sample) {
+  const { matchId, ...publicSample } = sample || {};
+  return publicSample;
+}
+
 const sampleGenerationLocks = new Map();
 
 function sampleGenerationLockKey(input) {
@@ -3175,10 +3180,7 @@ async function handleApi(req, res, url) {
     const manifest = await loadManifest();
     sendJson(res, 200, {
       ...manifest,
-      samples: manifest.samples.map((sample) => ({
-        ...sample,
-        matchId: inferMatchIdFromSampleEntry(sample),
-      })),
+      samples: manifest.samples.map(publicSampleListEntry),
     });
     return true;
   }
