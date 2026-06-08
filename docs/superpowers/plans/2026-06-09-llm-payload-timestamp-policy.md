@@ -142,7 +142,7 @@ Evidence, 2026-06-09 07:08 KST:
 - Local smoke report directory: `test-artifacts/tmp/llm-payload-timestamp-policy-local/2026-06-08T22-08-11Z-readonly`.
 - Local high-risk sensitive pattern scan over `test-artifacts/tmp/llm-payload-timestamp-policy-local` returned no matches.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -154,6 +154,13 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 07:10 KST:
+- Implementation commit: `66a327a32150ca65bc8aa23705d1f2f4310302e8` (`test: guard llm payload timestamps`) pushed to `origin/main`.
+- GitHub QA run: `27170176983`, conclusion `success`, URL `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27170176983`.
+- QA artifact: `qa-automation-27170176983`, artifact ID `7493649201`, size `3550 bytes`, digest `sha256:c65f070dd4e099c64b9269de64394469b01ca9d28ae02b0be2e27f5d31ddaab5`.
+- Downloaded artifact summary: QA `passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `202ms`, mode `readonly`, git `66a327a`, dirty `false`.
+- High-risk sensitive pattern scan over the downloaded artifact returned no matches.
 
 ## Self-Review
 
