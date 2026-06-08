@@ -190,6 +190,7 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   checkTrue("outputContract requires schemaVersion", out.outputContract.requiredTopLevelFields.includes("schemaVersion"));
   checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.phaseSummariesMin", out.outputContract.requiredArrayCounts.phaseSummariesMin, 3);
+  check("requiredArrayCounts.evidenceIndexMin", out.outputContract.requiredArrayCounts.evidenceIndexMin, 1);
   check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
   check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);

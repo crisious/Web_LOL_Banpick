@@ -1885,7 +1885,7 @@ function buildLlmPayload(normalized) {
     outputContract: {
       schemaVersion: "1.0",
       requiredTopLevelFields: ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"],
-      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: KEY_MOMENTS_MIN },
+      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: 1, strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: KEY_MOMENTS_MIN },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
   };
