@@ -43,6 +43,9 @@ if (serverSrc.includes("const KEY_MOMENTS_MIN =")) {
     extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   );
 }
+if (serverSrc.includes("function hasValidKeyMoments(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidKeyMoments"));
+}
 if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
   validatorSupportSources.push(
     extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
@@ -121,10 +124,10 @@ function validFixture() {
     weaknesses: [{ id: "wk_1", title: "t", description: "d", relatedEventIds: [] }],
     actionChecklist: [{ id: "act_1", text: "t" }],
     keyMoments: [
-      { id: "km_1", timestampLabel: "08:00", title: "t", description: "d" },
-      { id: "km_2", timestampLabel: "12:00", title: "t", description: "d" },
-      { id: "km_3", timestampLabel: "16:00", title: "t", description: "d" },
-      { id: "km_4", timestampLabel: "20:00", title: "t", description: "d" },
+      { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "t", description: "d", relatedEventIds: ["evt_001"] },
+      { id: "km_2", timestampLabel: "12:00", phase: "MID", title: "t", description: "d", relatedEventIds: ["evt_001"] },
+      { id: "km_3", timestampLabel: "16:00", phase: "MID", title: "t", description: "d", relatedEventIds: ["evt_001"] },
+      { id: "km_4", timestampLabel: "20:00", phase: "LATE", title: "t", description: "d", relatedEventIds: ["evt_001"] },
     ],
     evidenceIndex: [{ eventId: "evt_001", summary: "핵심 근거" }],
   };
@@ -310,6 +313,48 @@ expectThrows("keyMoments only 1 throws (need ≥2)", () => {
 
 expectThrows("keyMoments only 3 throws (need >=4)", () => {
   const f = validFixture(); f.keyMoments = f.keyMoments.slice(0, 3);
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing id/eventId throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { timestampLabel: "08:00", phase: "EARLY", title: "장면", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing timestamp throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", phase: "EARLY", title: "장면", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing phase throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", title: "장면", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing title/label throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing description/reason throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "장면", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item missing relatedEventIds throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "장면", description: "설명" };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item invalid relatedEventIds throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "장면", description: "설명", relatedEventIds: [""] };
   validateAnalysisOutput(f);
 }, "keyMoments");
 

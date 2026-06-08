@@ -1560,6 +1560,7 @@ function buildKeyMoments(normalized) {
       reason: event.summary,
       impact: impactForMoment(event, normalized.matchInfo.result),
       importance: event.importance,
+      relatedEventIds: [event.eventId],
     }));
 }
 
@@ -2081,6 +2082,34 @@ function hasMinimumKeyMoments(keyMoments) {
   return Array.isArray(keyMoments) && keyMoments.length >= KEY_MOMENTS_MIN;
 }
 
+function hasValidKeyMoments(keyMoments) {
+  return Array.isArray(keyMoments) &&
+    keyMoments.length >= KEY_MOMENTS_MIN &&
+    keyMoments.every((item) =>
+      item &&
+      (
+        (typeof item.id === "string" && item.id) ||
+        (typeof item.eventId === "string" && item.eventId)
+      ) &&
+      (
+        (typeof item.timestampLabel === "string" && item.timestampLabel) ||
+        (typeof item.timestamp === "string" && item.timestamp)
+      ) &&
+      typeof item.phase === "string" &&
+      item.phase &&
+      (
+        (typeof item.title === "string" && item.title) ||
+        (typeof item.label === "string" && item.label)
+      ) &&
+      (
+        (typeof item.description === "string" && item.description) ||
+        (typeof item.reason === "string" && item.reason)
+      ) &&
+      Array.isArray(item.relatedEventIds) &&
+      item.relatedEventIds.every((id) => typeof id === "string" && id)
+    );
+}
+
 function hasValidPhaseSummaries(phaseSummaries) {
   return Array.isArray(phaseSummaries) &&
     phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
@@ -2152,7 +2181,7 @@ function validateAnalysisOutput(json) {
   if (!hasValidInsightList(json?.strengths)) throw new Error("strengths invalid");
   if (!hasValidInsightList(json?.weaknesses)) throw new Error("weaknesses invalid");
   if (!hasValidActionChecklist(json?.actionChecklist)) throw new Error("actionChecklist invalid");
-  if (!hasMinimumKeyMoments(json?.keyMoments)) throw new Error(`keyMoments < ${KEY_MOMENTS_MIN}`);
+  if (!hasValidKeyMoments(json?.keyMoments)) throw new Error("keyMoments invalid");
   if (!hasValidEvidenceIndex(json?.evidenceIndex)) throw new Error("evidenceIndex invalid");
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
   // 있으면 배열 타입과 각 항목 필수 필드만 검증.
@@ -2328,9 +2357,9 @@ async function buildAnalysis(normalized, sampleId) {
     primary.phaseSummaries = buildPhaseSummaries(normalized);
     violations.push(`count.phaseSummaries<${PHASE_SUMMARIES_MIN}`);
   }
-  if (!hasMinimumKeyMoments(primary.keyMoments)) {
+  if (!hasValidKeyMoments(primary.keyMoments)) {
     primary.keyMoments = buildKeyMoments(normalized);
-    violations.push(`count.keyMoments<${KEY_MOMENTS_MIN}`);
+    violations.push("shape.keyMoments.invalid");
   }
   if (!hasValidEvidenceIndex(primary.evidenceIndex)) {
     primary.evidenceIndex = buildEvidenceIndex(normalized);
