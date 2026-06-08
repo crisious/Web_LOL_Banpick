@@ -13,7 +13,7 @@ const {
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
 const port = parsePortConfig(process.env.PORT);
-const host = process.env.HOST || "127.0.0.1";
+const host = parseHostConfig(process.env.HOST);
 const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
 const publicDemoModeConfig = parsePublicDemoModeConfig(process.env.PUBLIC_DEMO_MODE);
 const publicDemoMode = publicDemoModeConfig.value;
@@ -145,6 +145,17 @@ function parseTrustProxyConfig(rawTrustProxy) {
 
 function parseAgentDisableCodexConfig(rawFlag) {
   return String(rawFlag || "") === "1";
+}
+
+function parseHostConfig(rawHost, defaultHost = "127.0.0.1") {
+  const value = rawHost === undefined || rawHost === null ? "" : String(rawHost);
+  if (value === "") {
+    return defaultHost;
+  }
+  if (/\s/u.test(value) || /[\u0000-\u001F\u007F]/u.test(value)) {
+    throw new Error("HOST must be empty or a hostname/IP literal without whitespace or control characters.");
+  }
+  return value;
 }
 
 function parsePortConfig(rawPort, defaultPort = 8123) {

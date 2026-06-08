@@ -71,6 +71,8 @@ Expected:
 PUBLIC_DEMO_MODE=readonly TRUST_PROXY=1 npm start
 ```
 
+`HOST` defaults to `127.0.0.1` only when it is missing or empty. Set `HOST=0.0.0.0` when the server must bind for a tunnel or external reverse proxy, and keep the value free of whitespace and control characters. Values such as `HOST= 0.0.0.0`, `HOST=0.0.0.0 `, or `HOST=local host` fail before startup instead of being normalized.
+
 2. Start tunnel:
 
 ```bash
