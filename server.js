@@ -2416,8 +2416,22 @@ async function loadSampleBundle(sampleId) {
     return null;
   }
 
-  const normalized = await readJson(sampleEntryStoragePath(entry.normalizedPath));
-  const analysis = await readJson(sampleEntryStoragePath(entry.analysisPath));
+  let normalized;
+  let analysis;
+  try {
+    normalized = await readJson(sampleEntryStoragePath(entry.normalizedPath));
+    analysis = await readJson(sampleEntryStoragePath(entry.analysisPath));
+  } catch {
+    const error = new Error("Stored sample bundle is unavailable.");
+    error.statusCode = 500;
+    error.payload = {
+      ok: false,
+      code: "SAMPLE_BUNDLE_UNAVAILABLE",
+      error: "저장 샘플 리포트 파일을 읽을 수 없습니다.",
+      sampleId,
+    };
+    throw error;
+  }
 
   // 누락된 필드 서버측 보강 (기존 샘플 호환)
   if (!normalized.playtimeScore && normalized.playerStats && normalized.timelineEvents) {
