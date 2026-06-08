@@ -45,6 +45,16 @@ const objectiveFailPolicySources = serverSrc.includes("const OBJECTIVE_FAIL_EVEN
       'function isObjectiveFailEvent(event) { return OBJECTIVE_FAIL_EVENT_TYPES.has(event.eventType); }',
     ];
 
+const structureTakePolicySources = serverSrc.includes("const STRUCTURE_TAKE_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "STRUCTURE_TAKE_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isStructureTakeEvent"),
+    ]
+  : [
+      'const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);',
+      'function isStructureTakeEvent(event) { return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const env = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
@@ -53,6 +63,7 @@ const env = new Function(
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     ...objectiveFailPolicySources,
+    ...structureTakePolicySources,
     extractConstSource(serverSrc, "MACRO_OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isMacroObjectiveWinEvent"),
     extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
@@ -141,6 +152,10 @@ checkTrue(
 checkTrue(
   "buildDerivedSignals uses isMacroObjectiveWinEvent",
   buildDerivedSignalsSrc.includes("events.filter(isMacroObjectiveWinEvent)"),
+);
+checkTrue(
+  "buildDerivedSignals late structure uses isStructureTakeEvent",
+  buildDerivedSignalsSrc.includes('event.phase === "LATE" && isStructureTakeEvent(event)'),
 );
 checkTrue(
   "buildPhaseSummaries uses isMacroObjectiveWinEvent",
@@ -245,6 +260,14 @@ const strC = buildStrengths({
 });
 check("buildStrengths C first is tower fallback", strC[0].title, "구조물 압박으로 승리 조건을 연결했음");
 check("buildStrengths C length 3", strC.length, 3);
+checkTrue(
+  "buildStrengths tower fallback gate uses isStructureTakeEvent",
+  buildStrengthsSrc.includes("events.some(isStructureTakeEvent)"),
+);
+checkTrue(
+  "buildStrengths tower fallback evidence uses isStructureTakeEvent",
+  buildStrengthsSrc.includes(".filter(isStructureTakeEvent)"),
+);
 checkTrue(
   "buildStrengths tower fallback gate uses INSIGHT_LIST_MIN",
   buildStrengthsSrc.includes("strengths.length < INSIGHT_LIST_MIN &&"),

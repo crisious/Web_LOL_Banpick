@@ -34,6 +34,7 @@ const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
 const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
+const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);
 const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
@@ -847,9 +848,7 @@ function buildDerivedSignals(normalized) {
   const objectiveFails = events.filter(isObjectiveFailEvent);
   const playerDeaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
   const earlyDeaths = playerDeaths.filter((event) => event.phase === "EARLY");
-  const lateTowers = events.filter(
-    (event) => event.phase === "LATE" && event.eventType === "TOWER_TAKE",
-  );
+  const lateTowers = events.filter((event) => event.phase === "LATE" && isStructureTakeEvent(event));
   const postObjectiveDeaths = filterPostObjectiveDeaths(playerDeaths, objectiveWins);
 
   const candidateThemes = [];
@@ -1061,6 +1060,10 @@ function isMacroObjectiveWinEvent(event) {
   return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
 }
 
+function isStructureTakeEvent(event) {
+  return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType);
+}
+
 function isFightContributionEvent(event) {
   return FIGHT_CONTRIBUTION_EVENT_TYPES.has(event.eventType);
 }
@@ -1123,9 +1126,9 @@ function buildStrengths(normalized) {
   if (
     strengths.length < INSIGHT_LIST_MIN &&
     normalized.matchInfo.result === "WIN" &&
-    events.some((event) => event.eventType === "TOWER_TAKE")
+    events.some(isStructureTakeEvent)
   ) {
-    const linked = events.filter((event) => event.eventType === "TOWER_TAKE").slice(-2);
+    const linked = events.filter(isStructureTakeEvent).slice(-2);
     strengths.push({
       id: `str_0${strengths.length + 1}`,
       title: "구조물 압박으로 승리 조건을 연결했음",
@@ -1343,7 +1346,7 @@ function calcObjectiveScore(events) {
 }
 
 function calcStructureScore(team, events) {
-  const towerTakes = events.filter((e) => e.eventType === "TOWER_TAKE").length;
+  const towerTakes = events.filter(isStructureTakeEvent).length;
   const towerDiff = (team.teamTowers || 0) - (team.enemyTowers || 0);
   const towerPart = Math.min(towerTakes, 4) * 1.5;
   const diffPart = Math.min(Math.max(towerDiff + 3, 0), 6) / 6 * 4;
