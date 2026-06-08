@@ -595,6 +595,14 @@ function isRawPlayerInvolved(rawEvent, targetParticipantId) {
   );
 }
 
+function isKnownRawTeamId(teamId) {
+  return teamId === 100 || teamId === 200;
+}
+
+function isRawEnemyBuildingKill(rawEvent, targetTeamId) {
+  return isKnownRawTeamId(rawEvent.teamId) && rawEvent.teamId !== targetTeamId;
+}
+
 function laneHintForEvent(event) {
   if (event.monsterType === "DRAGON") {
     return "DRAGON_RIVER";
@@ -705,7 +713,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
   }
 
   if (isRawBuildingKillEvent(rawEvent)) {
-    return rawEvent.teamId === targetTeamId ? "OBJECTIVE_SETUP_FAIL" : "TOWER_TAKE";
+    return isRawEnemyBuildingKill(rawEvent, targetTeamId) ? "TOWER_TAKE" : "OBJECTIVE_SETUP_FAIL";
   }
 
   return "SKIRMISH_WIN";
@@ -723,7 +731,7 @@ function shouldKeepEvent(rawEvent, targetParticipantId, targetTeamId) {
   }
 
   if (isRawBuildingKillEvent(rawEvent)) {
-    return playerInvolved || rawEvent.teamId !== targetTeamId;
+    return playerInvolved || isRawEnemyBuildingKill(rawEvent, targetTeamId);
   }
 
   return false;

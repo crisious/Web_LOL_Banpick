@@ -41,6 +41,12 @@ const rawEventPolicySources = [
   serverSrc.includes("function isRawPlayerInvolved(rawEvent, targetParticipantId)")
     ? extractFunctionSource(serverSrc, "isRawPlayerInvolved")
     : "function isRawPlayerInvolved(rawEvent, targetParticipantId) { const assistingParticipantIds = rawAssistingParticipantIds(rawEvent); return rawEvent.killerId === targetParticipantId || rawEvent.victimId === targetParticipantId || assistingParticipantIds.includes(targetParticipantId); }",
+  serverSrc.includes("function isKnownRawTeamId(teamId)")
+    ? extractFunctionSource(serverSrc, "isKnownRawTeamId")
+    : "function isKnownRawTeamId(teamId) { return teamId === 100 || teamId === 200; }",
+  serverSrc.includes("function isRawEnemyBuildingKill(rawEvent, targetTeamId)")
+    ? extractFunctionSource(serverSrc, "isRawEnemyBuildingKill")
+    : "function isRawEnemyBuildingKill(rawEvent, targetTeamId) { return isKnownRawTeamId(rawEvent.teamId) && rawEvent.teamId !== targetTeamId; }",
 ];
 
 const shouldKeepEventSrc = extractFunctionSource(serverSrc, "shouldKeepEvent");
