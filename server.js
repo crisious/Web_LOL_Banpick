@@ -273,7 +273,7 @@ function loadEnvFile(filePath) {
       continue;
     }
 
-    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/);
     if (!match) {
       continue;
     }
@@ -283,7 +283,7 @@ function loadEnvFile(filePath) {
       continue;
     }
 
-    let value = rawValue.trim();
+    let value = rawValue;
     const hasDoubleQuotes = value.startsWith("\"") && value.endsWith("\"");
     const hasSingleQuotes = value.startsWith("'") && value.endsWith("'");
     if (hasDoubleQuotes || hasSingleQuotes) {

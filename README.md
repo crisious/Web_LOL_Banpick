@@ -187,7 +187,7 @@ Direct smoke는 알 수 없는 `--...` 옵션도 즉시 실패합니다. 예를 
 
 Direct smoke의 token material은 `--require-token --expect-mode=protected` 조합에서만 사용합니다. Read-only/full smoke에 inline `--token=...`을 넘기면 네트워크 요청 전에 `FAIL --token is only accepted with --require-token and --expect-mode=protected`로 종료하고, ambient `PUBLIC_DEMO_TOKEN`은 protected token-required smoke가 아니면 무시합니다. `--require-token`도 `--expect-mode=protected` 밖에서는 `FAIL --require-token is only accepted with --expect-mode=protected`로 실패합니다. Protected token 값은 non-empty이고 whitespace를 포함하지 않아야 합니다. Leading/trailing/internal whitespace가 섞인 `--token` 또는 `PUBLIC_DEMO_TOKEN`은 네트워크 요청 전에 token-shape 오류로 실패하며, whitespace-only 값은 기존처럼 missing token으로 처리됩니다.
 
-서버의 protected `PUBLIC_DEMO_TOKEN`도 같은 whitespace-free 계약을 따릅니다. Non-empty 서버 token에 leading/trailing/internal whitespace가 있으면 `/healthz`가 secret 값 없이 `publicDemoTokenValid: false`만 노출하고, live/write API는 403 `PUBLIC_DEMO_TOKEN_INVALID`로 fail-closed 차단됩니다. Bearer token이나 `x-demo-token` 요청 값에 붙은 whitespace도 서버에서 trim하지 않으므로 정확히 일치하지 않으면 401 `PUBLIC_DEMO_UNAUTHORIZED`로 실패합니다. Smoke CLI는 `publicDemoTokenValid: false`를 보면 home/assets/samples/live probe 전에 `FAIL public demo token config is valid`로 즉시 실패합니다.
+서버의 protected `PUBLIC_DEMO_TOKEN`도 같은 whitespace-free 계약을 따릅니다. `.env` 로더도 `=` 뒤의 값을 trim하지 않으므로 파일에 적힌 accidental whitespace가 서버 validator까지 그대로 전달됩니다. Non-empty 서버 token에 leading/trailing/internal whitespace가 있으면 `/healthz`가 secret 값 없이 `publicDemoTokenValid: false`만 노출하고, live/write API는 403 `PUBLIC_DEMO_TOKEN_INVALID`로 fail-closed 차단됩니다. Bearer token이나 `x-demo-token` 요청 값에 붙은 whitespace도 서버에서 trim하지 않으므로 정확히 일치하지 않으면 401 `PUBLIC_DEMO_UNAUTHORIZED`로 실패합니다. Smoke CLI는 `publicDemoTokenValid: false`를 보면 home/assets/samples/live probe 전에 `FAIL public demo token config is valid`로 즉시 실패합니다.
 
 `smoke:report:*`의 `--output-root=<path>`와 `SMOKE_REPORT_OUTPUT_ROOT`는 `test-artifacts/<subdir>` 아래 상대 경로만 허용합니다. 절대 경로, `.` / `..` path segment, leading/trailing whitespace로 감싼 경로, ASCII control character, Unicode whitespace, byte order mark, invisible Unicode format character, Unicode surrogate code unit, Unicode replacement character, literal backslash를 포함한 경로, `test-artifacts//qa-automation` 같은 repeated slash separator, `.github/...`처럼 artifact tree 밖의 경로, root-level `test-artifacts`, `test-artifacts/`, `test-artifacts//`는 report 디렉터리나 `qa-summary.json`을 만들기 전에 `FAIL --output-root must be a relative path under a test-artifacts subdirectory`로 종료합니다. 유효한 하위 디렉터리에 붙은 단일 trailing slash는 canonical path로 정규화됩니다.
 
@@ -197,7 +197,7 @@ Direct smoke의 token material은 `--require-token --expect-mode=protected` 조�
 
 `smoke:report:readonly`와 `smoke:report:external:readonly`는 `--token` pass-through를 받지 않습니다. 토큰은 protected report mode에서만 의미가 있으므로 read-only report에 `--token=...`을 넘기면 artifact 생성 전에 `FAIL --token is only accepted for protected smoke reports`로 종료합니다.
 
-`PUBLIC_DEMO_MODE`는 missing/empty 값일 때만 `full`로 기본 설정되며, non-empty 값은 lowercase `full`, `readonly`, `protected`와 정확히 일치해야 합니다. Leading/trailing whitespace가 섞인 ` readonly`나 uppercase `READONLY`처럼 서버가 보정할 수 있어 보이는 값도 invalid config로 유지합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보거나 raw `publicDemoMode`가 allowlist와 정확히 일치하지 않으면 live/write probe 전에 실패합니다.
+`PUBLIC_DEMO_MODE`는 missing/empty 값일 때만 `full`로 기본 설정되며, non-empty 값은 lowercase `full`, `readonly`, `protected`와 정확히 일치해야 합니다. `.env` 로더도 `=` 뒤 mode 값을 trim/lowercase하지 않습니다. Leading/trailing whitespace가 섞인 ` readonly`나 uppercase `READONLY`처럼 서버가 보정할 수 있어 보이는 값도 invalid config로 유지합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보거나 raw `publicDemoMode`가 allowlist와 정확히 일치하지 않으면 live/write probe 전에 실패합니다.
 
 `/healthz.sampleGeneration`은 writable 데모 운영 진단용으로 현재 샘플 생성 lock의 aggregate만 반환합니다. `activeCount`는 진행 중 작업 수, `oldestAgeMs`는 가장 오래된 작업의 경과 시간이며, 두 값 모두 음수가 아닌 정수입니다. 서버는 경과 시간을 정수 ms로 내림 처리해 노출합니다. lock key, matchId, Riot ID, 토큰, raw payload는 포함하지 않습니다. Smoke CLI는 이 필드가 있으면 두 aggregate field만 있는지 검증하고, 식별자 field가 섞이거나 `oldestAgeMs`가 fractional 값이거나 `activeCount: 0`인데 `oldestAgeMs`가 0이 아니면 sample/live/write probe 전에 실패합니다.
 
@@ -234,6 +234,8 @@ PORT=8123
 # SAMPLES_DIR=/var/lib/lol-ai-coach/samples
 # TRUST_PROXY=1
 ```
+
+Public demo 관련 `.env` 값은 `=` 뒤 공백까지 그대로 읽습니다. 예를 들어 `PUBLIC_DEMO_MODE= readonly`나 `PUBLIC_DEMO_TOKEN=secret `은 보정되지 않고 `/healthz`의 invalid config 진단과 smoke 실패로 드러납니다.
 
 외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. `PUBLIC_DEMO_MODE` 오타도 live/write API를 403 `PUBLIC_DEMO_MODE_INVALID`로 차단하므로, `/healthz`와 smoke 결과로 실제 mode를 먼저 확인하세요. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
 
