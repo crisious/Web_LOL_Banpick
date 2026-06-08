@@ -233,7 +233,7 @@ checkTrue("server imports shared sample manifest validator",
 checkTrue("top-level request catch reuses structured error status",
   /sendJson\(res,\s*error\?\.statusCode\s*\|\|\s*500/.test(serverSrc));
 checkTrue("top-level request catch reuses structured error payload",
-  /error\?\.payload\s*\|\|\s*\{[\s\S]*ok: false/.test(serverSrc));
+  /error\?\.payload\s*\|\|\s*internalServerErrorPayload\(error\)/.test(serverSrc));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

@@ -3296,6 +3296,14 @@ function invalidRequestTargetError() {
   return error;
 }
 
+function internalServerErrorPayload() {
+  return {
+    ok: false,
+    code: "INTERNAL_SERVER_ERROR",
+    error: "서버 처리 중 오류가 발생했습니다.",
+  };
+}
+
 function requestUrlFrom(req) {
   const rawTarget = firstHeaderValue(req.url) || "/";
   if (!rawTarget.startsWith("/") || rawTarget.startsWith("//")) {
@@ -3318,10 +3326,7 @@ const server = http.createServer(async (req, res) => {
     }
     await handleStatic(req, res, url);
   } catch (error) {
-    sendJson(res, error?.statusCode || 500, error?.payload || {
-      ok: false,
-      error: error.message,
-    });
+    sendJson(res, error?.statusCode || 500, error?.payload || internalServerErrorPayload(error));
   }
 });
 

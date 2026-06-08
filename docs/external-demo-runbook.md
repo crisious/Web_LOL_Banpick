@@ -66,6 +66,7 @@ Expected:
 - targeted sample list/detail error smoke can verify `/api/samples` or `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample flow
 - malformed `/api/samples/:id` values, including empty ids, encoded slashes, spaces, or uppercase ids, fail as HTTP 400 `INVALID_SAMPLE_ID` before manifest lookup
 - missing or malformed required stored sample report files fail sample detail requests as HTTP 500 `SAMPLE_BUNDLE_UNAVAILABLE` without exposing filesystem paths, `ENOENT`, or JSON parser text
+- payload-less top-level server exceptions fail as HTTP 500 `INTERNAL_SERVER_ERROR` without exposing raw exception messages
 
 ## Cloudflare Tunnel Demo
 
