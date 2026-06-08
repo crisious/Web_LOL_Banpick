@@ -336,7 +336,13 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
   checkTrue("teamfight prompt includes relatedEventIds", snippet.includes('"relatedEventIds"'));
 }
 
-// ─── 케이스 16: teamfight 지시문 본문은 필수 phase row 필드를 명시해야 함 ──
+// ─── 케이스 16: output schema preamble은 evidenceIndex 최소 개수를 명시해야 함 ──
+
+{
+  checkTrue("output schema states evidenceIndex non-empty", OUTPUT_SCHEMA_EXAMPLE.includes("evidenceIndex는 1개 이상의 배열"));
+}
+
+// ─── 케이스 17: teamfight 지시문 본문은 필수 phase row 필드를 명시해야 함 ──
 
 {
   const requiredFields = [
