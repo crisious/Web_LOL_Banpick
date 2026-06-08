@@ -48,6 +48,13 @@ const codexPromptSrc = extractConstSource(serverSrc, "CODEX_REDTEAM_PROMPT");
 const { CLAUDE_COACHING_PROMPT, CODEX_REDTEAM_PROMPT } = new Function(
   `${outputSchemaExampleSrc}\n${claudePromptSrc}\n${codexPromptSrc}\nreturn { CLAUDE_COACHING_PROMPT, CODEX_REDTEAM_PROMPT };`,
 )();
+const actionChecklistCountConstantsSrc = [
+  extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
+  extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
+].join("\n");
+const { ACTION_CHECKLIST_MIN, ACTION_CHECKLIST_MAX } = new Function(
+  `${actionChecklistCountConstantsSrc}\nreturn { ACTION_CHECKLIST_MIN, ACTION_CHECKLIST_MAX };`,
+)();
 
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
@@ -58,6 +65,7 @@ const tfConstants = [
   extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
   extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
+  actionChecklistCountConstantsSrc,
   extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
@@ -185,6 +193,8 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   const f = baseFixture();
   const out = buildLlmPayload(f);
   check("outputContract.schemaVersion = 1.0", out.outputContract.schemaVersion, "1.0");
+  check("taskMeta.checklistCountMin mirrors ACTION_CHECKLIST_MIN", out.taskMeta.checklistCountMin, ACTION_CHECKLIST_MIN);
+  check("taskMeta.checklistCountMax mirrors ACTION_CHECKLIST_MAX", out.taskMeta.checklistCountMax, ACTION_CHECKLIST_MAX);
   check("requiredTopLevelFields list",
     out.outputContract.requiredTopLevelFields,
     ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"]);
@@ -196,7 +206,13 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   check("requiredArrayCounts.weaknessesMax", out.outputContract.requiredArrayCounts.weaknessesMax, 3);
   check("requiredArrayCounts.strengths", out.outputContract.requiredArrayCounts.strengths, 3);
   check("requiredArrayCounts.weaknesses", out.outputContract.requiredArrayCounts.weaknesses, 3);
+  check("requiredArrayCounts.actionChecklistMin mirrors ACTION_CHECKLIST_MIN", out.outputContract.requiredArrayCounts.actionChecklistMin, ACTION_CHECKLIST_MIN);
+  check("requiredArrayCounts.actionChecklistMax mirrors ACTION_CHECKLIST_MAX", out.outputContract.requiredArrayCounts.actionChecklistMax, ACTION_CHECKLIST_MAX);
   check("requiredArrayCounts.keyMomentsMin", out.outputContract.requiredArrayCounts.keyMomentsMin, 4);
+  checkTrue("buildLlmPayload taskMeta uses ACTION_CHECKLIST_MIN", buildSrc.includes("checklistCountMin: ACTION_CHECKLIST_MIN"));
+  checkTrue("buildLlmPayload taskMeta uses ACTION_CHECKLIST_MAX", buildSrc.includes("checklistCountMax: ACTION_CHECKLIST_MAX"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses ACTION_CHECKLIST_MIN", buildSrc.includes("actionChecklistMin: ACTION_CHECKLIST_MIN"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses ACTION_CHECKLIST_MAX", buildSrc.includes("actionChecklistMax: ACTION_CHECKLIST_MAX"));
 }
 
 // ─── 케이스 6: phaseContext는 4개 필드만 추출 ───────────────────────────────

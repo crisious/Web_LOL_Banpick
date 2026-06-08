@@ -1870,7 +1870,7 @@ function buildLlmPayload(normalized) {
 
   const { early, mid, late } = normalized.phaseContext;
   return {
-    taskMeta: { language: "ko", analysisMode: "coaching", strengthCount: 3, weaknessCount: 3, checklistCountMin: 3, checklistCountMax: 5 },
+    taskMeta: { language: "ko", analysisMode: "coaching", strengthCount: 3, weaknessCount: 3, checklistCountMin: ACTION_CHECKLIST_MIN, checklistCountMax: ACTION_CHECKLIST_MAX },
     matchContext: {
       playerContext: { riotId: normalized.playerContext.riotId, participantId: normalized.playerContext.participantId },
       matchInfo: normalized.matchInfo,
@@ -1889,7 +1889,7 @@ function buildLlmPayload(normalized) {
     outputContract: {
       schemaVersion: "1.0",
       requiredTopLevelFields: ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"],
-      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: 1, strengths: 3, strengthsMax: INSIGHT_LIST_MAX, weaknesses: 3, weaknessesMax: INSIGHT_LIST_MAX, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: KEY_MOMENTS_MIN },
+      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: 1, strengths: 3, strengthsMax: INSIGHT_LIST_MAX, weaknesses: 3, weaknessesMax: INSIGHT_LIST_MAX, actionChecklistMin: ACTION_CHECKLIST_MIN, actionChecklistMax: ACTION_CHECKLIST_MAX, keyMomentsMin: KEY_MOMENTS_MIN },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
   };
