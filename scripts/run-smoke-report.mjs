@@ -33,6 +33,9 @@ const SAMPLE_LIST_ERROR_OPTIONS = [
   "--expect-sample-list-error-code=",
   "--expect-sample-list-error-message=",
 ];
+const REQUIRED_FULL_SMOKE_CHECK_LABELS = [
+  "/api/samples list entries omit explicit matchId",
+];
 const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
   "--expect-sample-list-error-message=",
@@ -294,6 +297,33 @@ export function qaSummaryPathFor(outputRoot) {
   return path.join(outputRoot, "qa-summary.json");
 }
 
+function isEarlySampleErrorProbe(config) {
+  return (config?.extraSmokeArgs || []).some((arg) =>
+    SAMPLE_DETAIL_ERROR_OPTIONS.some((prefix) => arg.startsWith(prefix)) ||
+    SAMPLE_LIST_ERROR_OPTIONS.some((prefix) => arg.startsWith(prefix))
+  );
+}
+
+export function requiredSmokeCheckResults(config, smokeReport) {
+  if (isEarlySampleErrorProbe(config)) return [];
+  const checks = Array.isArray(smokeReport?.checks) ? smokeReport.checks : [];
+  return REQUIRED_FULL_SMOKE_CHECK_LABELS.map((label) => {
+    const check = checks.find((item) => item?.label === label);
+    if (!check) return { label, status: "missing" };
+    return { label, status: check.status === "pass" ? "pass" : "fail" };
+  });
+}
+
+export function validateRequiredSmokeChecks(config, smokeReport) {
+  return requiredSmokeCheckResults(config, smokeReport)
+    .filter((check) => check.status !== "pass")
+    .map((check) =>
+      check.status === "missing"
+        ? `missing required smoke check: ${check.label}`
+        : `required smoke check failed: ${check.label}`
+    );
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -312,7 +342,7 @@ export function buildQaSummary({
       baseUrl: redactUrlForEvidence(config.baseUrl),
       expectedMode: config.expectedMode,
       actualMode: smokeReport?.actualMode || "",
-      status: smokeReport?.status || (exitCode ? "failed" : "passed"),
+      status: exitCode ? "failed" : (smokeReport?.status || "passed"),
       exitCode,
       startedAt,
       finishedAt,
@@ -321,6 +351,7 @@ export function buildQaSummary({
       smokeRunJsonPath: metadataPath,
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
+      requiredChecks: requiredSmokeCheckResults(config, smokeReport),
     },
   };
 }
@@ -358,6 +389,15 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
   });
 
   const finishedAt = new Date().toISOString();
+  const smokeReport = readJsonIfExists(reportJsonPath);
+  const requiredCheckFailures = exitCode === 0
+    ? validateRequiredSmokeChecks(config, smokeReport)
+    : [];
+  const finalExitCode = requiredCheckFailures.length ? 1 : exitCode;
+  for (const message of requiredCheckFailures) {
+    console.error(`FAIL ${message}`);
+  }
+
   writeRunMetadata(metadataPath, {
     schemaVersion: 1,
     mode: config.mode,
@@ -365,7 +405,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     reportJsonPath,
     startedAt,
     finishedAt,
-    exitCode,
+    exitCode: finalExitCode,
     command: [process.execPath, ...redactSmokeArgs(smokeArgs)],
   });
   writeRunMetadata(qaSummaryPath, buildQaSummary({
@@ -375,12 +415,12 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     metadataPath,
     startedAt,
     finishedAt,
-    exitCode,
-    smokeReport: readJsonIfExists(reportJsonPath),
+    exitCode: finalExitCode,
+    smokeReport,
   }));
 
   console.log(`Smoke report directory: ${reportDir}`);
-  return exitCode;
+  return finalExitCode;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -610,6 +610,7 @@ if (fs.existsSync(runnerPath)) {
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
+        requiredChecks: [{ label: "/api/samples list entries omit explicit matchId", status: "missing" }],
       },
     });
 
@@ -644,6 +645,70 @@ if (fs.existsSync(runnerPath)) {
   check("buildQaSummary omits sensitive URL material",
     JSON.stringify(sensitiveUrlSummary || {}).includes("summary-secret"),
     false);
+
+  const missingRequiredCheckConfig = runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {});
+  const missingRequiredCheckReport = {
+    status: "passed",
+    actualMode: "readonly",
+    summary: { passed: 42, failed: 0 },
+    checks: [{ status: "pass", label: "GET /healthz returns 200" }],
+  };
+
+  check("validateRequiredSmokeChecks reports missing sample list matchId check",
+    runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, missingRequiredCheckReport),
+    ["missing required smoke check: /api/samples list entries omit explicit matchId"]);
+
+  const passingRequiredCheckReport = {
+    status: "passed",
+    actualMode: "readonly",
+    summary: { passed: 43, failed: 0 },
+    checks: [
+      { status: "pass", label: "GET /healthz returns 200" },
+      { status: "pass", label: "/api/samples list entries omit explicit matchId" },
+    ],
+  };
+
+  check("validateRequiredSmokeChecks passes when sample list matchId check is present",
+    runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, passingRequiredCheckReport),
+    []);
+
+  const missingRequiredSummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:30:00.000Z",
+    finishedAt: "2026-06-08T06:30:10.000Z",
+    exitCode: 0,
+    smokeReport: missingRequiredCheckReport,
+  });
+
+  check("buildQaSummary records missing required smoke checks",
+    missingRequiredSummary?.latestRun?.requiredChecks,
+    [{ label: "/api/samples list entries omit explicit matchId", status: "missing" }]);
+
+  const sampleListErrorConfig = runner.parseRunnerArgs([
+    "node",
+    "scripts/run-smoke-report.mjs",
+    "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+  ], {});
+
+  check("sample list error smoke reports skip full-run required checks",
+    runner.validateRequiredSmokeChecks?.(sampleListErrorConfig, missingRequiredCheckReport),
+    []);
+
+  check("buildQaSummary prefers runner exit status over passed smoke report status",
+    runner.buildQaSummary?.({
+      config: missingRequiredCheckConfig,
+      reportDir: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly",
+      reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly/smoke-report.json",
+      metadataPath: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly/smoke-run.json",
+      startedAt: "2026-06-08T06:30:00.000Z",
+      finishedAt: "2026-06-08T06:30:10.000Z",
+      exitCode: 1,
+      smokeReport: passingRequiredCheckReport,
+    })?.latestRun?.status,
+    "failed");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
