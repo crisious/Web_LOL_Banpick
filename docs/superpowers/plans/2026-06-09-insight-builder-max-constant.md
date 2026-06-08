@@ -183,7 +183,7 @@ no sensitive matches
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-09-insight-builder-max-constant.md`
 
-- [ ] **Step 1: Update Obsidian project log**
+- [x] **Step 1: Update Obsidian project log**
 
 Record the intent, changed files, RED/GREEN output, full test count, local smoke result, commits, GitHub run, and artifact id in:
 
@@ -191,7 +191,7 @@ Record the intent, changed files, RED/GREEN output, full test count, local smoke
 /Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md
 ```
 
-- [ ] **Step 2: Commit implementation**
+- [x] **Step 2: Commit implementation**
 
 Run:
 
@@ -201,7 +201,7 @@ git commit -m "test: share insight builder max"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA artifact**
+- [x] **Step 3: Verify GitHub QA artifact**
 
 Run:
 
@@ -215,6 +215,27 @@ jq '{status: .latestRun.status, durationMs: .latestRun.durationMs, smokeSummary:
 Expected: workflow conclusion is success, `latestRun.status` is `passed`, `smokeSummary.failed` is `0`, and `latestRun.git.shortSha` matches the pushed commit.
 
 ---
+
+## Completion Evidence
+
+- RED focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 53 passed, 2 failed.
+- RED failures:
+  - `buildStrengths uses INSIGHT_LIST_MAX cap`
+  - `buildWeaknesses uses INSIGHT_LIST_MAX cap`
+- GREEN focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 55 passed, 0 failed.
+- Static verification:
+  - `node --check server.js`: passed
+  - `node --check test-artifacts/server/strength-weakness-tests.mjs`: passed
+  - `git diff --check`: passed
+  - placeholder scan: no matches
+- Full verification: `npm test` passed with 1453 passed, 0 failed across 40 test file(s).
+- Local read-only smoke report: 156 passed, 0 failed, `durationMs: 224`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke artifact sensitive-pattern scan: no matches.
+- Implementation commit: `f631803 test: share insight builder max`, pushed to `origin/main`.
+- GitHub Actions QA: run `27147559608` completed successfully for `f631803de7b5dcde72324b32ce7e2d8301b728a7`.
+- GitHub artifact: `7484508194` (`qa-automation-27147559608`, 3551 bytes), read-only smoke 156 passed / 0 failed, `durationMs: 213`, `latestRun.git.shortSha: "f631803"`, `dirty: false`.
+- GitHub artifact sensitive-pattern scan: no matches.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
 
 ## Self-Review
 
