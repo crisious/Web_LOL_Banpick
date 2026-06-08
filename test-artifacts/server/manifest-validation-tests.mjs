@@ -129,6 +129,16 @@ if (helpers) {
     ["manifest encoded slash sample id is rejected", { samples: [sampleWithId("sample%2Fsecret")] }, "Sample manifest entry id must be a lowercase generated sample id."],
     ["manifest whitespace sample id is rejected", { samples: [sampleWithId("sample-kr-1 ")] }, "Sample manifest entry id must be a lowercase generated sample id."],
     ["manifest trailing hyphen sample id is rejected", { samples: [sampleWithId("sample-kr-1-")] }, "Sample manifest entry id must be a lowercase generated sample id."],
+    ["manifest duplicate sample id is rejected", {
+      samples: [
+        validSample,
+        {
+          ...validSample,
+          matchId: "KR_2",
+          label: "sample-kr-1 duplicate",
+        },
+      ],
+    }, "Sample manifest entry id must be unique: sample-kr-1."],
     ["manifest path outside sample directory is rejected", { samples: [{ ...validSample, normalizedPath: "/data/samples/other-sample/normalized-match.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: normalizedPath."],
     ["manifest path without public prefix is rejected", { samples: [{ ...validSample, analysisPath: "data/samples/sample-kr-1/analysis-result.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: analysisPath."],
     ["manifest raw path exposure is rejected", { samples: [{ ...validSample, analysisPath: "/data/samples/sample-kr-1/raw-match.json" }] }, "Sample manifest entry path must not expose raw/internal files: analysisPath."],

@@ -129,6 +129,26 @@ if (manifestModule) {
   check("legacy manifest normalizes through shared module",
     validateManifest({ samples: [validSample] }),
     { schemaVersion: 1, samples: [validSample] });
+  {
+    let caught = null;
+    try {
+      validateManifest({
+        samples: [
+          validSample,
+          {
+            ...validSample,
+            matchId: "KR_2",
+            label: "sample-kr-1 duplicate",
+          },
+        ],
+      });
+    } catch (error) {
+      caught = error;
+    }
+    check("duplicate sample ids reject through shared module",
+      caught?.payload?.error,
+      "Sample manifest entry id must be unique: sample-kr-1.");
+  }
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
