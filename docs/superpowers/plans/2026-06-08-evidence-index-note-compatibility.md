@@ -200,7 +200,7 @@ rg -n "RGAPI-[A-Za-z0-9_-]+|Bearer [A-Za-z0-9._-]{8,}|Authorization:|api_key=|/U
 
 Expected: no output.
 
-- [ ] **Step 6: Commit and push**
+- [x] **Step 6: Commit and push**
 
 Run:
 
@@ -214,7 +214,7 @@ git push origin main
 
 Expected: the ahead/behind count is `0 0` before commit, and push updates `origin/main`.
 
-- [ ] **Step 7: Verify GitHub QA artifact**
+- [x] **Step 7: Verify GitHub QA artifact**
 
 Run:
 
