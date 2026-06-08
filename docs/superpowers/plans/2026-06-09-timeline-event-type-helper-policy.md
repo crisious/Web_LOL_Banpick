@@ -419,7 +419,7 @@ Implementation evidence:
 - Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 228`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "3a59a1e"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
 - Artifact high-risk sensitive pattern scan: no matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with implementation and docs completion evidence, then run:
 
@@ -436,6 +436,14 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
+
+Docs completion evidence:
+- Commit: `ff5ff42 docs: mark timeline event type helper plan complete`
+- Push: `origin/main`
+- GitHub Actions QA: run `27157442804` passed for head SHA `ff5ff42318c86555a96126db71a4c2a2885226f4`.
+- Artifact: `7488609404` (`qa-automation-27157442804`, 3549 bytes) downloaded and inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 208`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "ff5ff42"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Artifact high-risk sensitive pattern scan: no matches.
 
 ## Self-Review
 
