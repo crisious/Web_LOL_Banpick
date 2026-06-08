@@ -186,7 +186,7 @@ Add a new section before `## 리스크 관리` with:
 - main sync: 최종 확인 예정
 ```
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -199,7 +199,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub Actions QA artifact**
+- [x] **Step 4: Verify GitHub Actions QA artifact**
 
 Run:
 
@@ -213,7 +213,7 @@ if rg -n "Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY
 
 Expected: GitHub Actions QA passes, artifact smoke summary has 0 failed, sensitive scan prints `no sensitive matches`.
 
-- [ ] **Step 5: Mark plan complete and push docs completion**
+- [x] **Step 5: Mark plan complete and push docs completion**
 
 After implementation QA, update this plan’s checkboxes and add a `## Completion Evidence` section with local and GitHub evidence. Then run:
 
@@ -251,3 +251,18 @@ Expected:
 - Spec coverage: This plan shares the fight-contribution event type policy across the two rule-based positive-fight paths while preserving existing output behavior.
 - Placeholder scan target: `rg -n "TB[D]|TO[D]O|implement[ ]later|fill[ ]in[ ]details" docs/superpowers/plans/2026-06-09-fight-contribution-event-types.md`
 - Type consistency: `FIGHT_CONTRIBUTION_EVENT_TYPES` is a `Set`, `isFightContributionEvent(event)` accepts timeline event objects, and both consumers pass event objects directly to `Array.prototype.filter`.
+
+## Completion Evidence
+
+- RED check: `node test-artifacts/server/strength-weakness-tests.mjs` exited 1 with `74 passed, 4 failed`. The failing checks were `server defines FIGHT_CONTRIBUTION_EVENT_TYPES`, `server defines isFightContributionEvent`, `bestFightSummary uses isFightContributionEvent`, and `buildStrengths fight evidence uses isFightContributionEvent`.
+- GREEN check: `node test-artifacts/server/strength-weakness-tests.mjs` exited 0 with `78 passed, 0 failed`.
+- Syntax checks: `node --check server.js` and `node --check test-artifacts/server/strength-weakness-tests.mjs` exited 0.
+- Whitespace check: `git diff --check` exited 0.
+- Placeholder scan: `rg -n "TB[D]|TO[D]O|implement[ ]later|fill[ ]in[ ]details" docs/superpowers/plans/2026-06-09-fight-contribution-event-types.md` exited 1 with no matches.
+- Full test suite: `npm test` exited 0 with `1476 passed, 0 failed across 40 test file(s)`.
+- Local read-only smoke: `SMOKE_REPORT_OUTPUT_ROOT=test-artifacts/tmp/fight-contribution-event-types-local npm run smoke:report:readonly` exited 0. `qa-summary.json` recorded `status: "passed"`, `durationMs: 200`, smoke `156 passed / 0 failed`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke sensitive scan: no sensitive matches.
+- Implementation commit: `af56438 test: share fight contribution event types`, pushed to `origin/main`.
+- GitHub Actions QA run: `27152004674` passed for SHA `af564382fe798a2e539c563ab5fdfb436176d1b1`.
+- GitHub artifact: `7486402403` (`qa-automation-27152004674`, 3550 bytes) recorded `durationMs: 212`, smoke `156 passed / 0 failed`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "af56438"`, and `dirty: false`.
+- GitHub artifact sensitive scan: no sensitive matches.
