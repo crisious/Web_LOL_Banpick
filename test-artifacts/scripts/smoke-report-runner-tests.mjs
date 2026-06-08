@@ -632,6 +632,11 @@ if (fs.existsSync(runnerPath)) {
         reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
         reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
+        artifactRelativePaths: {
+          qaSummary: "qa-summary.json",
+          smokeReport: "2026-06-08T01-15-30Z-external-protected/smoke-report.json",
+          smokeRun: "2026-06-08T01-15-30Z-external-protected/smoke-run.json",
+        },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
         requiredChecks: commonMissingFullRequiredChecks,
@@ -730,6 +735,14 @@ if (fs.existsSync(runnerPath)) {
     exitCode: 0,
     smokeReport: passingRequiredCheckReport,
   });
+
+  check("buildQaSummary records artifact-relative smoke paths",
+    passingRequiredSummary?.latestRun?.artifactRelativePaths,
+    {
+      qaSummary: "qa-summary.json",
+      smokeReport: "2026-06-08T06-35-00Z-readonly/smoke-report.json",
+      smokeRun: "2026-06-08T06-35-00Z-readonly/smoke-run.json",
+    });
 
   check("buildQaSummary records passing required check summary",
     passingRequiredSummary?.latestRun?.requiredCheckSummary,

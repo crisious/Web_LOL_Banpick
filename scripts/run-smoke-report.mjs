@@ -374,6 +374,19 @@ export function validateRequiredSmokeChecks(config, smokeReport) {
   return requiredSmokeCheckFailureMessages(requiredSmokeCheckResults(config, smokeReport));
 }
 
+function artifactJsonPath(value) {
+  return value.split(path.sep).join("/");
+}
+
+function artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath) {
+  const outputRoot = path.dirname(reportDir);
+  return {
+    qaSummary: "qa-summary.json",
+    smokeReport: artifactJsonPath(path.relative(outputRoot, reportJsonPath)),
+    smokeRun: artifactJsonPath(path.relative(outputRoot, metadataPath)),
+  };
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -400,6 +413,7 @@ export function buildQaSummary({
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
+      artifactRelativePaths: artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath),
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
