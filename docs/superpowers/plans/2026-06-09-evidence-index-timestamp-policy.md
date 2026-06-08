@@ -127,7 +127,7 @@ Evidence, 2026-06-09 06:57 KST:
 - Local high-risk sensitive pattern scan over `test-artifacts/tmp/evidence-index-timestamp-policy-local` returned no matches.
 - `git diff --check` exited 0.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -138,6 +138,13 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 06:59 KST:
+- Implementation commit: `a995b1cb94ecd663e2fe4e05f30d126e4b8651d4` (`test: guard evidence index timestamps`) pushed to `origin/main`.
+- GitHub QA run: `27169623839`, conclusion `success`, URL `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27169623839`.
+- QA artifact: `qa-automation-27169623839`, artifact ID `7493447495`, size `3549 bytes`, digest `sha256:90c87fa1fce433dba5b10e622d2ea734d2018fd836cdfd5fc3bd9312999994f2`.
+- Downloaded artifact summary: QA `passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `202ms`, mode `readonly`, git `a995b1c`, dirty `false`.
+- High-risk sensitive pattern scan over the downloaded artifact returned no matches.
 
 ## Self-Review
 
