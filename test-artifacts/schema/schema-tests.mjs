@@ -64,6 +64,9 @@ if (serverSrc.includes("function hasValidMatchSummary(")) {
 if (serverSrc.includes("function hasValidCoachSummary(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidCoachSummary"));
 }
+if (serverSrc.includes("const EVIDENCE_INDEX_MIN =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "EVIDENCE_INDEX_MIN"));
+}
 if (serverSrc.includes("function hasValidEvidenceIndex(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidEvidenceIndex"));
 }
@@ -96,6 +99,7 @@ const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
   `${validatorSupportSources.join("\n")}\n${validateSrc}\nreturn validateAnalysisOutput;`,
 )();
+const evidenceIndexValidatorSrc = extractFunctionSource(serverSrc, "hasValidEvidenceIndex");
 
 let pass = 0, fail = 0;
 
@@ -121,6 +125,11 @@ function expectOk(label, fn) {
     console.log(`FAIL  ${label} — unexpected throw: ${err.message}`);
     fail += 1;
   }
+}
+
+function checkTrue(label, condition) {
+  console.log(`${condition ? "PASS" : "FAIL"}  ${label}`);
+  condition ? pass++ : fail++;
 }
 
 // 유효한 fixture (모든 분기 통과해야 함)
@@ -462,6 +471,11 @@ expectThrows("evidenceIndex empty throws", () => {
   f.evidenceIndex = [];
   validateAnalysisOutput(f);
 }, "evidenceIndex");
+
+checkTrue(
+  "hasValidEvidenceIndex uses EVIDENCE_INDEX_MIN",
+  evidenceIndexValidatorSrc.includes("evidenceIndex.length >= EVIDENCE_INDEX_MIN"),
+);
 
 expectThrows("evidenceIndex item missing eventId throws", () => {
   const f = validFixture();

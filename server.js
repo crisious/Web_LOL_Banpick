@@ -40,6 +40,8 @@ const CLEANUP_GAP_MS = 8000;
 const KEY_MOMENTS_MIN = 4;
 // AI 출력 계약과 최종 validator가 공유하는 단계 요약 최소 개수.
 const PHASE_SUMMARIES_MIN = 3;
+// evidenceIndex는 인사이트 근거 추적을 위해 최소 1개 이상을 검증한다.
+const EVIDENCE_INDEX_MIN = 1;
 // actionChecklist는 LLM 출력 계약과 코칭 체크리스트 UI에 맞춰 3~5개를 검증한다.
 const ACTION_CHECKLIST_MIN = 3;
 const ACTION_CHECKLIST_MAX = 5;
@@ -1889,7 +1891,7 @@ function buildLlmPayload(normalized) {
     outputContract: {
       schemaVersion: "1.0",
       requiredTopLevelFields: ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"],
-      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: 1, strengths: INSIGHT_LIST_MIN, strengthsMax: INSIGHT_LIST_MAX, weaknesses: INSIGHT_LIST_MIN, weaknessesMax: INSIGHT_LIST_MAX, actionChecklistMin: ACTION_CHECKLIST_MIN, actionChecklistMax: ACTION_CHECKLIST_MAX, keyMomentsMin: KEY_MOMENTS_MIN },
+      requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: EVIDENCE_INDEX_MIN, strengths: INSIGHT_LIST_MIN, strengthsMax: INSIGHT_LIST_MAX, weaknesses: INSIGHT_LIST_MIN, weaknessesMax: INSIGHT_LIST_MAX, actionChecklistMin: ACTION_CHECKLIST_MIN, actionChecklistMax: ACTION_CHECKLIST_MAX, keyMomentsMin: KEY_MOMENTS_MIN },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
   };
@@ -2161,7 +2163,7 @@ function hasValidCoachSummary(coachSummary) {
 
 function hasValidEvidenceIndex(evidenceIndex) {
   return Array.isArray(evidenceIndex) &&
-    evidenceIndex.length > 0 &&
+    evidenceIndex.length >= EVIDENCE_INDEX_MIN &&
     evidenceIndex.every((item) =>
       item &&
       isNonBlankString(item.eventId) &&

@@ -72,6 +72,7 @@ const tfConstants = [
   extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
   extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
+  extractConstSource(serverSrc, "EVIDENCE_INDEX_MIN"),
   actionChecklistCountConstantsSrc,
   insightListCountConstantsSrc,
 ].join("\n") + "\n";
@@ -211,6 +212,8 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.phaseSummariesMin", out.outputContract.requiredArrayCounts.phaseSummariesMin, 3);
   check("requiredArrayCounts.evidenceIndexMin", out.outputContract.requiredArrayCounts.evidenceIndexMin, 1);
+  checkTrue("server defines EVIDENCE_INDEX_MIN", serverSrc.includes("const EVIDENCE_INDEX_MIN = 1;"));
+  checkTrue("buildLlmPayload requiredArrayCounts uses EVIDENCE_INDEX_MIN", buildSrc.includes("evidenceIndexMin: EVIDENCE_INDEX_MIN"));
   check("requiredArrayCounts.strengthsMax mirrors INSIGHT_LIST_MAX", out.outputContract.requiredArrayCounts.strengthsMax, INSIGHT_LIST_MAX);
   check("requiredArrayCounts.weaknessesMax mirrors INSIGHT_LIST_MAX", out.outputContract.requiredArrayCounts.weaknessesMax, INSIGHT_LIST_MAX);
   check("requiredArrayCounts.strengths mirrors INSIGHT_LIST_MIN", out.outputContract.requiredArrayCounts.strengths, INSIGHT_LIST_MIN);
