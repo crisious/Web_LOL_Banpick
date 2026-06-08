@@ -269,7 +269,7 @@ Obsidian local entry evidence:
 - Added `### 2026-06-09 03:34 KST - Raw player involvement helper 공유`.
 - Recorded RED/GREEN, raw timeline harness adjustment, `npm test`, local read-only smoke, and local artifact sensitive scan evidence.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -282,7 +282,11 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+Implementation commit evidence:
+- `git commit -m "test: share raw player involvement helper"` created `ac4bd60`.
+- `git push origin main` pushed `ac4bd60` to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -293,6 +297,12 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 ```
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
+
+GitHub QA evidence for implementation commit:
+- QA run `27158885578` passed for `ac4bd6043693ff62f9c00b4e610092994e3e3420`.
+- Artifact `7489175644` (`qa-automation-27158885578`, 3548 bytes) inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` passed, read-only smoke 156 passed / 0 failed, `durationMs: 208`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "ac4bd60"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 5: Mark plan complete and final sync**
 
