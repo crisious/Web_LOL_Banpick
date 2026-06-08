@@ -125,6 +125,27 @@ check("exact TRUST_PROXY rejects duplicate x-forwarded-for values",
   })),
   "203.0.113.10");
 
+check("exact TRUST_PROXY rejects leading empty x-forwarded-for segment",
+  exactProxy.getClientIp(makeReq({
+    headers: { "x-forwarded-for": ", 198.51.100.12" },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
+
+check("exact TRUST_PROXY rejects trailing empty x-forwarded-for segment",
+  exactProxy.getClientIp(makeReq({
+    headers: { "x-forwarded-for": "198.51.100.13," },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
+
+check("exact TRUST_PROXY rejects middle empty x-forwarded-for segment",
+  exactProxy.getClientIp(makeReq({
+    headers: { "x-forwarded-for": "198.51.100.14, , 198.51.100.15" },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
+
 check("exact TRUST_PROXY rejects duplicate x-real-ip values",
   exactProxy.getClientIp(makeReq({
     headers: { "x-real-ip": ["198.51.100.10", "198.51.100.11"] },

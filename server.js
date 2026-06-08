@@ -234,10 +234,12 @@ function getClientIp(req) {
 
   const forwardedForHeader = proxyHeaderValue(req.headers["x-forwarded-for"]);
   if (forwardedForHeader.duplicate) return req.socket.remoteAddress || "unknown";
-  const forwardedFor = forwardedForHeader.value
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const forwardedForRaw = forwardedForHeader.value;
+  const forwardedForParts = forwardedForRaw.split(",").map((part) => part.trim());
+  if (forwardedForRaw.trim() && forwardedForParts.some((part) => part === "")) {
+    return req.socket.remoteAddress || "unknown";
+  }
+  const forwardedFor = forwardedForParts.filter(Boolean);
   if (forwardedFor.length > 0) return forwardedFor[0];
 
   const realIp = proxyHeaderValue(req.headers["x-real-ip"]);
