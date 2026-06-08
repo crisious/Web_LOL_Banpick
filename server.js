@@ -1854,15 +1854,20 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
 function detectCombatEncounters(timelineEvents) {
   const WINDOW_MS = 25000;
   const MAX_ENCOUNTERS = 8;
+  const eventTime = (event) => rawEventTimestampMs({ timestamp: event.timestampMs });
 
   const combatEvts = timelineEvents
     .filter(isPlayerCombatEvent)
-    .sort((a, b) => (a.timestampMs ?? 0) - (b.timestampMs ?? 0));
+    .sort((a, b) => {
+      const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
+      const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
+      return aTime - bTime;
+    });
 
   const groups = [];
   let current = null;
   for (const evt of combatEvts) {
-    const ts = evt.timestampMs ?? 0;
+    const ts = rawEventTimestampMs({ timestamp: evt.timestampMs });
     if (!current || ts - current.lastMs > WINDOW_MS) {
       current = { events: [evt], firstMs: ts, lastMs: ts };
       groups.push(current);
@@ -1889,11 +1894,13 @@ function detectCombatEncounters(timelineEvents) {
     if (playerKills > playerDeaths) situation = "PLAYER_DOMINANT";
     else if (playerDeaths > playerKills) situation = "PLAYER_DOWN";
     else situation = "TRADED";
+    const firstTime = eventTime(first);
+    const lastTime = eventTime(last);
     encounters.push({
       encounterId: `enc_${String(encounters.length + 1).padStart(3, "0")}`,
-      phase: first.phase,
-      startLabel: first.timestampLabel,
-      endLabel: last.timestampLabel,
+      phase: phaseFor(firstTime),
+      startLabel: timestampLabel(firstTime),
+      endLabel: timestampLabel(lastTime),
       eventCount: g.events.length,
       playerKills,
       playerDeaths,
@@ -1909,13 +1916,18 @@ function detectCombatEncounters(timelineEvents) {
 // 데이터 한계: 이벤트는 CHAMPION_KILL/PLAYER_DEATH만 → 단계는 순서·간격으로 추론.
 function buildTeamfightPhases(encounters, timelineEvents) {
   const byId = new Map((timelineEvents || []).map((e) => [e.eventId, e]));
+  const eventTime = (event) => rawEventTimestampMs({ timestamp: event.timestampMs });
   const teamfights = [];
   for (const enc of encounters || []) {
     if ((enc.eventCount ?? 0) < TEAMFIGHT_MIN_EVENTS) continue;
     const events = (enc.relatedEventIds || [])
       .map((id) => byId.get(id))
       .filter(Boolean)
-      .sort((a, b) => (a.timestampMs ?? 0) - (b.timestampMs ?? 0));
+      .sort((a, b) => {
+        const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
+        const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
+        return aTime - bTime;
+      });
     if (events.length < TEAMFIGHT_MIN_EVENTS) continue;
     const last = events.length - 1;
 
@@ -1928,8 +1940,8 @@ function buildTeamfightPhases(encounters, timelineEvents) {
       }
       return {
         phase: name,
-        startLabel: evs.length ? evs[0].timestampLabel : "",
-        endLabel: evs.length ? evs[evs.length - 1].timestampLabel : "",
+        startLabel: evs.length ? timestampLabel(eventTime(evs[0])) : "",
+        endLabel: evs.length ? timestampLabel(eventTime(evs[evs.length - 1])) : "",
         playerKills: pk,
         playerDeaths: pd,
         outcomeTag: null,
@@ -1950,7 +1962,7 @@ function buildTeamfightPhases(encounters, timelineEvents) {
     if (isPlayerKillEvent(lastEvt)) {
       cleanup.outcomeTag = "CLOSED_OUT";
     } else {
-      const gap = (lastEvt.timestampMs ?? 0) - (prevEvt.timestampMs ?? 0);
+      const gap = eventTime(lastEvt) - eventTime(prevEvt);
       cleanup.outcomeTag =
         isPlayerKillEvent(prevEvt) || gap > CLEANUP_GAP_MS ? "OVERCHASE_DEATH" : "DIED_IN_FIGHT";
     }
@@ -1959,8 +1971,8 @@ function buildTeamfightPhases(encounters, timelineEvents) {
     teamfights.push({
       teamfightId: enc.encounterId,
       gamePhase: enc.phase,
-      startLabel: events[0].timestampLabel,
-      endLabel: events[last].timestampLabel,
+      startLabel: timestampLabel(eventTime(events[0])),
+      endLabel: timestampLabel(eventTime(events[last])),
       totalKills: enc.playerKills,
       totalDeaths: enc.playerDeaths,
       situation: enc.situation,
