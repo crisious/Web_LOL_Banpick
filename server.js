@@ -54,6 +54,7 @@ const CLEANUP_GAP_MS = 8000;
 const KEY_MOMENTS_MIN = 4;
 // AI 출력 계약과 최종 validator가 공유하는 단계 요약 최소 개수.
 const PHASE_SUMMARIES_MIN = 3;
+const GAME_PHASES = new Set(["EARLY", "MID", "LATE"]);
 // evidenceIndex는 인사이트 근거 추적을 위해 최소 1개 이상을 검증한다.
 const EVIDENCE_INDEX_MIN = 1;
 // actionChecklist는 LLM 출력 계약과 코칭 체크리스트 UI에 맞춰 3~5개를 검증한다.
@@ -561,6 +562,10 @@ function phaseFor(timestampMs) {
     return "MID";
   }
   return "LATE";
+}
+
+function isValidGamePhase(phase) {
+  return GAME_PHASES.has(phase);
 }
 
 function rawEventTimestampMs(event) {
@@ -2307,8 +2312,7 @@ function hasValidKeyMoments(keyMoments) {
         (typeof item.timestampLabel === "string" && item.timestampLabel) ||
         (typeof item.timestamp === "string" && item.timestamp)
       ) &&
-      typeof item.phase === "string" &&
-      item.phase &&
+      isValidGamePhase(item.phase) &&
       (
         (typeof item.title === "string" && item.title) ||
         (typeof item.label === "string" && item.label)
@@ -2327,8 +2331,7 @@ function hasValidPhaseSummaries(phaseSummaries) {
     phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
     phaseSummaries.every((item) =>
       item &&
-      typeof item.phase === "string" &&
-      item.phase &&
+      isValidGamePhase(item.phase) &&
       typeof item.summary === "string" &&
       item.summary
     );

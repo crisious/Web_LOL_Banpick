@@ -49,8 +49,16 @@ if (serverSrc.includes("function hasValidKeyMoments(")) {
 if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
   validatorSupportSources.push(
     extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
-    extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   );
+}
+if (serverSrc.includes("const GAME_PHASES =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "GAME_PHASES"));
+}
+if (serverSrc.includes("function isValidGamePhase(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "isValidGamePhase"));
+}
+if (serverSrc.includes("function hasValidPhaseSummaries(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidPhaseSummaries"));
 }
 if (serverSrc.includes("function hasAnalysisMetaObject(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasAnalysisMetaObject"));
@@ -430,6 +438,12 @@ expectThrows("keyMoments item missing phase throws", () => {
   validateAnalysisOutput(f);
 }, "keyMoments");
 
+expectThrows("keyMoments item invalid phase throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "LANING", title: "장면", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
 expectThrows("keyMoments item missing title/label throws", () => {
   const f = validFixture();
   f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", description: "설명", relatedEventIds: [] };
@@ -510,6 +524,12 @@ expectThrows("phaseSummaries only 2 throws", () => {
 expectThrows("phaseSummaries item missing phase throws", () => {
   const f = validFixture();
   f.phaseSummaries = [{ summary: "early" }, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries item invalid phase throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = [{ phase: "LANING", summary: "early" }, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
   validateAnalysisOutput(f);
 }, "phaseSummaries");
 
