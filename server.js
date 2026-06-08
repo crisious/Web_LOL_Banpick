@@ -564,6 +564,10 @@ function rawEventTimestampMs(event) {
   return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0;
 }
 
+function rawParticipantId(value) {
+  return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null;
+}
+
 function isRawChampionKillEvent(rawEvent) {
   return RAW_CHAMPION_KILL_EVENT_TYPES.has(rawEvent.type);
 }
@@ -764,8 +768,8 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
       const rawEvent = {
         type: event.type,
         timestamp: rawEventTimestampMs(event),
-        killerId: event.killerId || null,
-        victimId: event.victimId || null,
+        killerId: rawParticipantId(event.killerId),
+        victimId: rawParticipantId(event.victimId),
         assistingParticipantIds: event.assistingParticipantIds || [],
         monsterType: event.monsterType || null,
         monsterSubType: event.monsterSubType || null,

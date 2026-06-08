@@ -56,6 +56,10 @@ const rawTimestampSource = serverSrc.includes("function rawEventTimestampMs(even
   ? extractFunctionSource(serverSrc, "rawEventTimestampMs")
   : "function rawEventTimestampMs(event) { return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0; }";
 
+const rawParticipantSource = serverSrc.includes("function rawParticipantId(value)")
+  ? extractFunctionSource(serverSrc, "rawParticipantId")
+  : "function rawParticipantId(value) { return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null; }";
+
 const extractTimelineEventsSrc = extractFunctionSource(serverSrc, "extractTimelineEvents");
 
 const { rawEventTimestampMs, extractTimelineEvents } = new Function(
@@ -64,6 +68,7 @@ const { rawEventTimestampMs, extractTimelineEvents } = new Function(
     extractFunctionSource(serverSrc, "participantTeam"),
     extractFunctionSource(serverSrc, "phaseFor"),
     rawTimestampSource,
+    rawParticipantSource,
     ...timelineTypePolicySources,
     ...eventTypePolicySources,
     extractFunctionSource(serverSrc, "laneHintForEvent"),

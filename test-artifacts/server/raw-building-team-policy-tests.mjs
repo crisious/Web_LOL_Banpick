@@ -74,6 +74,12 @@ const rawTimestampSource = functionSourceOrFallback(
   "function rawEventTimestampMs(event) { return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0; }",
 );
 
+const rawParticipantSource = functionSourceOrFallback(
+  serverSrc,
+  "rawParticipantId",
+  "function rawParticipantId(value) { return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null; }",
+);
+
 const buildEventTypeSrc = extractFunctionSource(serverSrc, "buildEventType");
 const shouldKeepEventSrc = extractFunctionSource(serverSrc, "shouldKeepEvent");
 const extractTimelineEventsSrc = extractFunctionSource(serverSrc, "extractTimelineEvents");
@@ -90,6 +96,7 @@ const {
     extractFunctionSource(serverSrc, "participantTeam"),
     extractFunctionSource(serverSrc, "phaseFor"),
     rawTimestampSource,
+    rawParticipantSource,
     ...rawTimelinePolicySources,
     ...eventTypePolicySources,
     extractFunctionSource(serverSrc, "laneHintForEvent"),
