@@ -83,6 +83,42 @@ function completeSampleDetail() {
   };
 }
 
+function createRawModeHealthServer(rawMode, requests) {
+  return http.createServer((req, res) => {
+    requests.push({ method: req.method, url: req.url });
+    const sendJson = (status, body) => {
+      res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
+      res.end(JSON.stringify(body));
+    };
+    if (req.url === "/healthz") {
+      return sendJson(200, { ok: true, publicDemoMode: rawMode });
+    }
+    if (req.url === "/") {
+      res.writeHead(200, { "Content-Type": "text/html", "X-Content-Type-Options": "nosniff" });
+      return res.end(`
+        <title>LoL Replay Coach</title>
+        <link rel="stylesheet" href="./styles.css?v=20260419">
+        <script src="./main.js?v=20260419"></script>
+      `);
+    }
+    if (req.url === "/styles.css?v=20260419") {
+      res.writeHead(200, { "Content-Type": "text/css", "X-Content-Type-Options": "nosniff" });
+      return res.end("body { color: black; }");
+    }
+    if (req.url === "/main.js?v=20260419") {
+      res.writeHead(200, { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff" });
+      return res.end("console.log('ok');");
+    }
+    if (req.url === "/api/samples") return sendJson(200, { samples: [{ id: "sample-complete" }] });
+    if (req.url === "/api/samples/sample-complete") return sendJson(200, completeSampleDetail());
+    if (req.method === "POST" && ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(req.url)) {
+      return sendJson(403, { ok: false, code: "PUBLIC_DEMO_READONLY" });
+    }
+    res.writeHead(403, { "Content-Type": "text/plain", "X-Content-Type-Options": "nosniff" });
+    return res.end("Forbidden");
+  });
+}
+
 function readJsonFileIfExists(filePath) {
   if (!fs.existsSync(filePath)) return null;
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -665,6 +701,54 @@ check("CLI stops before live/write probes when publicDemoMode is unknown",
   unknownModeRequests.some((request) => request.method === "POST" &&
     ["/api/recent-matches", "/api/champion-history", "/api/generate-sample"].includes(request.url)),
   false);
+
+const whitespaceRawModeRequests = [];
+const whitespaceRawModeServer = createRawModeHealthServer(" readonly", whitespaceRawModeRequests);
+await new Promise((resolve) => whitespaceRawModeServer.listen(0, "127.0.0.1", resolve));
+const whitespaceRawModeUrl = `http://127.0.0.1:${whitespaceRawModeServer.address().port}`;
+const whitespaceRawMode = await runNode([
+  smokePath,
+  whitespaceRawModeUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => whitespaceRawModeServer.close(resolve));
+
+check("CLI exits non-zero when healthz publicDemoMode has leading whitespace",
+  whitespaceRawMode.status,
+  1);
+
+check("CLI reports raw whitespace public demo mode as invalid",
+  whitespaceRawMode.stderr.includes("FAIL public demo mode is known"),
+  true);
+
+check("CLI stops after healthz when publicDemoMode has leading whitespace",
+  whitespaceRawModeRequests.map((request) => request.url),
+  ["/healthz"]);
+
+const uppercaseRawModeRequests = [];
+const uppercaseRawModeServer = createRawModeHealthServer("READONLY", uppercaseRawModeRequests);
+await new Promise((resolve) => uppercaseRawModeServer.listen(0, "127.0.0.1", resolve));
+const uppercaseRawModeUrl = `http://127.0.0.1:${uppercaseRawModeServer.address().port}`;
+const uppercaseRawMode = await runNode([
+  smokePath,
+  uppercaseRawModeUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => uppercaseRawModeServer.close(resolve));
+
+check("CLI exits non-zero when healthz publicDemoMode is uppercase",
+  uppercaseRawMode.status,
+  1);
+
+check("CLI reports raw uppercase public demo mode as invalid",
+  uppercaseRawMode.stderr.includes("FAIL public demo mode is known"),
+  true);
+
+check("CLI stops after healthz when publicDemoMode is uppercase",
+  uppercaseRawModeRequests.map((request) => request.url),
+  ["/healthz"]);
 
 const invalidModeValidityRequests = [];
 const invalidModeValidityServer = http.createServer((req, res) => {

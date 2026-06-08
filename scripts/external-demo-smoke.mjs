@@ -418,8 +418,8 @@ function expectFatal(condition, label, detail) {
 }
 
 function demoModeFromHealth(body) {
-  if (typeof body?.publicDemoMode === "string" && body.publicDemoMode.trim()) {
-    return body.publicDemoMode.trim().toLowerCase();
+  if (typeof body?.publicDemoMode === "string" && body.publicDemoMode) {
+    return body.publicDemoMode;
   }
   if (body?.readonly) return "readonly";
   if (body?.protected) return "protected";

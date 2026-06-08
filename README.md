@@ -197,7 +197,7 @@ Direct smoke의 token material은 `--require-token --expect-mode=protected` 조�
 
 `smoke:report:readonly`와 `smoke:report:external:readonly`는 `--token` pass-through를 받지 않습니다. 토큰은 protected report mode에서만 의미가 있으므로 read-only report에 `--token=...`을 넘기면 artifact 생성 전에 `FAIL --token is only accepted for protected smoke reports`로 종료합니다.
 
-`PUBLIC_DEMO_MODE`는 `full`, `readonly`, `protected`만 유효합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보면 live/write probe 전에 `FAIL public demo mode config is valid`로 즉시 실패합니다.
+`PUBLIC_DEMO_MODE`는 missing/empty 값일 때만 `full`로 기본 설정되며, non-empty 값은 lowercase `full`, `readonly`, `protected`와 정확히 일치해야 합니다. Leading/trailing whitespace가 섞인 ` readonly`나 uppercase `READONLY`처럼 서버가 보정할 수 있어 보이는 값도 invalid config로 유지합니다. 오타나 알 수 없는 값이 설정되면 `/healthz`에는 원본 mode와 `publicDemoModeValid: false`가 진단용으로 남지만, `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample` 같은 live/write API는 403 `PUBLIC_DEMO_MODE_INVALID`로 fail-closed 차단됩니다. Smoke CLI는 `publicDemoModeValid: false`를 보거나 raw `publicDemoMode`가 allowlist와 정확히 일치하지 않으면 live/write probe 전에 실패합니다.
 
 `/healthz.sampleGeneration`은 writable 데모 운영 진단용으로 현재 샘플 생성 lock의 aggregate만 반환합니다. `activeCount`는 진행 중 작업 수, `oldestAgeMs`는 가장 오래된 작업의 경과 시간이며, 두 값 모두 음수가 아닌 정수입니다. 서버는 경과 시간을 정수 ms로 내림 처리해 노출합니다. lock key, matchId, Riot ID, 토큰, raw payload는 포함하지 않습니다. Smoke CLI는 이 필드가 있으면 두 aggregate field만 있는지 검증하고, 식별자 field가 섞이거나 `oldestAgeMs`가 fractional 값이거나 `activeCount: 0`인데 `oldestAgeMs`가 0이 아니면 sample/live/write probe 전에 실패합니다.
 

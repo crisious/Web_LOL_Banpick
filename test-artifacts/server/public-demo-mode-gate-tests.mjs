@@ -33,13 +33,25 @@ const parsePublicDemoTokenConfigSource = serverSrc.includes("function parsePubli
       "}",
     ].join("\n");
 
+const parsePublicDemoModeConfigSource = serverSrc.includes("function parsePublicDemoModeConfig(")
+  ? extractFunctionSource(serverSrc, "parsePublicDemoModeConfig")
+  : [
+      "function parsePublicDemoModeConfig(rawMode) {",
+      "  return { value: String(rawMode || 'full').trim().toLowerCase(), valid: true };",
+      "}",
+    ].join("\n");
+
 function makeGate({ publicDemoMode, publicDemoToken }) {
   return new Function(
-    "publicDemoMode",
+    "rawPublicDemoMode",
     "rawPublicDemoToken",
     [
       "function sendJson(res, status, body) { res.status = status; res.body = body; }",
       "const validPublicDemoModes = new Set(['full', 'readonly', 'protected']);",
+      parsePublicDemoModeConfigSource,
+      "const publicDemoModeConfig = parsePublicDemoModeConfig(rawPublicDemoMode);",
+      "const publicDemoMode = publicDemoModeConfig.value;",
+      "const publicDemoModeValid = publicDemoModeConfig.valid;",
       parsePublicDemoTokenConfigSource,
       "const publicDemoTokenConfig = parsePublicDemoTokenConfig(rawPublicDemoToken);",
       "const publicDemoToken = publicDemoTokenConfig.value;",
@@ -88,6 +100,23 @@ try {
 checkTrue("invalid demo mode helper exists", !gateFactoryError, gateFactoryError?.message);
 
 if (invalidModeGate) {
+  const missingModeGate = makeGate({ publicDemoMode: undefined, publicDemoToken: "" });
+  const emptyModeGate = makeGate({ publicDemoMode: "", publicDemoToken: "" });
+  check("missing public demo mode defaults to full",
+    missingModeGate.publicDemoModeHealth().publicDemoMode,
+    "full");
+  check("missing public demo mode is valid",
+    missingModeGate.publicDemoModeHealth().publicDemoModeValid,
+    true);
+  check("empty public demo mode defaults to full",
+    emptyModeGate.publicDemoModeHealth().publicDemoMode,
+    "full");
+  check("empty public demo mode is valid",
+    emptyModeGate.publicDemoModeHealth().publicDemoModeValid,
+    true);
+}
+
+if (invalidModeGate) {
   const invalidModeRes = makeResponseRecorder();
   check("unknown demo mode health preserves raw configured mode",
     invalidModeGate.publicDemoModeHealth().publicDemoMode,
@@ -115,6 +144,46 @@ if (invalidModeGate) {
     "PUBLIC_DEMO_MODE_INVALID");
   checkTrue("unknown demo mode response explains live API block",
     typeof invalidModeRes.body?.error === "string" && invalidModeRes.body.error.includes("live API"));
+}
+
+if (invalidModeGate) {
+  const whitespaceModeGate = makeGate({ publicDemoMode: " readonly", publicDemoToken: "" });
+  const whitespaceModeRes = makeResponseRecorder();
+  check("whitespace demo mode health preserves raw configured mode",
+    whitespaceModeGate.publicDemoModeHealth().publicDemoMode,
+    " readonly");
+  check("whitespace demo mode health marks mode invalid",
+    whitespaceModeGate.publicDemoModeHealth().publicDemoModeValid,
+    false);
+  check("whitespace demo mode keeps readonly false",
+    whitespaceModeGate.publicDemoModeHealth().readonly,
+    false);
+  check("whitespace demo mode blocks live API access",
+    whitespaceModeGate.requireLiveApiAccess({ headers: {} }, whitespaceModeRes),
+    false);
+  check("whitespace demo mode returns stable code",
+    whitespaceModeRes.body?.code,
+    "PUBLIC_DEMO_MODE_INVALID");
+}
+
+if (invalidModeGate) {
+  const uppercaseModeGate = makeGate({ publicDemoMode: "READONLY", publicDemoToken: "" });
+  const uppercaseModeRes = makeResponseRecorder();
+  check("uppercase demo mode health preserves raw configured mode",
+    uppercaseModeGate.publicDemoModeHealth().publicDemoMode,
+    "READONLY");
+  check("uppercase demo mode health marks mode invalid",
+    uppercaseModeGate.publicDemoModeHealth().publicDemoModeValid,
+    false);
+  check("uppercase demo mode keeps readonly false",
+    uppercaseModeGate.publicDemoModeHealth().readonly,
+    false);
+  check("uppercase demo mode blocks live API access",
+    uppercaseModeGate.requireLiveApiAccess({ headers: {} }, uppercaseModeRes),
+    false);
+  check("uppercase demo mode returns stable code",
+    uppercaseModeRes.body?.code,
+    "PUBLIC_DEMO_MODE_INVALID");
 }
 
 if (invalidModeGate) {

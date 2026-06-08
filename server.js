@@ -14,11 +14,13 @@ const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
 const port = Number(process.env.PORT || 8123);
 const host = process.env.HOST || "127.0.0.1";
-const publicDemoMode = String(process.env.PUBLIC_DEMO_MODE || "full").trim().toLowerCase();
+const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
+const publicDemoModeConfig = parsePublicDemoModeConfig(process.env.PUBLIC_DEMO_MODE);
+const publicDemoMode = publicDemoModeConfig.value;
+const publicDemoModeValid = publicDemoModeConfig.valid;
 const publicDemoTokenConfig = parsePublicDemoTokenConfig(process.env.PUBLIC_DEMO_TOKEN);
 const publicDemoToken = publicDemoTokenConfig.value;
 const publicDemoTokenValid = publicDemoTokenConfig.valid;
-const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
 const trustProxy = String(process.env.TRUST_PROXY || "").trim() === "1";
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
 // S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
@@ -115,6 +117,17 @@ function firstHeaderValue(value) {
   return String(value || "");
 }
 
+function parsePublicDemoModeConfig(rawMode) {
+  const value = String(rawMode || "");
+  if (!value) {
+    return { value: "full", valid: true };
+  }
+  if (!validPublicDemoModes.has(value)) {
+    return { value, valid: false };
+  }
+  return { value, valid: true };
+}
+
 function parsePublicDemoTokenConfig(rawToken) {
   const value = String(rawToken || "");
   if (!value || value.trim() === "") {
@@ -155,13 +168,13 @@ function isProtectedDemoMode() {
 }
 
 function isInvalidDemoMode() {
-  return !validPublicDemoModes.has(publicDemoMode);
+  return !publicDemoModeValid;
 }
 
 function publicDemoModeHealth() {
   return {
     publicDemoMode,
-    publicDemoModeValid: !isInvalidDemoMode(),
+    publicDemoModeValid,
     publicDemoTokenValid,
     readonly: isReadOnlyDemoMode(),
     protected: isProtectedDemoMode(),
