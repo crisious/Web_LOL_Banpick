@@ -360,7 +360,7 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with completion evidence, then run:
 
