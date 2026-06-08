@@ -155,7 +155,7 @@
 npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
 npm run test:schema      # validateAnalysisOutput 위반 패턴 82건
 npm run test:champions   # aggregateChampionHistory 11건
-npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 64건
+npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 65건
 npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:protected  # 로컬 protected 외부 데모 안전성/API smoke
 npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 상세 기준 read-only smoke
