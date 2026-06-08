@@ -459,6 +459,26 @@ function artifactIntegrityFor(artifactFileSizes, artifactFileHashes) {
   };
 }
 
+function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegrity }) {
+  const smokeStatus = exitCode === 0 && runStatus === "passed" ? "passed" : "failed";
+  const resolvedRequiredCheckStatus = requiredCheckStatus || "failed";
+  const artifactIntegrityStatus = artifactIntegrity?.status === "passed" ? "passed" : "failed";
+  const failures = [];
+  if (smokeStatus !== "passed") failures.push("smoke report failed");
+  if (!["passed", "skipped"].includes(resolvedRequiredCheckStatus)) failures.push("required smoke checks failed");
+  if (artifactIntegrityStatus !== "passed") failures.push("artifact integrity failed");
+  return {
+    status: failures.length ? "failed" : "passed",
+    shareable: failures.length === 0,
+    components: {
+      smoke: smokeStatus,
+      requiredChecks: resolvedRequiredCheckStatus,
+      artifactIntegrity: artifactIntegrityStatus,
+    },
+    failures,
+  };
+}
+
 function runDurationMs(startedAt, finishedAt) {
   const started = Date.parse(startedAt);
   const finished = Date.parse(finishedAt);
@@ -585,6 +605,11 @@ export function buildQaSummary({
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
   const resolvedArtifactFileSizes = artifactFileSizes || emptyArtifactFileSizes();
   const resolvedArtifactFileHashes = artifactFileHashes || emptyArtifactFileHashes();
+  const runStatus = exitCode ? "failed" : (smokeReport?.status || "passed");
+  const requiredCheckStatus = requiredSmokeCheckStatus(requiredChecks);
+  const requiredCheckSummary = summarizeRequiredSmokeChecks(requiredChecks);
+  const requiredCheckFailures = requiredSmokeCheckFailureMessages(requiredChecks);
+  const artifactIntegrity = artifactIntegrityFor(resolvedArtifactFileSizes, resolvedArtifactFileHashes);
   return {
     schemaVersion: 1,
     generatedAt: finishedAt,
@@ -593,7 +618,7 @@ export function buildQaSummary({
       baseUrl: redactUrlForEvidence(config.baseUrl),
       expectedMode: config.expectedMode,
       actualMode: smokeReport?.actualMode || "",
-      status: exitCode ? "failed" : (smokeReport?.status || "passed"),
+      status: runStatus,
       exitCode,
       startedAt,
       finishedAt,
@@ -613,13 +638,19 @@ export function buildQaSummary({
       artifactRelativePaths: artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath),
       artifactFileSizes: resolvedArtifactFileSizes,
       artifactFileHashes: resolvedArtifactFileHashes,
-      artifactIntegrity: artifactIntegrityFor(resolvedArtifactFileSizes, resolvedArtifactFileHashes),
+      artifactIntegrity,
+      qaVerdict: qaVerdictFor({
+        runStatus,
+        exitCode,
+        requiredCheckStatus,
+        artifactIntegrity,
+      }),
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
-      requiredCheckStatus: requiredSmokeCheckStatus(requiredChecks),
-      requiredCheckSummary: summarizeRequiredSmokeChecks(requiredChecks),
-      requiredCheckFailures: requiredSmokeCheckFailureMessages(requiredChecks),
+      requiredCheckStatus,
+      requiredCheckSummary,
+      requiredCheckFailures,
     },
   };
 }

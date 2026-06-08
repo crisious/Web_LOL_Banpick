@@ -717,6 +717,16 @@ if (fs.existsSync(runnerPath)) {
           },
           failures: [],
         },
+        qaVerdict: {
+          status: "failed",
+          shareable: false,
+          components: {
+            smoke: "passed",
+            requiredChecks: "failed",
+            artifactIntegrity: "passed",
+          },
+          failures: ["required smoke checks failed"],
+        },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
         requiredChecks: commonMissingFullRequiredChecks,
@@ -880,6 +890,19 @@ if (fs.existsSync(runnerPath)) {
       smokeRun: {
         bytesPresent: true,
         sha256Present: true,
+      },
+      failures: [],
+    });
+
+  check("buildQaSummary records passing QA verdict",
+    passingRequiredSummary?.latestRun?.qaVerdict,
+    {
+      status: "passed",
+      shareable: true,
+      components: {
+        smoke: "passed",
+        requiredChecks: "passed",
+        artifactIntegrity: "passed",
       },
       failures: [],
     });
@@ -1063,6 +1086,19 @@ if (fs.existsSync(runnerPath)) {
         "smoke-run artifact is empty or missing",
         "smoke-run artifact SHA-256 is missing",
       ],
+    });
+
+  check("buildQaSummary records failed QA verdict when artifact integrity fails",
+    missingArtifactSummary?.latestRun?.qaVerdict,
+    {
+      status: "failed",
+      shareable: false,
+      components: {
+        smoke: "passed",
+        requiredChecks: "passed",
+        artifactIntegrity: "failed",
+      },
+      failures: ["artifact integrity failed"],
     });
 
   check("buildQaSummary records missing required smoke checks",
