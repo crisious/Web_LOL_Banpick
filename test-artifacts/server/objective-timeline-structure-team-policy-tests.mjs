@@ -41,6 +41,7 @@ const { objectiveStructureTeam, buildObjectiveTimeline } = new Function(
     extractFunctionSource(serverSrc, "rawParticipantId"),
     extractFunctionSource(serverSrc, "isKnownRawTeamId"),
     extractFunctionSource(serverSrc, "buildStructureLabel"),
+    extractFunctionSource(serverSrc, "objectiveMonsterSubTypeLabel"),
     extractFunctionSource(serverSrc, "buildObjectiveLabel"),
     extractFunctionSource(serverSrc, "objectiveKillerTeamId"),
     objectiveStructureTeamSrc,

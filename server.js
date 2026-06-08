@@ -1479,10 +1479,17 @@ function buildStructureLabel(event) {
   return `${lane[event.laneType] || ""} ${tower[event.towerType] || "구조물"}`;
 }
 
+function objectiveMonsterSubTypeLabel(event) {
+  if (typeof event.monsterSubType !== "string") {
+    return "";
+  }
+  const monsterSubType = event.monsterSubType.trim();
+  return monsterSubType ? ` (${monsterSubType.replace(/_/g, " ").toLowerCase()})` : "";
+}
+
 function buildObjectiveLabel(event) {
   const labels = { DRAGON: "드래곤", BARON_NASHOR: "바론", RIFTHERALD: "전령", HORDE: "공허 유충" };
-  const sub = event.monsterSubType ? ` (${event.monsterSubType.replace(/_/g, " ").toLowerCase()})` : "";
-  return `${labels[event.monsterType] || event.monsterType}${sub}`;
+  return `${labels[event.monsterType] || event.monsterType}${objectiveMonsterSubTypeLabel(event)}`;
 }
 
 function objectiveKillerTeamId(event, participantTeamMap) {
