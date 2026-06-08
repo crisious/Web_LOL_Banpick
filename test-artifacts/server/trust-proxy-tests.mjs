@@ -40,6 +40,7 @@ function makeTrustProxyHarness(rawTrustProxy) {
       parseTrustProxyConfigSource,
       "const trustProxy = parseTrustProxyConfig(rawTrustProxy);",
       extractFunctionSource(serverSrc, "firstHeaderValue"),
+      extractFunctionSource(serverSrc, "proxyHeaderValue"),
       extractFunctionSource(serverSrc, "getClientIp"),
       "return { parseTrustProxyConfig, getClientIp, trustProxy };",
     ].join("\n"),
@@ -100,12 +101,36 @@ check("exact TRUST_PROXY trusts cf-connecting-ip",
   })),
   "198.51.100.2");
 
+check("exact TRUST_PROXY rejects duplicate cf-connecting-ip values",
+  exactProxy.getClientIp(makeReq({
+    headers: {
+      "cf-connecting-ip": ["198.51.100.5", "198.51.100.6"],
+      "x-forwarded-for": "198.51.100.7",
+    },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
+
 check("exact TRUST_PROXY falls back to first x-forwarded-for value",
   exactProxy.getClientIp(makeReq({
     headers: { "x-forwarded-for": "198.51.100.3, 198.51.100.4" },
     remoteAddress: "203.0.113.10",
   })),
   "198.51.100.3");
+
+check("exact TRUST_PROXY rejects duplicate x-forwarded-for values",
+  exactProxy.getClientIp(makeReq({
+    headers: { "x-forwarded-for": ["198.51.100.8", "198.51.100.9"] },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
+
+check("exact TRUST_PROXY rejects duplicate x-real-ip values",
+  exactProxy.getClientIp(makeReq({
+    headers: { "x-real-ip": ["198.51.100.10", "198.51.100.11"] },
+    remoteAddress: "203.0.113.10",
+  })),
+  "203.0.113.10");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

@@ -127,6 +127,13 @@ function tokenHeaderValue(value) {
   return String(value || "");
 }
 
+function proxyHeaderValue(value) {
+  if (Array.isArray(value)) {
+    return { value: "", duplicate: value.length > 0 };
+  }
+  return { value: String(value || ""), duplicate: false };
+}
+
 function parsePublicDemoModeConfig(rawMode) {
   const value = String(rawMode || "");
   if (!value) {
@@ -220,17 +227,23 @@ function getClientIp(req) {
     return req.socket.remoteAddress || "unknown";
   }
 
-  const cfConnectingIp = firstHeaderValue(req.headers["cf-connecting-ip"]).trim();
-  if (cfConnectingIp) return cfConnectingIp;
+  const cfConnectingIp = proxyHeaderValue(req.headers["cf-connecting-ip"]);
+  if (cfConnectingIp.duplicate) return req.socket.remoteAddress || "unknown";
+  const cfConnectingIpValue = cfConnectingIp.value.trim();
+  if (cfConnectingIpValue) return cfConnectingIpValue;
 
-  const forwardedFor = firstHeaderValue(req.headers["x-forwarded-for"])
+  const forwardedForHeader = proxyHeaderValue(req.headers["x-forwarded-for"]);
+  if (forwardedForHeader.duplicate) return req.socket.remoteAddress || "unknown";
+  const forwardedFor = forwardedForHeader.value
     .split(",")
     .map((part) => part.trim())
     .filter(Boolean);
   if (forwardedFor.length > 0) return forwardedFor[0];
 
-  const realIp = firstHeaderValue(req.headers["x-real-ip"]).trim();
-  if (realIp) return realIp;
+  const realIp = proxyHeaderValue(req.headers["x-real-ip"]);
+  if (realIp.duplicate) return req.socket.remoteAddress || "unknown";
+  const realIpValue = realIp.value.trim();
+  if (realIpValue) return realIpValue;
 
   return req.socket.remoteAddress || "unknown";
 }
