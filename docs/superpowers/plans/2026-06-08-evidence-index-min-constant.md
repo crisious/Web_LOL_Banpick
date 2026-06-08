@@ -204,7 +204,7 @@ no sensitive matches
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-08-evidence-index-min-constant.md`
 
-- [ ] **Step 1: Update Obsidian project log**
+- [x] **Step 1: Update Obsidian project log**
 
 Record the intent, changed files, RED/GREEN output, full test count, local smoke result, commits, GitHub run, and artifact id in:
 
@@ -212,7 +212,7 @@ Record the intent, changed files, RED/GREEN output, full test count, local smoke
 /Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md
 ```
 
-- [ ] **Step 2: Commit implementation**
+- [x] **Step 2: Commit implementation**
 
 Run:
 
@@ -222,7 +222,7 @@ git commit -m "test: share evidence index minimum"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA artifact**
+- [x] **Step 3: Verify GitHub QA artifact**
 
 Run:
 
@@ -236,6 +236,29 @@ jq '{status: .latestRun.status, durationMs: .latestRun.durationMs, smokeSummary:
 Expected: workflow conclusion is success, `latestRun.status` is `passed`, `smokeSummary.failed` is `0`, and `latestRun.git.shortSha` matches the pushed commit.
 
 ---
+
+## Completion Evidence
+
+- RED focused tests:
+  - `node test-artifacts/server/llm-payload-tests.mjs`: 82 passed, 2 failed
+  - `node test-artifacts/schema/schema-tests.mjs`: 85 passed, 1 failed
+- GREEN focused tests:
+  - `node test-artifacts/server/llm-payload-tests.mjs`: 84 passed, 0 failed
+  - `node test-artifacts/schema/schema-tests.mjs`: 86 passed, 0 failed
+- Static verification:
+  - `node --check server.js`: passed
+  - `node --check test-artifacts/server/llm-payload-tests.mjs`: passed
+  - `node --check test-artifacts/schema/schema-tests.mjs`: passed
+  - `git diff --check`: passed
+  - placeholder scan: no matches
+- Full verification: `npm test` passed with 1451 passed, 0 failed across 40 test file(s).
+- Local read-only smoke report: 156 passed, 0 failed, `durationMs: 246`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke artifact sensitive-pattern scan: no matches.
+- Implementation commit: `38bc3b5 test: share evidence index minimum`, pushed to `origin/main`.
+- GitHub Actions QA: run `27146953594` completed successfully for `38bc3b5bffb36d0337fba9e46c0e23553c8ea4c1`.
+- GitHub artifact: `7484241688` (`qa-automation-27146953594`, 3550 bytes), read-only smoke 156 passed / 0 failed, `durationMs: 211`, `latestRun.git.shortSha: "38bc3b5"`, `dirty: false`.
+- GitHub artifact sensitive-pattern scan: no matches.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
 
 ## Self-Review
 
