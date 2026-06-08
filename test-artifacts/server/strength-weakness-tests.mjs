@@ -69,6 +69,8 @@ const env = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
     extractConstSource(serverSrc, "CS_LOW_FARM_THRESHOLDS"),
+    extractFunctionSource(serverSrc, "phaseFor"),
+    extractFunctionSource(serverSrc, "rawEventTimestampMs"),
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
@@ -166,7 +168,7 @@ checkTrue(
 );
 checkTrue(
   "buildDerivedSignals late structure uses isStructureTakeEvent",
-  buildDerivedSignalsSrc.includes('event.phase === "LATE" && isStructureTakeEvent(event)'),
+  buildDerivedSignalsSrc.includes('eventPhase(event) === "LATE" && isStructureTakeEvent(event)'),
 );
 checkTrue(
   "server defines PLAYER_DEATH_EVENT_TYPES",

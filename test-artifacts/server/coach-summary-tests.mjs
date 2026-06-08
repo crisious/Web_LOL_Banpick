@@ -64,6 +64,7 @@ const { buildCoachSummary, calcObjectiveScore } = new Function(
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     ...objectiveFailPolicySources,
     ...playerDeathPolicySources,
+    extractFunctionSource(serverSrc, "rawEventTimestampMs"),
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractFunctionSource(serverSrc, "clamp10"),
     extractFunctionSource(serverSrc, "calcObjectiveScore"),

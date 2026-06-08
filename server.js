@@ -895,13 +895,13 @@ function buildPhaseContext(events) {
 // 오브젝트 처치 직후(POST_OBJECTIVE_DEATH_WINDOW_MS 이내) 발생한 데스만 추출.
 // 호출부마다 objectiveWins 집합 정의가 다르므로(예: TOWER_TAKE 포함 여부) 인자로 받는다.
 function filterPostObjectiveDeaths(deaths, objectiveWins) {
-  return deaths.filter((deathEvent) =>
-    objectiveWins.some(
-      (objectiveEvent) =>
-        objectiveEvent.timestampMs < deathEvent.timestampMs &&
-        deathEvent.timestampMs - objectiveEvent.timestampMs <= POST_OBJECTIVE_DEATH_WINDOW_MS,
-    ),
-  );
+  return deaths.filter((deathEvent) => {
+    const deathTime = rawEventTimestampMs({ timestamp: deathEvent.timestampMs });
+    return objectiveWins.some((objectiveEvent) => {
+      const objectiveTime = rawEventTimestampMs({ timestamp: objectiveEvent.timestampMs });
+      return objectiveTime < deathTime && deathTime - objectiveTime <= POST_OBJECTIVE_DEATH_WINDOW_MS;
+    });
+  });
 }
 
 function buildDerivedSignals(normalized) {
@@ -909,8 +909,9 @@ function buildDerivedSignals(normalized) {
   const objectiveWins = events.filter(isMacroObjectiveWinEvent);
   const objectiveFails = events.filter(isObjectiveFailEvent);
   const playerDeaths = events.filter(isPlayerDeathEvent);
-  const earlyDeaths = playerDeaths.filter((event) => event.phase === "EARLY");
-  const lateTowers = events.filter((event) => event.phase === "LATE" && isStructureTakeEvent(event));
+  const eventPhase = (event) => phaseFor(rawEventTimestampMs({ timestamp: event.timestampMs }));
+  const earlyDeaths = playerDeaths.filter((event) => eventPhase(event) === "EARLY");
+  const lateTowers = events.filter((event) => eventPhase(event) === "LATE" && isStructureTakeEvent(event));
   const postObjectiveDeaths = filterPostObjectiveDeaths(playerDeaths, objectiveWins);
 
   const candidateThemes = [];
@@ -935,10 +936,10 @@ function buildDerivedSignals(normalized) {
   }
 
   return {
-    hasEarlyLeadMoments: objectiveWins.some((event) => event.phase === "EARLY"),
+    hasEarlyLeadMoments: objectiveWins.some((event) => eventPhase(event) === "EARLY"),
     hasMidGameThrowRisk:
       postObjectiveDeaths.length >= 1 ||
-      playerDeaths.filter((event) => event.phase === "MID").length >= 2,
+      playerDeaths.filter((event) => eventPhase(event) === "MID").length >= 2,
     hasObjectiveControlIssues: objectiveFails.length >= 2,
     hasStrongRoamingPattern: false,
     hasPositioningRisk: playerDeaths.length >= 4,
@@ -1255,7 +1256,8 @@ function buildWeaknesses(normalized) {
   const weaknesses = [];
   const events = normalized.timelineEvents;
   const deaths = events.filter(isPlayerDeathEvent);
-  const earlyDeaths = deaths.filter((event) => event.phase === "EARLY");
+  const eventPhase = (event) => phaseFor(rawEventTimestampMs({ timestamp: event.timestampMs }));
+  const earlyDeaths = deaths.filter((event) => eventPhase(event) === "EARLY");
   const objectiveWins = events.filter(isObjectiveWinEvent);
   const objectiveFailEvents = events.filter(isObjectiveFailEvent);
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveWins);
