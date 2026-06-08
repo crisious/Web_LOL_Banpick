@@ -383,6 +383,12 @@ expectThrows("actionChecklist item empty id throws", () => {
   validateAnalysisOutput(f);
 }, "actionChecklist");
 
+expectThrows("actionChecklist item whitespace id throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "   ", text: "준비하기" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
 expectThrows("actionChecklist item missing id throws", () => {
   const f = validFixture();
   f.actionChecklist = [{ text: "준비하기" }];
@@ -398,6 +404,18 @@ expectThrows("actionChecklist item missing text/action throws", () => {
 expectThrows("actionChecklist item empty text/action throws", () => {
   const f = validFixture();
   f.actionChecklist = [{ id: "act_1", text: "" }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item whitespace text/action throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "act_1", text: "   " }];
+  validateAnalysisOutput(f);
+}, "actionChecklist");
+
+expectThrows("actionChecklist item whitespace action throws", () => {
+  const f = validFixture();
+  f.actionChecklist = [{ id: "act_1", action: "   " }];
   validateAnalysisOutput(f);
 }, "actionChecklist");
 

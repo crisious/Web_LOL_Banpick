@@ -2378,11 +2378,10 @@ function hasValidActionChecklist(actionChecklist) {
     actionChecklist.length <= ACTION_CHECKLIST_MAX &&
     actionChecklist.every((item) =>
       item &&
-      typeof item.id === "string" &&
-      item.id &&
+      isNonBlankString(item.id) &&
       (
-        (typeof item.text === "string" && item.text) ||
-        (typeof item.action === "string" && item.action)
+        isNonBlankString(item.text) ||
+        isNonBlankString(item.action)
       )
     );
 }
