@@ -35,9 +35,12 @@ const rawEventPolicySources = [
   extractFunctionSource(serverSrc, "isRawEliteMonsterKillEvent"),
   extractFunctionSource(serverSrc, "isRawBuildingKillEvent"),
   extractFunctionSource(serverSrc, "isSupportedRawTimelineEvent"),
+  serverSrc.includes("function rawAssistingParticipantIds(rawEvent)")
+    ? extractFunctionSource(serverSrc, "rawAssistingParticipantIds")
+    : "function rawAssistingParticipantIds(rawEvent) { return Array.isArray(rawEvent.assistingParticipantIds) ? rawEvent.assistingParticipantIds : []; }",
   serverSrc.includes("function isRawPlayerInvolved(rawEvent, targetParticipantId)")
     ? extractFunctionSource(serverSrc, "isRawPlayerInvolved")
-    : "function isRawPlayerInvolved(rawEvent, targetParticipantId) { const assistingParticipantIds = Array.isArray(rawEvent.assistingParticipantIds) ? rawEvent.assistingParticipantIds : []; return rawEvent.killerId === targetParticipantId || rawEvent.victimId === targetParticipantId || assistingParticipantIds.includes(targetParticipantId); }",
+    : "function isRawPlayerInvolved(rawEvent, targetParticipantId) { const assistingParticipantIds = rawAssistingParticipantIds(rawEvent); return rawEvent.killerId === targetParticipantId || rawEvent.victimId === targetParticipantId || assistingParticipantIds.includes(targetParticipantId); }",
 ];
 
 const shouldKeepEventSrc = extractFunctionSource(serverSrc, "shouldKeepEvent");
@@ -90,8 +93,9 @@ checkTrue(
   serverSrc.includes("function isRawPlayerInvolved(rawEvent, targetParticipantId)"),
 );
 checkTrue(
-  "isRawPlayerInvolved guards missing assist arrays",
-  serverSrc.includes("const assistingParticipantIds = Array.isArray(rawEvent.assistingParticipantIds)") &&
+  "isRawPlayerInvolved uses rawAssistingParticipantIds",
+  serverSrc.includes("function rawAssistingParticipantIds(rawEvent)") &&
+    serverSrc.includes("const assistingParticipantIds = rawAssistingParticipantIds(rawEvent);") &&
     serverSrc.includes("assistingParticipantIds.includes(targetParticipantId)"),
 );
 checkTrue(

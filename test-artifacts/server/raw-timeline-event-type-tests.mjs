@@ -51,9 +51,12 @@ const rawEventPolicySources = [
   serverSrc.includes("function isSupportedRawTimelineEvent(rawEvent)")
     ? extractFunctionSource(serverSrc, "isSupportedRawTimelineEvent")
     : "function isSupportedRawTimelineEvent(rawEvent) { return SUPPORTED_RAW_TIMELINE_EVENT_TYPES.has(rawEvent.type); }",
+  serverSrc.includes("function rawAssistingParticipantIds(rawEvent)")
+    ? extractFunctionSource(serverSrc, "rawAssistingParticipantIds")
+    : "function rawAssistingParticipantIds(rawEvent) { return Array.isArray(rawEvent.assistingParticipantIds) ? rawEvent.assistingParticipantIds : []; }",
   serverSrc.includes("function isRawPlayerInvolved(rawEvent, targetParticipantId)")
     ? extractFunctionSource(serverSrc, "isRawPlayerInvolved")
-    : "function isRawPlayerInvolved(rawEvent, targetParticipantId) { const assistingParticipantIds = Array.isArray(rawEvent.assistingParticipantIds) ? rawEvent.assistingParticipantIds : []; return rawEvent.killerId === targetParticipantId || rawEvent.victimId === targetParticipantId || assistingParticipantIds.includes(targetParticipantId); }",
+    : "function isRawPlayerInvolved(rawEvent, targetParticipantId) { const assistingParticipantIds = rawAssistingParticipantIds(rawEvent); return rawEvent.killerId === targetParticipantId || rawEvent.victimId === targetParticipantId || assistingParticipantIds.includes(targetParticipantId); }",
 ];
 
 const buildEventTypeSrc = extractFunctionSource(serverSrc, "buildEventType");

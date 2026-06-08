@@ -576,10 +576,14 @@ function isSupportedRawTimelineEvent(rawEvent) {
   return SUPPORTED_RAW_TIMELINE_EVENT_TYPES.has(rawEvent.type);
 }
 
-function isRawPlayerInvolved(rawEvent, targetParticipantId) {
-  const assistingParticipantIds = Array.isArray(rawEvent.assistingParticipantIds)
+function rawAssistingParticipantIds(rawEvent) {
+  return Array.isArray(rawEvent.assistingParticipantIds)
     ? rawEvent.assistingParticipantIds
     : [];
+}
+
+function isRawPlayerInvolved(rawEvent, targetParticipantId) {
+  const assistingParticipantIds = rawAssistingParticipantIds(rawEvent);
   return (
     rawEvent.killerId === targetParticipantId ||
     rawEvent.victimId === targetParticipantId ||
@@ -683,7 +687,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
     if (rawEvent.killerId === targetParticipantId) {
       return "CHAMPION_KILL";
     }
-    return rawEvent.assistingParticipantIds.length > 1 ? "TEAMFIGHT_FOLLOWUP" : "SKIRMISH_WIN";
+    return rawAssistingParticipantIds(rawEvent).length > 1 ? "TEAMFIGHT_FOLLOWUP" : "SKIRMISH_WIN";
   }
 
   if (isRawEliteMonsterKillEvent(rawEvent)) {
