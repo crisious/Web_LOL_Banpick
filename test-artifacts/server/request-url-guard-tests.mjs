@@ -37,8 +37,13 @@ const requestUrlFromSource = serverSrc.includes("function requestUrlFrom(")
       "}",
     ].join("\n");
 
+const invalidRequestTargetErrorSource = serverSrc.includes("function invalidRequestTargetError(")
+  ? extractFunctionSource(serverSrc, "invalidRequestTargetError")
+  : "";
+
 const harness = new Function([
   extractFunctionSource(serverSrc, "firstHeaderValue"),
+  invalidRequestTargetErrorSource,
   requestUrlFromSource,
   "return { requestUrlFrom };",
 ].join("\n"))();
@@ -103,6 +108,28 @@ check("invalid Host header status",
   400);
 check("invalid Host header code",
   invalidHostError?.payload?.code,
+  "INVALID_REQUEST_TARGET");
+
+const absoluteTargetError = captureUrlError(makeReq({
+  url: "http://example.com/healthz",
+  host: "localhost:8123",
+}));
+check("absolute-form request target status",
+  absoluteTargetError?.statusCode,
+  400);
+check("absolute-form request target code",
+  absoluteTargetError?.payload?.code,
+  "INVALID_REQUEST_TARGET");
+
+const protocolRelativeTargetError = captureUrlError(makeReq({
+  url: "//example.com/healthz",
+  host: "localhost:8123",
+}));
+check("protocol-relative request target status",
+  protocolRelativeTargetError?.statusCode,
+  400);
+check("protocol-relative request target code",
+  protocolRelativeTargetError?.payload?.code,
   "INVALID_REQUEST_TARGET");
 
 checkTrue("server parses request URL inside top-level try",

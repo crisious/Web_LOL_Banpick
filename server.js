@@ -3245,19 +3245,27 @@ async function handleStatic(req, res, url) {
   }
 }
 
+function invalidRequestTargetError() {
+  const error = new Error("요청 URL이 올바르지 않습니다.");
+  error.statusCode = 400;
+  error.payload = {
+    ok: false,
+    code: "INVALID_REQUEST_TARGET",
+    error: "요청 URL이 올바르지 않습니다.",
+  };
+  return error;
+}
+
 function requestUrlFrom(req) {
+  const rawTarget = firstHeaderValue(req.url) || "/";
+  if (!rawTarget.startsWith("/") || rawTarget.startsWith("//")) {
+    throw invalidRequestTargetError();
+  }
   const host = firstHeaderValue(req.headers.host) || "127.0.0.1";
   try {
-    return new URL(req.url || "/", `http://${host}`);
+    return new URL(rawTarget, `http://${host}`);
   } catch {
-    const error = new Error("요청 URL이 올바르지 않습니다.");
-    error.statusCode = 400;
-    error.payload = {
-      ok: false,
-      code: "INVALID_REQUEST_TARGET",
-      error: "요청 URL이 올바르지 않습니다.",
-    };
-    throw error;
+    throw invalidRequestTargetError();
   }
 }
 

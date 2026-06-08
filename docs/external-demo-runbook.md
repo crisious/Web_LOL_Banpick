@@ -60,7 +60,7 @@ Expected:
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403
-- malformed request targets or Host headers fail as HTTP 400 `INVALID_REQUEST_TARGET` instead of escaping the request handler
+- malformed, absolute-form, protocol-relative request targets or invalid Host headers fail as HTTP 400 `INVALID_REQUEST_TARGET` instead of escaping the request handler
 - malformed live API JSON bodies fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
 - targeted sample list/detail error smoke can verify `/api/samples` or `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample flow
