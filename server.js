@@ -579,32 +579,29 @@ function laneHintForEvent(event) {
 }
 
 function importanceForEvent(eventType, phase, event) {
-  if (eventType === "BARON_FIGHT") {
-    return 5;
-  }
-  if (eventType === "DRAGON_FIGHT") {
-    return phase === "EARLY" ? 4 : 5;
+  if (isEliteObjectiveFightEventType(eventType)) {
+    return eventType === "DRAGON_FIGHT" && phase === "EARLY" ? 4 : 5;
   }
   if (eventType === "OBJECTIVE_SETUP_WIN" || eventType === "OBJECTIVE_SETUP_FAIL") {
     return event.monsterType === "RIFTHERALD" || event.monsterType === "HORDE" ? 4 : 5;
   }
-  if (eventType === "PLAYER_DEATH") {
+  if (isPlayerDeathEventType(eventType)) {
     return phase === "EARLY" ? 4 : 5;
   }
-  if (eventType === "TOWER_TAKE") {
+  if (isStructureTakeEventType(eventType)) {
     if (event.buildingType === "INHIBITOR_BUILDING" || event.towerType === "NEXUS_TURRET") {
       return 5;
     }
     return phase === "EARLY" ? 3 : 4;
   }
-  if (eventType === "CHAMPION_KILL") {
+  if (isPlayerKillEventType(eventType)) {
     return phase === "LATE" ? 4 : 4;
   }
   return phase === "EARLY" ? 3 : 4;
 }
 
 function summaryForEvent(eventType, phase, event, playerWonObjective) {
-  if (eventType === "PLAYER_DEATH") {
+  if (isPlayerDeathEventType(eventType)) {
     if (phase === "EARLY") {
       return "초반 교전에서 먼저 끊기며 템포가 흔들렸다.";
     }
@@ -614,11 +611,11 @@ function summaryForEvent(eventType, phase, event, playerWonObjective) {
     return "후반 결정적인 구도에서 생존하지 못했다.";
   }
 
-  if (eventType === "CHAMPION_KILL") {
+  if (isPlayerKillEventType(eventType)) {
     return "교전에서 직접 킬을 만들며 흐름을 당겨 왔다.";
   }
 
-  if (eventType === "TEAMFIGHT_FOLLOWUP" || eventType === "SKIRMISH_WIN") {
+  if (isFightContributionEventType(eventType)) {
     return "교전 후속 합류로 킬 관여를 만들었다.";
   }
 
@@ -640,7 +637,7 @@ function summaryForEvent(eventType, phase, event, playerWonObjective) {
     return "중요 오브젝트나 구조물을 상대에게 내주며 흐름이 흔들렸다.";
   }
 
-  if (eventType === "TOWER_TAKE") {
+  if (isStructureTakeEventType(eventType)) {
     return "구조물 압박에 관여하며 승리 조건을 구조물로 전환했다.";
   }
 
@@ -1062,6 +1059,26 @@ function isObjectiveFailEvent(event) {
 
 function isMacroObjectiveWinEvent(event) {
   return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
+}
+
+function isEliteObjectiveFightEventType(eventType) {
+  return ELITE_OBJECTIVE_FIGHT_EVENT_TYPES.has(eventType);
+}
+
+function isStructureTakeEventType(eventType) {
+  return STRUCTURE_TAKE_EVENT_TYPES.has(eventType);
+}
+
+function isPlayerKillEventType(eventType) {
+  return PLAYER_KILL_EVENT_TYPES.has(eventType);
+}
+
+function isPlayerDeathEventType(eventType) {
+  return PLAYER_DEATH_EVENT_TYPES.has(eventType);
+}
+
+function isFightContributionEventType(eventType) {
+  return FIGHT_CONTRIBUTION_EVENT_TYPES.has(eventType);
 }
 
 function isEliteObjectiveFightEvent(event) {
