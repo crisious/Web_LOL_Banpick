@@ -214,11 +214,11 @@ Expected:
 - Read-only smoke report exits 0.
 - `git diff --check` exits 0.
 
-- [ ] **Step 2: Update Obsidian QA log**
+- [x] **Step 2: Update Obsidian QA log**
 
 Append a cycle entry before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with local RED/GREEN evidence, `npm test`, local smoke summary, commit SHA, GitHub Actions run id, artifact id, sensitive scan result, and final `main...origin/main` sync count.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -231,7 +231,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -243,7 +243,7 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks `13 passed, 0 failed`, dirty `false`, and no sensitive-value scan matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with completion evidence, then run:
 
@@ -266,3 +266,19 @@ Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
 - Spec coverage: The plan covers the two remaining assist-like fight contribution consumers found in `server.js`: `buildPhaseContext()` and `buildKdaTimeline()`.
 - Placeholder scan: No placeholder wording is used for missing implementation or vague testing steps.
 - Type consistency: `isFightContributionEvent(event)` accepts event objects; `buildPhaseContext()` passes `event`, and `buildKdaTimeline()` passes `evt`.
+
+## Completion Evidence
+
+- RED check: `node test-artifacts/server/timeline-consumer-tests.mjs` exited 1 with `4 passed, 2 failed`. The failing checks were `buildPhaseContext uses isFightContributionEvent for assist-like events` and `buildKdaTimeline uses isFightContributionEvent for assist-like events`.
+- GREEN check: `node test-artifacts/server/timeline-consumer-tests.mjs` exited 0 with `6 passed, 0 failed`.
+- Syntax checks: `node --check server.js` and `node --check test-artifacts/server/timeline-consumer-tests.mjs` exited 0.
+- Diff hygiene: `git diff --check` exited 0.
+- Placeholder scan: the plan document scan exited 0 with no blocked placeholder strings.
+- Full local tests: `npm test` exited 0 with `1487 passed, 0 failed across 41 test file(s)`.
+- Local read-only smoke: `SMOKE_REPORT_OUTPUT_ROOT=test-artifacts/tmp/fight-contribution-timeline-consumers-local npm run smoke:report:readonly` exited 0 with smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, and `qaVerdict.status: "passed"`.
+- Local smoke sensitive scan: no matches for secret/token/API-key/path patterns.
+- Implementation commit: `4b30eec test: share fight contribution timeline consumers`.
+- GitHub Actions QA: run `27153030635` passed for SHA `4b30eecc131b0974e726b67178504b3b7034d3ac`.
+- GitHub QA artifact: `7486820969` (`qa-automation-27153030635`, 3550 bytes) reported read-only smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "4b30eec"`, and `dirty: false`.
+- GitHub artifact sensitive scan: no matches for secret/token/API-key/path patterns.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
