@@ -289,6 +289,7 @@ payload
 - API 키 불필요 — 두 CLI 모두 자체 세션 인증 사용
 - Fallback 체인: Claude → Codex → 규칙 기반 분석
 - `AGENT_DISABLE_CODEX=1`은 Codex 레드팀 에이전트만 정확히 비활성화합니다. 공백이 섞인 `AGENT_DISABLE_CODEX= 1`이나 `1 `, `true`, `yes`는 보정하지 않으며 Codex를 비활성화하지 않습니다.
+- `EXTRA_CLI_PATH`는 Claude/Codex CLI가 비표준 위치에 있을 때만 쓰는 추가 PATH segment 목록입니다. Missing/empty 값은 무시되며, non-empty 값은 `path.delimiter`로 나뉜 각 segment가 비어 있지 않고 leading/trailing whitespace 또는 control character가 없어야 합니다. Leading/trailing/double delimiter로 생기는 빈 segment는 현재 디렉터리 PATH 주입 위험 때문에 서버 시작 전에 실패합니다.
 
 ## 보안
 

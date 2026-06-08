@@ -190,6 +190,24 @@ function parseRiotApiKeyConfig(rawKey) {
   return value;
 }
 
+function parseExtraCliPathConfig(rawPath, delimiter = path.delimiter) {
+  const value = rawPath === undefined || rawPath === null ? "" : String(rawPath);
+  if (value === "") {
+    return [];
+  }
+  const segments = value.split(delimiter);
+  if (
+    segments.some((segment) =>
+      segment === "" ||
+      segment.trim() !== segment ||
+      /[\u0000-\u001F\u007F]/u.test(segment)
+    )
+  ) {
+    throw new Error("EXTRA_CLI_PATH must be empty or a delimiter-separated list of non-empty paths without leading/trailing whitespace or control characters.");
+  }
+  return segments;
+}
+
 function getClientIp(req) {
   if (!trustProxy) {
     return req.socket.remoteAddress || "unknown";
@@ -1852,7 +1870,7 @@ const AUGMENTED_PATH = [
   // codex CLI sandbox 변종 (win32) — Windows 설치 시 기본 위치
   process.env.USERPROFILE && `${process.env.USERPROFILE}\\.codex\\.sandbox-bin`,
   // 옵션: .env의 EXTRA_CLI_PATH로 추가 경로 지정 가능 (path.delimiter 구분)
-  process.env.EXTRA_CLI_PATH,
+  ...parseExtraCliPathConfig(process.env.EXTRA_CLI_PATH),
 ].filter(Boolean).join(path.delimiter);
 
 function runCli(args, stdinText, timeoutMs) {
