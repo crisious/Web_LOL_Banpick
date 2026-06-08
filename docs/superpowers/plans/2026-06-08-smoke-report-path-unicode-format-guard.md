@@ -242,3 +242,21 @@ Expected: `main` and `origin/main` are synchronized and the working tree is clea
   - Direct smoke tests: `168 passed, 0 failed`
   - Smoke report runner tests: `70 passed, 0 failed`
   - Full suite: `827 passed, 0 failed across 25 test file(s)`
+
+### Implementation Commit and Remote QA
+
+- Implementation commit:
+  - Commit: `8935ac6 ci: reject unicode format smoke report paths`
+  - Push target: `origin/main`
+- GitHub Actions:
+  - Run: `27109644817`
+  - Head SHA: `8935ac6e0e7a29c41c3439981e22aec194cca49b`
+  - Conclusion: `success`
+- Artifact:
+  - Name: `qa-automation-27109644817`
+  - ID: `7469501073`
+  - Download path: `/tmp/lol-ai-coach-path-format-27109644817`
+  - `qa-summary.json`: `actualMode=readonly`, `status=passed`, `exitCode=0`, `passed=155`, `failed=0`, `checkCount=155`
+- Sensitive value scan:
+  - Command: `rg -n "Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY_URL=[^[:space:]]|EXTERNAL_PROTECTED_URL=[^[:space:]]|access_token=|token=secret|asset-secret|script-secret|user:pass@|RIOT_API_KEY|RGAPI-|KR_[0-9]{8,}|NA1_[0-9]{8,}|lockKey" /tmp/lol-ai-coach-path-format-27109644817`
+  - Result: no matches
