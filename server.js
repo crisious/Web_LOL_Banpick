@@ -1603,10 +1603,11 @@ function buildItemTimeline(timeline, targetParticipantId) {
   timeline.info.frames.forEach((frame) => {
     frame.events.forEach((event) => {
       if (event.type === "ITEM_PURCHASED" && event.participantId === targetParticipantId) {
+        const time = rawEventTimestampMs(event);
         events.push({
-          time: event.timestamp,
-          timeLabel: timestampLabel(event.timestamp),
-          phase: phaseFor(event.timestamp),
+          time,
+          timeLabel: timestampLabel(time),
+          phase: phaseFor(time),
           itemId: event.itemId,
         });
       }
