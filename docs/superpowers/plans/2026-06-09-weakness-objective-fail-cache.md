@@ -164,7 +164,7 @@ no sensitive matches
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-09-weakness-objective-fail-cache.md`
 
-- [ ] **Step 1: Commit implementation**
+- [x] **Step 1: Commit implementation**
 
 Run:
 
@@ -174,7 +174,7 @@ git commit -m "test: cache weakness objective failures"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Run:
 
@@ -187,13 +187,36 @@ jq '{status: .latestRun.status, durationMs: .latestRun.durationMs, smokeSummary:
 
 Expected: workflow conclusion is success, `latestRun.status` is `passed`, `smokeSummary.failed` is `0`, and `latestRun.git.shortSha` matches the pushed commit.
 
-- [ ] **Step 3: Update Obsidian project log**
+- [x] **Step 3: Update Obsidian project log**
 
 Record the intent, changed files, RED/GREEN output, full test count, local smoke result, commits, GitHub run, and artifact id in:
 
 ```text
 /Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md
 ```
+
+---
+
+## Completion Evidence
+
+- RED focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 60 passed, 2 failed.
+- RED failures:
+  - `buildWeaknesses caches objectiveFailEvents`
+  - `buildWeaknesses fallback uses cached objectiveFailEvents`
+- GREEN focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 62 passed, 0 failed.
+- Static verification:
+  - `node --check server.js`: passed
+  - `node --check test-artifacts/server/strength-weakness-tests.mjs`: passed
+  - `git diff --check`: passed
+  - placeholder scan: no matches
+- Full verification: `npm test` passed with 1460 passed, 0 failed across 40 test file(s).
+- Local read-only smoke report: 156 passed, 0 failed, `durationMs: 216`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke artifact sensitive-pattern scan: no matches.
+- Implementation commit: `eea29f6 test: cache weakness objective failures`, pushed to `origin/main`.
+- GitHub Actions QA: run `27149746828` completed successfully for `eea29f6a6d2f2bb352ca35f6f4144d144df2aa2a`.
+- GitHub artifact: `7485470002` (`qa-automation-27149746828`, 3545 bytes), read-only smoke 156 passed / 0 failed, `durationMs: 208`, `latestRun.git.shortSha: "eea29f6"`, `dirty: false`.
+- GitHub artifact sensitive-pattern scan: no matches.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
 
 ---
 
