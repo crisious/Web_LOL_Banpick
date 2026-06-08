@@ -30,6 +30,15 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
   }
 
+  function assertSampleErrorStatus(value, optionName) {
+    if (!Number.isInteger(value) || value < 1) {
+      throw new Error(`${optionName} must be a positive integer`);
+    }
+    if (value < 400 || value > 599) {
+      throw new Error(`${optionName} must be an HTTP error status (400-599)`);
+    }
+  }
+
   function normalizeReportJsonPath(reportPath) {
     const raw = reportPath;
     const trimmed = raw.trim();
@@ -192,18 +201,14 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
     assertSampleErrorId(expectedSampleDetailError.id, "--expect-sample-detail-error-id");
     assertSampleErrorCode(expectedSampleDetailError.code, "--expect-sample-detail-error-code");
-    if (!Number.isInteger(expectedSampleDetailError.status) || expectedSampleDetailError.status < 1) {
-      throw new Error("--expect-sample-detail-error-status must be a positive integer");
-    }
+    assertSampleErrorStatus(expectedSampleDetailError.status, "--expect-sample-detail-error-status");
   }
   if (expectedSampleListError) {
     if (!expectedSampleListError.code) {
       throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
     }
     assertSampleErrorCode(expectedSampleListError.code, "--expect-sample-list-error-code");
-    if (!Number.isInteger(expectedSampleListError.status) || expectedSampleListError.status < 1) {
-      throw new Error("--expect-sample-list-error-status must be a positive integer");
-    }
+    assertSampleErrorStatus(expectedSampleListError.status, "--expect-sample-list-error-status");
   }
 
   return {

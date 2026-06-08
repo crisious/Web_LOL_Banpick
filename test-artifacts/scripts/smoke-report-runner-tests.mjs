@@ -210,6 +210,27 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID", "--expect-sample-list-error-status=0"], {}),
     "--expect-sample-list-error-status must be a positive integer");
 
+  checkThrows("parseRunnerArgs rejects non-error sample detail status before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=sample-kr-1",
+      "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+      "--expect-sample-detail-error-status=399",
+    ], {}),
+    "--expect-sample-detail-error-status must be an HTTP error status (400-599)");
+
+  checkThrows("parseRunnerArgs rejects out-of-range sample list status before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+      "--expect-sample-list-error-status=600",
+    ], {}),
+    "--expect-sample-list-error-status must be an HTTP error status (400-599)");
+
   checkThrows("parseRunnerArgs rejects unsafe sample detail error id before artifact creation",
     () => runner.parseRunnerArgs([
       "node",

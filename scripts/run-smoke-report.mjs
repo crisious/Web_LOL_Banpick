@@ -114,6 +114,19 @@ function assertPositiveIntegerOption(args, prefix, message) {
   }
 }
 
+function assertHttpErrorStatusOption(args, prefix) {
+  const arg = passThroughOptionArg(args, prefix);
+  if (!arg) return;
+  const value = Number(arg.slice(prefix.length));
+  const optionName = prefix.slice(0, -1);
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`${optionName} must be a positive integer`);
+  }
+  if (value < 400 || value > 599) {
+    throw new Error(`${optionName} must be an HTTP error status (400-599)`);
+  }
+}
+
 function inlineTokenValue(extraSmokeArgs) {
   const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
   return tokenArg ? tokenArg.slice("--token=".length).trim() : "";
@@ -129,8 +142,8 @@ function validateExtraSmokeArgs(extraSmokeArgs) {
     passThroughOptionArg(extraSmokeArgs, prefix);
   }
   assertPositiveIntegerOption(extraSmokeArgs, "--timeout-ms=", "--timeout-ms must be a positive integer");
-  assertPositiveIntegerOption(extraSmokeArgs, "--expect-sample-detail-error-status=", "--expect-sample-detail-error-status must be a positive integer");
-  assertPositiveIntegerOption(extraSmokeArgs, "--expect-sample-list-error-status=", "--expect-sample-list-error-status must be a positive integer");
+  assertHttpErrorStatusOption(extraSmokeArgs, "--expect-sample-detail-error-status=");
+  assertHttpErrorStatusOption(extraSmokeArgs, "--expect-sample-list-error-status=");
 
   const hasSampleDetailErrorArg = SAMPLE_DETAIL_ERROR_OPTIONS.some((prefix) => extraSmokeArgs.some((arg) => arg.startsWith(prefix)));
   if (hasSampleDetailErrorArg) {
