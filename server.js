@@ -541,6 +541,9 @@ function regionalCluster(platformRegion) {
 }
 
 function participantTeam(participantId) {
+  if (!Number.isInteger(participantId)) {
+    return null;
+  }
   if (participantId >= 1 && participantId <= 5) {
     return 100;
   }
