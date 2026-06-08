@@ -6,6 +6,7 @@ const path = require("path");
 const { URL } = require("url");
 const { spawn } = require("child_process");
 const {
+  isValidSampleId,
   sampleManifestPublicPathToStorageRelativePath,
   validateManifest,
 } = require("./lib/sample-manifest");
@@ -54,7 +55,6 @@ const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
 const SAMPLE_DETAIL_PATH_PREFIX = "/api/samples/";
-const SAMPLE_DETAIL_ID_PATTERN = /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function sampleStoragePath(sampleId, ...segments) {
   return path.join(samplesDir, sampleId, ...segments);
@@ -3122,7 +3122,7 @@ function sampleDetailIdFromPathname(pathname) {
     return null;
   }
   const sampleId = pathValue.slice(SAMPLE_DETAIL_PATH_PREFIX.length);
-  if (!SAMPLE_DETAIL_ID_PATTERN.test(sampleId)) {
+  if (!isValidSampleId(sampleId)) {
     return null;
   }
   return sampleId;

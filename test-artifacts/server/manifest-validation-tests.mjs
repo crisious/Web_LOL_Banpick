@@ -103,6 +103,13 @@ if (helpers) {
   const legacyManifest = {
     samples: [validSample],
   };
+  const sampleWithId = (id) => ({
+    ...validSample,
+    id,
+    normalizedPath: `/data/samples/${id}/normalized-match.json`,
+    analysisPath: `/data/samples/${id}/analysis-result.json`,
+    notesPath: `/data/samples/${id}/${id}-notes.md`,
+  });
 
   check("valid manifest passes through",
     validateManifest(validManifest),
@@ -117,6 +124,11 @@ if (helpers) {
     ["manifest with null entry is rejected", { samples: [null] }, "Sample manifest contains an invalid sample entry."],
     ["manifest with missing metadata field is rejected", { samples: [{ ...validSample, label: "" }] }, "Sample manifest entry missing required field: label."],
     ["manifest with missing notes path is rejected", { samples: [{ ...validSample, notesPath: "" }] }, "Sample manifest entry missing required field: notesPath."],
+    ["manifest uppercase sample id is rejected", { samples: [sampleWithId("Sample-KR-1")] }, "Sample manifest entry id must be a lowercase generated sample id."],
+    ["manifest slash sample id is rejected", { samples: [sampleWithId("sample-kr/1")] }, "Sample manifest entry id must be a lowercase generated sample id."],
+    ["manifest encoded slash sample id is rejected", { samples: [sampleWithId("sample%2Fsecret")] }, "Sample manifest entry id must be a lowercase generated sample id."],
+    ["manifest whitespace sample id is rejected", { samples: [sampleWithId("sample-kr-1 ")] }, "Sample manifest entry id must be a lowercase generated sample id."],
+    ["manifest trailing hyphen sample id is rejected", { samples: [sampleWithId("sample-kr-1-")] }, "Sample manifest entry id must be a lowercase generated sample id."],
     ["manifest path outside sample directory is rejected", { samples: [{ ...validSample, normalizedPath: "/data/samples/other-sample/normalized-match.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: normalizedPath."],
     ["manifest path without public prefix is rejected", { samples: [{ ...validSample, analysisPath: "data/samples/sample-kr-1/analysis-result.json" }] }, "Sample manifest entry path must stay under /data/samples/sample-kr-1/: analysisPath."],
     ["manifest raw path exposure is rejected", { samples: [{ ...validSample, analysisPath: "/data/samples/sample-kr-1/raw-match.json" }] }, "Sample manifest entry path must not expose raw/internal files: analysisPath."],

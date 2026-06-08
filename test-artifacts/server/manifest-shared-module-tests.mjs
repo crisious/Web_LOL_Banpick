@@ -38,9 +38,11 @@ if (manifestModule) {
   const {
     MANIFEST_PUBLIC_SAMPLE_PREFIX,
     SAMPLE_MANIFEST_SCHEMA_VERSION,
+    SAMPLE_ID_PATTERN,
     REQUIRED_MANIFEST_ENTRY_FIELDS,
     MANIFEST_ENTRY_PATH_FIELDS,
     MANIFEST_ENTRY_RAW_PATH_PATTERN,
+    isValidSampleId,
     sampleManifestPublicPathToStorageRelativePath,
     validateManifestEntryPaths,
     validateManifest,
@@ -75,6 +77,29 @@ if (manifestModule) {
   ]);
   check("path fields export", MANIFEST_ENTRY_PATH_FIELDS, ["normalizedPath", "analysisPath", "notesPath"]);
   checkTrue("raw path pattern export", MANIFEST_ENTRY_RAW_PATH_PATTERN instanceof RegExp);
+  checkTrue("sample id pattern export", SAMPLE_ID_PATTERN instanceof RegExp);
+  checkTrue("sample id helper export", typeof isValidSampleId === "function");
+  check("sample id helper accepts generated id",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample-kr-1") : null,
+    true);
+  check("sample id helper accepts short demo id",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample-complete") : null,
+    true);
+  check("sample id helper rejects uppercase",
+    typeof isValidSampleId === "function" ? isValidSampleId("Sample-KR-1") : null,
+    false);
+  check("sample id helper rejects slash",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample-kr/1") : null,
+    false);
+  check("sample id helper rejects encoded slash",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample%2Fsecret") : null,
+    false);
+  check("sample id helper rejects whitespace",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample-kr-1 ") : null,
+    false);
+  check("sample id helper rejects trailing hyphen",
+    typeof isValidSampleId === "function" ? isValidSampleId("sample-kr-1-") : null,
+    false);
   const hasPublicPathHelper = typeof sampleManifestPublicPathToStorageRelativePath === "function";
   checkTrue("public path helper export", hasPublicPathHelper);
   if (hasPublicPathHelper) {

@@ -40,6 +40,7 @@ const events = [];
 const harness = new Function("events", [
   "const SAMPLE_DETAIL_PATH_PREFIX = '/api/samples/';",
   "const SAMPLE_DETAIL_ID_PATTERN = /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;",
+  "function isValidSampleId(sampleId) { return /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(sampleId || '')); }",
   "function sendJson(res, status, body) { res.sent = { status, body }; }",
   "function publicDemoModeHealth() { return {}; }",
   "function sampleGenerationHealth() { return {}; }",
@@ -122,6 +123,10 @@ for (const [label, pathname] of [
 
 checkTrue("server declares sample detail id helper",
   /function sampleDetailIdFromPathname\(pathname\)/.test(serverSrc));
+checkTrue("server imports shared sample id helper",
+  /isValidSampleId/.test(serverSrc) && /require\("\.\/lib\/sample-manifest"\)/.test(serverSrc));
+checkTrue("sample detail helper uses shared sample id validator",
+  /function sampleDetailIdFromPathname\(pathname\)[\s\S]*isValidSampleId\(sampleId\)/.test(serverSrc));
 checkTrue("sample detail branch validates id before loadSampleBundle",
   /const sampleId = sampleDetailIdFromPathname\(url\.pathname\);[\s\S]*if \(!sampleId\)[\s\S]*sendJson\(res,\s*400,\s*invalidSampleIdPayload\(\)\);[\s\S]*loadSampleBundle\(sampleId\)/.test(serverSrc));
 
