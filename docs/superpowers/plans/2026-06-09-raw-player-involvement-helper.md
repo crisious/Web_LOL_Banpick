@@ -304,7 +304,7 @@ GitHub QA evidence for implementation commit:
 - Artifact `qa-summary.json`: `latestRun.qaVerdict.status` passed, read-only smoke 156 passed / 0 failed, `durationMs: 208`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "ac4bd60"`, `dirty: false`.
 - GitHub artifact high-risk sensitive pattern scan: no matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with implementation and docs completion evidence, then run:
 
@@ -321,6 +321,13 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
+
+Docs checkpoint and finalization evidence:
+- Docs checkpoint commit `0b60614` pushed to `origin/main`.
+- QA run `27158992832` passed for `0b606149438856887c78d38fe5d627d0c705c795`.
+- Artifact `7489219178` (`qa-automation-27158992832`, 3550 bytes) inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` passed, read-only smoke 156 passed / 0 failed, `durationMs: 205`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "0b60614"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 ## Self-Review
 
