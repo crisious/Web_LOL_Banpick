@@ -175,7 +175,7 @@ export function parseRunnerArgs(argv, env = {}) {
   const args = argv.slice(2);
   const modeArg = singleOptionArg(args, "--mode=");
   const outputRootArg = singleOptionArg(args, "--output-root=");
-  const mode = modeArg ? modeArg.slice("--mode=".length).trim() : "readonly";
+  const mode = modeArg ? modeArg.slice("--mode=".length) : "readonly";
   if (!VALID_MODES.includes(mode)) {
     throw new Error("--mode must be one of: " + VALID_MODES.join(", "));
   }

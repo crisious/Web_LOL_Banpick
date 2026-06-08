@@ -100,7 +100,7 @@ Direct smoke `--report-json=<path>` accepts only relative `test-artifacts/<subdi
 
 Direct smoke and `smoke:report:*` commands accept at most one positional base URL. Extra positional URL arguments fail before any network request or report artifact creation, so operators do not accidentally collect evidence for the wrong URL.
 
-Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json=<path>`, plus runner-owned singleton options such as `--mode=<mode>` and `--output-root=<path>`, accept only one value. Duplicate singleton options fail before network requests or artifact creation, so the first value cannot silently win over a later operator correction.
+Direct smoke singleton options such as `--expect-mode=<mode>` and `--report-json=<path>`, plus runner-owned singleton options such as `--mode=<mode>` and `--output-root=<path>`, accept only one value. Duplicate singleton options fail before network requests or artifact creation, so the first value cannot silently win over a later operator correction. Mode values must exactly match their lowercase allowlist entries; values with leading/trailing whitespace such as `--expect-mode= readonly` or `--mode= readonly` fail before network probes or artifact creation.
 
 Direct smoke also rejects unknown `--...` options before any network request or report JSON write. This keeps typos such as `--expectmode=readonly` from silently falling back to a weaker smoke configuration. Sample manifest error expectation probes accept only `sample-[a-z0-9]+(-[a-z0-9]+)*` sample detail ids, `[A-Z0-9_]+` diagnostic codes, and HTTP error statuses in the `400-599` range, so URL-like values, whitespace-containing values, ids with empty hyphen segments, or non-error statuses fail before network probes.
 

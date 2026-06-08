@@ -134,11 +134,11 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     throw new Error("--require-https needs an https:// base URL");
   }
   if (requireUrl && requireHttps) {
-    const modeForLabel = modeArg?.slice("--expect-mode=".length).trim().toLowerCase();
+    const modeForLabel = modeArg?.slice("--expect-mode=".length).toLowerCase();
     deps.validateExternalUrl?.(modeForLabel === "protected" ? "external_protected_url" : "external_readonly_url", baseUrl);
   }
-  const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).trim().toLowerCase() : "";
-  if (expectedMode && !validExpectedModes.includes(expectedMode)) {
+  const expectedMode = modeArg ? modeArg.slice("--expect-mode=".length).toLowerCase() : "";
+  if (modeArg && !validExpectedModes.includes(expectedMode)) {
     throw new Error("--expect-mode must be one of: " + validExpectedModes.join(", "));
   }
   const tokenArg = singleOptionArg(args, "--token=");

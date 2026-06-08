@@ -181,7 +181,7 @@ Direct smoke의 `--report-json=<path>`는 `test-artifacts/<subdir>/.../*.json` �
 
 Direct smoke와 `smoke:report:*` runner는 positional base URL을 최대 1개만 받습니다. URL을 두 개 이상 넘기면 첫 번째 URL만 사용해 잘못된 QA 근거를 만들지 않고, 네트워크 요청 전에 즉시 실패합니다.
 
-`--expect-mode=<mode>`, `--report-json=<path>` 같은 direct smoke singleton 옵션과 runner의 `--mode=<mode>`, `--output-root=<path>`는 한 번만 지정할 수 있습니다. 같은 옵션을 두 번 넘기면 첫 번째 값만 사용해 잘못된 QA 산출물을 만들지 않고 즉시 실패합니다.
+`--expect-mode=<mode>`, `--report-json=<path>` 같은 direct smoke singleton 옵션과 runner의 `--mode=<mode>`, `--output-root=<path>`는 한 번만 지정할 수 있습니다. 같은 옵션을 두 번 넘기면 첫 번째 값만 사용해 잘못된 QA 산출물을 만들지 않고 즉시 실패합니다. Mode 값은 allowlist의 lowercase 문자열과 정확히 일치해야 하며, leading/trailing whitespace가 섞인 `--expect-mode= readonly`나 `--mode= readonly`는 네트워크 요청 또는 artifact 생성 전에 실패합니다.
 
 Direct smoke는 알 수 없는 `--...` 옵션도 즉시 실패합니다. 예를 들어 `--expectmode=readonly`처럼 option 이름을 잘못 입력하면 기본값으로 smoke를 계속 진행하지 않고, 네트워크 요청 전에 `FAIL unknown smoke option: --expectmode=readonly`로 종료합니다.
 

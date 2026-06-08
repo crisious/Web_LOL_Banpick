@@ -192,6 +192,14 @@ checkThrows("parseSmokeArgs rejects invalid expected mode",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode=dev"], {}),
   "--expect-mode must be one of: full, protected, readonly");
 
+checkThrows("parseSmokeArgs rejects whitespace expected mode",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode= readonly"], {}),
+  "--expect-mode must be one of: full, protected, readonly");
+
+checkThrows("parseSmokeArgs rejects empty expected mode option",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--expect-mode="], {}),
+  "--expect-mode must be one of: full, protected, readonly");
+
 checkThrows("parseSmokeArgs rejects empty report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json="], {}),
   "--report-json needs a file path");

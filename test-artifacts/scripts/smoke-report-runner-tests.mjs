@@ -102,6 +102,10 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--mode=protected"], {}),
     "--mode accepts only one value");
 
+  checkThrows("parseRunnerArgs rejects whitespace mode value",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode= readonly"], {}),
+    "--mode must be one of: readonly, protected, external-readonly, external-protected");
+
   checkThrows("parseRunnerArgs rejects duplicate output root options",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/a", "--output-root=test-artifacts/b"], {}),
     "--output-root accepts only one value");
@@ -419,6 +423,15 @@ if (fs.existsSync(runnerPath)) {
     "--timeout-ms must be a positive integer");
   check("exponential timeout rejection does not create output root",
     fs.existsSync(exponentialTimeoutOutputRoot),
+    false);
+
+  const whitespaceModeOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-whitespace-mode");
+  fs.rmSync(whitespaceModeOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects whitespace mode before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", "--mode= readonly", `--output-root=${whitespaceModeOutputRoot}`], {}),
+    "--mode must be one of: readonly, protected, external-readonly, external-protected");
+  check("whitespace mode rejection does not create output root",
+    fs.existsSync(whitespaceModeOutputRoot),
     false);
 
   const missingTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-missing-token");
