@@ -2972,12 +2972,11 @@ function sampleGenerationLockKey(input) {
   return `${region}:${normalizedMatchId}`;
 }
 
-function sampleGenerationInProgressPayload(matchId) {
+function sampleGenerationInProgressPayload() {
   return {
     ok: false,
     code: "SAMPLE_GENERATION_IN_PROGRESS",
     error: "이미 이 경기 샘플 생성이 진행 중입니다. 완료 후 샘플 목록을 확인하세요.",
-    matchId,
   };
 }
 
@@ -2999,7 +2998,7 @@ function withSampleGenerationLock(lockKey, work) {
   if (sampleGenerationLocks.has(lockKey)) {
     const error = new Error("SAMPLE_GENERATION_IN_PROGRESS");
     error.statusCode = 409;
-    error.payload = sampleGenerationInProgressPayload(String(lockKey || "").split(":").slice(1).join(":"));
+    error.payload = sampleGenerationInProgressPayload();
     throw error;
   }
 

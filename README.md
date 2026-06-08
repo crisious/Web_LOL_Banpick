@@ -302,7 +302,7 @@ payload
 - 클라이언트 retry/status 메시지도 raw network, parser, path, URL, token-like 오류를 렌더링 전에 고정 한국어 문구로 정규화합니다.
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
-- 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음
+- 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막고, 응답에는 matchId나 lock key를 포함하지 않음
 - 생성 상태 진단: `/healthz.sampleGeneration`은 진행 중 생성 작업 수와 가장 오래된 작업의 경과 시간만 노출하고 작업 키/경기 ID/사용자 식별자는 숨김
 - JSON 저장 안정성: manifest와 sample bundle JSON은 임시 파일에 쓴 뒤 rename으로 교체해 부분 쓰기 손상을 줄임
 - Manifest 저장 안정성: 같은 프로세스 안에서는 queue로, 같은 `SAMPLES_DIR` 파일시스템을 공유하는 프로세스 간에는 `.manifest.lock` directory로 manifest read-modify-write 충돌을 줄이며 5분 이상 남은 stale lock은 회수 후 재시도. manifest는 `schemaVersion: 1`로 명시하고, legacy missing-version manifest는 v1로 정규화하며, 읽기/쓰기 전 shape, 지원 버전, sample entry 필수 metadata, exact `/data/samples/` public prefix, per-sample path prefix, traversal segment, raw/internal path 노출 여부를 `lib/sample-manifest.js` 공통 모듈 기준으로 검증해 오류는 `SAMPLE_MANIFEST_INVALID` 코드로 진단 가능

@@ -82,7 +82,11 @@ if (helpers) {
   const payload = sampleGenerationInProgressPayload("KR_8242613150");
   check("in-progress payload ok=false", payload.ok, false);
   check("in-progress payload code", payload.code, "SAMPLE_GENERATION_IN_PROGRESS");
-  check("in-progress payload includes matchId", payload.matchId, "KR_8242613150");
+  check("in-progress payload does not expose matchId",
+    Object.prototype.hasOwnProperty.call(payload, "matchId"),
+    false);
+  checkTrue("in-progress payload does not expose lock-derived identifiers",
+    !JSON.stringify(payload).includes("KR_8242613150"));
   checkTrue("in-progress payload is user-facing",
     typeof payload.error === "string" && payload.error.includes("샘플"));
 
@@ -96,7 +100,11 @@ if (helpers) {
   }
   check("duplicate lock rejects with status 409", secondError?.statusCode, 409);
   check("duplicate lock rejects with stable code", secondError?.payload?.code, "SAMPLE_GENERATION_IN_PROGRESS");
-  check("duplicate lock does not run second job", secondError?.payload?.matchId, "KR_8242613150");
+  check("duplicate lock payload does not expose matchId",
+    Object.prototype.hasOwnProperty.call(secondError?.payload || {}, "matchId"),
+    false);
+  checkTrue("duplicate lock payload does not expose lock-derived identifiers",
+    !JSON.stringify(secondError?.payload || {}).includes("KR_8242613150"));
 
   blocker.resolve();
   check("first locked job still resolves", await first, "first done");
