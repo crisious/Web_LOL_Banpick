@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -410,6 +411,28 @@ export function artifactFileSizesFor(reportJsonPath, metadataPath) {
   };
 }
 
+function fileSha256Hex(filePath) {
+  try {
+    return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+  } catch {
+    return "";
+  }
+}
+
+function emptyArtifactFileHashes() {
+  return {
+    smokeReportSha256: "",
+    smokeRunSha256: "",
+  };
+}
+
+export function artifactFileHashesFor(reportJsonPath, metadataPath) {
+  return {
+    smokeReportSha256: fileSha256Hex(reportJsonPath),
+    smokeRunSha256: fileSha256Hex(metadataPath),
+  };
+}
+
 function runDurationMs(startedAt, finishedAt) {
   const started = Date.parse(startedAt);
   const finished = Date.parse(finishedAt);
@@ -522,6 +545,7 @@ export function buildQaSummary({
   ciContext = null,
   runtimeContext = null,
   artifactFileSizes = null,
+  artifactFileHashes = null,
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
@@ -551,6 +575,7 @@ export function buildQaSummary({
       smokeRunJsonPath: metadataPath,
       artifactRelativePaths: artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath),
       artifactFileSizes: artifactFileSizes || emptyArtifactFileSizes(),
+      artifactFileHashes: artifactFileHashes || emptyArtifactFileHashes(),
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
@@ -625,6 +650,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     ciContext: ciContextFor(env),
     runtimeContext: runtimeContextFor(process),
     artifactFileSizes: artifactFileSizesFor(reportJsonPath, metadataPath),
+    artifactFileHashes: artifactFileHashesFor(reportJsonPath, metadataPath),
     smokeReport,
   }));
 

@@ -635,6 +635,10 @@ if (fs.existsSync(runnerPath)) {
       smokeReportBytes: 2048,
       smokeRunBytes: 512,
     },
+    artifactFileHashes: {
+      smokeReportSha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      smokeRunSha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    },
     smokeReport: {
       status: "passed",
       actualMode: "protected",
@@ -691,6 +695,10 @@ if (fs.existsSync(runnerPath)) {
         artifactFileSizes: {
           smokeReportBytes: 2048,
           smokeRunBytes: 512,
+        },
+        artifactFileHashes: {
+          smokeReportSha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          smokeRunSha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
@@ -815,6 +823,10 @@ if (fs.existsSync(runnerPath)) {
       smokeReportBytes: 4096,
       smokeRunBytes: 768,
     },
+    artifactFileHashes: {
+      smokeReportSha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      smokeRunSha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    },
     smokeReport: passingRequiredCheckReport,
   });
 
@@ -831,6 +843,13 @@ if (fs.existsSync(runnerPath)) {
     {
       smokeReportBytes: 4096,
       smokeRunBytes: 768,
+    });
+
+  check("buildQaSummary records artifact file hashes",
+    passingRequiredSummary?.latestRun?.artifactFileHashes,
+    {
+      smokeReportSha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      smokeRunSha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     });
 
   check("buildQaSummary records run duration in milliseconds",
@@ -929,8 +948,23 @@ if (fs.existsSync(runnerPath)) {
     {
       smokeReportBytes: 10,
       smokeRunBytes: 3,
-    });
+      });
   fs.rmSync(artifactSizeFixtureRoot, { recursive: true, force: true });
+
+  const artifactHashFixtureRoot = path.join("test-artifacts", "tmp", "smoke-report-artifact-hash-fixture");
+  const artifactHashReportPath = path.join(artifactHashFixtureRoot, "smoke-report.json");
+  const artifactHashMetadataPath = path.join(artifactHashFixtureRoot, "smoke-run.json");
+  fs.rmSync(artifactHashFixtureRoot, { recursive: true, force: true });
+  fs.mkdirSync(artifactHashFixtureRoot, { recursive: true });
+  fs.writeFileSync(artifactHashReportPath, "abc", "utf8");
+  fs.writeFileSync(artifactHashMetadataPath, "123", "utf8");
+  check("artifactFileHashesFor records smoke artifact SHA-256 hashes",
+    runner.artifactFileHashesFor?.(artifactHashReportPath, artifactHashMetadataPath),
+    {
+      smokeReportSha256: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+      smokeRunSha256: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    });
+  fs.rmSync(artifactHashFixtureRoot, { recursive: true, force: true });
 
   check("buildQaSummary records passing required check summary",
     passingRequiredSummary?.latestRun?.requiredCheckSummary,
