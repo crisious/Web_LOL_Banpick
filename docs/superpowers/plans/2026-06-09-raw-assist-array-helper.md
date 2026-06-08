@@ -295,7 +295,7 @@ Obsidian local entry evidence:
 - Added `### 2026-06-09 03:47 KST - Raw assist array helper 공유`.
 - Recorded RED/GREEN, `npm test`, local read-only smoke, and local artifact sensitive scan evidence.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -308,7 +308,11 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+Implementation commit evidence:
+- `git commit -m "test: share raw assist array helper"` created `8dd239c`.
+- `git push origin main` pushed `8dd239c` to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -319,6 +323,12 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 ```
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
+
+GitHub QA evidence for implementation commit:
+- QA run `27159582950` passed for `8dd239c427314f4fba45aae3176bb1bd747657ab`.
+- Artifact `7489461191` (`qa-automation-27159582950`, 3551 bytes) inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` passed, read-only smoke 156 passed / 0 failed, `durationMs: 227`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "8dd239c"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 5: Mark plan complete and final sync**
 
