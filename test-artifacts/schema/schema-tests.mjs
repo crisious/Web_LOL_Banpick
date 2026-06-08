@@ -36,16 +36,23 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
-const keyMomentsSupportSrc = serverSrc.includes("const KEY_MOMENTS_MIN =")
-  ? [
-      extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
-      extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
-    ].join("\n")
-  : "";
+const validatorSupportSources = [];
+if (serverSrc.includes("const KEY_MOMENTS_MIN =")) {
+  validatorSupportSources.push(
+    extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
+    extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
+  );
+}
+if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
+  validatorSupportSources.push(
+    extractConstSource(serverSrc, "PHASE_SUMMARIES_MIN"),
+    extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
+  );
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
-  `${keyMomentsSupportSrc}\n${validateSrc}\nreturn validateAnalysisOutput;`,
+  `${validatorSupportSources.join("\n")}\n${validateSrc}\nreturn validateAnalysisOutput;`,
 )();
 
 let pass = 0, fail = 0;
@@ -143,17 +150,41 @@ expectThrows("keyMoments only 3 throws (need >=4)", () => {
   validateAnalysisOutput(f);
 }, "keyMoments");
 
-expectThrows("phaseSummaries as object (not array) — currently silent",
-  () => {
-    // validateAnalysisOutput는 phaseSummaries를 검사하지 않는다 (정규화 단계에서
-    // 처리 가정). 여기서 명시적 throw가 없는 점이 의도된 동작인지 회귀 추적용으로
-    // 기록. 향후 게이트 강화 시 이 테스트는 expectThrows로 전환.
-    const f = validFixture();
-    f.phaseSummaries = { early: { summary: "x" }, mid: { summary: "y" }, late: { summary: "z" } };
-    validateAnalysisOutput(f);
-    throw new Error("phaseSummaries-object-tolerated-by-validate"); // 의도된 marker
-  },
-  "phaseSummaries-object-tolerated-by-validate");
+expectThrows("phaseSummaries as object throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = { early: { summary: "x" }, mid: { summary: "y" }, late: { summary: "z" } };
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries missing throws", () => {
+  const f = validFixture();
+  delete f.phaseSummaries;
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries only 2 throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = f.phaseSummaries.slice(0, 2);
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries item missing phase throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = [{ summary: "early" }, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries item missing summary throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = [{ phase: "EARLY" }, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries item object missing throws", () => {
+  const f = validFixture();
+  f.phaseSummaries = [null, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
 
 // ─── Phase 32: combatAnalysis 검증 (선택적 필드, backward-compat) ────────────
 

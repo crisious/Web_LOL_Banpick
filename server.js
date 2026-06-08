@@ -38,6 +38,8 @@ const TEAMFIGHT_MIN_EVENTS = 3;
 const CLEANUP_GAP_MS = 8000;
 // AI 출력 계약과 최종 validator가 공유하는 핵심 장면 최소 개수.
 const KEY_MOMENTS_MIN = 4;
+// AI 출력 계약과 최종 validator가 공유하는 단계 요약 최소 개수.
+const PHASE_SUMMARIES_MIN = 3;
 
 function resolveSamplesDir(configuredDir, appRoot) {
   const value = configuredDir === undefined || configuredDir === null ? "" : String(configuredDir);
@@ -2073,10 +2075,23 @@ function hasMinimumKeyMoments(keyMoments) {
   return Array.isArray(keyMoments) && keyMoments.length >= KEY_MOMENTS_MIN;
 }
 
+function hasValidPhaseSummaries(phaseSummaries) {
+  return Array.isArray(phaseSummaries) &&
+    phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
+    phaseSummaries.every((item) =>
+      item &&
+      typeof item.phase === "string" &&
+      item.phase &&
+      typeof item.summary === "string" &&
+      item.summary
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
   if (!json?.coachSummary?.overallSummary) throw new Error("missing coachSummary.overallSummary");
+  if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);
   if (!Array.isArray(json?.strengths) || json.strengths.length < 1) throw new Error("strengths empty");
   if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
   if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
@@ -2238,6 +2253,10 @@ async function buildAnalysis(normalized, sampleId) {
         return typeof v === "string" ? { phase: k.toUpperCase(), summary: v } : { phase: k.toUpperCase(), ...v };
       });
     violations.push("type.phaseSummaries.object");
+  }
+  if (!hasValidPhaseSummaries(primary.phaseSummaries)) {
+    primary.phaseSummaries = buildPhaseSummaries(normalized);
+    violations.push(`count.phaseSummaries<${PHASE_SUMMARIES_MIN}`);
   }
   if (!hasMinimumKeyMoments(primary.keyMoments)) {
     primary.keyMoments = buildKeyMoments(normalized);
