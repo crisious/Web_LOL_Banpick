@@ -26,6 +26,10 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const rawParticipantSource = serverSrc.includes("function rawParticipantId(value)")
+  ? extractFunctionSource(serverSrc, "rawParticipantId")
+  : "function rawParticipantId(value) { return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null; }";
+
 const rawEventPolicySources = [
   serverSrc.includes("const RAW_CHAMPION_KILL_EVENT_TYPES =")
     ? extractConstSource(serverSrc, "RAW_CHAMPION_KILL_EVENT_TYPES")
@@ -39,6 +43,7 @@ const rawEventPolicySources = [
   serverSrc.includes("const SUPPORTED_RAW_TIMELINE_EVENT_TYPES =")
     ? extractConstSource(serverSrc, "SUPPORTED_RAW_TIMELINE_EVENT_TYPES")
     : 'const SUPPORTED_RAW_TIMELINE_EVENT_TYPES = new Set([...RAW_CHAMPION_KILL_EVENT_TYPES, ...RAW_ELITE_MONSTER_KILL_EVENT_TYPES, ...RAW_BUILDING_KILL_EVENT_TYPES]);',
+  rawParticipantSource,
   serverSrc.includes("function isRawChampionKillEvent(rawEvent)")
     ? extractFunctionSource(serverSrc, "isRawChampionKillEvent")
     : "function isRawChampionKillEvent(rawEvent) { return RAW_CHAMPION_KILL_EVENT_TYPES.has(rawEvent.type); }",

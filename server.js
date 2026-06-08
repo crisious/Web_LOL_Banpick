@@ -587,6 +587,8 @@ function isSupportedRawTimelineEvent(rawEvent) {
 function rawAssistingParticipantIds(rawEvent) {
   return Array.isArray(rawEvent.assistingParticipantIds)
     ? rawEvent.assistingParticipantIds
+        .map(rawParticipantId)
+        .filter((participantId) => participantId !== null)
     : [];
 }
 

@@ -26,11 +26,16 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const rawParticipantSource = serverSrc.includes("function rawParticipantId(value)")
+  ? extractFunctionSource(serverSrc, "rawParticipantId")
+  : "function rawParticipantId(value) { return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null; }";
+
 const rawEventPolicySources = [
   extractConstSource(serverSrc, "RAW_CHAMPION_KILL_EVENT_TYPES"),
   extractConstSource(serverSrc, "RAW_ELITE_MONSTER_KILL_EVENT_TYPES"),
   extractConstSource(serverSrc, "RAW_BUILDING_KILL_EVENT_TYPES"),
   extractConstSource(serverSrc, "SUPPORTED_RAW_TIMELINE_EVENT_TYPES"),
+  rawParticipantSource,
   extractFunctionSource(serverSrc, "isRawChampionKillEvent"),
   extractFunctionSource(serverSrc, "isRawEliteMonsterKillEvent"),
   extractFunctionSource(serverSrc, "isRawBuildingKillEvent"),
