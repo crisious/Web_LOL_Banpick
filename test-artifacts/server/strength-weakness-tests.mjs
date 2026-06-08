@@ -147,6 +147,10 @@ const strC = buildStrengths({
 check("buildStrengths C first is tower fallback", strC[0].title, "구조물 압박으로 승리 조건을 연결했음");
 check("buildStrengths C length 3", strC.length, 3);
 checkTrue(
+  "buildStrengths tower fallback gate uses INSIGHT_LIST_MIN",
+  buildStrengthsSrc.includes("strengths.length < INSIGHT_LIST_MIN &&"),
+);
+checkTrue(
   "buildStrengths uses INSIGHT_LIST_MAX cap",
   buildStrengthsSrc.includes("return strengths.slice(0, INSIGHT_LIST_MAX);"),
 );

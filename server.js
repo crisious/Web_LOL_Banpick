@@ -1101,7 +1101,7 @@ function buildStrengths(normalized) {
   }
 
   if (
-    strengths.length < 3 &&
+    strengths.length < INSIGHT_LIST_MIN &&
     normalized.matchInfo.result === "WIN" &&
     events.some((event) => event.eventType === "TOWER_TAKE")
   ) {
