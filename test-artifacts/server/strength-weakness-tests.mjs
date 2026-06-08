@@ -44,6 +44,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
+    extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
     extractFunctionSource(serverSrc, "buildActionChecklist"),
@@ -190,17 +191,18 @@ checkTrue("buildWeaknesses LOSS deaths 4 → objective-after present", wkLoss4.s
 const wkLoss3 = buildWeaknesses({ timelineEvents: [], matchInfo: { result: "LOSS", position: "SUPPORT" }, playerStats: { csPerMinute: 1, cs: 20, deaths: 3 } });
 checkTrue("buildWeaknesses LOSS deaths 3 → no objective-after", !wkLoss3.some((w) => w.title === "오브젝트 이후 생존과 전환이 아쉬웠음"));
 
-// ─── buildActionChecklist — index 기반 매핑, slice(0,4) ────────────────────────
-const hints = ["h0", "h1", "h2", "h3", "h4"].map((h) => ({ improvementHint: h }));
+// ─── buildActionChecklist — index 기반 매핑, max cap + min padding ─────────────
+const hints = ["h0", "h1", "h2", "h3", "h4", "h5"].map((h) => ({ improvementHint: h }));
 const acts = buildActionChecklist({}, hints);
-check("actionChecklist length capped at 4", acts.length, 4);
-check("actionChecklist ids", acts.map((a) => a.id), ["act_01", "act_02", "act_03", "act_04"]);
-check("actionChecklist priorities", acts.map((a) => a.priority), [1, 2, 3, 4]);
-check("actionChecklist reasons mirror improvementHint", acts.map((a) => a.reason), ["h0", "h1", "h2", "h3"]);
+check("actionChecklist length capped at max 5", acts.length, 5);
+check("actionChecklist ids", acts.map((a) => a.id), ["act_01", "act_02", "act_03", "act_04", "act_05"]);
+check("actionChecklist priorities", acts.map((a) => a.priority), [1, 2, 3, 4, 5]);
+check("actionChecklist reasons mirror improvementHint", acts.map((a) => a.reason), ["h0", "h1", "h2", "h3", "h4"]);
 check("actionChecklist action[0]", acts[0].action, "초반 주요 구도 직후에는 한 템포 먼저 빠지는 기준 만들기");
 check("actionChecklist action[1]", acts[1].action, "교전이 비는 구간에는 웨이브나 캠프를 더 확실하게 챙겨 자원 손실 줄이기");
 check("actionChecklist action[2]", acts[2].action, "드래곤·바론 직후에는 추가 추격보다 리셋과 라인 정리를 먼저 선택하기");
 check("actionChecklist action[3+]", acts[3].action, "시야가 밀릴 때는 contest와 이탈 중 하나를 더 빠르게 결정하기");
+check("actionChecklist action[4+]", acts[4]?.action, "시야가 밀릴 때는 contest와 이탈 중 하나를 더 빠르게 결정하기");
 
 const singleWeaknessChecklist = buildActionChecklist({}, [{ improvementHint: "only" }]);
 check("actionChecklist single weakness pads to min 3", singleWeaknessChecklist.length, 3);

@@ -1203,7 +1203,7 @@ function buildWeaknesses(normalized) {
 }
 
 function buildActionChecklist(normalized, weaknesses) {
-  const checklistWeaknesses = Array.isArray(weaknesses) ? weaknesses.slice(0, 4) : [];
+  const checklistWeaknesses = Array.isArray(weaknesses) ? weaknesses.slice(0, ACTION_CHECKLIST_MAX) : [];
   while (checklistWeaknesses.length < ACTION_CHECKLIST_MIN) {
     checklistWeaknesses.push({ improvementHint: "체크리스트 최소 항목을 채우기 위한 기본 개선 루틴" });
   }
