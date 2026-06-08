@@ -49,6 +49,9 @@ if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
     extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   );
 }
+if (serverSrc.includes("function hasAnalysisMetaObject(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasAnalysisMetaObject"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -114,6 +117,42 @@ expectThrows("missing schemaVersion throws", () => {
   const f = validFixture(); delete f.schemaVersion;
   validateAnalysisOutput(f);
 }, "schemaVersion");
+
+expectThrows("missing analysisMeta throws", () => {
+  const f = validFixture();
+  delete f.analysisMeta;
+  validateAnalysisOutput(f);
+}, "analysisMeta");
+
+expectThrows("analysisMeta as string throws", () => {
+  const f = validFixture();
+  f.analysisMeta = "claude_ai";
+  validateAnalysisOutput(f);
+}, "analysisMeta");
+
+expectThrows("analysisMeta missing sourceType throws", () => {
+  const f = validFixture();
+  delete f.analysisMeta.sourceType;
+  validateAnalysisOutput(f);
+}, "analysisMeta.sourceType");
+
+expectThrows("analysisMeta empty sourceType throws", () => {
+  const f = validFixture();
+  f.analysisMeta.sourceType = "";
+  validateAnalysisOutput(f);
+}, "analysisMeta.sourceType");
+
+expectThrows("analysisMeta missing language throws", () => {
+  const f = validFixture();
+  delete f.analysisMeta.language;
+  validateAnalysisOutput(f);
+}, "analysisMeta.language");
+
+expectThrows("analysisMeta empty language throws", () => {
+  const f = validFixture();
+  f.analysisMeta.language = "";
+  validateAnalysisOutput(f);
+}, "analysisMeta.language");
 
 expectThrows("matchSummary as string throws (no .headline)", () => {
   const f = validFixture(); f.matchSummary = "단순 문자열";

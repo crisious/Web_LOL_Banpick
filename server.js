@@ -2087,8 +2087,15 @@ function hasValidPhaseSummaries(phaseSummaries) {
     );
 }
 
+function hasAnalysisMetaObject(analysisMeta) {
+  return Boolean(analysisMeta) && typeof analysisMeta === "object" && !Array.isArray(analysisMeta);
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
+  if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
+  if (typeof json.analysisMeta.sourceType !== "string" || !json.analysisMeta.sourceType) throw new Error("missing analysisMeta.sourceType");
+  if (typeof json.analysisMeta.language !== "string" || !json.analysisMeta.language) throw new Error("missing analysisMeta.language");
   if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
   if (!json?.coachSummary?.overallSummary) throw new Error("missing coachSummary.overallSummary");
   if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);
@@ -2218,8 +2225,20 @@ async function buildAnalysis(normalized, sampleId) {
 
   // 모델이 생략하기 쉬운 필드 서버측 보완 (AI 콘텐츠는 최대한 유지)
   if (!primary.schemaVersion) { primary.schemaVersion = "1.0"; violations.push("missing.schemaVersion"); }
-  if (!primary.analysisMeta) { primary.analysisMeta = {}; violations.push("missing.analysisMeta"); }
-  if (!primary.analysisMeta.language) primary.analysisMeta.language = "ko";
+  const inferredPrimarySourceType = primary === claudeResult ? "claude_ai" : "codex_redteam";
+  if (!hasAnalysisMetaObject(primary.analysisMeta)) {
+    const violation = primary.analysisMeta ? "type.analysisMeta.invalid" : "missing.analysisMeta";
+    primary.analysisMeta = {};
+    violations.push(violation);
+  }
+  if (typeof primary.analysisMeta.sourceType !== "string" || !primary.analysisMeta.sourceType) {
+    primary.analysisMeta.sourceType = inferredPrimarySourceType;
+    violations.push("missing.analysisMeta.sourceType");
+  }
+  if (typeof primary.analysisMeta.language !== "string" || !primary.analysisMeta.language) {
+    primary.analysisMeta.language = "ko";
+    violations.push("missing.analysisMeta.language");
+  }
 
   // matchSummary: AI가 string으로 반환하는 경우 → 객체로 정규화
   if (typeof primary.matchSummary === "string") {
