@@ -320,6 +320,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected", "--token=   "], { PUBLIC_DEMO_TOKEN: "env-token" }),
     "--require-token needs --token or PUBLIC_DEMO_TOKEN");
 
+  checkThrows("parseRunnerArgs rejects protected inline token with leading whitespace",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected", "--token= secret"], {}),
+    "--token must not contain whitespace");
+
+  checkThrows("parseRunnerArgs rejects protected env token with trailing whitespace",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=protected"], { PUBLIC_DEMO_TOKEN: "env-token " }),
+    "PUBLIC_DEMO_TOKEN must not contain whitespace");
+
   checkThrows("parseRunnerArgs rejects readonly mode with token pass-through",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--token=secret"], {}),
     "--token is only accepted for protected smoke reports");
@@ -441,6 +449,15 @@ if (fs.existsSync(runnerPath)) {
     "--require-token needs --token or PUBLIC_DEMO_TOKEN");
   check("missing protected token does not create output root",
     fs.existsSync(missingTokenOutputRoot),
+    false);
+
+  const whitespaceTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-whitespace-token");
+  fs.rmSync(whitespaceTokenOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects whitespace token before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", "--mode=protected", `--output-root=${whitespaceTokenOutputRoot}`], { PUBLIC_DEMO_TOKEN: "env-token " }),
+    "PUBLIC_DEMO_TOKEN must not contain whitespace");
+  check("whitespace token rejection does not create output root",
+    fs.existsSync(whitespaceTokenOutputRoot),
     false);
 
   const readonlyTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-readonly-token");

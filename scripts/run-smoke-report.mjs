@@ -135,9 +135,19 @@ function assertHttpErrorStatusOption(args, prefix) {
   }
 }
 
+function parseDemoTokenValue(rawToken, sourceName) {
+  if (!rawToken || rawToken.trim() === "") {
+    return "";
+  }
+  if (rawToken.trim() !== rawToken || /\s/u.test(rawToken)) {
+    throw new Error(`${sourceName} must not contain whitespace`);
+  }
+  return rawToken;
+}
+
 function inlineTokenValue(extraSmokeArgs) {
   const tokenArg = passThroughOptionArg(extraSmokeArgs, "--token=");
-  return tokenArg ? tokenArg.slice("--token=".length).trim() : "";
+  return tokenArg ? parseDemoTokenValue(tokenArg.slice("--token=".length), "--token") : "";
 }
 
 function validateExtraSmokeArgs(extraSmokeArgs) {
@@ -221,7 +231,7 @@ export function parseRunnerArgs(argv, env = {}) {
     throw new Error("--token is only accepted for protected smoke reports");
   }
   if (isProtected) {
-    const demoToken = tokenArg ? inlineTokenValue(extraSmokeArgs) : (env.PUBLIC_DEMO_TOKEN || "").trim();
+    const demoToken = tokenArg ? inlineTokenValue(extraSmokeArgs) : parseDemoTokenValue(env.PUBLIC_DEMO_TOKEN || "", "PUBLIC_DEMO_TOKEN");
     if (!demoToken) {
       throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
     }

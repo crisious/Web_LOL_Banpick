@@ -112,6 +112,25 @@ check("parseSmokeArgs accepts protected inline token when token is required",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--require-token", "https://demo.example", "--token=abc", "--expect-mode=protected"], {}),
   { baseUrl: "https://demo.example", demoToken: "abc", expectedMode: "protected", minSamples: 1, requestTimeoutMs: 10000 });
 
+checkThrows("parseSmokeArgs rejects protected inline token with leading whitespace",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--require-token",
+    "--expect-mode=protected",
+    "--token= secret",
+  ], {}),
+  "--token must not contain whitespace");
+
+checkThrows("parseSmokeArgs rejects protected env token with trailing whitespace",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--require-token",
+    "--expect-mode=protected",
+  ], { PUBLIC_DEMO_TOKEN: "env-token " }),
+  "PUBLIC_DEMO_TOKEN must not contain whitespace");
+
 check("parseSmokeArgs omits expected mode when not provided",
   parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "http://127.0.0.1:9000"], {}),
   { baseUrl: "http://127.0.0.1:9000", demoToken: "", expectedMode: "", minSamples: 1, requestTimeoutMs: 10000 });

@@ -49,6 +49,16 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     return parsed;
   }
 
+  function parseDemoTokenValue(rawToken, sourceName) {
+    if (!rawToken || rawToken.trim() === "") {
+      return "";
+    }
+    if (rawToken.trim() !== rawToken || /\s/u.test(rawToken)) {
+      throw new Error(`${sourceName} must not contain whitespace`);
+    }
+    return rawToken;
+  }
+
   function normalizeReportJsonPath(reportPath) {
     const raw = reportPath;
     const trimmed = raw.trim();
@@ -149,7 +159,7 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     throw new Error("--token is only accepted with --require-token and --expect-mode=protected");
   }
   const demoToken = requireToken
-    ? (tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "").trim()
+    ? parseDemoTokenValue(tokenArg ? tokenArg.slice("--token=".length) : env.PUBLIC_DEMO_TOKEN || "", tokenArg ? "--token" : "PUBLIC_DEMO_TOKEN")
     : "";
   if (requireToken && !demoToken) {
     throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
