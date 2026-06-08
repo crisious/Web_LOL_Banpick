@@ -3245,10 +3245,25 @@ async function handleStatic(req, res, url) {
   }
 }
 
-const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-
+function requestUrlFrom(req) {
+  const host = firstHeaderValue(req.headers.host) || "127.0.0.1";
   try {
+    return new URL(req.url || "/", `http://${host}`);
+  } catch {
+    const error = new Error("요청 URL이 올바르지 않습니다.");
+    error.statusCode = 400;
+    error.payload = {
+      ok: false,
+      code: "INVALID_REQUEST_TARGET",
+      error: "요청 URL이 올바르지 않습니다.",
+    };
+    throw error;
+  }
+}
+
+const server = http.createServer(async (req, res) => {
+  try {
+    const url = requestUrlFrom(req);
     const handled = await handleApi(req, res, url);
     if (handled) {
       return;
