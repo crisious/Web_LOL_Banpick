@@ -567,6 +567,10 @@ function rawEventTimestampMs(event) {
   return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0;
 }
 
+function timelineEventTimestampLabel(event) {
+  return timestampLabel(rawEventTimestampMs({ timestamp: event.timestampMs }));
+}
+
 function rawParticipantId(value) {
   return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null;
 }
@@ -1183,7 +1187,7 @@ function buildStrengths(normalized) {
       description:
         "초중후반 오브젝트 타이밍에 빠지지 않고 관여해 팀이 경기 구조를 잃지 않도록 만들었다.",
       evidence: linked
-        .map((event) => `${event.timestampLabel} ${event.eventType}`)
+        .map((event) => `${timelineEventTimestampLabel(event)} ${event.eventType}`)
         .join(", "),
       impact:
         normalized.matchInfo.result === "WIN"
@@ -1203,7 +1207,7 @@ function buildStrengths(normalized) {
       description:
         "개인 킬 수보다도 팀 교전이 열렸을 때 늦지 않게 붙어 한타 흐름을 이어 주는 장면이 많았다.",
       evidence: linked
-        .map((event) => `${event.timestampLabel} ${event.summary}`)
+        .map((event) => `${timelineEventTimestampLabel(event)} ${event.summary}`)
         .join(" "),
       impact: "한타가 길어졌을 때 팀이 추가 킬을 만드는 흐름을 도와줬다.",
       relatedEventIds: linked.map((event) => event.eventId),
@@ -1232,7 +1236,7 @@ function buildStrengths(normalized) {
       id: `str_0${strengths.length + 1}`,
       title: "구조물 압박으로 승리 조건을 연결했음",
       description: "교전에서 끝나지 않고 구조물 파괴로 승리 조건을 실제 결과로 전환했다.",
-      evidence: linked.map((event) => `${event.timestampLabel} ${event.laneHint}`).join(", "),
+      evidence: linked.map((event) => `${timelineEventTimestampLabel(event)} ${event.laneHint}`).join(", "),
       impact: "길어질 수 있는 경기를 실제 승리로 마무리했다.",
       relatedEventIds: linked.map((event) => event.eventId),
     });
@@ -1267,7 +1271,7 @@ function buildWeaknesses(normalized) {
       id: "weak_01",
       title: "초반 안정감이 낮았음",
       description: "초반 데스로 성장 구간을 어렵게 시작하면서 이후 운영이 더 까다로워졌다.",
-      evidence: earlyDeaths.map((event) => `${event.timestampLabel} ${event.summary}`).join(" "),
+      evidence: earlyDeaths.map((event) => `${timelineEventTimestampLabel(event)} ${event.summary}`).join(" "),
       impact: "초반 스노우볼을 만들거나 안정적인 성장 곡선을 그리기 어려웠다.",
       improvementHint:
         "초반 10분은 오브젝트 이후나 라인 푸시 이후에 한 템포 먼저 빠지는 기준을 만들어 손해 없는 출발을 우선하는 것이 좋다.",
@@ -1295,7 +1299,7 @@ function buildWeaknesses(normalized) {
       title: "오브젝트 이후 생존과 전환이 아쉬웠음",
       description:
         "큰 오브젝트를 챙긴 뒤나 한타 직후에 데스를 내주며 만든 이득을 더 길게 굴리지 못한 장면이 있었다.",
-      evidence: linked.map((event) => `${event.timestampLabel} ${event.summary}`).join(" "),
+      evidence: linked.map((event) => `${timelineEventTimestampLabel(event)} ${event.summary}`).join(" "),
       impact:
         normalized.matchInfo.result === "WIN"
           ? "이기는 경기를 더 길게 끌고 가는 원인이 됐다."
@@ -1314,7 +1318,7 @@ function buildWeaknesses(normalized) {
       description: "contest와 이탈 중 하나를 더 빠르게 정하면 손실을 줄일 수 있는 장면이 있었다.",
       evidence:
         linked.length > 0
-          ? linked.map((event) => `${event.timestampLabel} ${event.summary}`).join(" ")
+          ? linked.map((event) => `${timelineEventTimestampLabel(event)} ${event.summary}`).join(" ")
           : "중요 구도에서 판단이 길어진 장면이 있었다.",
       impact: "작은 지연이 데스나 오브젝트 손실로 이어질 수 있다.",
       improvementHint: "시야가 밀리거나 숫자가 안 맞으면 contest 기준을 짧게 정하고 빠르게 후퇴하는 콜을 만드는 편이 좋다.",

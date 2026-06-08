@@ -69,8 +69,10 @@ const env = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
     extractConstSource(serverSrc, "CS_LOW_FARM_THRESHOLDS"),
+    extractFunctionSource(serverSrc, "timestampLabel"),
     extractFunctionSource(serverSrc, "phaseFor"),
     extractFunctionSource(serverSrc, "rawEventTimestampMs"),
+    extractFunctionSource(serverSrc, "timelineEventTimestampLabel"),
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
