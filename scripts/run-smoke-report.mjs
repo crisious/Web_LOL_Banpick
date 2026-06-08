@@ -533,6 +533,14 @@ export function runtimeContextFor(runtimeProcess = process) {
   };
 }
 
+function generatorMetadata() {
+  return {
+    name: "smoke-report-runner",
+    version: 1,
+    script: "scripts/run-smoke-report.mjs",
+  };
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -570,6 +578,7 @@ export function buildQaSummary({
       },
       ci: ciContext || emptyCiContext(),
       runtime: runtimeContext || emptyRuntimeContext(),
+      generator: generatorMetadata(),
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,

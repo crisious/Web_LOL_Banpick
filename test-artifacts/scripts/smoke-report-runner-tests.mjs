@@ -684,6 +684,11 @@ if (fs.existsSync(runnerPath)) {
           platform: "linux",
           arch: "x64",
         },
+        generator: {
+          name: "smoke-report-runner",
+          version: 1,
+          script: "scripts/run-smoke-report.mjs",
+        },
         reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
         reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
@@ -850,6 +855,14 @@ if (fs.existsSync(runnerPath)) {
     {
       smokeReportSha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
       smokeRunSha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    });
+
+  check("buildQaSummary records generator metadata",
+    passingRequiredSummary?.latestRun?.generator,
+    {
+      name: "smoke-report-runner",
+      version: 1,
+      script: "scripts/run-smoke-report.mjs",
     });
 
   check("buildQaSummary records run duration in milliseconds",
