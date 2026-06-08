@@ -121,6 +121,14 @@ check("buildStrengths A titles", strA.map((s) => s.title), [
   "교전 후속 합류 기여가 좋았음",
   "시야 투자량이 높은 편이었음",
 ]);
+checkTrue(
+  "buildStrengths caches fightTitle",
+  buildStrengthsSrc.includes("const fightTitle = bestFightSummary(normalized);"),
+);
+checkTrue(
+  "buildStrengths uses cached fightTitle as title",
+  buildStrengthsSrc.includes("title: fightTitle,"),
+);
 check("buildStrengths A objective relatedEventIds (4 dragons)", strA[0].relatedEventIds, ["e1", "e2", "e3", "e4"]);
 check("buildStrengths A fight relatedEventIds (3 combat)", strA[1].relatedEventIds, ["e5", "e6", "e7"]);
 

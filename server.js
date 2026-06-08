@@ -1050,6 +1050,7 @@ function buildStrengths(normalized) {
   const strengths = [];
   const events = normalized.timelineEvents;
   const objectiveTitle = bestObjectiveSummary(normalized);
+  const fightTitle = bestFightSummary(normalized);
 
   if (objectiveTitle) {
     const linked = events
@@ -1071,13 +1072,13 @@ function buildStrengths(normalized) {
     });
   }
 
-  if (bestFightSummary(normalized)) {
+  if (fightTitle) {
     const linked = events
       .filter((event) => ["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"].includes(event.eventType))
       .slice(0, 3);
     strengths.push({
       id: "str_02",
-      title: bestFightSummary(normalized),
+      title: fightTitle,
       description:
         "개인 킬 수보다도 팀 교전이 열렸을 때 늦지 않게 붙어 한타 흐름을 이어 주는 장면이 많았다.",
       evidence: linked
