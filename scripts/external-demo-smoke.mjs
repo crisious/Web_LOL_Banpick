@@ -7,7 +7,7 @@ import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 
 function parseSmokeArgs(argv, env = {}, deps = {}) {
   const validExpectedModes = ["full", "protected", "readonly"];
-  const sampleErrorIdPattern = /^sample-[a-z0-9-]+$/;
+  const sampleErrorIdPattern = /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
   const sampleErrorCodePattern = /^[A-Z0-9_]+$/;
   const args = argv.slice(2);
   function singleOptionArg(args, prefix) {
@@ -20,7 +20,7 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
 
   function assertSampleErrorId(value, optionName) {
     if (!sampleErrorIdPattern.test(value)) {
-      throw new Error(`${optionName} must match sample-[a-z0-9-]+`);
+      throw new Error(`${optionName} must match sample-[a-z0-9]+(-[a-z0-9]+)*`);
     }
   }
 

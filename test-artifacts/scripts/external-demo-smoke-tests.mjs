@@ -358,7 +358,25 @@ checkThrows("parseSmokeArgs rejects unsafe sample detail error id",
     "--expect-sample-detail-error-id=https://user:pass@demo.example/path?token=secret",
     "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
   ], {}),
-  "--expect-sample-detail-error-id must match sample-[a-z0-9-]+");
+  "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
+
+checkThrows("parseSmokeArgs rejects sample detail error id empty segment",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-kr--1",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+  ], {}),
+  "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
+
+checkThrows("parseSmokeArgs rejects sample detail error id trailing separator",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-bad-",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+  ], {}),
+  "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
 
 checkThrows("parseSmokeArgs rejects unsafe sample detail error code",
   () => parseSmokeArgs([

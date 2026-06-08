@@ -37,12 +37,12 @@ const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
   "--expect-sample-list-error-message=",
 ];
-const SAMPLE_ERROR_ID_PATTERN = /^sample-[a-z0-9-]+$/;
+const SAMPLE_ERROR_ID_PATTERN = /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SAMPLE_ERROR_CODE_PATTERN = /^[A-Z0-9_]+$/;
 
 function assertSampleErrorId(value, optionName) {
   if (!SAMPLE_ERROR_ID_PATTERN.test(value)) {
-    throw new Error(`${optionName} must match sample-[a-z0-9-]+`);
+    throw new Error(`${optionName} must match sample-[a-z0-9]+(-[a-z0-9]+)*`);
   }
 }
 

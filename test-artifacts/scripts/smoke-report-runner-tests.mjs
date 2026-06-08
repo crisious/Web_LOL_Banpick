@@ -218,7 +218,27 @@ if (fs.existsSync(runnerPath)) {
       "--expect-sample-detail-error-id=https://user:pass@demo.example/path?token=secret",
       "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
     ], {}),
-    "--expect-sample-detail-error-id must match sample-[a-z0-9-]+");
+    "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
+
+  checkThrows("parseRunnerArgs rejects sample detail error id empty segment before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=sample-kr--1",
+      "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    ], {}),
+    "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
+
+  checkThrows("parseRunnerArgs rejects sample detail error id trailing separator before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=sample-bad-",
+      "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    ], {}),
+    "--expect-sample-detail-error-id must match sample-[a-z0-9]+(-[a-z0-9]+)*");
 
   checkThrows("parseRunnerArgs rejects unsafe sample detail error code before artifact creation",
     () => runner.parseRunnerArgs([
