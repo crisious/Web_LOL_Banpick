@@ -248,6 +248,10 @@ checkThrows("parseSmokeArgs rejects unicode format report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u200bformat.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects unicode Cf report JSON path outside common ranges",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u061cformat.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1281,6 +1285,27 @@ check("CLI reports unicode format report JSON path without network request",
 
 check("CLI unicode format report JSON path does not create file",
   fs.existsSync(unicodeFormatReportJsonPath),
+  false);
+
+const unicodeCfReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-\u061cformat.json");
+fs.rmSync(unicodeCfReportJsonPath, { force: true });
+const unicodeCfReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts/tmp/smoke-report-\u061cformat.json",
+]);
+
+check("CLI exits non-zero for unicode Cf report JSON path",
+  unicodeCfReportJson.status,
+  1);
+
+check("CLI reports unicode Cf report JSON path without network request",
+  unicodeCfReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI unicode Cf report JSON path does not create file",
+  fs.existsSync(unicodeCfReportJsonPath),
   false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";
