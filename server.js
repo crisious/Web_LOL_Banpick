@@ -31,6 +31,7 @@ const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 // 약점 판정용 "저파밍 바닥선" 분당 CS 임계값 (이 값 미만이면 자원 전환 약점으로 표시).
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
 const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
+const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
 // 한타 단계별 분석: 이 이상 관여 이벤트면 '한타'로 간주.
@@ -1021,9 +1022,7 @@ function buildNormalized(account, matchDetail, timeline, options) {
 }
 
 function bestObjectiveSummary(normalized) {
-  const wins = normalized.timelineEvents.filter((event) =>
-    ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
-  );
+  const wins = normalized.timelineEvents.filter(isObjectiveWinEvent);
   if (wins.length >= 4) {
     return "주요 오브젝트 타이밍을 꾸준히 챙겼음";
   }
@@ -1051,6 +1050,10 @@ function visionStrengthThreshold(position) {
   return VISION_STRENGTH_THRESHOLDS[position] || VISION_STRENGTH_THRESHOLDS.DEFAULT;
 }
 
+function isObjectiveWinEvent(event) {
+  return OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
+}
+
 function buildStrengths(normalized) {
   const strengths = [];
   const events = normalized.timelineEvents;
@@ -1059,7 +1062,7 @@ function buildStrengths(normalized) {
 
   if (objectiveTitle) {
     const linked = events
-      .filter((event) => ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType))
+      .filter(isObjectiveWinEvent)
       .slice(0, 4);
     strengths.push({
       id: "str_01",
@@ -1141,9 +1144,7 @@ function buildWeaknesses(normalized) {
   const events = normalized.timelineEvents;
   const deaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
   const earlyDeaths = deaths.filter((event) => event.phase === "EARLY");
-  const objectiveWins = events.filter((event) =>
-    ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
-  );
+  const objectiveWins = events.filter(isObjectiveWinEvent);
   const objectiveFailEvents = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveWins);
 

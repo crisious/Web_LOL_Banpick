@@ -40,6 +40,8 @@ const env = new Function(
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
     extractConstSource(serverSrc, "CS_LOW_FARM_THRESHOLDS"),
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
+    extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
+    extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     extractFunctionSource(serverSrc, "bestObjectiveSummary"),
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
@@ -61,6 +63,7 @@ const {
 } = env;
 const buildStrengthsSrc = extractFunctionSource(serverSrc, "buildStrengths");
 const buildWeaknessesSrc = extractFunctionSource(serverSrc, "buildWeaknesses");
+const bestObjectiveSummarySrc = extractFunctionSource(serverSrc, "bestObjectiveSummary");
 
 let pass = 0, fail = 0;
 function check(label, got, expected) {
@@ -85,6 +88,14 @@ check("bestObjectiveSummary 4 wins", bestObjectiveSummary({ timelineEvents: drag
 check("bestObjectiveSummary 2 wins", bestObjectiveSummary({ timelineEvents: dragons(2) }), "오브젝트 타이밍에 자주 합류했음");
 check("bestObjectiveSummary 1 win → null", bestObjectiveSummary({ timelineEvents: dragons(1) }), null);
 check("bestObjectiveSummary 0 win → null", bestObjectiveSummary({ timelineEvents: [] }), null);
+checkTrue(
+  "server defines OBJECTIVE_WIN_EVENT_TYPES",
+  serverSrc.includes('const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);'),
+);
+checkTrue(
+  "bestObjectiveSummary uses isObjectiveWinEvent",
+  bestObjectiveSummarySrc.includes("timelineEvents.filter(isObjectiveWinEvent)"),
+);
 
 // ─── bestFightSummary (combat>=3 OR KP>=0.35) ─────────────────────────────────
 const STR = "교전 후속 합류 기여가 좋았음";
@@ -133,6 +144,10 @@ checkTrue(
 );
 check("buildStrengths A objective relatedEventIds (4 dragons)", strA[0].relatedEventIds, ["e1", "e2", "e3", "e4"]);
 check("buildStrengths A fight relatedEventIds (3 combat)", strA[1].relatedEventIds, ["e5", "e6", "e7"]);
+checkTrue(
+  "buildStrengths objective evidence uses isObjectiveWinEvent",
+  buildStrengthsSrc.includes(".filter(isObjectiveWinEvent)"),
+);
 checkTrue(
   "server defines VISION_STRENGTH_THRESHOLDS",
   serverSrc.includes("const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };"),
@@ -202,6 +217,10 @@ check("buildWeaknesses A titles", wkA.map((w) => w.title), [
   "자원 전환 속도가 느렸음",
   "오브젝트 이후 생존과 전환이 아쉬웠음",
 ]);
+checkTrue(
+  "buildWeaknesses objective wins use isObjectiveWinEvent",
+  buildWeaknessesSrc.includes("const objectiveWins = events.filter(isObjectiveWinEvent);"),
+);
 
 // B) SUPPORT는 CS 약점 안 만듦(임계 0). 모든 분기 skip → fallback 3개로 패딩.
 const wkB = buildWeaknesses({
