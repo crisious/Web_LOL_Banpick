@@ -193,7 +193,7 @@ rg -n --hidden -S "RGAPI-|api_key|RIOT_API_KEY|OPENAI_API_KEY|BEGIN (RSA|OPENSSH
 
 Expected: `npm test` passes, diff has no whitespace errors, smoke verdict is `pass`, sensitive scan has no matches except the scan command recorded in report metadata if present.
 
-- [ ] **Step 6: Commit and push with GitHub QA evidence**
+- [x] **Step 6: Commit and push with GitHub QA evidence**
 
 Run:
 
@@ -215,3 +215,4 @@ Expected: push succeeds, GitHub QA succeeds for the pushed commit, artifact summ
 - 2026-06-09 08:02 KST: RED confirmed. `node --check test-artifacts/server/phase-context-endms-policy-tests.mjs` passed, and `node test-artifacts/server/phase-context-endms-policy-tests.mjs` failed 4/8 with `late endMs derives max normalized timestamp` showing expected `1900000`, got `-100`.
 - 2026-06-09 08:03 KST: GREEN focused QA passed: `node --check server.js`, `node --check test-artifacts/server/phase-context-endms-policy-tests.mjs`, `node --check test-artifacts/server/phase-summary-timestamp-policy-tests.mjs`, new phase context endMs test 8/0, phase summary timestamp policy 9/0, timeline consumer 12/0, LLM payload 84/0, schema 86/0.
 - 2026-06-09 08:05 KST: Full local QA passed. `npm test` reported 1920 passed, 0 failed across 70 test files. `git diff --check` passed. Read-only smoke report passed with QA verdict `passed`, required checks 13/13, smoke 156/0, duration 609 ms, mode `readonly`, local dirty state expected before commit. Sensitive/runtime-path scan over `test-artifacts/tmp/phase-context-endms-policy-local` returned no matches.
+- 2026-06-09 08:07 KST: Implementation commit `e7a8ac2` (`test: guard phase context end time`) pushed to `main`. GitHub Actions QA run `27172641880` completed with conclusion `success`; artifact `7494580951` (`qa-automation-27172641880`, 3552 bytes) reported QA verdict `passed`, required checks 13/13, smoke 156/0, duration 212 ms, mode `readonly`, `latestRun.ci.provider: "github-actions"`, `runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27172641880"`, `latestRun.git.shortSha: "e7a8ac2"`, `dirty: false`. Artifact sensitive/runtime-path scan returned no matches.
