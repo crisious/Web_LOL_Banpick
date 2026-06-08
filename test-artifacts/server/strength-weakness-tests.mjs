@@ -199,6 +199,14 @@ check("buildWeaknesses B padded length 3", wkB.length, 3);
 check("buildWeaknesses B ids sequential", wkB.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
 check("buildWeaknesses B all fallback title", wkB.every((w) => w.title === "중요 구도 판단을 더 빠르게 정리할 필요가 있음"), true);
 checkTrue(
+  "buildWeaknesses caches objectiveFailEvents",
+  buildWeaknessesSrc.includes('const objectiveFailEvents = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");'),
+);
+checkTrue(
+  "buildWeaknesses fallback uses cached objectiveFailEvents",
+  buildWeaknessesSrc.includes("objectiveFailEvents.length ? objectiveFailEvents.slice(0, 2) : deaths.slice(0, 2);"),
+);
+checkTrue(
   "buildWeaknesses uses INSIGHT_LIST_MIN padding",
   buildWeaknessesSrc.includes("while (weaknesses.length < INSIGHT_LIST_MIN)"),
 );

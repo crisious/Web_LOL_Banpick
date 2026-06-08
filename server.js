@@ -1139,6 +1139,7 @@ function buildWeaknesses(normalized) {
   const objectiveWins = events.filter((event) =>
     ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
   );
+  const objectiveFailEvents = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveWins);
 
   if (earlyDeaths.length >= 2) {
@@ -1186,8 +1187,7 @@ function buildWeaknesses(normalized) {
   }
 
   while (weaknesses.length < INSIGHT_LIST_MIN) {
-    const objectiveFails = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
-    const linked = objectiveFails.length ? objectiveFails.slice(0, 2) : deaths.slice(0, 2);
+    const linked = objectiveFailEvents.length ? objectiveFailEvents.slice(0, 2) : deaths.slice(0, 2);
     weaknesses.push({
       id: `weak_0${weaknesses.length + 1}`,
       title: "중요 구도 판단을 더 빠르게 정리할 필요가 있음",
