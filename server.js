@@ -1476,6 +1476,18 @@ function buildObjectiveLabel(event) {
   return `${labels[event.monsterType] || event.monsterType}${sub}`;
 }
 
+function objectiveKillerTeamId(event, participantTeamMap) {
+  if (isKnownRawTeamId(event.killerTeamId)) {
+    return event.killerTeamId;
+  }
+  const killerId = rawParticipantId(event.killerId);
+  if (killerId === null) {
+    return null;
+  }
+  const mappedTeamId = participantTeamMap.get(killerId);
+  return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null;
+}
+
 function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
   const events = [];
   timeline.info.frames.forEach((frame) => {
@@ -1493,7 +1505,7 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
         });
       }
       if (event.type === "ELITE_MONSTER_KILL") {
-        const killerTeam = participantTeamMap.get(event.killerId);
+        const killerTeam = objectiveKillerTeamId(event, participantTeamMap);
         events.push({
           time: event.timestamp,
           timeLabel: timestampLabel(event.timestamp),
