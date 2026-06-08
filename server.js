@@ -2392,14 +2392,11 @@ function hasValidInsightList(items) {
     items.length <= INSIGHT_LIST_MAX &&
     items.every((item) =>
       item &&
-      typeof item.id === "string" &&
-      item.id &&
-      typeof item.title === "string" &&
-      item.title &&
-      typeof item.description === "string" &&
-      item.description &&
+      isNonBlankString(item.id) &&
+      isNonBlankString(item.title) &&
+      isNonBlankString(item.description) &&
       Array.isArray(item.relatedEventIds) &&
-      item.relatedEventIds.every((id) => typeof id === "string" && id)
+      item.relatedEventIds.every((id) => isNonBlankString(id))
     );
 }
 

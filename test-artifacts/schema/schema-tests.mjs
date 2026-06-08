@@ -309,6 +309,24 @@ expectThrows("strengths item missing relatedEventIds throws", () => {
   validateAnalysisOutput(f);
 }, "strengths");
 
+expectThrows("strengths item whitespace id throws", () => {
+  const f = validFixture();
+  f.strengths[0] = { ...f.strengths[0], id: "   " };
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths item whitespace title throws", () => {
+  const f = validFixture();
+  f.strengths[0] = { ...f.strengths[0], title: "   " };
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths item whitespace relatedEventIds throws", () => {
+  const f = validFixture();
+  f.strengths[0] = { ...f.strengths[0], relatedEventIds: ["evt_001", "   "] };
+  validateAnalysisOutput(f);
+}, "strengths");
+
 expectThrows("strengths over 3 throws", () => {
   const f = validFixture();
   f.strengths = Array.from({ length: 4 }, (_, index) => ({
@@ -352,6 +370,12 @@ expectThrows("weaknesses item missing description throws", () => {
 expectThrows("weaknesses item missing relatedEventIds throws", () => {
   const f = validFixture();
   f.weaknesses = [{ id: "wk_1", title: "아쉬운 전환", description: "설명" }];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses item whitespace description throws", () => {
+  const f = validFixture();
+  f.weaknesses[0] = { ...f.weaknesses[0], description: "   " };
   validateAnalysisOutput(f);
 }, "weaknesses");
 
