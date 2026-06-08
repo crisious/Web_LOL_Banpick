@@ -626,6 +626,11 @@ if (fs.existsSync(runnerPath)) {
       serverUrl: "https://github.com",
       runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27123905756",
     },
+    runtimeContext: {
+      nodeVersion: "v20.19.5",
+      platform: "linux",
+      arch: "x64",
+    },
     smokeReport: {
       status: "passed",
       actualMode: "protected",
@@ -665,6 +670,11 @@ if (fs.existsSync(runnerPath)) {
           sha: "abc1234def5678",
           serverUrl: "https://github.com",
           runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27123905756",
+        },
+        runtime: {
+          nodeVersion: "v20.19.5",
+          platform: "linux",
+          arch: "x64",
         },
         reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
         reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
@@ -788,6 +798,11 @@ if (fs.existsSync(runnerPath)) {
       serverUrl: "https://github.com",
       runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27124000000",
     },
+    runtimeContext: {
+      nodeVersion: "v22.16.0",
+      platform: "darwin",
+      arch: "arm64",
+    },
     smokeReport: passingRequiredCheckReport,
   });
 
@@ -825,6 +840,14 @@ if (fs.existsSync(runnerPath)) {
       sha: "feed1234567890abcdef",
       serverUrl: "https://github.com",
       runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27124000000",
+    });
+
+  check("buildQaSummary records supplied runtime context",
+    passingRequiredSummary?.latestRun?.runtime,
+    {
+      nodeVersion: "v22.16.0",
+      platform: "darwin",
+      arch: "arm64",
     });
 
   check("ciContextFor returns empty context outside GitHub Actions",
@@ -865,6 +888,14 @@ if (fs.existsSync(runnerPath)) {
       sha: "abc1234def5678",
       serverUrl: "https://github.com",
       runUrl: "https://github.com/crisious/Web_LOL_Banpick/actions/runs/27123905756",
+    });
+
+  check("runtimeContextFor records current Node runtime",
+    runner.runtimeContextFor?.({ version: "v20.19.5", platform: "linux", arch: "x64" }),
+    {
+      nodeVersion: "v20.19.5",
+      platform: "linux",
+      arch: "x64",
     });
 
   check("buildQaSummary records passing required check summary",

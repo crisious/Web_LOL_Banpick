@@ -468,6 +468,25 @@ export function ciContextFor(env = process.env) {
   };
 }
 
+function emptyRuntimeContext() {
+  return {
+    nodeVersion: "",
+    platform: "",
+    arch: "",
+  };
+}
+
+export function runtimeContextFor(runtimeProcess = process) {
+  const nodeVersion = typeof runtimeProcess?.nodeVersion === "string"
+    ? runtimeProcess.nodeVersion
+    : runtimeProcess?.version;
+  return {
+    nodeVersion: ciText(nodeVersion),
+    platform: ciText(runtimeProcess?.platform),
+    arch: ciText(runtimeProcess?.arch),
+  };
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -478,6 +497,7 @@ export function buildQaSummary({
   exitCode,
   gitContext = null,
   ciContext = null,
+  runtimeContext = null,
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
@@ -501,6 +521,7 @@ export function buildQaSummary({
         dirty: false,
       },
       ci: ciContext || emptyCiContext(),
+      runtime: runtimeContext || emptyRuntimeContext(),
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
@@ -577,6 +598,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     exitCode: finalExitCode,
     gitContext: gitContextFor(process.cwd()),
     ciContext: ciContextFor(env),
+    runtimeContext: runtimeContextFor(process),
     smokeReport,
   }));
 
