@@ -150,7 +150,7 @@ Evidence, 2026-06-09 07:30 KST:
 - Local `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `205ms`, mode `readonly`, git short SHA `6e2f4ed`, dirty `true` because this implementation was intentionally uncommitted.
 - Local artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -161,6 +161,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 07:32 KST:
+- Staged only `docs/superpowers/plans/2026-06-09-phase-summary-timestamp-policy.md`, `server.js`, `test-artifacts/server/timeline-consumer-tests.mjs`, and `test-artifacts/server/phase-summary-timestamp-policy-tests.mjs`.
+- Commit `8009928` (`test: guard phase summary timestamps`) pushed to `origin/main`.
+- GitHub QA run `27171176987` completed with conclusion `success` for SHA `8009928ee141b1d11face126d5048849b980715b`.
+- GitHub artifact `qa-automation-27171176987` id `7494027290`, size `3549`, digest `sha256:9c0ac7024f1f1753d79d42579dfa1ff04b2452e5c108e132caf31f83c0c687f9`.
+- Downloaded artifact `qa-summary.json`: `qaStatus=passed`, required checks `13/13`, smoke checks `156 passed, 0 failed`, duration `200ms`, mode `readonly`, git short SHA `8009928`, dirty `false`.
+- Downloaded artifact sensitive-pattern scan found no matches for Riot/OpenAI key markers, private key headers, local absolute paths, runtime sample paths, Riot hostnames, DNS errors, or parser errors.
 
 ## Self-Review
 
