@@ -32,6 +32,7 @@ const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
 const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
+const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
 // 한타 단계별 분석: 이 이상 관여 이벤트면 '한타'로 간주.
@@ -840,9 +841,7 @@ function filterPostObjectiveDeaths(deaths, objectiveWins) {
 
 function buildDerivedSignals(normalized) {
   const events = normalized.timelineEvents;
-  const objectiveWins = events.filter((event) =>
-    ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN", "TOWER_TAKE"].includes(event.eventType),
-  );
+  const objectiveWins = events.filter(isMacroObjectiveWinEvent);
   const objectiveFails = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
   const playerDeaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
   const earlyDeaths = playerDeaths.filter((event) => event.phase === "EARLY");
@@ -1054,6 +1053,10 @@ function isObjectiveWinEvent(event) {
   return OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
 }
 
+function isMacroObjectiveWinEvent(event) {
+  return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
+}
+
 function buildStrengths(normalized) {
   const strengths = [];
   const events = normalized.timelineEvents;
@@ -1247,9 +1250,7 @@ function buildPhaseSummaries(normalized) {
           ? normalized.phaseContext.mid
           : normalized.phaseContext.late;
 
-    const objectiveWins = phaseEvents.filter((event) =>
-      ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN", "TOWER_TAKE"].includes(event.eventType),
-    ).length;
+    const objectiveWins = phaseEvents.filter(isMacroObjectiveWinEvent).length;
     const objectiveFails = phaseEvents.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL").length;
     const rating =
       bucket.deaths > bucket.kills + bucket.assists

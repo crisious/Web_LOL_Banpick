@@ -42,6 +42,8 @@ const env = new Function(
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
+    extractConstSource(serverSrc, "MACRO_OBJECTIVE_WIN_EVENT_TYPES"),
+    extractFunctionSource(serverSrc, "isMacroObjectiveWinEvent"),
     extractFunctionSource(serverSrc, "bestObjectiveSummary"),
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
@@ -64,6 +66,8 @@ const {
 const buildStrengthsSrc = extractFunctionSource(serverSrc, "buildStrengths");
 const buildWeaknessesSrc = extractFunctionSource(serverSrc, "buildWeaknesses");
 const bestObjectiveSummarySrc = extractFunctionSource(serverSrc, "bestObjectiveSummary");
+const buildDerivedSignalsSrc = extractFunctionSource(serverSrc, "buildDerivedSignals");
+const buildPhaseSummariesSrc = extractFunctionSource(serverSrc, "buildPhaseSummaries");
 
 let pass = 0, fail = 0;
 function check(label, got, expected) {
@@ -95,6 +99,22 @@ checkTrue(
 checkTrue(
   "bestObjectiveSummary uses isObjectiveWinEvent",
   bestObjectiveSummarySrc.includes("timelineEvents.filter(isObjectiveWinEvent)"),
+);
+checkTrue(
+  "server defines MACRO_OBJECTIVE_WIN_EVENT_TYPES",
+  serverSrc.includes('const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);'),
+);
+checkTrue(
+  "server defines isMacroObjectiveWinEvent",
+  serverSrc.includes("function isMacroObjectiveWinEvent(event)"),
+);
+checkTrue(
+  "buildDerivedSignals uses isMacroObjectiveWinEvent",
+  buildDerivedSignalsSrc.includes("events.filter(isMacroObjectiveWinEvent)"),
+);
+checkTrue(
+  "buildPhaseSummaries uses isMacroObjectiveWinEvent",
+  buildPhaseSummariesSrc.includes("phaseEvents.filter(isMacroObjectiveWinEvent).length"),
 );
 
 // ─── bestFightSummary (combat>=3 OR KP>=0.35) ─────────────────────────────────
