@@ -92,11 +92,11 @@ function checkTrue(label, condition) {
 }
 
 const phaseContext = buildPhaseContext([
-  { phase: "EARLY", eventType: "CHAMPION_KILL", importance: 5 },
-  { phase: "EARLY", eventType: "TEAMFIGHT_FOLLOWUP", importance: 4 },
-  { phase: "EARLY", eventType: "SKIRMISH_WIN", importance: 3 },
-  { phase: "EARLY", eventType: "PLAYER_DEATH", importance: 5 },
-  { phase: "MID", eventType: "TEAMFIGHT_FOLLOWUP", importance: 4 },
+  { phase: "EARLY", timestampMs: 100000, eventType: "CHAMPION_KILL", importance: 5 },
+  { phase: "EARLY", timestampMs: 200000, eventType: "TEAMFIGHT_FOLLOWUP", importance: 4 },
+  { phase: "EARLY", timestampMs: 300000, eventType: "SKIRMISH_WIN", importance: 3 },
+  { phase: "EARLY", timestampMs: 400000, eventType: "PLAYER_DEATH", importance: 5 },
+  { phase: "MID", timestampMs: 1000000, eventType: "TEAMFIGHT_FOLLOWUP", importance: 4 },
 ]);
 
 check("phaseContext EARLY keeps kill/death/assist counts", {

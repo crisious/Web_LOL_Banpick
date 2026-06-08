@@ -867,7 +867,9 @@ function buildPhaseContext(events) {
   };
 
   events.forEach((event) => {
-    const bucket = phases[event.phase];
+    const time = rawEventTimestampMs({ timestamp: event.timestampMs });
+    const phase = phaseFor(time);
+    const bucket = phases[phase];
     if (!bucket) {
       return;
     }
@@ -1342,11 +1344,12 @@ function buildActionChecklist(normalized, weaknesses) {
 }
 
 function buildPhaseSummaries(normalized) {
-  const eventsByPhase = {
-    EARLY: normalized.timelineEvents.filter((event) => event.phase === "EARLY"),
-    MID: normalized.timelineEvents.filter((event) => event.phase === "MID"),
-    LATE: normalized.timelineEvents.filter((event) => event.phase === "LATE"),
-  };
+  const eventsByPhase = Object.fromEntries(
+    ["EARLY", "MID", "LATE"].map((phaseKey) => [
+      phaseKey,
+      normalized.timelineEvents.filter((event) => phaseFor(rawEventTimestampMs({ timestamp: event.timestampMs })) === phaseKey),
+    ]),
+  );
 
   return ["EARLY", "MID", "LATE"].map((phaseKey) => {
     const phaseEvents = eventsByPhase[phaseKey];
