@@ -35,6 +35,7 @@ const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJEC
 const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
 const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);
+const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);
 const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);
 const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
@@ -812,9 +813,9 @@ function buildPhaseContext(events) {
     if (!bucket) {
       return;
     }
-    if (event.eventType === "CHAMPION_KILL") {
+    if (isPlayerKillEvent(event)) {
       bucket.kills += 1;
-    } else if (event.eventType === "PLAYER_DEATH") {
+    } else if (isPlayerDeathEvent(event)) {
       bucket.deaths += 1;
     } else if (isFightContributionEvent(event)) {
       bucket.assists += 1;
@@ -1063,6 +1064,10 @@ function isMacroObjectiveWinEvent(event) {
 
 function isStructureTakeEvent(event) {
   return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType);
+}
+
+function isPlayerKillEvent(event) {
+  return PLAYER_KILL_EVENT_TYPES.has(event.eventType);
 }
 
 function isPlayerDeathEvent(event) {
@@ -1513,10 +1518,10 @@ function buildKdaTimeline(normalized) {
     if (!evt.isPlayerInvolved) continue;
 
     let changed = false;
-    if (evt.eventType === "PLAYER_DEATH") {
+    if (isPlayerDeathEvent(evt)) {
       deaths++;
       changed = true;
-    } else if (evt.eventType === "CHAMPION_KILL") {
+    } else if (isPlayerKillEvent(evt)) {
       kills++;
       changed = true;
     } else if (isFightContributionEvent(evt)) {

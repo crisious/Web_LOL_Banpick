@@ -29,11 +29,33 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const playerKillPolicySources = serverSrc.includes("const PLAYER_KILL_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_KILL_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerKillEvent"),
+    ]
+  : [
+      'const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);',
+      'function isPlayerKillEvent(event) { return PLAYER_KILL_EVENT_TYPES.has(event.eventType); }',
+    ];
+
+const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
+    ]
+  : [
+      'const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);',
+      'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const buildPhaseContextSrc = extractFunctionSource(serverSrc, "buildPhaseContext");
 const buildKdaTimelineSrc = extractFunctionSource(serverSrc, "buildKdaTimeline");
 
 const { buildPhaseContext, buildKdaTimeline } = new Function(
   [
+    ...playerKillPolicySources,
+    ...playerDeathPolicySources,
     extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isFightContributionEvent"),
     extractFunctionSource(serverSrc, "buildPhaseContext"),
@@ -88,6 +110,30 @@ check("kdaTimeline final counts", {
   assists: finalKdaPoint.assists,
   kda: finalKdaPoint.kda,
 }, { kills: 1, deaths: 1, assists: 2, kda: 3 });
+checkTrue(
+  "server defines PLAYER_KILL_EVENT_TYPES",
+  serverSrc.includes('const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);'),
+);
+checkTrue(
+  "server defines isPlayerKillEvent",
+  serverSrc.includes("function isPlayerKillEvent(event)"),
+);
+checkTrue(
+  "buildPhaseContext uses isPlayerKillEvent for kills",
+  buildPhaseContextSrc.includes("if (isPlayerKillEvent(event))"),
+);
+checkTrue(
+  "buildPhaseContext uses isPlayerDeathEvent for deaths",
+  buildPhaseContextSrc.includes("} else if (isPlayerDeathEvent(event))"),
+);
+checkTrue(
+  "buildKdaTimeline uses isPlayerKillEvent for kills",
+  buildKdaTimelineSrc.includes("} else if (isPlayerKillEvent(evt))"),
+);
+checkTrue(
+  "buildKdaTimeline uses isPlayerDeathEvent for deaths",
+  buildKdaTimelineSrc.includes("if (isPlayerDeathEvent(evt))"),
+);
 checkTrue(
   "buildPhaseContext uses isFightContributionEvent for assist-like events",
   buildPhaseContextSrc.includes("isFightContributionEvent(event)"),
