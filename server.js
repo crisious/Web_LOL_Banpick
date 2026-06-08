@@ -30,6 +30,7 @@ const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000;
 const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 // 약점 판정용 "저파밍 바닥선" 분당 CS 임계값 (이 값 미만이면 자원 전환 약점으로 표시).
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
+const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
 // 한타 단계별 분석: 이 이상 관여 이벤트면 '한타'로 간주.
@@ -1046,6 +1047,10 @@ function lowFarmThreshold(position) {
   return CS_LOW_FARM_THRESHOLDS[position] || 0;
 }
 
+function visionStrengthThreshold(position) {
+  return VISION_STRENGTH_THRESHOLDS[position] || VISION_STRENGTH_THRESHOLDS.DEFAULT;
+}
+
 function buildStrengths(normalized) {
   const strengths = [];
   const events = normalized.timelineEvents;
@@ -1089,7 +1094,7 @@ function buildStrengths(normalized) {
     });
   }
 
-  if (normalized.playerStats.visionScore >= (normalized.matchInfo.position === "JUNGLE" ? 35 : 25)) {
+  if (normalized.playerStats.visionScore >= visionStrengthThreshold(normalized.matchInfo.position)) {
     strengths.push({
       id: "str_03",
       title: "시야 투자량이 높은 편이었음",

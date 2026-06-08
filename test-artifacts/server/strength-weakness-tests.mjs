@@ -47,6 +47,8 @@ const env = new Function(
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
     extractConstSource(serverSrc, "INSIGHT_LIST_MIN"),
     extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
+    extractConstSource(serverSrc, "VISION_STRENGTH_THRESHOLDS"),
+    extractFunctionSource(serverSrc, "visionStrengthThreshold"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
     extractFunctionSource(serverSrc, "buildActionChecklist"),
@@ -131,6 +133,14 @@ checkTrue(
 );
 check("buildStrengths A objective relatedEventIds (4 dragons)", strA[0].relatedEventIds, ["e1", "e2", "e3", "e4"]);
 check("buildStrengths A fight relatedEventIds (3 combat)", strA[1].relatedEventIds, ["e5", "e6", "e7"]);
+checkTrue(
+  "server defines VISION_STRENGTH_THRESHOLDS",
+  serverSrc.includes("const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };"),
+);
+checkTrue(
+  "buildStrengths uses visionStrengthThreshold",
+  buildStrengthsSrc.includes("visionStrengthThreshold(normalized.matchInfo.position)"),
+);
 
 // B) 모든 분기 미발동 → while 패딩으로 3개
 const strB = buildStrengths({
@@ -168,6 +178,10 @@ const strJ35 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS",
 checkTrue("buildStrengths JUNGLE vision 35 → vision strength present", strJ35.some((s) => s.id === "str_03" && s.title === "시야 투자량이 높은 편이었음"));
 const strJ34 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS", position: "JUNGLE" }, playerStats: { visionScore: 34, killParticipation: 0 } });
 checkTrue("buildStrengths JUNGLE vision 34 → no vision strength", !strJ34.some((s) => s.title === "시야 투자량이 높은 편이었음"));
+const strAdc25 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS", position: "ADC" }, playerStats: { visionScore: 25, killParticipation: 0 } });
+checkTrue("buildStrengths ADC vision 25 -> vision strength present", strAdc25.some((s) => s.id === "str_03" && s.title === "시야 투자량이 높은 편이었음"));
+const strAdc24 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS", position: "ADC" }, playerStats: { visionScore: 24, killParticipation: 0 } });
+checkTrue("buildStrengths ADC vision 24 -> no vision strength", !strAdc24.some((s) => s.title === "시야 투자량이 높은 편이었음"));
 
 // ─── buildWeaknesses — 항상 길이 3 (while 패딩) ─────────────────────────────
 // A) early(2) + cs(ADC csPerMinute 3<6.5) + postObjective → weak_01/02/03
