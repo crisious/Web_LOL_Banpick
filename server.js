@@ -2149,10 +2149,11 @@ function hasValidEvidenceIndex(evidenceIndex) {
     evidenceIndex.length > 0 &&
     evidenceIndex.every((item) =>
       item &&
-      typeof item.eventId === "string" &&
-      item.eventId &&
-      typeof item.summary === "string" &&
-      item.summary
+      isNonBlankString(item.eventId) &&
+      (
+        isNonBlankString(item.summary) ||
+        isNonBlankString(item.shortNote)
+      )
     );
 }
 

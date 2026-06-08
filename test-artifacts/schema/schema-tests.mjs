@@ -152,6 +152,12 @@ function validFixture() {
 
 expectOk("valid fixture passes", () => validateAnalysisOutput(validFixture()));
 
+expectOk("evidenceIndex shortNote passes", () => {
+  const f = validFixture();
+  f.evidenceIndex = [{ eventId: "evt_001", shortNote: "핵심 근거" }];
+  validateAnalysisOutput(f);
+});
+
 expectThrows("missing schemaVersion throws", () => {
   const f = validFixture(); delete f.schemaVersion;
   validateAnalysisOutput(f);
