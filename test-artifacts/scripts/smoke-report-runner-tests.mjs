@@ -74,6 +74,15 @@ if (fs.existsSync(runnerPath)) {
   const readonlyMissingFullRequiredCheckFailures = readonlyMissingFullRequiredChecks.map((check) =>
     `missing required smoke check: ${check.label}`
   );
+  function sampleEvidenceChecks(count = 19) {
+    return Array.from({ length: count }, (_, index) => {
+      const id = `sample-kr-${String(index + 1).padStart(10, "0")}`;
+      return [
+        { status: "pass", label: `GET /api/samples/:id returns 200 for ${id}` },
+        { status: "pass", label: `sample detail ${id} includes report essentials` },
+      ];
+    }).flat();
+  }
 
   check("parseRunnerArgs defaults to local readonly",
     runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}),
@@ -724,8 +733,27 @@ if (fs.existsSync(runnerPath)) {
             smoke: "passed",
             requiredChecks: "failed",
             artifactIntegrity: "passed",
+            sampleEvidence: "failed",
           },
-          failures: ["required smoke checks failed"],
+          failures: ["required smoke checks failed", "sample evidence incomplete"],
+        },
+        sampleEvidence: {
+          status: "failed",
+          requiredMin: 19,
+          listedSamples: null,
+          detailChecks: {
+            passed: 0,
+            failed: 0,
+          },
+          reportEssentialChecks: {
+            passed: 0,
+            failed: 0,
+          },
+          failures: [
+            "sample list check missing",
+            "sample detail checks below required minimum",
+            "sample report essentials checks below required minimum",
+          ],
         },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
@@ -792,9 +820,11 @@ if (fs.existsSync(runnerPath)) {
   const passingRequiredCheckReport = {
     status: "passed",
     actualMode: "readonly",
-    summary: { passed: 43, failed: 0 },
+    summary: { passed: 82, failed: 0 },
     checks: [
       { status: "pass", label: "GET /healthz returns 200" },
+      { status: "pass", label: "/api/samples has at least 19 samples" },
+      ...sampleEvidenceChecks(19),
       { status: "pass", label: "/api/samples list entries omit explicit matchId" },
       { status: "pass", label: "/.env is not publicly served" },
       { status: "pass", label: "/.env has X-Content-Type-Options nosniff" },
@@ -903,6 +933,24 @@ if (fs.existsSync(runnerPath)) {
         smoke: "passed",
         requiredChecks: "passed",
         artifactIntegrity: "passed",
+        sampleEvidence: "passed",
+      },
+      failures: [],
+    });
+
+  check("buildQaSummary records passing sample evidence",
+    passingRequiredSummary?.latestRun?.sampleEvidence,
+    {
+      status: "passed",
+      requiredMin: 19,
+      listedSamples: null,
+      detailChecks: {
+        passed: 19,
+        failed: 0,
+      },
+      reportEssentialChecks: {
+        passed: 19,
+        failed: 0,
       },
       failures: [],
     });
@@ -1097,9 +1145,62 @@ if (fs.existsSync(runnerPath)) {
         smoke: "passed",
         requiredChecks: "passed",
         artifactIntegrity: "failed",
+        sampleEvidence: "passed",
       },
       failures: ["artifact integrity failed"],
     });
+
+  const partialSampleEvidenceSummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-50-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-50-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-50-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:50:00.000Z",
+    finishedAt: "2026-06-08T06:50:10.000Z",
+    exitCode: 0,
+    artifactFileSizes: {
+      smokeReportBytes: 4096,
+      smokeRunBytes: 768,
+    },
+    artifactFileHashes: {
+      smokeReportSha256: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      smokeRunSha256: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    },
+    smokeReport: {
+      status: "passed",
+      actualMode: "readonly",
+      summary: { passed: 20, failed: 0 },
+      checks: [
+        { status: "fail", label: "/api/samples has at least 19 samples", detail: "count=18" },
+        ...sampleEvidenceChecks(18),
+      ],
+    },
+  });
+
+  check("buildQaSummary records failed sample evidence when detail coverage is short",
+    partialSampleEvidenceSummary?.latestRun?.sampleEvidence,
+    {
+      status: "failed",
+      requiredMin: 19,
+      listedSamples: 18,
+      detailChecks: {
+        passed: 18,
+        failed: 0,
+      },
+      reportEssentialChecks: {
+        passed: 18,
+        failed: 0,
+      },
+      failures: [
+        "sample list below required minimum",
+        "sample detail checks below required minimum",
+        "sample report essentials checks below required minimum",
+      ],
+    });
+
+  check("buildQaSummary records failed QA verdict when sample evidence is incomplete",
+    partialSampleEvidenceSummary?.latestRun?.qaVerdict?.failures,
+    ["required smoke checks failed", "sample evidence incomplete"]);
 
   check("buildQaSummary records missing required smoke checks",
     missingRequiredSummary?.latestRun?.requiredChecks,

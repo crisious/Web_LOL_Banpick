@@ -371,6 +371,63 @@ function requiredSmokeCheckFailureMessages(requiredChecks) {
     );
 }
 
+const SAMPLE_COUNT_LABEL_PATTERN = /^\/api\/samples has at least (\d+) samples$/;
+const SAMPLE_COUNT_DETAIL_PATTERN = /^count=(\d+)$/;
+const SAMPLE_DETAIL_OK_LABEL_PATTERN = /^GET \/api\/samples\/:id returns 200 for sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const SAMPLE_REPORT_ESSENTIALS_LABEL_PATTERN = /^sample detail sample-[a-z0-9]+(?:-[a-z0-9]+)* includes report essentials$/;
+
+function smokeCheckCount(checks, pattern, status) {
+  return checks.filter((check) => pattern.test(check?.label || "") && check?.status === status).length;
+}
+
+function sampleListCountCheckFor(checks) {
+  return checks.find((check) => SAMPLE_COUNT_LABEL_PATTERN.test(check?.label || ""));
+}
+
+function listedSampleCountFor(countCheck) {
+  const match = SAMPLE_COUNT_DETAIL_PATTERN.exec(countCheck?.detail || "");
+  return match ? Number(match[1]) : null;
+}
+
+function sampleEvidenceFor(config, smokeReport) {
+  if (isEarlySampleErrorProbe(config)) {
+    return {
+      status: "skipped",
+      requiredMin: 0,
+      listedSamples: null,
+      detailChecks: { passed: 0, failed: 0 },
+      reportEssentialChecks: { passed: 0, failed: 0 },
+      failures: [],
+    };
+  }
+  const checks = Array.isArray(smokeReport?.checks) ? smokeReport.checks : [];
+  const requiredMin = MIN_SAMPLES;
+  const sampleListCountCheck = sampleListCountCheckFor(checks);
+  const listedSamples = listedSampleCountFor(sampleListCountCheck);
+  const detailChecks = {
+    passed: smokeCheckCount(checks, SAMPLE_DETAIL_OK_LABEL_PATTERN, "pass"),
+    failed: smokeCheckCount(checks, SAMPLE_DETAIL_OK_LABEL_PATTERN, "fail"),
+  };
+  const reportEssentialChecks = {
+    passed: smokeCheckCount(checks, SAMPLE_REPORT_ESSENTIALS_LABEL_PATTERN, "pass"),
+    failed: smokeCheckCount(checks, SAMPLE_REPORT_ESSENTIALS_LABEL_PATTERN, "fail"),
+  };
+  const failures = [];
+  if (!sampleListCountCheck) failures.push("sample list check missing");
+  else if (sampleListCountCheck.status !== "pass") failures.push("sample list below required minimum");
+  else if (Number.isSafeInteger(listedSamples) && listedSamples < requiredMin) failures.push("sample list below required minimum");
+  if (detailChecks.passed < requiredMin) failures.push("sample detail checks below required minimum");
+  if (reportEssentialChecks.passed < requiredMin) failures.push("sample report essentials checks below required minimum");
+  return {
+    status: failures.length ? "failed" : "passed",
+    requiredMin,
+    listedSamples,
+    detailChecks,
+    reportEssentialChecks,
+    failures,
+  };
+}
+
 export function validateRequiredSmokeChecks(config, smokeReport) {
   return requiredSmokeCheckFailureMessages(requiredSmokeCheckResults(config, smokeReport));
 }
@@ -459,14 +516,16 @@ function artifactIntegrityFor(artifactFileSizes, artifactFileHashes) {
   };
 }
 
-function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegrity }) {
+function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegrity, sampleEvidence }) {
   const smokeStatus = exitCode === 0 && runStatus === "passed" ? "passed" : "failed";
   const resolvedRequiredCheckStatus = requiredCheckStatus || "failed";
   const artifactIntegrityStatus = artifactIntegrity?.status === "passed" ? "passed" : "failed";
+  const sampleEvidenceStatus = ["passed", "skipped"].includes(sampleEvidence?.status) ? sampleEvidence.status : "failed";
   const failures = [];
   if (smokeStatus !== "passed") failures.push("smoke report failed");
   if (!["passed", "skipped"].includes(resolvedRequiredCheckStatus)) failures.push("required smoke checks failed");
   if (artifactIntegrityStatus !== "passed") failures.push("artifact integrity failed");
+  if (!["passed", "skipped"].includes(sampleEvidenceStatus)) failures.push("sample evidence incomplete");
   return {
     status: failures.length ? "failed" : "passed",
     shareable: failures.length === 0,
@@ -474,6 +533,7 @@ function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegr
       smoke: smokeStatus,
       requiredChecks: resolvedRequiredCheckStatus,
       artifactIntegrity: artifactIntegrityStatus,
+      sampleEvidence: sampleEvidenceStatus,
     },
     failures,
   };
@@ -610,6 +670,7 @@ export function buildQaSummary({
   const requiredCheckSummary = summarizeRequiredSmokeChecks(requiredChecks);
   const requiredCheckFailures = requiredSmokeCheckFailureMessages(requiredChecks);
   const artifactIntegrity = artifactIntegrityFor(resolvedArtifactFileSizes, resolvedArtifactFileHashes);
+  const sampleEvidence = sampleEvidenceFor(config, smokeReport);
   return {
     schemaVersion: 1,
     generatedAt: finishedAt,
@@ -644,7 +705,9 @@ export function buildQaSummary({
         exitCode,
         requiredCheckStatus,
         artifactIntegrity,
+        sampleEvidence,
       }),
+      sampleEvidence,
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
