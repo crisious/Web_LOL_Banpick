@@ -1,4 +1,4 @@
-// server.js key moment player-death policy regression tests
+// server.js key moment impact event policy regression tests
 
 import fs from "fs";
 
@@ -36,11 +36,33 @@ const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TY
       'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
     ];
 
+const structureTakePolicySources = serverSrc.includes("const STRUCTURE_TAKE_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "STRUCTURE_TAKE_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isStructureTakeEvent"),
+    ]
+  : [
+      'const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);',
+      'function isStructureTakeEvent(event) { return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType); }',
+    ];
+
+const eliteObjectiveFightPolicySources = serverSrc.includes("const ELITE_OBJECTIVE_FIGHT_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "ELITE_OBJECTIVE_FIGHT_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isEliteObjectiveFightEvent"),
+    ]
+  : [
+      'const ELITE_OBJECTIVE_FIGHT_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT"]);',
+      'function isEliteObjectiveFightEvent(event) { return ELITE_OBJECTIVE_FIGHT_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const impactForMomentSrc = extractFunctionSource(serverSrc, "impactForMoment");
 
 const { impactForMoment } = new Function(
   [
     ...playerDeathPolicySources,
+    ...structureTakePolicySources,
+    ...eliteObjectiveFightPolicySources,
     extractFunctionSource(serverSrc, "impactForMoment"),
     "return { impactForMoment };",
   ].join("\n"),
@@ -74,6 +96,22 @@ checkTrue(
 checkTrue(
   "impactForMoment uses isPlayerDeathEvent",
   impactForMomentSrc.includes("isPlayerDeathEvent(event)"),
+);
+checkTrue(
+  "server defines ELITE_OBJECTIVE_FIGHT_EVENT_TYPES",
+  serverSrc.includes('const ELITE_OBJECTIVE_FIGHT_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT"]);'),
+);
+checkTrue(
+  "server defines isEliteObjectiveFightEvent",
+  serverSrc.includes("function isEliteObjectiveFightEvent(event)"),
+);
+checkTrue(
+  "impactForMoment uses isEliteObjectiveFightEvent",
+  impactForMomentSrc.includes("isEliteObjectiveFightEvent(event)"),
+);
+checkTrue(
+  "impactForMoment uses isStructureTakeEvent",
+  impactForMomentSrc.includes("isStructureTakeEvent(event)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

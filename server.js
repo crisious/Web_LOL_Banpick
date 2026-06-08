@@ -34,6 +34,7 @@ const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
 const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
+const ELITE_OBJECTIVE_FIGHT_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT"]);
 const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);
 const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);
 const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);
@@ -1063,6 +1064,10 @@ function isMacroObjectiveWinEvent(event) {
   return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
 }
 
+function isEliteObjectiveFightEvent(event) {
+  return ELITE_OBJECTIVE_FIGHT_EVENT_TYPES.has(event.eventType);
+}
+
 function isStructureTakeEvent(event) {
   return STRUCTURE_TAKE_EVENT_TYPES.has(event.eventType);
 }
@@ -1572,10 +1577,10 @@ function impactForMoment(event, result) {
   if (isPlayerDeathEvent(event)) {
     return result === "WIN" ? "이기는 흐름을 다소 늦췄다." : "팀 운영이 크게 흔들렸다.";
   }
-  if (event.eventType === "DRAGON_FIGHT" || event.eventType === "BARON_FIGHT") {
+  if (isEliteObjectiveFightEvent(event)) {
     return "오브젝트 주도권에 직접 영향을 줬다.";
   }
-  if (event.eventType === "TOWER_TAKE") {
+  if (isStructureTakeEvent(event)) {
     return "승리 조건을 구조물로 전환했다.";
   }
   return "교전 흐름을 유리하게 만드는 장면이었다.";
