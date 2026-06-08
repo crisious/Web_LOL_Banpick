@@ -298,6 +298,7 @@ payload
 - 서버의 `RIOT_API_KEY`와 direct API `riotApiKey` override는 공백/control character가 없는 exact `RGAPI-...` 문자열이어야 합니다. 브라우저 로그인 폼은 전송 전에 입력값을 trim하지만, 서버는 `.env`나 direct API secret material을 보정하지 않습니다.
 - Riot/live API generic failure는 `RIOT_API_ERROR`와 고정 한국어 메시지만 반환하며, raw upstream 메시지, 요청 URL, 로컬 경로, token-like 문자열은 브라우저로 반환하지 않습니다.
 - 최근 경기 응답에서 보조 랭크 조회만 실패하면 `rankedStatus: "error"`는 유지하되 `rankedError`는 고정 한국어 메시지를 사용하며 upstream host, 요청 URL, parser text, 로컬 경로, token-like 문자열을 반환하지 않습니다.
+- 챔피언 히스토리 SSE `match-error` progress event는 누락 경기 집계를 위한 `phase`/`matchId`를 유지하되 고정 메시지를 사용하며 upstream host, 요청 URL, parser text, 로컬 경로, token-like 문자열을 반환하지 않습니다.
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)
 - 중복 생성 방지: 동일 `platformRegion + matchId` 샘플 생성이 진행 중이면 `/api/generate-sample`은 409 `SAMPLE_GENERATION_IN_PROGRESS`로 새 작업을 막음

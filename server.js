@@ -2371,6 +2371,10 @@ function rankedLookupErrorMessage() {
   return "랭크 정보를 불러오지 못했습니다. 잠시 후 다시 시도하세요.";
 }
 
+function championHistoryMatchErrorMessage() {
+  return "일부 경기 정보를 불러오지 못했습니다.";
+}
+
 function riotErrorPayload(error) {
   if (
     error &&
@@ -2822,7 +2826,7 @@ async function handleChampionHistory(req, res) {
         }
       } catch (error) {
         // 개별 매치 실패는 부분 누락으로 처리, 전체 중단하지 않음
-        safeWrite("progress", { phase: "match-error", matchId: id, message: error.message });
+        safeWrite("progress", { phase: "match-error", matchId: id, message: championHistoryMatchErrorMessage() });
       }
       safeWrite("progress", { phase: "details", current: i + 1, total: uniqueIds.length });
       if (i < uniqueIds.length - 1) {
