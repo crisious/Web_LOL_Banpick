@@ -1700,20 +1700,29 @@ function buildKeyMoments(normalized) {
       if (b.importance !== a.importance) {
         return b.importance - a.importance;
       }
-      return a.timestampMs - b.timestampMs;
+      const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
+      const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
+      return aTime - bTime;
     })
     .slice(0, 7)
-    .sort((a, b) => a.timestampMs - b.timestampMs)
-    .map((event) => ({
-      eventId: event.eventId,
-      timestamp: event.timestampLabel,
-      phase: event.phase,
-      label: labelForMoment(event),
-      reason: event.summary,
-      impact: impactForMoment(event, normalized.matchInfo.result),
-      importance: event.importance,
-      relatedEventIds: [event.eventId],
-    }));
+    .sort((a, b) => {
+      const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
+      const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
+      return aTime - bTime;
+    })
+    .map((event) => {
+      const time = rawEventTimestampMs({ timestamp: event.timestampMs });
+      return {
+        eventId: event.eventId,
+        timestamp: timestampLabel(time),
+        phase: phaseFor(time),
+        label: labelForMoment(event),
+        reason: event.summary,
+        impact: impactForMoment(event, normalized.matchInfo.result),
+        importance: event.importance,
+        relatedEventIds: [event.eventId],
+      };
+    });
 }
 
 function buildEvidenceIndex(normalized) {
