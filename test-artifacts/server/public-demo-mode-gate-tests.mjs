@@ -254,6 +254,30 @@ if (invalidModeGate) {
     lowercaseBearerRes.body?.code,
     "PUBLIC_DEMO_UNAUTHORIZED");
 
+  const lowercaseBearerWithHeaderTokenRes = makeResponseRecorder();
+  check("protected mode rejects lowercase bearer even when x-demo-token matches",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "bearer demo-secret", "x-demo-token": "demo-secret" } }, lowercaseBearerWithHeaderTokenRes),
+    false);
+  check("protected mode lowercase bearer with x-demo-token returns unauthorized code",
+    lowercaseBearerWithHeaderTokenRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const basicAuthWithHeaderTokenRes = makeResponseRecorder();
+  check("protected mode rejects non-bearer Authorization even when x-demo-token matches",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "Basic demo-secret", "x-demo-token": "demo-secret" } }, basicAuthWithHeaderTokenRes),
+    false);
+  check("protected mode non-bearer Authorization with x-demo-token returns unauthorized code",
+    basicAuthWithHeaderTokenRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const whitespaceAuthWithHeaderTokenRes = makeResponseRecorder();
+  check("protected mode rejects whitespace Authorization even when x-demo-token matches",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: "   ", "x-demo-token": "demo-secret" } }, whitespaceAuthWithHeaderTokenRes),
+    false);
+  check("protected mode whitespace Authorization with x-demo-token returns unauthorized code",
+    whitespaceAuthWithHeaderTokenRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
   const trailingBearerRes = makeResponseRecorder();
   check("protected mode rejects bearer token with trailing whitespace",
     protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer demo-secret " } }, trailingBearerRes),

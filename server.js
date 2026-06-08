@@ -254,6 +254,7 @@ function tokenFromRequest(req) {
   const auth = firstHeaderValue(req.headers.authorization);
   const bearerPrefix = "Bearer ";
   if (auth.startsWith(bearerPrefix)) return auth.slice(bearerPrefix.length);
+  if (auth) return "\u0000invalid-authorization";
   return firstHeaderValue(req.headers["x-demo-token"]);
 }
 
