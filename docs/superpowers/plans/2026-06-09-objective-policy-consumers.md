@@ -219,7 +219,7 @@ Add a new section before `## 리스크 관리` with:
 - main sync: 최종 확인 예정
 ```
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -232,7 +232,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub Actions QA artifact**
+- [x] **Step 4: Verify GitHub Actions QA artifact**
 
 Run:
 
@@ -246,7 +246,7 @@ if rg -n "Authorization|Bearer|PUBLIC_DEMO_TOKEN: [^[:space:]]|EXTERNAL_READONLY
 
 Expected: GitHub Actions QA passes, artifact smoke summary has 0 failed, sensitive scan prints `no sensitive matches`.
 
-- [ ] **Step 5: Mark plan complete and push docs completion**
+- [x] **Step 5: Mark plan complete and push docs completion**
 
 After implementation QA, update this plan’s checkboxes and add a `## Completion Evidence` section with local and GitHub evidence. Then run:
 
@@ -284,3 +284,18 @@ Expected:
 - Spec coverage: This plan routes the remaining score and coach-summary objective-win consumers through `isObjectiveWinEvent()` while preserving current output behavior and keeping structure takes excluded from this policy.
 - Placeholder scan target: `rg -n "TB[D]|TO[D]O|implement[ ]later|fill[ ]in[ ]details" docs/superpowers/plans/2026-06-09-objective-policy-consumers.md`
 - Type consistency: `OBJECTIVE_WIN_EVENT_TYPES`, `isObjectiveWinEvent`, `calcObjectiveScore`, and `buildCoachSummary` are named consistently across tests and implementation.
+
+## Completion Evidence
+
+- RED check: `node test-artifacts/server/coach-summary-tests.mjs` exited 1 with `7 passed, 2 failed`. The failing checks were `buildCoachSummary uses isObjectiveWinEvent` and `calcObjectiveScore uses isObjectiveWinEvent`.
+- GREEN check: `node test-artifacts/server/coach-summary-tests.mjs` exited 0 with `9 passed, 0 failed`.
+- Syntax checks: `node --check server.js` and `node --check test-artifacts/server/coach-summary-tests.mjs` exited 0.
+- Whitespace check: `git diff --check` exited 0.
+- Placeholder scan: `rg -n "TB[D]|TO[D]O|implement[ ]later|fill[ ]in[ ]details" docs/superpowers/plans/2026-06-09-objective-policy-consumers.md` exited 1 with no matches.
+- Full test suite: `npm test` exited 0 with `1481 passed, 0 failed across 40 test file(s)`.
+- Local read-only smoke: `SMOKE_REPORT_OUTPUT_ROOT=test-artifacts/tmp/objective-policy-consumers-local npm run smoke:report:readonly` exited 0. `qa-summary.json` recorded `status: "passed"`, `durationMs: 206`, smoke `156 passed / 0 failed`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke sensitive scan: no sensitive matches.
+- Implementation commit: `66215e9 test: share objective policy consumers`, pushed to `origin/main`.
+- GitHub Actions QA run: `27152486230` passed for SHA `66215e94f618c0bc734754184ea520f5c35726fa`.
+- GitHub artifact: `7486599973` (`qa-automation-27152486230`, 3551 bytes) recorded `durationMs: 227`, smoke `156 passed / 0 failed`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "66215e9"`, and `dirty: false`.
+- GitHub artifact sensitive scan: no sensitive matches.
