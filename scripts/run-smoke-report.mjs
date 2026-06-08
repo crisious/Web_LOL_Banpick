@@ -387,6 +387,29 @@ function artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath) {
   };
 }
 
+function fileSizeBytes(filePath) {
+  try {
+    const size = fs.statSync(filePath).size;
+    return Number.isSafeInteger(size) && size > 0 ? size : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function emptyArtifactFileSizes() {
+  return {
+    smokeReportBytes: 0,
+    smokeRunBytes: 0,
+  };
+}
+
+export function artifactFileSizesFor(reportJsonPath, metadataPath) {
+  return {
+    smokeReportBytes: fileSizeBytes(reportJsonPath),
+    smokeRunBytes: fileSizeBytes(metadataPath),
+  };
+}
+
 function runDurationMs(startedAt, finishedAt) {
   const started = Date.parse(startedAt);
   const finished = Date.parse(finishedAt);
@@ -498,6 +521,7 @@ export function buildQaSummary({
   gitContext = null,
   ciContext = null,
   runtimeContext = null,
+  artifactFileSizes = null,
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
@@ -526,6 +550,7 @@ export function buildQaSummary({
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
       artifactRelativePaths: artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath),
+      artifactFileSizes: artifactFileSizes || emptyArtifactFileSizes(),
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
@@ -599,6 +624,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     gitContext: gitContextFor(process.cwd()),
     ciContext: ciContextFor(env),
     runtimeContext: runtimeContextFor(process),
+    artifactFileSizes: artifactFileSizesFor(reportJsonPath, metadataPath),
     smokeReport,
   }));
 

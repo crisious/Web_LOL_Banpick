@@ -631,6 +631,10 @@ if (fs.existsSync(runnerPath)) {
       platform: "linux",
       arch: "x64",
     },
+    artifactFileSizes: {
+      smokeReportBytes: 2048,
+      smokeRunBytes: 512,
+    },
     smokeReport: {
       status: "passed",
       actualMode: "protected",
@@ -683,6 +687,10 @@ if (fs.existsSync(runnerPath)) {
           qaSummary: "qa-summary.json",
           smokeReport: "2026-06-08T01-15-30Z-external-protected/smoke-report.json",
           smokeRun: "2026-06-08T01-15-30Z-external-protected/smoke-run.json",
+        },
+        artifactFileSizes: {
+          smokeReportBytes: 2048,
+          smokeRunBytes: 512,
         },
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
@@ -803,6 +811,10 @@ if (fs.existsSync(runnerPath)) {
       platform: "darwin",
       arch: "arm64",
     },
+    artifactFileSizes: {
+      smokeReportBytes: 4096,
+      smokeRunBytes: 768,
+    },
     smokeReport: passingRequiredCheckReport,
   });
 
@@ -812,6 +824,13 @@ if (fs.existsSync(runnerPath)) {
       qaSummary: "qa-summary.json",
       smokeReport: "2026-06-08T06-35-00Z-readonly/smoke-report.json",
       smokeRun: "2026-06-08T06-35-00Z-readonly/smoke-run.json",
+    });
+
+  check("buildQaSummary records artifact file sizes",
+    passingRequiredSummary?.latestRun?.artifactFileSizes,
+    {
+      smokeReportBytes: 4096,
+      smokeRunBytes: 768,
     });
 
   check("buildQaSummary records run duration in milliseconds",
@@ -897,6 +916,21 @@ if (fs.existsSync(runnerPath)) {
       platform: "linux",
       arch: "x64",
     });
+
+  const artifactSizeFixtureRoot = path.join("test-artifacts", "tmp", "smoke-report-artifact-size-fixture");
+  const artifactSizeReportPath = path.join(artifactSizeFixtureRoot, "smoke-report.json");
+  const artifactSizeMetadataPath = path.join(artifactSizeFixtureRoot, "smoke-run.json");
+  fs.rmSync(artifactSizeFixtureRoot, { recursive: true, force: true });
+  fs.mkdirSync(artifactSizeFixtureRoot, { recursive: true });
+  fs.writeFileSync(artifactSizeReportPath, "1234567890", "utf8");
+  fs.writeFileSync(artifactSizeMetadataPath, "abc", "utf8");
+  check("artifactFileSizesFor records smoke artifact byte sizes",
+    runner.artifactFileSizesFor?.(artifactSizeReportPath, artifactSizeMetadataPath),
+    {
+      smokeReportBytes: 10,
+      smokeRunBytes: 3,
+    });
+  fs.rmSync(artifactSizeFixtureRoot, { recursive: true, force: true });
 
   check("buildQaSummary records passing required check summary",
     passingRequiredSummary?.latestRun?.requiredCheckSummary,
