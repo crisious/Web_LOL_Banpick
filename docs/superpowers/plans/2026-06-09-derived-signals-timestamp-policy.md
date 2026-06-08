@@ -59,7 +59,7 @@ Expected RED:
 - Syntax check exits 0.
 - Test command fails because `buildDerivedSignals()`, `buildWeaknesses()`, and `filterPostObjectiveDeaths()` currently depend on stale `event.phase` or raw `timestampMs` comparison.
 
-Evidence, 2026-06-09 07:43 KST:
+Evidence, 2026-06-09 07:37 KST:
 - `node --check test-artifacts/server/derived-signals-timestamp-policy-tests.mjs` exited 0.
 - `node test-artifacts/server/derived-signals-timestamp-policy-tests.mjs` exited 1 with `0 passed, 9 failed`.
 - RED failures covered stale phase gates in `buildDerivedSignals()`, early-death weakness generation in `buildWeaknesses()`, raw malformed timestamp comparison in `filterPostObjectiveDeaths()`, and all source-shape checks proving the functions still depended on `event.phase` or direct `timestampMs` comparisons.
@@ -89,7 +89,7 @@ hasMidGameThrowRisk:
 
 Do not change insight copy, CS thresholds, objective/fight event type policy, weakness ordering, or returned object shape.
 
-Evidence, 2026-06-09 07:45 KST:
+Evidence, 2026-06-09 07:39 KST:
 - Updated `filterPostObjectiveDeaths()` to normalize both objective and death `timestampMs` values through `rawEventTimestampMs({ timestamp: ... })` before comparing the post-objective death window.
 - Updated `buildDerivedSignals()` to derive `earlyDeaths`, `lateTowers`, `hasEarlyLeadMoments`, and the MID death throw-risk gate through `phaseFor(rawEventTimestampMs({ timestamp: event.timestampMs }))`.
 - Updated `buildWeaknesses()` to derive early-death weakness gates through normalized timestamp phase.
@@ -114,7 +114,7 @@ Expected GREEN:
 - New derived signals timestamp policy test passes.
 - Existing strength/weakness, phase summary, LLM payload, and schema contracts still pass.
 
-Evidence, 2026-06-09 07:45 KST:
+Evidence, 2026-06-09 07:40 KST:
 - `node --check server.js && node --check test-artifacts/server/derived-signals-timestamp-policy-tests.mjs && node --check test-artifacts/server/strength-weakness-tests.mjs` exited 0.
 - `node test-artifacts/server/derived-signals-timestamp-policy-tests.mjs`: `9 passed, 0 failed`.
 - `node test-artifacts/server/strength-weakness-tests.mjs`: `89 passed, 0 failed`.
@@ -138,7 +138,7 @@ Expected:
 - Local smoke artifact scan finds no high-risk sensitive patterns.
 - `git diff --check` exits 0.
 
-Evidence, 2026-06-09 07:51 KST:
+Evidence, 2026-06-09 07:42 KST:
 - Initial full QA surfaced a harness dependency gap in `test-artifacts/server/coach-summary-tests.mjs` after `filterPostObjectiveDeaths()` began using `rawEventTimestampMs()`.
 - Root cause was confirmed by rerunning `node test-artifacts/server/coach-summary-tests.mjs`: `ReferenceError: rawEventTimestampMs is not defined`.
 - Updated the coach summary extraction harness to include `rawEventTimestampMs()`.
@@ -162,7 +162,7 @@ git push origin main
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
 
-Evidence, 2026-06-09 07:53 KST:
+Evidence, 2026-06-09 07:43 KST:
 - Staged only `docs/superpowers/plans/2026-06-09-derived-signals-timestamp-policy.md`, `server.js`, `test-artifacts/server/coach-summary-tests.mjs`, `test-artifacts/server/strength-weakness-tests.mjs`, and `test-artifacts/server/derived-signals-timestamp-policy-tests.mjs`.
 - Commit `d989db6` (`test: guard derived signal timestamps`) pushed to `origin/main`.
 - GitHub QA run `27171653760` completed with conclusion `success` for SHA `d989db6552bae5a76b2299af8f7e5237dbffa0fd`.
