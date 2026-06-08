@@ -335,7 +335,7 @@ Local evidence recorded before commit:
 
 Append a cycle entry before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with local RED/GREEN evidence, `npm test`, local smoke summary, commit SHA, GitHub Actions run id, artifact id, sensitive scan result, and final `main...origin/main` sync count.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -348,7 +348,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -383,3 +383,11 @@ Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
 - Spec coverage: The plan covers player death consumers in derived signals, weaknesses, coach summary, and key moment impact text.
 - Placeholder scan: No blocked placeholder wording is used.
 - Type consistency: `PLAYER_DEATH_EVENT_TYPES` is a `Set`, `isPlayerDeathEvent(event)` accepts event objects, and each updated consumer passes event objects directly to `Array.prototype.filter` or branch checks.
+
+## Completion Evidence
+
+- Implementation commit: `17a6ae8f17acb71dd139c6aca2c2574fcb4079cc` (`test: share player death event policy`) pushed to `origin/main`.
+- GitHub Actions QA run: `27154756641` passed for `17a6ae8f17acb71dd139c6aca2c2574fcb4079cc`.
+- GitHub QA artifact: `7487526434` (`qa-automation-27154756641`, 3548 bytes, not expired).
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 208`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
