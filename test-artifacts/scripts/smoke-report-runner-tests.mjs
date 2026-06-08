@@ -68,6 +68,12 @@ if (fs.existsSync(runnerPath)) {
     { label: "readonly mode blocks /api/generate-sample", status: "missing" },
     { label: "/api/generate-sample readonly block returns PUBLIC_DEMO_READONLY", status: "missing" },
   ];
+  const commonMissingFullRequiredCheckFailures = commonMissingFullRequiredChecks.map((check) =>
+    `missing required smoke check: ${check.label}`
+  );
+  const readonlyMissingFullRequiredCheckFailures = readonlyMissingFullRequiredChecks.map((check) =>
+    `missing required smoke check: ${check.label}`
+  );
 
   check("parseRunnerArgs defaults to local readonly",
     runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}),
@@ -635,6 +641,7 @@ if (fs.existsSync(runnerPath)) {
           failed: 0,
           missing: 7,
         },
+        requiredCheckFailures: commonMissingFullRequiredCheckFailures,
       },
     });
 
@@ -684,21 +691,7 @@ if (fs.existsSync(runnerPath)) {
 
   check("validateRequiredSmokeChecks reports missing full smoke security checks",
     runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, missingRequiredCheckReport),
-    [
-      "missing required smoke check: /api/samples list entries omit explicit matchId",
-      "missing required smoke check: /.env is not publicly served",
-      "missing required smoke check: /.env has X-Content-Type-Options nosniff",
-      "missing required smoke check: /server.js is not publicly served",
-      "missing required smoke check: /server.js has X-Content-Type-Options nosniff",
-      "missing required smoke check: /data/samples/manifest.json is not publicly served",
-      "missing required smoke check: /data/samples/manifest.json has X-Content-Type-Options nosniff",
-      "missing required smoke check: readonly mode blocks /api/recent-matches",
-      "missing required smoke check: /api/recent-matches readonly block returns PUBLIC_DEMO_READONLY",
-      "missing required smoke check: readonly mode blocks /api/champion-history",
-      "missing required smoke check: /api/champion-history readonly block returns PUBLIC_DEMO_READONLY",
-      "missing required smoke check: readonly mode blocks /api/generate-sample",
-      "missing required smoke check: /api/generate-sample readonly block returns PUBLIC_DEMO_READONLY",
-    ]);
+    readonlyMissingFullRequiredCheckFailures);
 
   const passingRequiredCheckReport = {
     status: "passed",
@@ -746,6 +739,10 @@ if (fs.existsSync(runnerPath)) {
       missing: 0,
     });
 
+  check("buildQaSummary records no required check failures when required checks pass",
+    passingRequiredSummary?.latestRun?.requiredCheckFailures,
+    []);
+
   const missingRequiredSummary = runner.buildQaSummary?.({
     config: missingRequiredCheckConfig,
     reportDir: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly",
@@ -769,6 +766,10 @@ if (fs.existsSync(runnerPath)) {
       failed: 0,
       missing: 13,
     });
+
+  check("buildQaSummary records missing required check failures",
+    missingRequiredSummary?.latestRun?.requiredCheckFailures,
+    readonlyMissingFullRequiredCheckFailures);
 
   const mixedRequiredSummary = runner.buildQaSummary?.({
     config: missingRequiredCheckConfig,
@@ -797,6 +798,23 @@ if (fs.existsSync(runnerPath)) {
       failed: 1,
       missing: 11,
     });
+
+  check("buildQaSummary records mixed required check failures",
+    mixedRequiredSummary?.latestRun?.requiredCheckFailures,
+    [
+      "required smoke check failed: /.env is not publicly served",
+      "missing required smoke check: /.env has X-Content-Type-Options nosniff",
+      "missing required smoke check: /server.js is not publicly served",
+      "missing required smoke check: /server.js has X-Content-Type-Options nosniff",
+      "missing required smoke check: /data/samples/manifest.json is not publicly served",
+      "missing required smoke check: /data/samples/manifest.json has X-Content-Type-Options nosniff",
+      "missing required smoke check: readonly mode blocks /api/recent-matches",
+      "missing required smoke check: /api/recent-matches readonly block returns PUBLIC_DEMO_READONLY",
+      "missing required smoke check: readonly mode blocks /api/champion-history",
+      "missing required smoke check: /api/champion-history readonly block returns PUBLIC_DEMO_READONLY",
+      "missing required smoke check: readonly mode blocks /api/generate-sample",
+      "missing required smoke check: /api/generate-sample readonly block returns PUBLIC_DEMO_READONLY",
+    ]);
 
   const sampleListErrorConfig = runner.parseRunnerArgs([
     "node",
@@ -827,6 +845,10 @@ if (fs.existsSync(runnerPath)) {
       failed: 0,
       missing: 0,
     });
+
+  check("sample list error smoke reports record no required check failures",
+    sampleListErrorSummary?.latestRun?.requiredCheckFailures,
+    []);
 
   check("buildQaSummary prefers runner exit status over passed smoke report status",
     runner.buildQaSummary?.({

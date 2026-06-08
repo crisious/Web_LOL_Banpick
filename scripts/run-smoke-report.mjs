@@ -355,14 +355,18 @@ function summarizeRequiredSmokeChecks(requiredChecks) {
   return summary;
 }
 
-export function validateRequiredSmokeChecks(config, smokeReport) {
-  return requiredSmokeCheckResults(config, smokeReport)
+function requiredSmokeCheckFailureMessages(requiredChecks) {
+  return requiredChecks
     .filter((check) => check.status !== "pass")
     .map((check) =>
       check.status === "missing"
         ? `missing required smoke check: ${check.label}`
         : `required smoke check failed: ${check.label}`
     );
+}
+
+export function validateRequiredSmokeChecks(config, smokeReport) {
+  return requiredSmokeCheckFailureMessages(requiredSmokeCheckResults(config, smokeReport));
 }
 
 export function buildQaSummary({
@@ -395,6 +399,7 @@ export function buildQaSummary({
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
       requiredCheckSummary: summarizeRequiredSmokeChecks(requiredChecks),
+      requiredCheckFailures: requiredSmokeCheckFailureMessages(requiredChecks),
     },
   };
 }
