@@ -50,6 +50,12 @@ check("smoke report runner script exists",
 
 if (fs.existsSync(runnerPath)) {
   const runner = await import(runnerPath);
+  const missingFullRequiredChecks = [
+    { label: "/api/samples list entries omit explicit matchId", status: "missing" },
+    { label: "/.env is not publicly served", status: "missing" },
+    { label: "/server.js is not publicly served", status: "missing" },
+    { label: "/data/samples/manifest.json is not publicly served", status: "missing" },
+  ];
 
   check("parseRunnerArgs defaults to local readonly",
     runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}),
@@ -610,7 +616,7 @@ if (fs.existsSync(runnerPath)) {
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
-        requiredChecks: [{ label: "/api/samples list entries omit explicit matchId", status: "missing" }],
+        requiredChecks: missingFullRequiredChecks,
       },
     });
 
@@ -654,9 +660,14 @@ if (fs.existsSync(runnerPath)) {
     checks: [{ status: "pass", label: "GET /healthz returns 200" }],
   };
 
-  check("validateRequiredSmokeChecks reports missing sample list matchId check",
+  check("validateRequiredSmokeChecks reports missing full smoke security checks",
     runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, missingRequiredCheckReport),
-    ["missing required smoke check: /api/samples list entries omit explicit matchId"]);
+    [
+      "missing required smoke check: /api/samples list entries omit explicit matchId",
+      "missing required smoke check: /.env is not publicly served",
+      "missing required smoke check: /server.js is not publicly served",
+      "missing required smoke check: /data/samples/manifest.json is not publicly served",
+    ]);
 
   const passingRequiredCheckReport = {
     status: "passed",
@@ -665,10 +676,13 @@ if (fs.existsSync(runnerPath)) {
     checks: [
       { status: "pass", label: "GET /healthz returns 200" },
       { status: "pass", label: "/api/samples list entries omit explicit matchId" },
+      { status: "pass", label: "/.env is not publicly served" },
+      { status: "pass", label: "/server.js is not publicly served" },
+      { status: "pass", label: "/data/samples/manifest.json is not publicly served" },
     ],
   };
 
-  check("validateRequiredSmokeChecks passes when sample list matchId check is present",
+  check("validateRequiredSmokeChecks passes when full smoke security checks are present",
     runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, passingRequiredCheckReport),
     []);
 
@@ -685,7 +699,7 @@ if (fs.existsSync(runnerPath)) {
 
   check("buildQaSummary records missing required smoke checks",
     missingRequiredSummary?.latestRun?.requiredChecks,
-    [{ label: "/api/samples list entries omit explicit matchId", status: "missing" }]);
+    missingFullRequiredChecks);
 
   const sampleListErrorConfig = runner.parseRunnerArgs([
     "node",

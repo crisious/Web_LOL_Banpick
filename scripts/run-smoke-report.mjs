@@ -35,6 +35,9 @@ const SAMPLE_LIST_ERROR_OPTIONS = [
 ];
 const REQUIRED_FULL_SMOKE_CHECK_LABELS = [
   "/api/samples list entries omit explicit matchId",
+  "/.env is not publicly served",
+  "/server.js is not publicly served",
+  "/data/samples/manifest.json is not publicly served",
 ];
 const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
