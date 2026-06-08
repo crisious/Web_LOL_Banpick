@@ -292,7 +292,7 @@ Evidence:
 - Added the `2026-06-09 04:01 KST - Raw event timestamp helper 공유` entry with RED/GREEN and local QA evidence.
 - Commit SHA, GitHub Actions run id, artifact id, and final sync evidence remain pending until push and CI verification complete.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -305,7 +305,10 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+Evidence:
+- Implementation commit `5d223c9` (`test: share raw event timestamp helper`) was pushed to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -316,6 +319,12 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 ```
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
+
+Evidence:
+- GitHub Actions QA run `27160366298` passed for head SHA `5d223c98ab8b637d73302c7010eb914fbf6b9d64`.
+- Workflow artifact `7489775296` (`qa-automation-27160366298`, 3551 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 201`, `latestRun.git.shortSha: "5d223c9"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 5: Mark plan complete and final sync**
 
