@@ -61,6 +61,7 @@ Expected:
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403
 - generic Riot/live API failures surface only `RIOT_API_ERROR`; responses must not contain `RGAPI`, `api_key`, local file paths, upstream hostnames, parser text, or DNS error strings
+- partial ranked lookup failures in `/api/recent-matches` keep `rankedStatus: "error"` with a fixed `rankedError`; responses must not contain `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, or parser text
 - malformed, absolute-form, protocol-relative request targets or invalid Host headers fail as HTTP 400 `INVALID_REQUEST_TARGET` instead of escaping the request handler
 - malformed live API JSON bodies fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field

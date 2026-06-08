@@ -2367,6 +2367,10 @@ function genericRiotApiErrorPayload() {
   };
 }
 
+function rankedLookupErrorMessage() {
+  return "랭크 정보를 불러오지 못했습니다. 잠시 후 다시 시도하세요.";
+}
+
 function riotErrorPayload(error) {
   if (
     error &&
@@ -2691,7 +2695,7 @@ async function handleRecentMatches(req, res) {
       }
     } else if (rankedLookupError) {
       rankedStatus = "error";
-      rankedError = rankedLookupError?.message || "ranked lookup failed";
+      rankedError = rankedLookupErrorMessage();
     }
 
 
