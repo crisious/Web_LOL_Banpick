@@ -2004,7 +2004,7 @@ playerDecision은 그 순간 플레이어의 판단/포지셔닝을 사실 기�
 적용할 짧은 교훈. encounterId와 relatedEventIds는 입력값을 그대로 반영. 입력 encounter가 0개면
 combatAnalysis는 빈 배열.
 
-teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(teamfightId)마다 1개씩 작성. 각 phase(ENGAGE/TRADE/CLEANUP)별로 그 국면의 판단을 coaching 한 줄로, takeaway는 이 한타의 핵심 교훈 한 줄. teamfightId와 phase는 입력값을 그대로 반영. 입력 teamfightPhases가 0개면 빈 배열.
+teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(\`teamfightId\`)마다 1개씩 작성. 각 \`phases\` row는 입력 phase row의 \`phase\`, \`outcomeTag\`, \`playerKills\`, \`playerDeaths\`, \`relatedEventIds\`를 그대로 반영하고, \`coaching\`은 그 국면 판단 코칭 한 줄로 작성. \`takeaway\`는 이 한타의 핵심 교훈 한 줄. 입력 teamfightPhases가 0개면 빈 배열.
 
 분석할 경기 데이터:`;
 
@@ -2046,7 +2046,7 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. 레드팀 관점으로
 판단 실수와 구조적 약점을 더 날카롭게 지적. 입력 encounter가 0개면 빈 배열.
 
-teamfightPhaseAnalysis: 입력 teamfightPhases 각 한타를 진입/딜교환/정리 국면으로 보고, 레드팀 관점에서 국면별 판단 실수를 coaching에 날카롭게 지적. 입력이 0개면 빈 배열.
+teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(\`teamfightId\`)마다 1개씩 작성. 각 \`phases\` row는 입력 phase row의 \`phase\`, \`outcomeTag\`, \`playerKills\`, \`playerDeaths\`, \`relatedEventIds\`를 그대로 반영하고, \`coaching\`은 레드팀 관점에서 국면별 판단 실수를 날카롭게 지적. \`takeaway\`는 이 한타의 핵심 교훈 한 줄. 입력 teamfightPhases가 0개면 빈 배열.
 
 분석할 경기 데이터:`;
 

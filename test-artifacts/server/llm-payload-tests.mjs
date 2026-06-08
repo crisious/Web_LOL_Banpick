@@ -43,6 +43,11 @@ const outputSchemaExampleSrc = extractConstSource(serverSrc, "OUTPUT_SCHEMA_EXAM
 const OUTPUT_SCHEMA_EXAMPLE = new Function(
   `${outputSchemaExampleSrc}\nreturn OUTPUT_SCHEMA_EXAMPLE;`,
 )();
+const claudePromptSrc = extractConstSource(serverSrc, "CLAUDE_COACHING_PROMPT");
+const codexPromptSrc = extractConstSource(serverSrc, "CODEX_REDTEAM_PROMPT");
+const { CLAUDE_COACHING_PROMPT, CODEX_REDTEAM_PROMPT } = new Function(
+  `${outputSchemaExampleSrc}\n${claudePromptSrc}\n${codexPromptSrc}\nreturn { CLAUDE_COACHING_PROMPT, CODEX_REDTEAM_PROMPT };`,
+)();
 
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
@@ -70,6 +75,13 @@ function check(label, got, expected) {
 function checkTrue(label, condition) {
   console.log(`${condition ? "PASS" : "FAIL"}  ${label}`);
   condition ? pass++ : fail++;
+}
+
+function finalTeamfightInstructionSnippet(prompt) {
+  const start = prompt.lastIndexOf("teamfightPhaseAnalysis:");
+  const end = prompt.indexOf("분석할 경기 데이터:", start);
+  if (start < 0 || end < 0 || end <= start) return "";
+  return prompt.slice(start, end);
 }
 
 // 최소 정규화 fixture (필수 필드만)
@@ -314,6 +326,30 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
   checkTrue("teamfight prompt includes playerKills", snippet.includes('"playerKills"'));
   checkTrue("teamfight prompt includes playerDeaths", snippet.includes('"playerDeaths"'));
   checkTrue("teamfight prompt includes relatedEventIds", snippet.includes('"relatedEventIds"'));
+}
+
+// ─── 케이스 16: teamfight 지시문 본문은 필수 phase row 필드를 명시해야 함 ──
+
+{
+  const requiredFields = [
+    "teamfightId",
+    "phase",
+    "outcomeTag",
+    "playerKills",
+    "playerDeaths",
+    "coaching",
+    "relatedEventIds",
+    "takeaway",
+  ];
+  for (const [label, prompt] of [
+    ["Claude", CLAUDE_COACHING_PROMPT],
+    ["Codex", CODEX_REDTEAM_PROMPT],
+  ]) {
+    const snippet = finalTeamfightInstructionSnippet(prompt);
+    for (const field of requiredFields) {
+      checkTrue(`${label} teamfight instruction names ${field}`, snippet.includes(`\`${field}\``));
+    }
+  }
 }
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
