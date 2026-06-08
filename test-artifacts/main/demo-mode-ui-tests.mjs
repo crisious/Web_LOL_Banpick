@@ -72,5 +72,37 @@ check("already actionable retry messages are not duplicated",
   formatRetryMessage(new Error("샘플 생성이 이미 진행 중입니다. 잠시 후 다시 시도하세요.")),
   "샘플 생성이 이미 진행 중입니다. 잠시 후 다시 시도하세요.");
 
+check("sensitive DNS/token errors use generic retry copy",
+  formatRetryMessage(new Error("getaddrinfo ENOTFOUND kr.api.riotgames.com?api_key=RGAPI-secret")),
+  "요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.");
+
+check("sensitive local path errors use generic retry copy",
+  formatRetryMessage(new Error("ENOENT: no such file or directory, open '/runtime/samples/secret.json'")),
+  "요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.");
+
+check("sensitive parser errors use generic retry copy",
+  formatRetryMessage(new Error("Unexpected token < in JSON at position 0")),
+  "요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.");
+
+check("sample load failure uses retry formatter",
+  mainSrc.includes("샘플 로드 실패: ${escapeHtml(formatRetryMessage(error))}"),
+  true);
+
+check("recent matches failure escapes retry formatter output",
+  mainSrc.includes("최근 경기 조회 실패: ${escapeHtml(formatRetryMessage(error))}"),
+  true);
+
+check("recent stats error stores retry formatter output",
+  mainSrc.includes("state.recentStatsError = formatRetryMessage(error);"),
+  true);
+
+check("champion history failure uses retry formatter",
+  mainSrc.includes("분석 실패: ${formatRetryMessage(error)}"),
+  true);
+
+check("sample load failure no longer renders raw error.message",
+  !mainSrc.includes("샘플 로드 실패: ${escapeHtml(error.message)}"),
+  true);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

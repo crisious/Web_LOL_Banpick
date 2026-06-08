@@ -1372,7 +1372,7 @@ async function fetchRecentStats({ force = false } = {}) {
     refreshMetricDeltas();
   } catch (error) {
     maybeHandleRiotKeyError(error);
-    state.recentStatsError = error.message || String(error);
+    state.recentStatsError = formatRetryMessage(error);
     renderRecentStatsError(state.recentStatsError);
   } finally {
     state.recentStatsLoading = false;
@@ -3187,7 +3187,7 @@ async function selectSample(sampleId) {
     renderSample(sample);
     dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
   } catch (error) {
-    dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(error.message)} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
+    dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(formatRetryMessage(error))} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
   }
 }
 
@@ -3251,7 +3251,25 @@ function isNonRetryablePublicDemoMessage(message) {
 
 function formatRetryMessage(error) {
   const rawMessage = String(error?.message || "");
-  const baseMessage = rawMessage.trim() || "알 수 없는 오류가 발생했습니다.";
+  const trimmed = rawMessage.trim();
+  const sensitivePatterns = [
+    "RGAPI",
+    "api_key",
+    "Authorization",
+    "Bearer ",
+    "token=",
+    "access_token",
+    "/runtime/samples",
+    "/Users/",
+    "ENOENT",
+    "Unexpected token",
+    "getaddrinfo",
+    "ENOTFOUND",
+    ".api.riotgames.com",
+  ];
+  const baseMessage = sensitivePatterns.some((token) => trimmed.includes(token))
+    ? "요청 처리 중 오류가 발생했습니다."
+    : trimmed || "알 수 없는 오류가 발생했습니다.";
   if (isNonRetryablePublicDemoMessage(baseMessage)) {
     return baseMessage;
   }
@@ -3340,7 +3358,7 @@ async function handleRecentMatchesSubmit(event) {
     dom.fetchStatus.textContent = `${result.riotId} 최근 경기 ${result.matches.length}건을 불러왔습니다. fit 점수가 높은 순서대로 정렬했습니다.`;
   } catch (error) {
     maybeHandleRiotKeyError(error);
-    dom.fetchStatus.innerHTML = `최근 경기 조회 실패: ${formatRetryMessage(error)} <button class="retry-btn" data-retry-recent>다시 시도</button>`;
+    dom.fetchStatus.innerHTML = `최근 경기 조회 실패: ${escapeHtml(formatRetryMessage(error))} <button class="retry-btn" data-retry-recent>다시 시도</button>`;
   } finally {
     state.isRecentMatchesPending = false;
     applyPendingUi();
@@ -4217,7 +4235,7 @@ async function startChampionHistoryFetch(force) {
       setChampionHistoryEmpty("분석이 취소되었습니다.");
     } else {
       maybeHandleRiotKeyError(error);
-      setChampionHistoryEmpty(`분석 실패: ${error.message}`);
+      setChampionHistoryEmpty(`분석 실패: ${formatRetryMessage(error)}`);
     }
   } finally {
     state.championHistoryLoading = false;
