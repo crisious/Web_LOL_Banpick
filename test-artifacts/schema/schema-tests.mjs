@@ -85,6 +85,9 @@ if (serverSrc.includes("const INSIGHT_LIST_MAX =")) {
 if (serverSrc.includes("function hasValidInsightList(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidInsightList"));
 }
+if (serverSrc.includes("function hasValidCombatAnalysis(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidCombatAnalysis"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -498,7 +501,13 @@ expectOk("combatAnalysis: empty array → tolerated", () => {
 
 expectOk("combatAnalysis: valid item passes", () => {
   validateAnalysisOutput(withCombat([
-    { encounterId: "enc_001", situationLabel: "초반 갱킹 손실", takeaway: "와드 우선" },
+    {
+      encounterId: "enc_001",
+      situationLabel: "초반 갱킹 손실",
+      playerDecision: "시야 없이 라인 압박을 유지",
+      takeaway: "와드 우선",
+      relatedEventIds: ["evt_001"],
+    },
   ]));
 });
 
@@ -515,8 +524,71 @@ expectThrows("combatAnalysis: missing situationLabel throws",
   "situationLabel");
 
 expectThrows("combatAnalysis: missing takeaway throws",
-  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "x" }])),
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    playerDecision: "판단",
+    relatedEventIds: ["evt_001"],
+  }])),
   "takeaway");
+
+expectThrows("combatAnalysis: blank encounterId throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "   ",
+    situationLabel: "x",
+    playerDecision: "판단",
+    takeaway: "y",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "encounterId");
+
+expectThrows("combatAnalysis: missing playerDecision throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    takeaway: "y",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "playerDecision");
+
+expectThrows("combatAnalysis: blank playerDecision throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    playerDecision: "   ",
+    takeaway: "y",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "playerDecision");
+
+expectThrows("combatAnalysis: blank takeaway throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    playerDecision: "판단",
+    takeaway: "   ",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "takeaway");
+
+expectThrows("combatAnalysis: missing relatedEventIds throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    playerDecision: "판단",
+    takeaway: "y",
+  }])),
+  "relatedEventIds");
+
+expectThrows("combatAnalysis: invalid relatedEventIds throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "x",
+    playerDecision: "판단",
+    takeaway: "y",
+    relatedEventIds: ["evt_001", ""],
+  }])),
+  "relatedEventIds");
 
 expectThrows("combatAnalysis: empty string situationLabel throws",
   () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "", takeaway: "y" }])),

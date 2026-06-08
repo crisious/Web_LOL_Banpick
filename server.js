@@ -2188,6 +2188,23 @@ function hasValidInsightList(items) {
     );
 }
 
+function hasValidCombatAnalysis(combatAnalysis) {
+  return combatAnalysis === undefined ||
+    combatAnalysis === null ||
+    (
+      Array.isArray(combatAnalysis) &&
+      combatAnalysis.every((item) =>
+        item &&
+        isNonBlankString(item.encounterId) &&
+        isNonBlankString(item.situationLabel) &&
+        isNonBlankString(item.playerDecision) &&
+        isNonBlankString(item.takeaway) &&
+        Array.isArray(item.relatedEventIds) &&
+        item.relatedEventIds.every((id) => isNonBlankString(id))
+      )
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
@@ -2202,13 +2219,17 @@ function validateAnalysisOutput(json) {
   if (!hasValidKeyMoments(json?.keyMoments)) throw new Error("keyMoments invalid");
   if (!hasValidEvidenceIndex(json?.evidenceIndex)) throw new Error("evidenceIndex invalid");
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
-  // 있으면 배열 타입과 각 항목 필수 필드만 검증.
+  // 있으면 UI가 렌더링하는 판단/교훈/근거 링크 필드까지 검증.
   if (json.combatAnalysis !== undefined && json.combatAnalysis !== null) {
     if (!Array.isArray(json.combatAnalysis)) throw new Error("combatAnalysis not array");
     for (const item of json.combatAnalysis) {
-      if (!item || typeof item.encounterId !== "string") throw new Error("combatAnalysis item missing encounterId");
-      if (typeof item.situationLabel !== "string" || !item.situationLabel) throw new Error("combatAnalysis item missing situationLabel");
-      if (typeof item.takeaway !== "string" || !item.takeaway) throw new Error("combatAnalysis item missing takeaway");
+      if (!item || !isNonBlankString(item.encounterId)) throw new Error("combatAnalysis item missing encounterId");
+      if (!isNonBlankString(item.situationLabel)) throw new Error("combatAnalysis item missing situationLabel");
+      if (!isNonBlankString(item.playerDecision)) throw new Error("combatAnalysis item missing playerDecision");
+      if (!isNonBlankString(item.takeaway)) throw new Error("combatAnalysis item missing takeaway");
+      if (!Array.isArray(item.relatedEventIds) || !item.relatedEventIds.every((id) => isNonBlankString(id))) {
+        throw new Error("combatAnalysis item missing relatedEventIds");
+      }
     }
   }
   // 한타 단계별 분석은 선택적 — 있으면 배열 + 각 항목 형태만 검증.
@@ -2402,13 +2423,12 @@ async function buildAnalysis(normalized, sampleId) {
     primary.actionChecklist = buildActionChecklist(normalized, checklistWeaknesses);
     violations.push("shape.actionChecklist.invalid");
   }
-  // Phase 32: combatAnalysis 정규화 — 누락 시 빈 배열, 비배열이면 빈 배열로 강제.
-  // 형태 오류는 violation에 등재하되 fallback 트리거하지 않음 (선택적 필드).
+  // Phase 32: combatAnalysis 정규화 — 선택 필드이므로 깨진 AI 응답은 빈 배열로 복구.
   if (primary.combatAnalysis === undefined || primary.combatAnalysis === null) {
     primary.combatAnalysis = [];
-  } else if (!Array.isArray(primary.combatAnalysis)) {
+  } else if (!hasValidCombatAnalysis(primary.combatAnalysis)) {
     primary.combatAnalysis = [];
-    violations.push("type.combatAnalysis.notArray");
+    violations.push("shape.combatAnalysis.invalid");
   }
 
   // 한타 단계별 분석: payload의 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
