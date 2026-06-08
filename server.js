@@ -1203,7 +1203,11 @@ function buildWeaknesses(normalized) {
 }
 
 function buildActionChecklist(normalized, weaknesses) {
-  return weaknesses.slice(0, 4).map((item, index) => ({
+  const checklistWeaknesses = Array.isArray(weaknesses) ? weaknesses.slice(0, 4) : [];
+  while (checklistWeaknesses.length < ACTION_CHECKLIST_MIN) {
+    checklistWeaknesses.push({ improvementHint: "체크리스트 최소 항목을 채우기 위한 기본 개선 루틴" });
+  }
+  return checklistWeaknesses.map((item, index) => ({
     id: `act_0${index + 1}`,
     priority: index + 1,
     action:

@@ -43,6 +43,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "bestObjectiveSummary"),
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
+    extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
     extractFunctionSource(serverSrc, "buildActionChecklist"),
@@ -200,7 +201,16 @@ check("actionChecklist action[0]", acts[0].action, "초반 주요 구도 직후�
 check("actionChecklist action[1]", acts[1].action, "교전이 비는 구간에는 웨이브나 캠프를 더 확실하게 챙겨 자원 손실 줄이기");
 check("actionChecklist action[2]", acts[2].action, "드래곤·바론 직후에는 추가 추격보다 리셋과 라인 정리를 먼저 선택하기");
 check("actionChecklist action[3+]", acts[3].action, "시야가 밀릴 때는 contest와 이탈 중 하나를 더 빠르게 결정하기");
-check("actionChecklist single weakness → length 1", buildActionChecklist({}, [{ improvementHint: "only" }]).length, 1);
+
+const singleWeaknessChecklist = buildActionChecklist({}, [{ improvementHint: "only" }]);
+check("actionChecklist single weakness pads to min 3", singleWeaknessChecklist.length, 3);
+check("actionChecklist single weakness keeps first reason", singleWeaknessChecklist[0].reason, "only");
+check("actionChecklist single weakness pads fallback reasons",
+  singleWeaknessChecklist.slice(1).every((a) => a.reason === "체크리스트 최소 항목을 채우기 위한 기본 개선 루틴"), true);
+
+const emptyWeaknessChecklist = buildActionChecklist({}, []);
+check("actionChecklist empty weakness list pads to min 3", emptyWeaknessChecklist.length, 3);
+check("actionChecklist empty weakness ids", emptyWeaknessChecklist.map((a) => a.id), ["act_01", "act_02", "act_03"]);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);
