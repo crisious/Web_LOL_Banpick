@@ -1957,7 +1957,7 @@ function runCli(args, stdinText, timeoutMs) {
 // string vs object) 위반 빈도를 줄인다. 누락/이름변경/중첩 금지를 명시.
 const OUTPUT_SCHEMA_EXAMPLE = `정확히 다음 JSON 키 구조를 따른다. 키 이름 변경/누락/중첩 금지.
 matchSummary는 객체이며 headline은 문자열이다. coachSummary는 객체이며 overallSummary는 문자열이다.
-phaseSummaries는 배열이다 (객체 아님). keyMoments는 4개 이상의 배열이다.
+phaseSummaries는 3개 이상의 배열이다 (객체 아님). keyMoments는 4개 이상의 배열이다.
 evidenceIndex는 1개 이상의 배열이며 각 항목은 eventId와 shortNote 또는 summary를 포함한다.
 combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당 1개씩 작성하되, 입력에 encounter가 없으면 빈 배열을 반환한다.
 teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 항목당 1개씩 작성하되, 입력에 teamfightPhases가 없으면 빈 배열을 반환한다.
