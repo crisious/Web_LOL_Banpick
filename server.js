@@ -1646,11 +1646,12 @@ function buildKdaTimeline(normalized) {
     }
 
     if (changed) {
+      const time = rawEventTimestampMs({ timestamp: evt.timestampMs });
       const kda = +((kills + assists) / Math.max(1, deaths)).toFixed(2);
       points.push({
-        time: evt.timestampMs,
-        timeLabel: evt.timestampLabel,
-        phase: evt.phase,
+        time,
+        timeLabel: timestampLabel(time),
+        phase: phaseFor(time),
         kills,
         deaths,
         assists,

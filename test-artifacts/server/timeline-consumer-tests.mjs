@@ -29,6 +29,12 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+function functionSourceOrFallback(source, name, fallback) {
+  return source.includes(`function ${name}(`)
+    ? extractFunctionSource(source, name)
+    : fallback;
+}
+
 const playerKillPolicySources = serverSrc.includes("const PLAYER_KILL_EVENT_TYPES =")
   ? [
       extractConstSource(serverSrc, "PLAYER_KILL_EVENT_TYPES"),
@@ -49,11 +55,20 @@ const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TY
       'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
     ];
 
+const rawTimestampSource = functionSourceOrFallback(
+  serverSrc,
+  "rawEventTimestampMs",
+  "function rawEventTimestampMs(event) { return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0; }",
+);
+
 const buildPhaseContextSrc = extractFunctionSource(serverSrc, "buildPhaseContext");
 const buildKdaTimelineSrc = extractFunctionSource(serverSrc, "buildKdaTimeline");
 
 const { buildPhaseContext, buildKdaTimeline } = new Function(
   [
+    extractFunctionSource(serverSrc, "timestampLabel"),
+    extractFunctionSource(serverSrc, "phaseFor"),
+    rawTimestampSource,
     ...playerKillPolicySources,
     ...playerDeathPolicySources,
     extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
