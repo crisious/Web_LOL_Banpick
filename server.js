@@ -43,6 +43,9 @@ const PHASE_SUMMARIES_MIN = 3;
 // actionChecklist는 legacy rule-based fallback 호환을 위해 최소 1개, LLM 계약 상한 5개를 검증한다.
 const ACTION_CHECKLIST_MIN = 1;
 const ACTION_CHECKLIST_MAX = 5;
+// strengths/weaknesses는 legacy fallback 호환 최소 1개와 리포트 카드 상한 3개를 검증한다.
+const INSIGHT_LIST_MIN = 1;
+const INSIGHT_LIST_MAX = 3;
 
 function resolveSamplesDir(configuredDir, appRoot) {
   const value = configuredDir === undefined || configuredDir === null ? "" : String(configuredDir);
@@ -2121,6 +2124,23 @@ function hasValidActionChecklist(actionChecklist) {
     );
 }
 
+function hasValidInsightList(items) {
+  return Array.isArray(items) &&
+    items.length >= INSIGHT_LIST_MIN &&
+    items.length <= INSIGHT_LIST_MAX &&
+    items.every((item) =>
+      item &&
+      typeof item.id === "string" &&
+      item.id &&
+      typeof item.title === "string" &&
+      item.title &&
+      typeof item.description === "string" &&
+      item.description &&
+      Array.isArray(item.relatedEventIds) &&
+      item.relatedEventIds.every((id) => typeof id === "string" && id)
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
@@ -2129,8 +2149,8 @@ function validateAnalysisOutput(json) {
   if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
   if (!json?.coachSummary?.overallSummary) throw new Error("missing coachSummary.overallSummary");
   if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);
-  if (!Array.isArray(json?.strengths) || json.strengths.length < 1) throw new Error("strengths empty");
-  if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
+  if (!hasValidInsightList(json?.strengths)) throw new Error("strengths invalid");
+  if (!hasValidInsightList(json?.weaknesses)) throw new Error("weaknesses invalid");
   if (!hasValidActionChecklist(json?.actionChecklist)) throw new Error("actionChecklist invalid");
   if (!hasMinimumKeyMoments(json?.keyMoments)) throw new Error(`keyMoments < ${KEY_MOMENTS_MIN}`);
   if (!hasValidEvidenceIndex(json?.evidenceIndex)) throw new Error("evidenceIndex invalid");
@@ -2315,6 +2335,14 @@ async function buildAnalysis(normalized, sampleId) {
   if (!hasValidEvidenceIndex(primary.evidenceIndex)) {
     primary.evidenceIndex = buildEvidenceIndex(normalized);
     violations.push("missing.evidenceIndex");
+  }
+  if (!hasValidInsightList(primary.strengths)) {
+    primary.strengths = buildStrengths(normalized);
+    violations.push("shape.strengths.invalid");
+  }
+  if (!hasValidInsightList(primary.weaknesses)) {
+    primary.weaknesses = buildWeaknesses(normalized);
+    violations.push("shape.weaknesses.invalid");
   }
   if (!hasValidActionChecklist(primary.actionChecklist)) {
     const checklistWeaknesses = Array.isArray(primary.weaknesses) && primary.weaknesses.length > 0

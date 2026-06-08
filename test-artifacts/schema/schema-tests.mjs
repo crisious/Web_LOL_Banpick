@@ -64,6 +64,15 @@ if (serverSrc.includes("const ACTION_CHECKLIST_MAX =")) {
 if (serverSrc.includes("function hasValidActionChecklist(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidActionChecklist"));
 }
+if (serverSrc.includes("const INSIGHT_LIST_MIN =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "INSIGHT_LIST_MIN"));
+}
+if (serverSrc.includes("const INSIGHT_LIST_MAX =")) {
+  validatorSupportSources.push(extractConstSource(serverSrc, "INSIGHT_LIST_MAX"));
+}
+if (serverSrc.includes("function hasValidInsightList(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidInsightList"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -181,8 +190,78 @@ expectThrows("strengths empty throws", () => {
   validateAnalysisOutput(f);
 }, "strengths");
 
+expectThrows("strengths item missing id throws", () => {
+  const f = validFixture();
+  f.strengths = [{ title: "좋은 합류", description: "설명", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths item missing title throws", () => {
+  const f = validFixture();
+  f.strengths = [{ id: "str_1", description: "설명", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths item missing description throws", () => {
+  const f = validFixture();
+  f.strengths = [{ id: "str_1", title: "좋은 합류", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths item missing relatedEventIds throws", () => {
+  const f = validFixture();
+  f.strengths = [{ id: "str_1", title: "좋은 합류", description: "설명" }];
+  validateAnalysisOutput(f);
+}, "strengths");
+
+expectThrows("strengths over 3 throws", () => {
+  const f = validFixture();
+  f.strengths = Array.from({ length: 4 }, (_, index) => ({
+    id: `str_${index + 1}`,
+    title: `강점 ${index + 1}`,
+    description: "설명",
+    relatedEventIds: [],
+  }));
+  validateAnalysisOutput(f);
+}, "strengths");
+
 expectThrows("weaknesses empty throws", () => {
   const f = validFixture(); f.weaknesses = [];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses item missing id throws", () => {
+  const f = validFixture();
+  f.weaknesses = [{ title: "아쉬운 전환", description: "설명", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses item missing title throws", () => {
+  const f = validFixture();
+  f.weaknesses = [{ id: "wk_1", description: "설명", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses item missing description throws", () => {
+  const f = validFixture();
+  f.weaknesses = [{ id: "wk_1", title: "아쉬운 전환", relatedEventIds: [] }];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses item missing relatedEventIds throws", () => {
+  const f = validFixture();
+  f.weaknesses = [{ id: "wk_1", title: "아쉬운 전환", description: "설명" }];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses over 3 throws", () => {
+  const f = validFixture();
+  f.weaknesses = Array.from({ length: 4 }, (_, index) => ({
+    id: `wk_${index + 1}`,
+    title: `약점 ${index + 1}`,
+    description: "설명",
+    relatedEventIds: [],
+  }));
   validateAnalysisOutput(f);
 }, "weaknesses");
 
