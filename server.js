@@ -1127,7 +1127,7 @@ function buildStrengths(normalized) {
     });
   }
 
-  return strengths.slice(0, 3);
+  return strengths.slice(0, INSIGHT_LIST_MAX);
 }
 
 function buildWeaknesses(normalized) {
@@ -1201,7 +1201,7 @@ function buildWeaknesses(normalized) {
     });
   }
 
-  return weaknesses.slice(0, 3);
+  return weaknesses.slice(0, INSIGHT_LIST_MAX);
 }
 
 function buildActionChecklist(normalized, weaknesses) {

@@ -45,6 +45,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
+    extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
     extractFunctionSource(serverSrc, "buildActionChecklist"),
@@ -55,6 +56,8 @@ const {
   filterPostObjectiveDeaths, bestObjectiveSummary, bestFightSummary, lowFarmThreshold,
   buildStrengths, buildWeaknesses, buildActionChecklist,
 } = env;
+const buildStrengthsSrc = extractFunctionSource(serverSrc, "buildStrengths");
+const buildWeaknessesSrc = extractFunctionSource(serverSrc, "buildWeaknesses");
 
 let pass = 0, fail = 0;
 function check(label, got, expected) {
@@ -138,6 +141,10 @@ const strC = buildStrengths({
 });
 check("buildStrengths C first is tower fallback", strC[0].title, "구조물 압박으로 승리 조건을 연결했음");
 check("buildStrengths C length 3", strC.length, 3);
+checkTrue(
+  "buildStrengths uses INSIGHT_LIST_MAX cap",
+  buildStrengthsSrc.includes("return strengths.slice(0, INSIGHT_LIST_MAX);"),
+);
 
 // JUNGLE vision 경계: 35 추가 / 34 미추가
 const strJ35 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS", position: "JUNGLE" }, playerStats: { visionScore: 35, killParticipation: 0 } });
@@ -183,6 +190,10 @@ const wkC = buildWeaknesses({
 });
 check("buildWeaknesses C padded length 3", wkC.length, 3);
 check("buildWeaknesses C ids", wkC.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
+checkTrue(
+  "buildWeaknesses uses INSIGHT_LIST_MAX cap",
+  buildWeaknessesSrc.includes("return weaknesses.slice(0, INSIGHT_LIST_MAX);"),
+);
 check("buildWeaknesses C first title (objective-after via death count)", wkC[0].title, "오브젝트 이후 생존과 전환이 아쉬웠음");
 
 // LOSS deaths>=4 경계: 4 발동 / 3 미발동(SUPPORT, 다른 분기 모두 skip 시 fallback만)
