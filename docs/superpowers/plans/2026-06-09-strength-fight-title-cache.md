@@ -173,7 +173,7 @@ no sensitive matches
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 - Modify: `docs/superpowers/plans/2026-06-09-strength-fight-title-cache.md`
 
-- [ ] **Step 1: Update Obsidian project log**
+- [x] **Step 1: Update Obsidian project log**
 
 Record the intent, changed files, RED/GREEN output, full test count, local smoke result, commits, GitHub run, and artifact id in:
 
@@ -181,7 +181,7 @@ Record the intent, changed files, RED/GREEN output, full test count, local smoke
 /Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md
 ```
 
-- [ ] **Step 2: Commit implementation**
+- [x] **Step 2: Commit implementation**
 
 Run:
 
@@ -191,7 +191,7 @@ git commit -m "test: cache strength fight title"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA artifact**
+- [x] **Step 3: Verify GitHub QA artifact**
 
 Run:
 
@@ -203,6 +203,29 @@ jq '{status: .latestRun.status, durationMs: .latestRun.durationMs, smokeSummary:
 ```
 
 Expected: workflow conclusion is success, `latestRun.status` is `passed`, `smokeSummary.failed` is `0`, and `latestRun.git.shortSha` matches the pushed commit.
+
+---
+
+## Completion Evidence
+
+- RED focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 58 passed, 2 failed.
+- RED failures:
+  - `buildStrengths caches fightTitle`
+  - `buildStrengths uses cached fightTitle as title`
+- GREEN focused test: `node test-artifacts/server/strength-weakness-tests.mjs` returned 60 passed, 0 failed.
+- Static verification:
+  - `node --check server.js`: passed
+  - `node --check test-artifacts/server/strength-weakness-tests.mjs`: passed
+  - `git diff --check`: passed
+  - placeholder scan: no matches
+- Full verification: `npm test` passed with 1458 passed, 0 failed across 40 test file(s).
+- Local read-only smoke report: 156 passed, 0 failed, `durationMs: 249`, `qaVerdict: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Local smoke artifact sensitive-pattern scan: no matches.
+- Implementation commit: `a670520 test: cache strength fight title`, pushed to `origin/main`.
+- GitHub Actions QA: run `27149211232` completed successfully for `a670520474d25facb8163ba0122d832bf3156e96`.
+- GitHub artifact: `7485239419` (`qa-automation-27149211232`, 3551 bytes), read-only smoke 156 passed / 0 failed, `durationMs: 219`, `latestRun.git.shortSha: "a670520"`, `dirty: false`.
+- GitHub artifact sensitive-pattern scan: no matches.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
 
 ---
 
