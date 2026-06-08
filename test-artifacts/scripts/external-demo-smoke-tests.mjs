@@ -312,8 +312,16 @@ checkThrows("parseSmokeArgs rejects invalid minimum sample count",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--min-samples=0"], {}),
   "--min-samples must be a positive integer");
 
+checkThrows("parseSmokeArgs rejects exponential minimum sample count",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--min-samples=1e2"], {}),
+  "--min-samples must be a positive integer");
+
 checkThrows("parseSmokeArgs rejects invalid request timeout",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--timeout-ms=0"], {}),
+  "--timeout-ms must be a positive integer");
+
+checkThrows("parseSmokeArgs rejects whitespace request timeout",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--timeout-ms= 5000"], {}),
   "--timeout-ms must be a positive integer");
 
 checkThrows("parseSmokeArgs requires sample detail error code with id",
@@ -344,6 +352,16 @@ checkThrows("parseSmokeArgs rejects non-error sample detail status",
   ], {}),
   "--expect-sample-detail-error-status must be an HTTP error status (400-599)");
 
+checkThrows("parseSmokeArgs rejects exponential sample detail status",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-detail-error-id=sample-kr-1",
+    "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-detail-error-status=5e2",
+  ], {}),
+  "--expect-sample-detail-error-status must be a positive integer");
+
 checkThrows("parseSmokeArgs requires sample list error code when list error options are set",
   () => parseSmokeArgs([
     "node",
@@ -369,6 +387,15 @@ checkThrows("parseSmokeArgs rejects out-of-range sample list status",
     "--expect-sample-list-error-status=600",
   ], {}),
   "--expect-sample-list-error-status must be an HTTP error status (400-599)");
+
+checkThrows("parseSmokeArgs rejects whitespace sample list status",
+  () => parseSmokeArgs([
+    "node",
+    "scripts/external-demo-smoke.mjs",
+    "--expect-sample-list-error-code=SAMPLE_MANIFEST_INVALID",
+    "--expect-sample-list-error-status= 500",
+  ], {}),
+  "--expect-sample-list-error-status must be a positive integer");
 
 checkThrows("parseSmokeArgs rejects unsafe sample detail error id",
   () => parseSmokeArgs([

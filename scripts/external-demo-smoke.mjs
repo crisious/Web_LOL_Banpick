@@ -30,13 +30,23 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
   }
 
-  function assertSampleErrorStatus(value, optionName) {
-    if (!Number.isInteger(value) || value < 1) {
+  function parsePositiveIntegerOption(value, optionName) {
+    if (!/^[0-9]+$/.test(value)) {
       throw new Error(`${optionName} must be a positive integer`);
     }
-    if (value < 400 || value > 599) {
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      throw new Error(`${optionName} must be a positive integer`);
+    }
+    return parsed;
+  }
+
+  function parseSampleErrorStatus(value, optionName) {
+    const parsed = parsePositiveIntegerOption(value, optionName);
+    if (parsed < 400 || parsed > 599) {
       throw new Error(`${optionName} must be an HTTP error status (400-599)`);
     }
+    return parsed;
   }
 
   function normalizeReportJsonPath(reportPath) {
@@ -145,9 +155,11 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     throw new Error("--require-token needs --token or PUBLIC_DEMO_TOKEN");
   }
   const minSamplesArg = singleOptionArg(args, "--min-samples=");
-  const minSamples = minSamplesArg ? Number(minSamplesArg.slice("--min-samples=".length)) : 1;
+  const minSamplesValue = minSamplesArg ? minSamplesArg.slice("--min-samples=".length) : "1";
+  const minSamples = parsePositiveIntegerOption(minSamplesValue, "--min-samples");
   const timeoutArg = singleOptionArg(args, "--timeout-ms=");
-  const requestTimeoutMs = timeoutArg ? Number(timeoutArg.slice("--timeout-ms=".length)) : 10000;
+  const requestTimeoutMsValue = timeoutArg ? timeoutArg.slice("--timeout-ms=".length) : "10000";
+  const requestTimeoutMs = parsePositiveIntegerOption(requestTimeoutMsValue, "--timeout-ms");
   const sampleDetailErrorIdArg = singleOptionArg(args, "--expect-sample-detail-error-id=");
   const sampleDetailErrorCodeArg = singleOptionArg(args, "--expect-sample-detail-error-code=");
   const sampleDetailErrorStatusArg = singleOptionArg(args, "--expect-sample-detail-error-status=");
@@ -173,25 +185,25 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
   const expectedSampleDetailError = hasSampleDetailErrorArg
     ? {
         id: sampleDetailErrorIdArg ? sampleDetailErrorIdArg.slice("--expect-sample-detail-error-id=".length).trim() : "",
-        status: sampleDetailErrorStatusArg ? Number(sampleDetailErrorStatusArg.slice("--expect-sample-detail-error-status=".length)) : 500,
+        status: parseSampleErrorStatus(
+          sampleDetailErrorStatusArg ? sampleDetailErrorStatusArg.slice("--expect-sample-detail-error-status=".length) : "500",
+          "--expect-sample-detail-error-status"
+        ),
         code: sampleDetailErrorCodeArg ? sampleDetailErrorCodeArg.slice("--expect-sample-detail-error-code=".length).trim() : "",
         message: sampleDetailErrorMessageArg ? sampleDetailErrorMessageArg.slice("--expect-sample-detail-error-message=".length) : "",
       }
     : null;
   const expectedSampleListError = hasSampleListErrorArg
     ? {
-        status: sampleListErrorStatusArg ? Number(sampleListErrorStatusArg.slice("--expect-sample-list-error-status=".length)) : 500,
+        status: parseSampleErrorStatus(
+          sampleListErrorStatusArg ? sampleListErrorStatusArg.slice("--expect-sample-list-error-status=".length) : "500",
+          "--expect-sample-list-error-status"
+        ),
         code: sampleListErrorCodeArg ? sampleListErrorCodeArg.slice("--expect-sample-list-error-code=".length).trim() : "",
         message: sampleListErrorMessageArg ? sampleListErrorMessageArg.slice("--expect-sample-list-error-message=".length) : "",
       }
     : null;
 
-  if (!Number.isInteger(minSamples) || minSamples < 1) {
-    throw new Error("--min-samples must be a positive integer");
-  }
-  if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1) {
-    throw new Error("--timeout-ms must be a positive integer");
-  }
   if (expectedSampleDetailError) {
     if (!expectedSampleDetailError.id) {
       throw new Error("--expect-sample-detail-error-id is required when sample detail error options are set");
@@ -201,14 +213,12 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     }
     assertSampleErrorId(expectedSampleDetailError.id, "--expect-sample-detail-error-id");
     assertSampleErrorCode(expectedSampleDetailError.code, "--expect-sample-detail-error-code");
-    assertSampleErrorStatus(expectedSampleDetailError.status, "--expect-sample-detail-error-status");
   }
   if (expectedSampleListError) {
     if (!expectedSampleListError.code) {
       throw new Error("--expect-sample-list-error-code is required when sample list error options are set");
     }
     assertSampleErrorCode(expectedSampleListError.code, "--expect-sample-list-error-code");
-    assertSampleErrorStatus(expectedSampleListError.status, "--expect-sample-list-error-status");
   }
 
   return {

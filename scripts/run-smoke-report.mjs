@@ -108,7 +108,11 @@ function normalizeOutputRoot(outputRoot) {
 function assertPositiveIntegerOption(args, prefix, message) {
   const arg = passThroughOptionArg(args, prefix);
   if (!arg) return;
-  const value = Number(arg.slice(prefix.length));
+  const rawValue = arg.slice(prefix.length);
+  if (!/^[0-9]+$/.test(rawValue)) {
+    throw new Error(message);
+  }
+  const value = Number(rawValue);
   if (!Number.isInteger(value) || value < 1) {
     throw new Error(message);
   }
@@ -117,8 +121,12 @@ function assertPositiveIntegerOption(args, prefix, message) {
 function assertHttpErrorStatusOption(args, prefix) {
   const arg = passThroughOptionArg(args, prefix);
   if (!arg) return;
-  const value = Number(arg.slice(prefix.length));
+  const rawValue = arg.slice(prefix.length);
   const optionName = prefix.slice(0, -1);
+  if (!/^[0-9]+$/.test(rawValue)) {
+    throw new Error(`${optionName} must be a positive integer`);
+  }
+  const value = Number(rawValue);
   if (!Number.isInteger(value) || value < 1) {
     throw new Error(`${optionName} must be a positive integer`);
   }

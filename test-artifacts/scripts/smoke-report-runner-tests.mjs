@@ -202,6 +202,10 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--timeout-ms=0"], {}),
     "--timeout-ms must be a positive integer");
 
+  checkThrows("parseRunnerArgs rejects exponential smoke pass-through timeout",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--timeout-ms=1e3"], {}),
+    "--timeout-ms must be a positive integer");
+
   checkThrows("parseRunnerArgs rejects incomplete sample detail error pass-through",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--mode=readonly", "--expect-sample-detail-error-message=blocked"], {}),
     "--expect-sample-detail-error-id is required when sample detail error options are set");
@@ -220,6 +224,17 @@ if (fs.existsSync(runnerPath)) {
       "--expect-sample-detail-error-status=399",
     ], {}),
     "--expect-sample-detail-error-status must be an HTTP error status (400-599)");
+
+  checkThrows("parseRunnerArgs rejects exponential sample detail status before artifact creation",
+    () => runner.parseRunnerArgs([
+      "node",
+      "scripts/run-smoke-report.mjs",
+      "--mode=readonly",
+      "--expect-sample-detail-error-id=sample-kr-1",
+      "--expect-sample-detail-error-code=SAMPLE_MANIFEST_INVALID",
+      "--expect-sample-detail-error-status=5e2",
+    ], {}),
+    "--expect-sample-detail-error-status must be a positive integer");
 
   checkThrows("parseRunnerArgs rejects out-of-range sample list status before artifact creation",
     () => runner.parseRunnerArgs([
@@ -395,6 +410,15 @@ if (fs.existsSync(runnerPath)) {
     "--timeout-ms must be a positive integer");
   check("invalid pass-through does not create output root",
     fs.existsSync(invalidOutputRoot),
+    false);
+
+  const exponentialTimeoutOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-exponential-timeout");
+  fs.rmSync(exponentialTimeoutOutputRoot, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects exponential timeout before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs", `--output-root=${exponentialTimeoutOutputRoot}`, "--timeout-ms=1e3"], {}),
+    "--timeout-ms must be a positive integer");
+  check("exponential timeout rejection does not create output root",
+    fs.existsSync(exponentialTimeoutOutputRoot),
     false);
 
   const missingTokenOutputRoot = path.join("test-artifacts", "tmp", "smoke-report-missing-token");
