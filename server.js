@@ -617,7 +617,11 @@ function rawObjectiveTeamId(rawEvent) {
 }
 
 function isRawEnemyBuildingKill(rawEvent, targetTeamId) {
-  return isKnownRawTeamId(rawEvent.teamId) && rawEvent.teamId !== targetTeamId;
+  return (
+    isKnownRawTeamId(rawEvent.teamId) &&
+    isKnownRawTeamId(targetTeamId) &&
+    rawEvent.teamId !== targetTeamId
+  );
 }
 
 function laneHintForEvent(event) {
