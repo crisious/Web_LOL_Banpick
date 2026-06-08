@@ -12,7 +12,7 @@ const {
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
-const port = Number(process.env.PORT || 8123);
+const port = parsePortConfig(process.env.PORT);
 const host = process.env.HOST || "127.0.0.1";
 const validPublicDemoModes = new Set(["full", "readonly", "protected"]);
 const publicDemoModeConfig = parsePublicDemoModeConfig(process.env.PUBLIC_DEMO_MODE);
@@ -141,6 +141,21 @@ function parsePublicDemoTokenConfig(rawToken) {
 
 function parseTrustProxyConfig(rawTrustProxy) {
   return String(rawTrustProxy || "") === "1";
+}
+
+function parsePortConfig(rawPort, defaultPort = 8123) {
+  const value = rawPort === undefined || rawPort === null ? "" : String(rawPort);
+  if (value === "") {
+    return defaultPort;
+  }
+  if (!/^(0|[1-9][0-9]*)$/.test(value)) {
+    throw new Error("PORT must be an exact decimal integer between 0 and 65535.");
+  }
+  const portNumber = Number(value);
+  if (!Number.isSafeInteger(portNumber) || portNumber < 0 || portNumber > 65535) {
+    throw new Error("PORT must be an exact decimal integer between 0 and 65535.");
+  }
+  return portNumber;
 }
 
 function getClientIp(req) {
