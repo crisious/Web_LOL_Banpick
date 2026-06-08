@@ -301,7 +301,7 @@ payload
 - Riot/live API generic failure는 `RIOT_API_ERROR`와 고정 한국어 메시지만 반환하며, raw upstream 메시지, 요청 URL, 로컬 경로, token-like 문자열은 브라우저로 반환하지 않습니다.
 - 최근 경기 응답에서 보조 랭크 조회만 실패하면 `rankedStatus: "error"`는 유지하되 `rankedError`는 고정 한국어 메시지를 사용하며 upstream host, 요청 URL, parser text, 로컬 경로, token-like 문자열을 반환하지 않습니다.
 - 챔피언 히스토리 SSE `match-error` progress event는 누락 경기 집계를 위한 `phase`/`matchId`를 유지하되 고정 메시지를 사용하며 upstream host, 요청 URL, parser text, 로컬 경로, token-like 문자열을 반환하지 않습니다.
-- `/api/samples` public list response keeps sample display metadata and detail paths but omits explicit `matchId`; the browser can still match stored samples through sample id/path inference.
+- `/api/samples` public list response keeps sample display metadata and detail paths but omits explicit `matchId`; the browser can still match stored samples through sample id/path inference, and external smoke fails if a list entry reintroduces `matchId`.
 - 클라이언트 retry/status 메시지도 raw network, parser, path, URL, token-like 오류를 렌더링 전에 고정 한국어 문구로 정규화합니다.
 - 입력 검증: gameName/tagLine 길이/형식 제한 (서버 + 클라이언트)
 - Rate limiting: recent-matches 10초, generate-sample 60초 (IP 기반)

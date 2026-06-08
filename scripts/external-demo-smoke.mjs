@@ -546,6 +546,15 @@ expect(samples.response.status === 200, "GET /api/samples returns 200", `status=
 expectJsonResponse(samples, "GET /api/samples");
 expect(Array.isArray(samples.body?.samples), "/api/samples returns samples array");
 expect((samples.body?.samples?.length || 0) >= minSamples, `/api/samples has at least ${minSamples} samples`, `count=${samples.body?.samples?.length || 0}`);
+const sampleListEntries = samples.body?.samples || [];
+const samplesWithMatchId = sampleListEntries
+  .filter((sample) => Object.prototype.hasOwnProperty.call(sample || {}, "matchId"))
+  .map((sample) => sample?.id || "(missing id)");
+expect(
+  samplesWithMatchId.length === 0,
+  "/api/samples list entries omit explicit matchId",
+  samplesWithMatchId.length ? `ids=${samplesWithMatchId.slice(0, 5).join(",")}` : "",
+);
 
 function hasReportEssentials(analysis) {
   return Boolean(
