@@ -1977,7 +1977,7 @@ teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 �
   "strengths": [{ "id": "str_1", "title": "...", "description": "...", "relatedEventIds": ["evt_001"] }],
   "weaknesses": [{ "id": "wk_1", "title": "...", "description": "...", "relatedEventIds": ["evt_002"] }],
   "actionChecklist": [{ "id": "act_1", "text": "...", "linkedWeaknessId": "wk_1" }],
-  "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
+  "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "phase": "EARLY", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
   "combatAnalysis": [{ "encounterId": "enc_001", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
   "teamfightPhaseAnalysis": [{
     "teamfightId": "enc_001",

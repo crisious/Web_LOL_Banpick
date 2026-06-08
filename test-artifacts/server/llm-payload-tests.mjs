@@ -339,6 +339,13 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
 // ─── 케이스 16: output schema preamble은 evidenceIndex 최소 개수를 명시해야 함 ──
 
 {
+  const start = OUTPUT_SCHEMA_EXAMPLE.indexOf('"keyMoments"');
+  const end = OUTPUT_SCHEMA_EXAMPLE.indexOf('"combatAnalysis"', start);
+  const snippet = OUTPUT_SCHEMA_EXAMPLE.slice(start, end);
+  checkTrue("keyMoments prompt includes phase", snippet.includes('"phase"'));
+}
+
+{
   checkTrue("output schema states insight list exact count", OUTPUT_SCHEMA_EXAMPLE.includes("strengths와 weaknesses는 각각 3개의 배열"));
   checkTrue("output schema states actionChecklist count range", OUTPUT_SCHEMA_EXAMPLE.includes("actionChecklist는 3~5개의 배열"));
   checkTrue("output schema states phaseSummaries minimum", OUTPUT_SCHEMA_EXAMPLE.includes("phaseSummaries는 3개 이상의 배열"));
