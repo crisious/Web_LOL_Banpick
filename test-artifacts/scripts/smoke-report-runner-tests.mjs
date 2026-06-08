@@ -83,6 +83,35 @@ if (fs.existsSync(runnerPath)) {
       ];
     }).flat();
   }
+  const sensitiveStaticPaths = [
+    "/.env",
+    "/server.js",
+    "/package.json",
+    "/data/samples/manifest.json",
+    "/test-artifacts/run-tests.mjs",
+    "/external-access-deployment-plan.md",
+    "/%2eenv",
+    "/..%2Fserver.js",
+    "/%2e%2e%2Fserver.js",
+    "/data%2Fsamples%2Fmanifest.json",
+  ];
+  const readonlyLiveApiLabels = [
+    "/api/recent-matches",
+    "/api/champion-history",
+    "/api/generate-sample",
+  ];
+  function demoSafetyChecks() {
+    return [
+      ...sensitiveStaticPaths.flatMap((path) => [
+        { status: "pass", label: `${path} is not publicly served` },
+        { status: "pass", label: `${path} has X-Content-Type-Options nosniff` },
+      ]),
+      ...readonlyLiveApiLabels.flatMap((label) => [
+        { status: "pass", label: `readonly mode blocks ${label}` },
+        { status: "pass", label: `${label} readonly block returns PUBLIC_DEMO_READONLY` },
+      ]),
+    ];
+  }
 
   check("parseRunnerArgs defaults to local readonly",
     runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs"], {}),
@@ -734,8 +763,9 @@ if (fs.existsSync(runnerPath)) {
             requiredChecks: "failed",
             artifactIntegrity: "passed",
             sampleEvidence: "failed",
+            demoSafety: "failed",
           },
-          failures: ["required smoke checks failed", "sample evidence incomplete"],
+          failures: ["required smoke checks failed", "sample evidence incomplete", "demo safety evidence incomplete"],
         },
         sampleEvidence: {
           status: "failed",
@@ -753,6 +783,24 @@ if (fs.existsSync(runnerPath)) {
             "sample list check missing",
             "sample detail checks below required minimum",
             "sample report essentials checks below required minimum",
+          ],
+        },
+        demoSafetyEvidence: {
+          status: "failed",
+          staticPaths: {
+            required: 10,
+            blocked: { passed: 0, failed: 0, missing: 10 },
+            nosniff: { passed: 0, failed: 0, missing: 10 },
+          },
+          readonlyApis: {
+            status: "skipped",
+            required: 0,
+            blocked: { passed: 0, failed: 0, missing: 0 },
+            blockCodes: { passed: 0, failed: 0, missing: 0 },
+          },
+          failures: [
+            "sensitive static path block checks incomplete",
+            "sensitive static path nosniff checks incomplete",
           ],
         },
         smokeSummary: { passed: 42, failed: 0 },
@@ -825,6 +873,7 @@ if (fs.existsSync(runnerPath)) {
       { status: "pass", label: "GET /healthz returns 200" },
       { status: "pass", label: "/api/samples has at least 19 samples" },
       ...sampleEvidenceChecks(19),
+      ...demoSafetyChecks(),
       { status: "pass", label: "/api/samples list entries omit explicit matchId" },
       { status: "pass", label: "/.env is not publicly served" },
       { status: "pass", label: "/.env has X-Content-Type-Options nosniff" },
@@ -934,6 +983,7 @@ if (fs.existsSync(runnerPath)) {
         requiredChecks: "passed",
         artifactIntegrity: "passed",
         sampleEvidence: "passed",
+        demoSafety: "passed",
       },
       failures: [],
     });
@@ -951,6 +1001,24 @@ if (fs.existsSync(runnerPath)) {
       reportEssentialChecks: {
         passed: 19,
         failed: 0,
+      },
+      failures: [],
+    });
+
+  check("buildQaSummary records passing demo safety evidence",
+    passingRequiredSummary?.latestRun?.demoSafetyEvidence,
+    {
+      status: "passed",
+      staticPaths: {
+        required: 10,
+        blocked: { passed: 10, failed: 0, missing: 0 },
+        nosniff: { passed: 10, failed: 0, missing: 0 },
+      },
+      readonlyApis: {
+        status: "passed",
+        required: 3,
+        blocked: { passed: 3, failed: 0, missing: 0 },
+        blockCodes: { passed: 3, failed: 0, missing: 0 },
       },
       failures: [],
     });
@@ -1146,6 +1214,7 @@ if (fs.existsSync(runnerPath)) {
         requiredChecks: "passed",
         artifactIntegrity: "failed",
         sampleEvidence: "passed",
+        demoSafety: "passed",
       },
       failures: ["artifact integrity failed"],
     });
@@ -1200,7 +1269,58 @@ if (fs.existsSync(runnerPath)) {
 
   check("buildQaSummary records failed QA verdict when sample evidence is incomplete",
     partialSampleEvidenceSummary?.latestRun?.qaVerdict?.failures,
-    ["required smoke checks failed", "sample evidence incomplete"]);
+    ["required smoke checks failed", "sample evidence incomplete", "demo safety evidence incomplete"]);
+
+  const partialDemoSafetySummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-55-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-55-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-55-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:55:00.000Z",
+    finishedAt: "2026-06-08T06:55:10.000Z",
+    exitCode: 0,
+    artifactFileSizes: {
+      smokeReportBytes: 4096,
+      smokeRunBytes: 768,
+    },
+    artifactFileHashes: {
+      smokeReportSha256: "1111111111111111111111111111111111111111111111111111111111111111",
+      smokeRunSha256: "2222222222222222222222222222222222222222222222222222222222222222",
+    },
+    smokeReport: {
+      status: "passed",
+      actualMode: "readonly",
+      summary: { passed: 70, failed: 1 },
+      checks: [
+        { status: "pass", label: "/api/samples has at least 19 samples" },
+        ...sampleEvidenceChecks(19),
+        ...demoSafetyChecks().filter((check) => check.label !== "/server.js is not publicly served"),
+        { status: "fail", label: "/server.js is not publicly served" },
+      ],
+    },
+  });
+
+  check("buildQaSummary records failed demo safety evidence",
+    partialDemoSafetySummary?.latestRun?.demoSafetyEvidence,
+    {
+      status: "failed",
+      staticPaths: {
+        required: 10,
+        blocked: { passed: 9, failed: 1, missing: 0 },
+        nosniff: { passed: 10, failed: 0, missing: 0 },
+      },
+      readonlyApis: {
+        status: "passed",
+        required: 3,
+        blocked: { passed: 3, failed: 0, missing: 0 },
+        blockCodes: { passed: 3, failed: 0, missing: 0 },
+      },
+      failures: ["sensitive static path block checks incomplete"],
+    });
+
+  check("buildQaSummary records failed QA verdict when demo safety is incomplete",
+    partialDemoSafetySummary?.latestRun?.qaVerdict?.failures,
+    ["required smoke checks failed", "demo safety evidence incomplete"]);
 
   check("buildQaSummary records missing required smoke checks",
     missingRequiredSummary?.latestRun?.requiredChecks,
@@ -1309,6 +1429,24 @@ if (fs.existsSync(runnerPath)) {
   check("sample list error smoke reports record no required check failures",
     sampleListErrorSummary?.latestRun?.requiredCheckFailures,
     []);
+
+  check("sample list error smoke reports skip demo safety evidence",
+    sampleListErrorSummary?.latestRun?.demoSafetyEvidence,
+    {
+      status: "skipped",
+      staticPaths: {
+        required: 0,
+        blocked: { passed: 0, failed: 0, missing: 0 },
+        nosniff: { passed: 0, failed: 0, missing: 0 },
+      },
+      readonlyApis: {
+        status: "skipped",
+        required: 0,
+        blocked: { passed: 0, failed: 0, missing: 0 },
+        blockCodes: { passed: 0, failed: 0, missing: 0 },
+      },
+      failures: [],
+    });
 
   check("buildQaSummary prefers runner exit status over passed smoke report status",
     runner.buildQaSummary?.({

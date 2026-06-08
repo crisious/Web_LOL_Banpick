@@ -51,6 +51,23 @@ const READONLY_REQUIRED_FULL_SMOKE_CHECK_LABELS = [
   "readonly mode blocks /api/generate-sample",
   "/api/generate-sample readonly block returns PUBLIC_DEMO_READONLY",
 ];
+const SENSITIVE_STATIC_PATHS = [
+  "/.env",
+  "/server.js",
+  "/package.json",
+  "/data/samples/manifest.json",
+  "/test-artifacts/run-tests.mjs",
+  "/external-access-deployment-plan.md",
+  "/%2eenv",
+  "/..%2Fserver.js",
+  "/%2e%2e%2Fserver.js",
+  "/data%2Fsamples%2Fmanifest.json",
+];
+const READONLY_LIVE_API_LABELS = [
+  "/api/recent-matches",
+  "/api/champion-history",
+  "/api/generate-sample",
+];
 const SMOKE_METADATA_MESSAGE_REDACTION_PREFIXES = [
   "--expect-sample-detail-error-message=",
   "--expect-sample-list-error-message=",
@@ -371,6 +388,27 @@ function requiredSmokeCheckFailureMessages(requiredChecks) {
     );
 }
 
+function checkStatusFor(checks, label) {
+  const check = checks.find((item) => item?.label === label);
+  if (!check) return "missing";
+  return check.status === "pass" ? "pass" : "fail";
+}
+
+function summarizeLabelStatuses(checks, labels) {
+  const summary = {
+    passed: 0,
+    failed: 0,
+    missing: 0,
+  };
+  for (const label of labels) {
+    const status = checkStatusFor(checks, label);
+    if (status === "pass") summary.passed += 1;
+    else if (status === "fail") summary.failed += 1;
+    else summary.missing += 1;
+  }
+  return summary;
+}
+
 const SAMPLE_COUNT_LABEL_PATTERN = /^\/api\/samples has at least (\d+) samples$/;
 const SAMPLE_COUNT_DETAIL_PATTERN = /^count=(\d+)$/;
 const SAMPLE_DETAIL_OK_LABEL_PATTERN = /^GET \/api\/samples\/:id returns 200 for sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -424,6 +462,81 @@ function sampleEvidenceFor(config, smokeReport) {
     listedSamples,
     detailChecks,
     reportEssentialChecks,
+    failures,
+  };
+}
+
+function emptyDemoSafetyEvidence(status = "skipped") {
+  return {
+    status,
+    staticPaths: {
+      required: 0,
+      blocked: { passed: 0, failed: 0, missing: 0 },
+      nosniff: { passed: 0, failed: 0, missing: 0 },
+    },
+    readonlyApis: {
+      status: "skipped",
+      required: 0,
+      blocked: { passed: 0, failed: 0, missing: 0 },
+      blockCodes: { passed: 0, failed: 0, missing: 0 },
+    },
+    failures: [],
+  };
+}
+
+function readonlyApiStatus(readonlyRequired, readonlyBlocked, readonlyBlockCodes) {
+  if (!readonlyRequired) return "skipped";
+  const expected = READONLY_LIVE_API_LABELS.length;
+  return readonlyBlocked.passed === expected &&
+    readonlyBlockCodes.passed === expected &&
+    readonlyBlocked.failed === 0 &&
+    readonlyBlocked.missing === 0 &&
+    readonlyBlockCodes.failed === 0 &&
+    readonlyBlockCodes.missing === 0
+    ? "passed"
+    : "failed";
+}
+
+function demoSafetyEvidenceFor(config, smokeReport) {
+  if (isEarlySampleErrorProbe(config)) return emptyDemoSafetyEvidence();
+  const checks = Array.isArray(smokeReport?.checks) ? smokeReport.checks : [];
+  const staticBlockedLabels = SENSITIVE_STATIC_PATHS.map((staticPath) => `${staticPath} is not publicly served`);
+  const staticNosniffLabels = SENSITIVE_STATIC_PATHS.map((staticPath) => `${staticPath} has X-Content-Type-Options nosniff`);
+  const staticBlocked = summarizeLabelStatuses(checks, staticBlockedLabels);
+  const staticNosniff = summarizeLabelStatuses(checks, staticNosniffLabels);
+  const readonlyRequired = config?.expectedMode === "readonly";
+  const readonlyBlocked = readonlyRequired
+    ? summarizeLabelStatuses(checks, READONLY_LIVE_API_LABELS.map((label) => `readonly mode blocks ${label}`))
+    : { passed: 0, failed: 0, missing: 0 };
+  const readonlyBlockCodes = readonlyRequired
+    ? summarizeLabelStatuses(checks, READONLY_LIVE_API_LABELS.map((label) => `${label} readonly block returns PUBLIC_DEMO_READONLY`))
+    : { passed: 0, failed: 0, missing: 0 };
+  const failures = [];
+  if (staticBlocked.passed !== SENSITIVE_STATIC_PATHS.length || staticBlocked.failed || staticBlocked.missing) {
+    failures.push("sensitive static path block checks incomplete");
+  }
+  if (staticNosniff.passed !== SENSITIVE_STATIC_PATHS.length || staticNosniff.failed || staticNosniff.missing) {
+    failures.push("sensitive static path nosniff checks incomplete");
+  }
+  if (readonlyRequired && (readonlyBlocked.passed !== READONLY_LIVE_API_LABELS.length || readonlyBlocked.failed || readonlyBlocked.missing)) {
+    failures.push("readonly live API block checks incomplete");
+  }
+  if (readonlyRequired && (readonlyBlockCodes.passed !== READONLY_LIVE_API_LABELS.length || readonlyBlockCodes.failed || readonlyBlockCodes.missing)) {
+    failures.push("readonly live API block code checks incomplete");
+  }
+  return {
+    status: failures.length ? "failed" : "passed",
+    staticPaths: {
+      required: SENSITIVE_STATIC_PATHS.length,
+      blocked: staticBlocked,
+      nosniff: staticNosniff,
+    },
+    readonlyApis: {
+      status: readonlyApiStatus(readonlyRequired, readonlyBlocked, readonlyBlockCodes),
+      required: readonlyRequired ? READONLY_LIVE_API_LABELS.length : 0,
+      blocked: readonlyBlocked,
+      blockCodes: readonlyBlockCodes,
+    },
     failures,
   };
 }
@@ -516,16 +629,18 @@ function artifactIntegrityFor(artifactFileSizes, artifactFileHashes) {
   };
 }
 
-function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegrity, sampleEvidence }) {
+function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegrity, sampleEvidence, demoSafetyEvidence }) {
   const smokeStatus = exitCode === 0 && runStatus === "passed" ? "passed" : "failed";
   const resolvedRequiredCheckStatus = requiredCheckStatus || "failed";
   const artifactIntegrityStatus = artifactIntegrity?.status === "passed" ? "passed" : "failed";
   const sampleEvidenceStatus = ["passed", "skipped"].includes(sampleEvidence?.status) ? sampleEvidence.status : "failed";
+  const demoSafetyStatus = ["passed", "skipped"].includes(demoSafetyEvidence?.status) ? demoSafetyEvidence.status : "failed";
   const failures = [];
   if (smokeStatus !== "passed") failures.push("smoke report failed");
   if (!["passed", "skipped"].includes(resolvedRequiredCheckStatus)) failures.push("required smoke checks failed");
   if (artifactIntegrityStatus !== "passed") failures.push("artifact integrity failed");
   if (!["passed", "skipped"].includes(sampleEvidenceStatus)) failures.push("sample evidence incomplete");
+  if (!["passed", "skipped"].includes(demoSafetyStatus)) failures.push("demo safety evidence incomplete");
   return {
     status: failures.length ? "failed" : "passed",
     shareable: failures.length === 0,
@@ -534,6 +649,7 @@ function qaVerdictFor({ runStatus, exitCode, requiredCheckStatus, artifactIntegr
       requiredChecks: resolvedRequiredCheckStatus,
       artifactIntegrity: artifactIntegrityStatus,
       sampleEvidence: sampleEvidenceStatus,
+      demoSafety: demoSafetyStatus,
     },
     failures,
   };
@@ -671,6 +787,7 @@ export function buildQaSummary({
   const requiredCheckFailures = requiredSmokeCheckFailureMessages(requiredChecks);
   const artifactIntegrity = artifactIntegrityFor(resolvedArtifactFileSizes, resolvedArtifactFileHashes);
   const sampleEvidence = sampleEvidenceFor(config, smokeReport);
+  const demoSafetyEvidence = demoSafetyEvidenceFor(config, smokeReport);
   return {
     schemaVersion: 1,
     generatedAt: finishedAt,
@@ -706,8 +823,10 @@ export function buildQaSummary({
         requiredCheckStatus,
         artifactIntegrity,
         sampleEvidence,
+        demoSafetyEvidence,
       }),
       sampleEvidence,
+      demoSafetyEvidence,
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
