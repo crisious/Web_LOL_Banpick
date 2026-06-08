@@ -44,6 +44,8 @@
 
 > **Riot API 변경 대응**: summoner-v4 응답에서 `encryptedSummonerId`가 제거된 이후, 랭크 조회는 `league-v4/entries/by-puuid/{puuid}` 신규 엔드포인트를 사용합니다.
 
+- 챔피언 히스토리 SSE `account` progress event는 UI 진행 표시용 `phase`만 전송하고 PUUID를 브라우저 이벤트 payload에 포함하지 않습니다.
+
 ## 포함된 화면
 
 ### 1. Replay Coach 대시보드 (`/`)

@@ -62,7 +62,7 @@ Expected:
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403
 - generic Riot/live API failures surface only `RIOT_API_ERROR`; responses must not contain `RGAPI`, `api_key`, local file paths, upstream hostnames, parser text, or DNS error strings
 - partial ranked lookup failures in `/api/recent-matches` keep `rankedStatus: "error"` with a fixed `rankedError`; responses must not contain `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, or parser text
-- champion history partial match failures emit `match-error` progress with fixed copy; responses/events must not contain `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, or parser text
+- champion history account progress emits only phase-level status without PUUID; partial match failures emit `match-error` progress with fixed copy; responses/events must not contain `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, parser text, or PUUID from the account lookup progress event
 - frontend status/error text should not display raw `RGAPI`, `api_key`, local paths, upstream hostnames, DNS text, parser text, bearer fragments, or token URL fragments even when a client fetch fails before structured server JSON is available
 - malformed, absolute-form, protocol-relative request targets or invalid Host headers fail as HTTP 400 `INVALID_REQUEST_TARGET` instead of escaping the request handler
 - malformed live API JSON bodies, including `/api/champion-history`, fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details

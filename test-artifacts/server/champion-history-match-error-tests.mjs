@@ -95,5 +95,11 @@ checkTrue("match-error progress uses safe helper",
 checkTrue("match-error progress no longer sends raw error.message",
   !serverSrc.includes('phase: "match-error", matchId: id, message: error.message'));
 
+checkTrue("account progress no longer emits puuid",
+  !serverSrc.includes('safeWrite("progress", { phase: "account", puuid: account.puuid });'));
+
+checkTrue("account progress keeps phase-only status",
+  serverSrc.includes('safeWrite("progress", { phase: "account" });'));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

@@ -2798,7 +2798,7 @@ async function handleChampionHistory(req, res) {
       headers,
     );
     if (aborted) { safeEnd(); return; }
-    safeWrite("progress", { phase: "account", puuid: account.puuid });
+    safeWrite("progress", { phase: "account" });
 
     const queueIds = [420, 440];
     const allIds = [];
