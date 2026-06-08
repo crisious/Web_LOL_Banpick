@@ -53,8 +53,11 @@ if (fs.existsSync(runnerPath)) {
   const missingFullRequiredChecks = [
     { label: "/api/samples list entries omit explicit matchId", status: "missing" },
     { label: "/.env is not publicly served", status: "missing" },
+    { label: "/.env has X-Content-Type-Options nosniff", status: "missing" },
     { label: "/server.js is not publicly served", status: "missing" },
+    { label: "/server.js has X-Content-Type-Options nosniff", status: "missing" },
     { label: "/data/samples/manifest.json is not publicly served", status: "missing" },
+    { label: "/data/samples/manifest.json has X-Content-Type-Options nosniff", status: "missing" },
   ];
 
   check("parseRunnerArgs defaults to local readonly",
@@ -665,8 +668,11 @@ if (fs.existsSync(runnerPath)) {
     [
       "missing required smoke check: /api/samples list entries omit explicit matchId",
       "missing required smoke check: /.env is not publicly served",
+      "missing required smoke check: /.env has X-Content-Type-Options nosniff",
       "missing required smoke check: /server.js is not publicly served",
+      "missing required smoke check: /server.js has X-Content-Type-Options nosniff",
       "missing required smoke check: /data/samples/manifest.json is not publicly served",
+      "missing required smoke check: /data/samples/manifest.json has X-Content-Type-Options nosniff",
     ]);
 
   const passingRequiredCheckReport = {
@@ -677,8 +683,11 @@ if (fs.existsSync(runnerPath)) {
       { status: "pass", label: "GET /healthz returns 200" },
       { status: "pass", label: "/api/samples list entries omit explicit matchId" },
       { status: "pass", label: "/.env is not publicly served" },
+      { status: "pass", label: "/.env has X-Content-Type-Options nosniff" },
       { status: "pass", label: "/server.js is not publicly served" },
+      { status: "pass", label: "/server.js has X-Content-Type-Options nosniff" },
       { status: "pass", label: "/data/samples/manifest.json is not publicly served" },
+      { status: "pass", label: "/data/samples/manifest.json has X-Content-Type-Options nosniff" },
     ],
   };
 
