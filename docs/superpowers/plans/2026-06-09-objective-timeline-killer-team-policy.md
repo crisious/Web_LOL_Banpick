@@ -274,11 +274,11 @@ Evidence captured at `2026-06-09 05:05 KST`:
 - Modify: `docs/superpowers/plans/2026-06-09-objective-timeline-killer-team-policy.md`
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Update docs with QA evidence**
+- [x] **Step 1: Update docs with QA evidence**
 
 Record RED, GREEN, full local QA, smoke report, Git commit SHA, GitHub Actions run ID, artifact ID, and final `main...origin/main` sync evidence.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -294,7 +294,10 @@ git push origin main
 
 Expected: implementation commit is pushed to `origin/main`.
 
-- [ ] **Step 3: Verify GitHub Actions QA**
+Evidence:
+- Implementation commit `b64efb1` (`test: guard objective timeline team mapping`) was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA**
 
 Run:
 
@@ -305,6 +308,12 @@ gh run download <run-id> --dir test-artifacts/tmp/github-qa-<run-id>
 ```
 
 Expected: GitHub Actions QA exits `0`, the downloaded `qa-summary.json` reports passed required checks, and sensitive-pattern scan finds no high-risk strings.
+
+Evidence:
+- GitHub Actions QA run `27163770443` passed for head SHA `b64efb1c18423b1cbf5c01de60874421523eb214`.
+- Workflow artifact `7491141681` (`qa-automation-27163770443`, 3552 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` `passed`, required checks `13 passed / 0 failed / 0 missing`, smoke `156 passed / 0 failed`, duration `233ms`, mode `readonly`, `latestRun.git.shortSha` `b64efb1`, `dirty: false`.
+- Downloaded artifact sensitive scan: `no high-risk sensitive patterns found`.
 
 - [ ] **Step 4: Commit docs finalization and verify final sync**
 
