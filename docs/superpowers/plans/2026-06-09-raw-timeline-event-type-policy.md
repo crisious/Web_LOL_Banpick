@@ -422,7 +422,7 @@ Local evidence recorded before commit:
 
 Append a cycle entry before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with local RED/GREEN evidence, `npm test`, local smoke summary, implementation commit SHA, GitHub Actions run id, artifact id, sensitive scan result, docs completion commit SHA, final docs GitHub Actions run id, and final `main...origin/main` sync count.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -435,7 +435,11 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+Implementation commit evidence:
+- `git commit -m "test: share raw timeline event type helpers"` created `592188c`.
+- `git push origin main` pushed `592188c` to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -446,6 +450,12 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 ```
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
+
+GitHub QA evidence for implementation commit:
+- QA run `27158005577` passed for `592188ce189174a0d80a9d9a6e26a53f51f2d225`.
+- Artifact `7488835835` (`qa-automation-27158005577`, 3549 bytes) inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` passed, read-only smoke 156 passed / 0 failed, `durationMs: 206`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "592188c"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 5: Mark plan complete and final sync**
 
