@@ -2126,6 +2126,24 @@ function hasAnalysisMetaObject(analysisMeta) {
   return Boolean(analysisMeta) && typeof analysisMeta === "object" && !Array.isArray(analysisMeta);
 }
 
+function isNonBlankString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function hasValidMatchSummary(matchSummary) {
+  return Boolean(matchSummary) &&
+    typeof matchSummary === "object" &&
+    !Array.isArray(matchSummary) &&
+    isNonBlankString(matchSummary.headline);
+}
+
+function hasValidCoachSummary(coachSummary) {
+  return Boolean(coachSummary) &&
+    typeof coachSummary === "object" &&
+    !Array.isArray(coachSummary) &&
+    isNonBlankString(coachSummary.overallSummary);
+}
+
 function hasValidEvidenceIndex(evidenceIndex) {
   return Array.isArray(evidenceIndex) &&
     evidenceIndex.length > 0 &&
@@ -2175,8 +2193,8 @@ function validateAnalysisOutput(json) {
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
   if (typeof json.analysisMeta.sourceType !== "string" || !json.analysisMeta.sourceType) throw new Error("missing analysisMeta.sourceType");
   if (typeof json.analysisMeta.language !== "string" || !json.analysisMeta.language) throw new Error("missing analysisMeta.language");
-  if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
-  if (!json?.coachSummary?.overallSummary) throw new Error("missing coachSummary.overallSummary");
+  if (!hasValidMatchSummary(json?.matchSummary)) throw new Error("missing matchSummary.headline");
+  if (!hasValidCoachSummary(json?.coachSummary)) throw new Error("missing coachSummary.overallSummary");
   if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);
   if (!hasValidInsightList(json?.strengths)) throw new Error("strengths invalid");
   if (!hasValidInsightList(json?.weaknesses)) throw new Error("weaknesses invalid");
@@ -2324,9 +2342,11 @@ async function buildAnalysis(normalized, sampleId) {
   if (typeof primary.matchSummary === "string") {
     primary.matchSummary = { headline: primary.matchSummary };
     violations.push("type.matchSummary.string");
+  } else if (!primary.matchSummary || typeof primary.matchSummary !== "object" || Array.isArray(primary.matchSummary)) {
+    primary.matchSummary = {};
+    violations.push("type.matchSummary.invalid");
   }
-  if (!primary.matchSummary) { primary.matchSummary = {}; violations.push("missing.matchSummary"); }
-  if (!primary.matchSummary.headline) {
+  if (!hasValidMatchSummary(primary.matchSummary)) {
     const fb = buildRuleBasedAnalysis(normalized, sampleId);
     primary.matchSummary.headline = fb.matchSummary.headline;
     violations.push("missing.matchSummary.headline");
@@ -2335,9 +2355,11 @@ async function buildAnalysis(normalized, sampleId) {
   if (typeof primary.coachSummary === "string") {
     primary.coachSummary = { overallSummary: primary.coachSummary };
     violations.push("type.coachSummary.string");
+  } else if (!primary.coachSummary || typeof primary.coachSummary !== "object" || Array.isArray(primary.coachSummary)) {
+    primary.coachSummary = {};
+    violations.push("type.coachSummary.invalid");
   }
-  if (!primary.coachSummary) { primary.coachSummary = {}; violations.push("missing.coachSummary"); }
-  if (!primary.coachSummary.overallSummary) {
+  if (!hasValidCoachSummary(primary.coachSummary)) {
     const fb = buildCoachSummary(normalized);
     primary.coachSummary.overallSummary = fb.overallSummary;
     violations.push("missing.coachSummary.overallSummary");

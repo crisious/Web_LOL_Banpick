@@ -153,7 +153,7 @@
 
 ```bash
 npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
-npm run test:schema      # validateAnalysisOutput 위반 패턴 57건
+npm run test:schema      # validateAnalysisOutput 위반 패턴 63건
 npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 35건
 npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke

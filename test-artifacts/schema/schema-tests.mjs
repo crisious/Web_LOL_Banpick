@@ -55,6 +55,15 @@ if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
 if (serverSrc.includes("function hasAnalysisMetaObject(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasAnalysisMetaObject"));
 }
+if (serverSrc.includes("function isNonBlankString(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "isNonBlankString"));
+}
+if (serverSrc.includes("function hasValidMatchSummary(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidMatchSummary"));
+}
+if (serverSrc.includes("function hasValidCoachSummary(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidCoachSummary"));
+}
 if (serverSrc.includes("function hasValidEvidenceIndex(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidEvidenceIndex"));
 }
@@ -183,8 +192,44 @@ expectThrows("matchSummary as string throws (no .headline)", () => {
   validateAnalysisOutput(f);
 }, "matchSummary.headline");
 
+expectThrows("matchSummary headline array throws", () => {
+  const f = validFixture();
+  f.matchSummary = { headline: ["한 줄 요약"] };
+  validateAnalysisOutput(f);
+}, "matchSummary.headline");
+
+expectThrows("matchSummary headline number throws", () => {
+  const f = validFixture();
+  f.matchSummary = { headline: 123 };
+  validateAnalysisOutput(f);
+}, "matchSummary.headline");
+
+expectThrows("matchSummary blank headline throws", () => {
+  const f = validFixture();
+  f.matchSummary = { headline: "   " };
+  validateAnalysisOutput(f);
+}, "matchSummary.headline");
+
 expectThrows("coachSummary missing overallSummary throws", () => {
   const f = validFixture(); f.coachSummary = {};
+  validateAnalysisOutput(f);
+}, "coachSummary.overallSummary");
+
+expectThrows("coachSummary overallSummary array throws", () => {
+  const f = validFixture();
+  f.coachSummary = { overallSummary: ["전체 흐름 요약"] };
+  validateAnalysisOutput(f);
+}, "coachSummary.overallSummary");
+
+expectThrows("coachSummary overallSummary number throws", () => {
+  const f = validFixture();
+  f.coachSummary = { overallSummary: 123 };
+  validateAnalysisOutput(f);
+}, "coachSummary.overallSummary");
+
+expectThrows("coachSummary blank overallSummary throws", () => {
+  const f = validFixture();
+  f.coachSummary = { overallSummary: "   " };
   validateAnalysisOutput(f);
 }, "coachSummary.overallSummary");
 
