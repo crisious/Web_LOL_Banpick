@@ -2355,6 +2355,22 @@ function requestJson(urlString, headers = {}) {
 // Track B: Riot 401/403/429 → 사용자 친화적 코드 + 힌트로 normalize.
 // 그 외 에러는 기존 500 + error.message 형식 유지 (호환).
 function riotErrorPayload(error) {
+  if (
+    error &&
+    Number.isInteger(error.statusCode) &&
+    error.statusCode >= 400 &&
+    error.statusCode <= 599
+  ) {
+    return {
+      status: error.statusCode,
+      body: {
+        ok: false,
+        ...(typeof error.code === "string" && error.code ? { code: error.code } : {}),
+        error: error.message || "요청 처리 중 오류가 발생했습니다.",
+      },
+    };
+  }
+
   const status = error && typeof error.riotStatus === "number" ? error.riotStatus : null;
   if (status === 401 || status === 403) {
     return {
@@ -2489,14 +2505,22 @@ async function parseBody(req) {
   for await (const chunk of req) {
     total += chunk.length;
     if (total > MAX_BODY_BYTES) {
-      const error = new Error("Payload too large");
+      const error = new Error("요청 본문이 너무 큽니다.");
       error.statusCode = 413;
+      error.code = "REQUEST_BODY_TOO_LARGE";
       throw error;
     }
     chunks.push(chunk);
   }
   const raw = Buffer.concat(chunks).toString("utf8");
-  return raw ? JSON.parse(raw) : {};
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    const error = new Error("요청 본문이 올바른 JSON 형식이 아닙니다.");
+    error.statusCode = 400;
+    error.code = "INVALID_JSON_BODY";
+    throw error;
+  }
 }
 
 function validateRiotId(gameName, tagLine) {
