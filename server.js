@@ -32,6 +32,7 @@ const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
 const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
+const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
 const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
@@ -843,7 +844,7 @@ function filterPostObjectiveDeaths(deaths, objectiveWins) {
 function buildDerivedSignals(normalized) {
   const events = normalized.timelineEvents;
   const objectiveWins = events.filter(isMacroObjectiveWinEvent);
-  const objectiveFails = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
+  const objectiveFails = events.filter(isObjectiveFailEvent);
   const playerDeaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
   const earlyDeaths = playerDeaths.filter((event) => event.phase === "EARLY");
   const lateTowers = events.filter(
@@ -1052,6 +1053,10 @@ function isObjectiveWinEvent(event) {
   return OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
 }
 
+function isObjectiveFailEvent(event) {
+  return OBJECTIVE_FAIL_EVENT_TYPES.has(event.eventType);
+}
+
 function isMacroObjectiveWinEvent(event) {
   return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
 }
@@ -1151,7 +1156,7 @@ function buildWeaknesses(normalized) {
   const deaths = events.filter((event) => event.eventType === "PLAYER_DEATH");
   const earlyDeaths = deaths.filter((event) => event.phase === "EARLY");
   const objectiveWins = events.filter(isObjectiveWinEvent);
-  const objectiveFailEvents = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
+  const objectiveFailEvents = events.filter(isObjectiveFailEvent);
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveWins);
 
   if (earlyDeaths.length >= 2) {
@@ -1254,7 +1259,7 @@ function buildPhaseSummaries(normalized) {
           : normalized.phaseContext.late;
 
     const objectiveWins = phaseEvents.filter(isMacroObjectiveWinEvent).length;
-    const objectiveFails = phaseEvents.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL").length;
+    const objectiveFails = phaseEvents.filter(isObjectiveFailEvent).length;
     const rating =
       bucket.deaths > bucket.kills + bucket.assists
         ? "BAD"
@@ -1330,7 +1335,7 @@ function calcSurvivalScore(stats, minutes) {
 
 function calcObjectiveScore(events) {
   const wins = events.filter(isObjectiveWinEvent).length;
-  const fails = events.filter((e) => e.eventType === "OBJECTIVE_SETUP_FAIL").length;
+  const fails = events.filter(isObjectiveFailEvent).length;
   const total = wins + fails;
   if (total === 0) return 5;
   const ratio = wins / total;

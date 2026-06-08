@@ -35,6 +35,16 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const objectiveFailPolicySources = serverSrc.includes("const OBJECTIVE_FAIL_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "OBJECTIVE_FAIL_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isObjectiveFailEvent"),
+    ]
+  : [
+      'const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);',
+      'function isObjectiveFailEvent(event) { return OBJECTIVE_FAIL_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const env = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
@@ -42,6 +52,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
+    ...objectiveFailPolicySources,
     extractConstSource(serverSrc, "MACRO_OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isMacroObjectiveWinEvent"),
     extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
@@ -102,6 +113,22 @@ checkTrue(
 checkTrue(
   "bestObjectiveSummary uses isObjectiveWinEvent",
   bestObjectiveSummarySrc.includes("timelineEvents.filter(isObjectiveWinEvent)"),
+);
+checkTrue(
+  "server defines OBJECTIVE_FAIL_EVENT_TYPES",
+  serverSrc.includes('const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);'),
+);
+checkTrue(
+  "server defines isObjectiveFailEvent",
+  serverSrc.includes("function isObjectiveFailEvent(event)"),
+);
+checkTrue(
+  "buildDerivedSignals uses isObjectiveFailEvent",
+  buildDerivedSignalsSrc.includes("events.filter(isObjectiveFailEvent)"),
+);
+checkTrue(
+  "buildPhaseSummaries uses isObjectiveFailEvent",
+  buildPhaseSummariesSrc.includes("phaseEvents.filter(isObjectiveFailEvent).length"),
 );
 checkTrue(
   "server defines MACRO_OBJECTIVE_WIN_EVENT_TYPES",
@@ -271,8 +298,8 @@ check("buildWeaknesses B padded length 3", wkB.length, 3);
 check("buildWeaknesses B ids sequential", wkB.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
 check("buildWeaknesses B all fallback title", wkB.every((w) => w.title === "중요 구도 판단을 더 빠르게 정리할 필요가 있음"), true);
 checkTrue(
-  "buildWeaknesses caches objectiveFailEvents",
-  buildWeaknessesSrc.includes('const objectiveFailEvents = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");'),
+  "buildWeaknesses objective fails use isObjectiveFailEvent",
+  buildWeaknessesSrc.includes("const objectiveFailEvents = events.filter(isObjectiveFailEvent);"),
 );
 checkTrue(
   "buildWeaknesses fallback uses cached objectiveFailEvents",

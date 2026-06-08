@@ -34,6 +34,16 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const objectiveFailPolicySources = serverSrc.includes("const OBJECTIVE_FAIL_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "OBJECTIVE_FAIL_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isObjectiveFailEvent"),
+    ]
+  : [
+      'const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);',
+      'function isObjectiveFailEvent(event) { return OBJECTIVE_FAIL_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const buildCoachSummarySrc = extractFunctionSource(serverSrc, "buildCoachSummary");
 const calcObjectiveScoreSrc = extractFunctionSource(serverSrc, "calcObjectiveScore");
 
@@ -42,6 +52,7 @@ const { buildCoachSummary, calcObjectiveScore } = new Function(
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
     extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
+    ...objectiveFailPolicySources,
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
     extractFunctionSource(serverSrc, "clamp10"),
     extractFunctionSource(serverSrc, "calcObjectiveScore"),
@@ -92,6 +103,10 @@ checkTrue(
 checkTrue(
   "calcObjectiveScore uses isObjectiveWinEvent",
   calcObjectiveScoreSrc.includes("events.filter(isObjectiveWinEvent)"),
+);
+checkTrue(
+  "calcObjectiveScore objective fails use isObjectiveFailEvent",
+  calcObjectiveScoreSrc.includes("events.filter(isObjectiveFailEvent).length"),
 );
 
 // A) WIN, objectiveEvents=3 (>=3), postObjectiveDeaths=0
