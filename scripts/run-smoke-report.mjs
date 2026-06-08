@@ -335,6 +335,26 @@ export function requiredSmokeCheckResults(config, smokeReport) {
   });
 }
 
+function summarizeRequiredSmokeChecks(requiredChecks) {
+  const summary = {
+    total: 0,
+    passed: 0,
+    failed: 0,
+    missing: 0,
+  };
+  for (const check of requiredChecks) {
+    summary.total += 1;
+    if (check?.status === "pass") {
+      summary.passed += 1;
+    } else if (check?.status === "fail") {
+      summary.failed += 1;
+    } else {
+      summary.missing += 1;
+    }
+  }
+  return summary;
+}
+
 export function validateRequiredSmokeChecks(config, smokeReport) {
   return requiredSmokeCheckResults(config, smokeReport)
     .filter((check) => check.status !== "pass")
@@ -355,6 +375,7 @@ export function buildQaSummary({
   exitCode,
   smokeReport = null,
 }) {
+  const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
   return {
     schemaVersion: 1,
     generatedAt: finishedAt,
@@ -372,7 +393,8 @@ export function buildQaSummary({
       smokeRunJsonPath: metadataPath,
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
-      requiredChecks: requiredSmokeCheckResults(config, smokeReport),
+      requiredChecks,
+      requiredCheckSummary: summarizeRequiredSmokeChecks(requiredChecks),
     },
   };
 }

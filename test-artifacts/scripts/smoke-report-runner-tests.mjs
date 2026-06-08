@@ -629,6 +629,12 @@ if (fs.existsSync(runnerPath)) {
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
         requiredChecks: commonMissingFullRequiredChecks,
+        requiredCheckSummary: {
+          total: 7,
+          passed: 0,
+          failed: 0,
+          missing: 7,
+        },
       },
     });
 
@@ -720,6 +726,26 @@ if (fs.existsSync(runnerPath)) {
     runner.validateRequiredSmokeChecks?.(missingRequiredCheckConfig, passingRequiredCheckReport),
     []);
 
+  const passingRequiredSummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-35-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-35-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-35-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:35:00.000Z",
+    finishedAt: "2026-06-08T06:35:10.000Z",
+    exitCode: 0,
+    smokeReport: passingRequiredCheckReport,
+  });
+
+  check("buildQaSummary records passing required check summary",
+    passingRequiredSummary?.latestRun?.requiredCheckSummary,
+    {
+      total: 13,
+      passed: 13,
+      failed: 0,
+      missing: 0,
+    });
+
   const missingRequiredSummary = runner.buildQaSummary?.({
     config: missingRequiredCheckConfig,
     reportDir: "test-artifacts/qa-automation/2026-06-08T06-30-00Z-readonly",
@@ -735,6 +761,43 @@ if (fs.existsSync(runnerPath)) {
     missingRequiredSummary?.latestRun?.requiredChecks,
     readonlyMissingFullRequiredChecks);
 
+  check("buildQaSummary records missing required check summary",
+    missingRequiredSummary?.latestRun?.requiredCheckSummary,
+    {
+      total: 13,
+      passed: 0,
+      failed: 0,
+      missing: 13,
+    });
+
+  const mixedRequiredSummary = runner.buildQaSummary?.({
+    config: missingRequiredCheckConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-40-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:40:00.000Z",
+    finishedAt: "2026-06-08T06:40:10.000Z",
+    exitCode: 1,
+    smokeReport: {
+      status: "failed",
+      actualMode: "readonly",
+      summary: { passed: 41, failed: 1 },
+      checks: [
+        { status: "pass", label: "/api/samples list entries omit explicit matchId" },
+        { status: "fail", label: "/.env is not publicly served" },
+      ],
+    },
+  });
+
+  check("buildQaSummary records mixed required check summary",
+    mixedRequiredSummary?.latestRun?.requiredCheckSummary,
+    {
+      total: 13,
+      passed: 1,
+      failed: 1,
+      missing: 11,
+    });
+
   const sampleListErrorConfig = runner.parseRunnerArgs([
     "node",
     "scripts/run-smoke-report.mjs",
@@ -744,6 +807,26 @@ if (fs.existsSync(runnerPath)) {
   check("sample list error smoke reports skip full-run required checks",
     runner.validateRequiredSmokeChecks?.(sampleListErrorConfig, missingRequiredCheckReport),
     []);
+
+  const sampleListErrorSummary = runner.buildQaSummary?.({
+    config: sampleListErrorConfig,
+    reportDir: "test-artifacts/qa-automation/2026-06-08T06-45-00Z-readonly",
+    reportJsonPath: "test-artifacts/qa-automation/2026-06-08T06-45-00Z-readonly/smoke-report.json",
+    metadataPath: "test-artifacts/qa-automation/2026-06-08T06-45-00Z-readonly/smoke-run.json",
+    startedAt: "2026-06-08T06:45:00.000Z",
+    finishedAt: "2026-06-08T06:45:10.000Z",
+    exitCode: 0,
+    smokeReport: missingRequiredCheckReport,
+  });
+
+  check("sample list error smoke reports record zero required check summary",
+    sampleListErrorSummary?.latestRun?.requiredCheckSummary,
+    {
+      total: 0,
+      passed: 0,
+      failed: 0,
+      missing: 0,
+    });
 
   check("buildQaSummary prefers runner exit status over passed smoke report status",
     runner.buildQaSummary?.({
