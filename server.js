@@ -120,6 +120,13 @@ function firstHeaderValue(value) {
   return String(value || "");
 }
 
+function tokenHeaderValue(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? "\u0000invalid-duplicate-header" : "";
+  }
+  return String(value || "");
+}
+
 function parsePublicDemoModeConfig(rawMode) {
   const value = String(rawMode || "");
   if (!value) {
@@ -251,11 +258,11 @@ function publicDemoModeHealth() {
 }
 
 function tokenFromRequest(req) {
-  const auth = firstHeaderValue(req.headers.authorization);
+  const auth = tokenHeaderValue(req.headers.authorization);
   const bearerPrefix = "Bearer ";
   if (auth.startsWith(bearerPrefix)) return auth.slice(bearerPrefix.length);
   if (auth) return "\u0000invalid-authorization";
-  return firstHeaderValue(req.headers["x-demo-token"]);
+  return tokenHeaderValue(req.headers["x-demo-token"]);
 }
 
 function sendDemoModeBlocked(res) {

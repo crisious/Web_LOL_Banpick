@@ -57,6 +57,7 @@ function makeGate({ publicDemoMode, publicDemoToken }) {
       "const publicDemoToken = publicDemoTokenConfig.value;",
       "const publicDemoTokenValid = publicDemoTokenConfig.valid;",
       extractFunctionSource(serverSrc, "firstHeaderValue"),
+      extractFunctionSource(serverSrc, "tokenHeaderValue"),
       extractFunctionSource(serverSrc, "isReadOnlyDemoMode"),
       extractFunctionSource(serverSrc, "isProtectedDemoMode"),
       extractFunctionSource(serverSrc, "isInvalidDemoMode"),
@@ -230,6 +231,14 @@ if (invalidModeGate) {
     authorizedRes.body,
     null);
 
+  const duplicateBearerRes = makeResponseRecorder();
+  check("protected mode rejects duplicate Authorization header values",
+    protectedGate.requireLiveApiAccess({ headers: { authorization: ["Bearer demo-secret", "Basic other"] } }, duplicateBearerRes),
+    false);
+  check("protected mode duplicate Authorization returns unauthorized code",
+    duplicateBearerRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
   const doubleSpaceBearerRes = makeResponseRecorder();
   check("protected mode rejects bearer token with double-space separator",
     protectedGate.requireLiveApiAccess({ headers: { authorization: "Bearer  demo-secret" } }, doubleSpaceBearerRes),
@@ -292,6 +301,14 @@ if (invalidModeGate) {
     false);
   check("protected mode trailing x-demo-token returns unauthorized code",
     trailingHeaderRes.body?.code,
+    "PUBLIC_DEMO_UNAUTHORIZED");
+
+  const duplicateHeaderTokenRes = makeResponseRecorder();
+  check("protected mode rejects duplicate x-demo-token values",
+    protectedGate.requireLiveApiAccess({ headers: { "x-demo-token": ["demo-secret", "other-secret"] } }, duplicateHeaderTokenRes),
+    false);
+  check("protected mode duplicate x-demo-token returns unauthorized code",
+    duplicateHeaderTokenRes.body?.code,
     "PUBLIC_DEMO_UNAUTHORIZED");
 }
 
