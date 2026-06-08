@@ -33,6 +33,7 @@ const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT:
 const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
+const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
 // 한타 단계별 분석: 이 이상 관여 이벤트면 '한타'로 간주.
@@ -1032,9 +1033,7 @@ function bestObjectiveSummary(normalized) {
 }
 
 function bestFightSummary(normalized) {
-  const combat = normalized.timelineEvents.filter((event) =>
-    ["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"].includes(event.eventType),
-  );
+  const combat = normalized.timelineEvents.filter(isFightContributionEvent);
   if (combat.length >= 3 || normalized.playerStats.killParticipation >= 0.35) {
     return "교전 후속 합류 기여가 좋았음";
   }
@@ -1055,6 +1054,10 @@ function isObjectiveWinEvent(event) {
 
 function isMacroObjectiveWinEvent(event) {
   return MACRO_OBJECTIVE_WIN_EVENT_TYPES.has(event.eventType);
+}
+
+function isFightContributionEvent(event) {
+  return FIGHT_CONTRIBUTION_EVENT_TYPES.has(event.eventType);
 }
 
 function buildStrengths(normalized) {
@@ -1085,7 +1088,7 @@ function buildStrengths(normalized) {
 
   if (fightTitle) {
     const linked = events
-      .filter((event) => ["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"].includes(event.eventType))
+      .filter(isFightContributionEvent)
       .slice(0, 3);
     strengths.push({
       id: "str_02",

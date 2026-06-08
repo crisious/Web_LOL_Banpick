@@ -44,6 +44,8 @@ const env = new Function(
     extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     extractConstSource(serverSrc, "MACRO_OBJECTIVE_WIN_EVENT_TYPES"),
     extractFunctionSource(serverSrc, "isMacroObjectiveWinEvent"),
+    extractConstSource(serverSrc, "FIGHT_CONTRIBUTION_EVENT_TYPES"),
+    extractFunctionSource(serverSrc, "isFightContributionEvent"),
     extractFunctionSource(serverSrc, "bestObjectiveSummary"),
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
@@ -66,6 +68,7 @@ const {
 const buildStrengthsSrc = extractFunctionSource(serverSrc, "buildStrengths");
 const buildWeaknessesSrc = extractFunctionSource(serverSrc, "buildWeaknesses");
 const bestObjectiveSummarySrc = extractFunctionSource(serverSrc, "bestObjectiveSummary");
+const bestFightSummarySrc = extractFunctionSource(serverSrc, "bestFightSummary");
 const buildDerivedSignalsSrc = extractFunctionSource(serverSrc, "buildDerivedSignals");
 const buildPhaseSummariesSrc = extractFunctionSource(serverSrc, "buildPhaseSummaries");
 
@@ -123,6 +126,22 @@ check("bestFightSummary 3 combat, low KP", bestFightSummary({ timelineEvents: [o
 check("bestFightSummary 0 combat, KP 0.35 (boundary)", bestFightSummary({ timelineEvents: [], playerStats: { killParticipation: 0.35 } }), STR);
 check("bestFightSummary 0 combat, KP 0.34999 → null", bestFightSummary({ timelineEvents: [], playerStats: { killParticipation: 0.34999 } }), null);
 check("bestFightSummary 2 combat, low KP → null", bestFightSummary({ timelineEvents: [obj("CHAMPION_KILL"), obj("SKIRMISH_WIN")], playerStats: { killParticipation: 0.1 } }), null);
+checkTrue(
+  "server defines FIGHT_CONTRIBUTION_EVENT_TYPES",
+  serverSrc.includes('const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);'),
+);
+checkTrue(
+  "server defines isFightContributionEvent",
+  serverSrc.includes("function isFightContributionEvent(event)"),
+);
+checkTrue(
+  "bestFightSummary uses isFightContributionEvent",
+  bestFightSummarySrc.includes("timelineEvents.filter(isFightContributionEvent)"),
+);
+checkTrue(
+  "buildStrengths fight evidence uses isFightContributionEvent",
+  buildStrengthsSrc.includes(".filter(isFightContributionEvent)"),
+);
 
 // ─── lowFarmThreshold (CS_LOW_FARM_THRESHOLDS + ||0) ──────────────────────────
 check("lowFarmThreshold TOP", lowFarmThreshold("TOP"), 6);
