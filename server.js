@@ -813,7 +813,7 @@ function buildPhaseContext(events) {
       bucket.kills += 1;
     } else if (event.eventType === "PLAYER_DEATH") {
       bucket.deaths += 1;
-    } else if (event.eventType === "TEAMFIGHT_FOLLOWUP" || event.eventType === "SKIRMISH_WIN") {
+    } else if (isFightContributionEvent(event)) {
       bucket.assists += 1;
     }
     if (event.importance >= 4) {
@@ -1506,7 +1506,7 @@ function buildKdaTimeline(normalized) {
     } else if (evt.eventType === "CHAMPION_KILL") {
       kills++;
       changed = true;
-    } else if (evt.eventType === "TEAMFIGHT_FOLLOWUP" || evt.eventType === "SKIRMISH_WIN") {
+    } else if (isFightContributionEvent(evt)) {
       assists++;
       changed = true;
     }
