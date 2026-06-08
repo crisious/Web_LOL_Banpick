@@ -302,11 +302,11 @@ Evidence captured at `2026-06-09 05:26 KST`:
 - Modify: `docs/superpowers/plans/2026-06-09-baron-objective-result-policy.md`
 - Modify: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Update docs with QA evidence**
+- [x] **Step 1: Update docs with QA evidence**
 
 Record RED, GREEN, full local QA, smoke report, Git commit SHA, GitHub Actions run ID, artifact ID, and final `main...origin/main` sync evidence.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -322,7 +322,10 @@ git push origin main
 
 Expected: implementation commit is pushed to `origin/main`.
 
-- [ ] **Step 3: Verify GitHub Actions QA**
+Evidence:
+- Implementation commit `60e1056` (`test: guard Baron objective result mapping`) was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub Actions QA**
 
 Run:
 
@@ -333,6 +336,12 @@ gh run download <run-id> --dir test-artifacts/tmp/github-qa-<run-id>
 ```
 
 Expected: GitHub Actions QA exits `0`, the downloaded `qa-summary.json` reports passed required checks, and sensitive-pattern scan finds no high-risk strings.
+
+Evidence:
+- GitHub Actions QA run `27164894478` passed for head SHA `60e105606cf951884db5b8a94c8ba4baec82d972`.
+- Workflow artifact `7491586651` (`qa-automation-27164894478`, 3549 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status` `passed`, required checks `13 passed / 0 failed / 0 missing`, smoke `156 passed / 0 failed`, duration `220ms`, mode `readonly`, `latestRun.git.shortSha` `60e1056`, `dirty: false`.
+- Downloaded artifact sensitive scan: `no high-risk sensitive patterns found`.
 
 - [ ] **Step 4: Commit docs finalization and verify final sync**
 
