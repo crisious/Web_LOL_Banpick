@@ -2354,20 +2354,32 @@ function requestJson(urlString, headers = {}) {
   });
 }
 
-// Track B: Riot 401/403/429 → 사용자 친화적 코드 + 힌트로 normalize.
-// 그 외 에러는 기존 500 + error.message 형식 유지 (호환).
+// Track B: Riot 401/403/429 -> 사용자 친화적 코드 + 힌트로 normalize.
+// 그 외 Riot/live API 오류는 외부 세부 정보를 숨기는 고정 500 코드로 normalize.
+function genericRiotApiErrorPayload() {
+  return {
+    status: 500,
+    body: {
+      ok: false,
+      code: "RIOT_API_ERROR",
+      error: "Riot API 요청을 처리하는 중 오류가 발생했습니다.",
+    },
+  };
+}
+
 function riotErrorPayload(error) {
   if (
     error &&
     Number.isInteger(error.statusCode) &&
     error.statusCode >= 400 &&
-    error.statusCode <= 599
+    error.statusCode <= 599 &&
+    (error.code === "INVALID_JSON_BODY" || error.code === "REQUEST_BODY_TOO_LARGE")
   ) {
     return {
       status: error.statusCode,
       body: {
         ok: false,
-        ...(typeof error.code === "string" && error.code ? { code: error.code } : {}),
+        code: error.code,
         error: error.message || "요청 처리 중 오류가 발생했습니다.",
       },
     };
@@ -2395,10 +2407,7 @@ function riotErrorPayload(error) {
       },
     };
   }
-  return {
-    status: 500,
-    body: { ok: false, error: error?.message || String(error) },
-  };
+  return genericRiotApiErrorPayload();
 }
 
 async function loadManifest() {

@@ -8,9 +8,9 @@
 //   1) riotStatus === 401 → code: "RIOT_KEY_EXPIRED", status 401, hint 포함
 //   2) riotStatus === 403 → 동일 (401과 같은 분기)
 //   3) riotStatus === 429 → code: "RIOT_RATE_LIMITED", status 429
-//   4) riotStatus === 500 (or other) → no code, status 500, error.message 통과
-//   5) 필드 없는 일반 Error → status 500, error.message 통과
-//   6) null / undefined → status 500, "null"/"undefined" 문자열 fallback
+//   4) riotStatus === 500 (or other) → code: "RIOT_API_ERROR", raw detail 숨김
+//   5) 필드 없는 일반 Error → code: "RIOT_API_ERROR", raw detail 숨김
+//   6) null / undefined → code: "RIOT_API_ERROR", 안정 메시지 fallback
 
 import fs from "fs";
 
@@ -32,10 +32,28 @@ function extractFunctionSource(source, name) {
   throw new Error(`function ${name} not closed`);
 }
 
-const src = extractFunctionSource(serverSrc, "riotErrorPayload");
+function tryExtractFunctionSource(source, name) {
+  try {
+    return extractFunctionSource(source, name);
+  } catch (error) {
+    if (error?.message === `function ${name} not found`) return "";
+    throw error;
+  }
+}
+
+const src = [
+  tryExtractFunctionSource(serverSrc, "genericRiotApiErrorPayload"),
+  extractFunctionSource(serverSrc, "riotErrorPayload"),
+].filter(Boolean).join("\n");
 const riotErrorPayload = new Function(`${src}\nreturn riotErrorPayload;`)();
 
 let pass = 0, fail = 0;
+
+const GENERIC_RIOT_API_ERROR = {
+  ok: false,
+  code: "RIOT_API_ERROR",
+  error: "Riot API 요청을 처리하는 중 오류가 발생했습니다.",
+};
 
 function check(label, got, expected) {
   const ok = JSON.stringify(got) === JSON.stringify(expected);
@@ -47,6 +65,23 @@ function check(label, got, expected) {
 function checkTrue(label, condition) {
   console.log(`${condition ? "PASS" : "FAIL"}  ${label}`);
   condition ? pass++ : fail++;
+}
+
+function checkNoRawDetails(label, payloadText) {
+  const blocked = [
+    "ENOENT",
+    "/runtime/samples",
+    "secret.json",
+    "kr.api.riotgames.com",
+    "RGAPI-secret",
+    "api_key",
+    "getaddrinfo",
+    "Unexpected token",
+  ];
+  for (const token of blocked) {
+    checkTrue(`${label}: does not expose ${token}`,
+      !payloadText.includes(token));
+  }
 }
 
 function makeRiotError(status, message = "Riot API error") {
@@ -89,35 +124,34 @@ function makeRiotError(status, message = "Riot API error") {
     !("hint" in out.body));
 }
 
-// ─── 케이스 4: 500 → 일반 500 (no code) ─────────────────────────────────────
+// ─── 케이스 4: 500 → 안전한 generic 500 ────────────────────────────────────
 
 {
-  const err = makeRiotError(500, "Internal Error");
+  const err = makeRiotError(500, "ENOENT: no such file or directory, open '/runtime/samples/secret.json'");
   const out = riotErrorPayload(err);
   check("500: status", out.status, 500);
-  check("500: body.ok=false", out.body.ok, false);
-  checkTrue("500: no code field",
-    !("code" in out.body));
-  check("500: body.error from message", out.body.error, err.message);
+  check("500: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("500", JSON.stringify(out.body));
 }
 
-// ─── 케이스 5: 404 → 일반 500 (RIOT 매핑 없음) ──────────────────────────────
+// ─── 케이스 5: 404 → 안전한 generic 500 ────────────────────────────────────
 
 {
-  const err = makeRiotError(404, "Not Found");
+  const err = makeRiotError(404, "Unexpected token < in JSON at position 0");
   const out = riotErrorPayload(err);
   check("404: maps to status 500 (no special handling)", out.status, 500);
-  checkTrue("404: no code field", !("code" in out.body));
+  check("404: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("404", JSON.stringify(out.body));
 }
 
 // ─── 케이스 6: 일반 Error (riotStatus 없음) ─────────────────────────────────
 
 {
-  const err = new Error("connection refused");
+  const err = new Error("getaddrinfo ENOTFOUND kr.api.riotgames.com?api_key=RGAPI-secret");
   const out = riotErrorPayload(err);
   check("plain Error: status", out.status, 500);
-  check("plain Error: body.error", out.body.error, "connection refused");
-  checkTrue("plain Error: no code", !("code" in out.body));
+  check("plain Error: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("plain Error", JSON.stringify(out.body));
 }
 
 // ─── 케이스 7: null / undefined ─────────────────────────────────────────────
@@ -125,14 +159,14 @@ function makeRiotError(status, message = "Riot API error") {
 {
   const out = riotErrorPayload(null);
   check("null: status", out.status, 500);
-  check("null: body.error fallback to 'null' string",
-    out.body.error, "null");
+  check("null: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("null", JSON.stringify(out.body));
 }
 {
   const out = riotErrorPayload(undefined);
   check("undefined: status", out.status, 500);
-  check("undefined: body.error fallback to 'undefined' string",
-    out.body.error, "undefined");
+  check("undefined: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("undefined", JSON.stringify(out.body));
 }
 
 // ─── 케이스 8: riotStatus가 string인 경우 (방어적) ─────────────────────────
@@ -144,6 +178,8 @@ function makeRiotError(status, message = "Riot API error") {
   // 함수는 typeof === "number" 체크하므로 string은 미매핑 → 500 fallback
   check("string riotStatus: maps to 500 (type guard)",
     out.status, 500);
+  check("string riotStatus: body", out.body, GENERIC_RIOT_API_ERROR);
+  checkNoRawDetails("string riotStatus", JSON.stringify(out.body));
 }
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
