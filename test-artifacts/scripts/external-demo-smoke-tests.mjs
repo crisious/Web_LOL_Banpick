@@ -240,6 +240,10 @@ checkThrows("parseSmokeArgs rejects control character report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u0007control.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects unicode whitespace report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u00a0unicode.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1231,6 +1235,27 @@ check("CLI reports control character report JSON path without network request",
 
 check("CLI control character report JSON path does not create file",
   fs.existsSync(controlCharReportJsonPath),
+  false);
+
+const unicodeWhitespaceReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-\u00a0unicode.json");
+fs.rmSync(unicodeWhitespaceReportJsonPath, { force: true });
+const unicodeWhitespaceReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts/tmp/smoke-report-\u00a0unicode.json",
+]);
+
+check("CLI exits non-zero for unicode whitespace report JSON path",
+  unicodeWhitespaceReportJson.status,
+  1);
+
+check("CLI reports unicode whitespace report JSON path without network request",
+  unicodeWhitespaceReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI unicode whitespace report JSON path does not create file",
+  fs.existsSync(unicodeWhitespaceReportJsonPath),
   false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";

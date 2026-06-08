@@ -65,6 +65,9 @@ function normalizeOutputRoot(outputRoot) {
   if (/[\u0000-\u001f\u007f]/.test(raw)) {
     throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
   }
+  if (/[\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/u.test(raw)) {
+    throw new Error("--output-root must be a relative path under a test-artifacts subdirectory");
+  }
   const comparable = raw.replace(/\\/g, "/");
   const rawSegments = comparable.split("/");
   if (path.isAbsolute(raw) || path.win32.isAbsolute(raw) || comparable.includes("//") || rawSegments.includes(".") || rawSegments.includes("..")) {
