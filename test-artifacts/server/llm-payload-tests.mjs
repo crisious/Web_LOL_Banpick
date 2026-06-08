@@ -39,6 +39,11 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const outputSchemaExampleSrc = extractConstSource(serverSrc, "OUTPUT_SCHEMA_EXAMPLE");
+const OUTPUT_SCHEMA_EXAMPLE = new Function(
+  `${outputSchemaExampleSrc}\nreturn OUTPUT_SCHEMA_EXAMPLE;`,
+)();
+
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
 const teamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
@@ -297,6 +302,18 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
   check("playerKills counts only involved", out[0].playerKills, 1);
   check("playerDeaths counts only involved", out[0].playerDeaths, 1);
   check("eventCount includes all in group", out[0].eventCount, 3);
+}
+
+// ─── 케이스 15: teamfight prompt 예시는 validator/UI phase row 필드를 모두 보여줘야 함 ──
+
+{
+  const start = OUTPUT_SCHEMA_EXAMPLE.indexOf('"teamfightPhaseAnalysis"');
+  const end = OUTPUT_SCHEMA_EXAMPLE.indexOf('"evidenceIndex"', start);
+  const snippet = OUTPUT_SCHEMA_EXAMPLE.slice(start, end);
+  checkTrue("teamfight prompt includes outcomeTag", snippet.includes('"outcomeTag"'));
+  checkTrue("teamfight prompt includes playerKills", snippet.includes('"playerKills"'));
+  checkTrue("teamfight prompt includes playerDeaths", snippet.includes('"playerDeaths"'));
+  checkTrue("teamfight prompt includes relatedEventIds", snippet.includes('"relatedEventIds"'));
 }
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────

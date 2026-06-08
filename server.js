@@ -1976,7 +1976,15 @@ teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 �
   "actionChecklist": [{ "id": "act_1", "text": "...", "linkedWeaknessId": "wk_1" }],
   "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
   "combatAnalysis": [{ "encounterId": "enc_001", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
-  "teamfightPhaseAnalysis": [{ "teamfightId": "enc_001", "phases": [{ "phase": "ENGAGE", "coaching": "진입 국면 코칭 한 줄" }, { "phase": "TRADE", "coaching": "딜교환 코칭" }, { "phase": "CLEANUP", "coaching": "정리 국면 코칭" }], "takeaway": "이 한타 핵심 교훈" }],
+  "teamfightPhaseAnalysis": [{
+    "teamfightId": "enc_001",
+    "phases": [
+      { "phase": "ENGAGE", "outcomeTag": "INITIATED_KILL", "playerKills": 1, "playerDeaths": 0, "coaching": "진입 국면 코칭 한 줄", "relatedEventIds": ["evt_004"] },
+      { "phase": "TRADE", "outcomeTag": "TRADE_EVEN", "playerKills": 0, "playerDeaths": 0, "coaching": "딜교환 코칭", "relatedEventIds": ["evt_005"] },
+      { "phase": "CLEANUP", "outcomeTag": "CLOSED_OUT", "playerKills": 1, "playerDeaths": 0, "coaching": "정리 국면 코칭", "relatedEventIds": ["evt_006"] }
+    ],
+    "takeaway": "이 한타 핵심 교훈"
+  }],
   "evidenceIndex": [{ "eventId": "evt_001", "shortNote": "..." }]
 }`;
 
