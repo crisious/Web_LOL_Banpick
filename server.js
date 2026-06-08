@@ -31,6 +31,10 @@ const POST_OBJECTIVE_DEATH_WINDOW_MS = 120000;
 // 약점 판정용 "저파밍 바닥선" 분당 CS 임계값 (이 값 미만이면 자원 전환 약점으로 표시).
 const CS_LOW_FARM_THRESHOLDS = { TOP: 6, MID: 6, ADC: 6.5, JUNGLE: 4.5, SUPPORT: 0 };
 const VISION_STRENGTH_THRESHOLDS = { JUNGLE: 35, DEFAULT: 25 };
+const RAW_CHAMPION_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);
+const RAW_ELITE_MONSTER_KILL_EVENT_TYPES = new Set(["ELITE_MONSTER_KILL"]);
+const RAW_BUILDING_KILL_EVENT_TYPES = new Set(["BUILDING_KILL"]);
+const SUPPORTED_RAW_TIMELINE_EVENT_TYPES = new Set([...RAW_CHAMPION_KILL_EVENT_TYPES, ...RAW_ELITE_MONSTER_KILL_EVENT_TYPES, ...RAW_BUILDING_KILL_EVENT_TYPES]);
 const OBJECTIVE_WIN_EVENT_TYPES = new Set(["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"]);
 const OBJECTIVE_FAIL_EVENT_TYPES = new Set(["OBJECTIVE_SETUP_FAIL"]);
 const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "TOWER_TAKE"]);
@@ -556,6 +560,22 @@ function phaseFor(timestampMs) {
   return "LATE";
 }
 
+function isRawChampionKillEvent(rawEvent) {
+  return RAW_CHAMPION_KILL_EVENT_TYPES.has(rawEvent.type);
+}
+
+function isRawEliteMonsterKillEvent(rawEvent) {
+  return RAW_ELITE_MONSTER_KILL_EVENT_TYPES.has(rawEvent.type);
+}
+
+function isRawBuildingKillEvent(rawEvent) {
+  return RAW_BUILDING_KILL_EVENT_TYPES.has(rawEvent.type);
+}
+
+function isSupportedRawTimelineEvent(rawEvent) {
+  return SUPPORTED_RAW_TIMELINE_EVENT_TYPES.has(rawEvent.type);
+}
+
 function laneHintForEvent(event) {
   if (event.monsterType === "DRAGON") {
     return "DRAGON_RIVER";
@@ -645,7 +665,7 @@ function summaryForEvent(eventType, phase, event, playerWonObjective) {
 }
 
 function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonObjective) {
-  if (rawEvent.type === "CHAMPION_KILL") {
+  if (isRawChampionKillEvent(rawEvent)) {
     if (rawEvent.victimId === targetParticipantId) {
       return "PLAYER_DEATH";
     }
@@ -655,7 +675,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
     return rawEvent.assistingParticipantIds.length > 1 ? "TEAMFIGHT_FOLLOWUP" : "SKIRMISH_WIN";
   }
 
-  if (rawEvent.type === "ELITE_MONSTER_KILL") {
+  if (isRawEliteMonsterKillEvent(rawEvent)) {
     if (rawEvent.monsterType === "DRAGON") {
       return playerWonObjective ? "DRAGON_FIGHT" : "OBJECTIVE_SETUP_FAIL";
     }
@@ -665,7 +685,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
     return playerWonObjective ? "OBJECTIVE_SETUP_WIN" : "OBJECTIVE_SETUP_FAIL";
   }
 
-  if (rawEvent.type === "BUILDING_KILL") {
+  if (isRawBuildingKillEvent(rawEvent)) {
     return rawEvent.teamId === targetTeamId ? "OBJECTIVE_SETUP_FAIL" : "TOWER_TAKE";
   }
 
@@ -678,15 +698,15 @@ function shouldKeepEvent(rawEvent, targetParticipantId, targetTeamId) {
     rawEvent.victimId === targetParticipantId ||
     rawEvent.assistingParticipantIds.includes(targetParticipantId);
 
-  if (rawEvent.type === "CHAMPION_KILL") {
+  if (isRawChampionKillEvent(rawEvent)) {
     return playerInvolved;
   }
 
-  if (rawEvent.type === "ELITE_MONSTER_KILL") {
+  if (isRawEliteMonsterKillEvent(rawEvent)) {
     return true;
   }
 
-  if (rawEvent.type === "BUILDING_KILL") {
+  if (isRawBuildingKillEvent(rawEvent)) {
     return playerInvolved || rawEvent.teamId !== targetTeamId;
   }
 
@@ -731,11 +751,7 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
         teamId: event.teamId || null,
       };
 
-      if (
-        rawEvent.type !== "CHAMPION_KILL" &&
-        rawEvent.type !== "ELITE_MONSTER_KILL" &&
-        rawEvent.type !== "BUILDING_KILL"
-      ) {
+      if (!isSupportedRawTimelineEvent(rawEvent)) {
         return;
       }
 
@@ -744,14 +760,14 @@ function extractTimelineEvents(matchDetail, timeline, targetParticipantId, targe
       }
 
       if (
-        rawEvent.type === "ELITE_MONSTER_KILL" &&
+        isRawEliteMonsterKillEvent(rawEvent) &&
         rawEvent.monsterType === "HORDE" &&
         rawEvent.timestamp - lastHordeTimestamp < 20000
       ) {
         return;
       }
 
-      if (rawEvent.type === "ELITE_MONSTER_KILL" && rawEvent.monsterType === "HORDE") {
+      if (isRawEliteMonsterKillEvent(rawEvent) && rawEvent.monsterType === "HORDE") {
         lastHordeTimestamp = rawEvent.timestamp;
       }
 
