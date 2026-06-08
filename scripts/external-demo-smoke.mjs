@@ -37,6 +37,9 @@ function parseSmokeArgs(argv, env = {}, deps = {}) {
     if (/\p{Cf}/u.test(raw)) {
       throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
     }
+    if (/[\ufffd]|\p{Cs}/u.test(raw)) {
+      throw new Error("--report-json must be a relative .json path under a test-artifacts subdirectory");
+    }
     const comparable = raw.replace(/\\/g, "/");
     const rawSegments = comparable.split("/");
     if (comparable.startsWith("/") || /^[A-Za-z]:\//.test(comparable) || comparable.startsWith("//") || comparable.includes("//") || comparable.endsWith("/") || rawSegments.includes(".") || rawSegments.includes("..")) {

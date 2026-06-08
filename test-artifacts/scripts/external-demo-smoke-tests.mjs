@@ -252,6 +252,14 @@ checkThrows("parseSmokeArgs rejects unicode Cf report JSON path outside common r
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\u061cformat.json"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
 
+checkThrows("parseSmokeArgs rejects surrogate report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\ud800surrogate.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
+checkThrows("parseSmokeArgs rejects replacement character report JSON path",
+  () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report-\ufffdreplacement.json"], {}),
+  "--report-json must be a relative .json path under a test-artifacts subdirectory");
+
 checkThrows("parseSmokeArgs rejects trailing slash report JSON path",
   () => parseSmokeArgs(["node", "scripts/external-demo-smoke.mjs", "--report-json=test-artifacts/tmp/smoke-report.json/"], {}),
   "--report-json must be a relative .json path under a test-artifacts subdirectory");
@@ -1306,6 +1314,27 @@ check("CLI reports unicode Cf report JSON path without network request",
 
 check("CLI unicode Cf report JSON path does not create file",
   fs.existsSync(unicodeCfReportJsonPath),
+  false);
+
+const replacementCharReportJsonPath = path.join("test-artifacts", "tmp", "smoke-report-\ufffdreplacement.json");
+fs.rmSync(replacementCharReportJsonPath, { force: true });
+const replacementCharReportJson = await runNode([
+  smokePath,
+  `http://127.0.0.1:${closedPort}`,
+  "--expect-mode=readonly",
+  "--report-json=test-artifacts/tmp/smoke-report-\ufffdreplacement.json",
+]);
+
+check("CLI exits non-zero for replacement character report JSON path",
+  replacementCharReportJson.status,
+  1);
+
+check("CLI reports replacement character report JSON path without network request",
+  replacementCharReportJson.stderr.includes("FAIL --report-json must be a relative .json path under a test-artifacts subdirectory"),
+  true);
+
+check("CLI replacement character report JSON path does not create file",
+  fs.existsSync(replacementCharReportJsonPath),
   false);
 
 const trailingSlashReportJsonPath = "test-artifacts/tmp/smoke-report-trailing.json/";

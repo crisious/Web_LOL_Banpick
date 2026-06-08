@@ -166,6 +166,14 @@ if (fs.existsSync(runnerPath)) {
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/smoke-report-\u061cformat-root"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
 
+  checkThrows("parseRunnerArgs rejects surrogate output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/smoke-report-\ud800surrogate-root"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
+  checkThrows("parseRunnerArgs rejects replacement character output root",
+    () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/tmp/smoke-report-\ufffdreplacement-root"], {}),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+
   checkThrows("parseRunnerArgs rejects root dot-segment output root",
     () => runner.parseRunnerArgs(["node", "scripts/run-smoke-report.mjs", "--output-root=test-artifacts/./qa-automation"], {}),
     "--output-root must be a relative path under a test-artifacts subdirectory");
@@ -401,6 +409,16 @@ if (fs.existsSync(runnerPath)) {
     "--output-root must be a relative path under a test-artifacts subdirectory");
   check("unicode Cf env output root rejection does not create output root",
     fs.existsSync(unicodeCfEnvCreatedPath),
+    false);
+
+  const replacementCharEnvOutputRoot = "test-artifacts/tmp/smoke-report-\ufffdreplacement-root";
+  const replacementCharEnvCreatedPath = path.join("test-artifacts", "tmp", "smoke-report-\ufffdreplacement-root");
+  fs.rmSync(replacementCharEnvCreatedPath, { recursive: true, force: true });
+  await checkRejects("runSmokeReport rejects replacement character env output root before artifact creation",
+    () => runner.runSmokeReport(["node", "scripts/run-smoke-report.mjs"], { SMOKE_REPORT_OUTPUT_ROOT: replacementCharEnvOutputRoot }),
+    "--output-root must be a relative path under a test-artifacts subdirectory");
+  check("replacement character env output root rejection does not create output root",
+    fs.existsSync(replacementCharEnvCreatedPath),
     false);
 
   const protectedConfig = runner.parseRunnerArgs([
