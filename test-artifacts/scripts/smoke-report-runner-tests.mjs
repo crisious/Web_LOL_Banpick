@@ -608,6 +608,12 @@ if (fs.existsSync(runnerPath)) {
     startedAt: "2026-06-08T01:15:30.000Z",
     finishedAt: "2026-06-08T01:15:45.000Z",
     exitCode: 0,
+    gitContext: {
+      branch: "main",
+      shortSha: "abc1234",
+      fullSha: "abc1234def5678",
+      dirty: false,
+    },
     smokeReport: {
       status: "passed",
       actualMode: "protected",
@@ -630,6 +636,12 @@ if (fs.existsSync(runnerPath)) {
         startedAt: "2026-06-08T01:15:30.000Z",
         finishedAt: "2026-06-08T01:15:45.000Z",
         durationMs: 15000,
+        git: {
+          branch: "main",
+          shortSha: "abc1234",
+          fullSha: "abc1234def5678",
+          dirty: false,
+        },
         reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
         reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
@@ -734,6 +746,12 @@ if (fs.existsSync(runnerPath)) {
     startedAt: "2026-06-08T06:35:00.000Z",
     finishedAt: "2026-06-08T06:35:10.000Z",
     exitCode: 0,
+    gitContext: {
+      branch: "main",
+      shortSha: "feed123",
+      fullSha: "feed1234567890abcdef",
+      dirty: true,
+    },
     smokeReport: passingRequiredCheckReport,
   });
 
@@ -748,6 +766,15 @@ if (fs.existsSync(runnerPath)) {
   check("buildQaSummary records run duration in milliseconds",
     passingRequiredSummary?.latestRun?.durationMs,
     10000);
+
+  check("buildQaSummary records supplied git context",
+    passingRequiredSummary?.latestRun?.git,
+    {
+      branch: "main",
+      shortSha: "feed123",
+      fullSha: "feed1234567890abcdef",
+      dirty: true,
+    });
 
   check("buildQaSummary records passing required check summary",
     passingRequiredSummary?.latestRun?.requiredCheckSummary,

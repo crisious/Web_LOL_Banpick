@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -394,6 +394,36 @@ function runDurationMs(startedAt, finishedAt) {
   return Math.max(0, finished - started);
 }
 
+function gitOutput(args, cwd) {
+  return execFileSync("git", args, {
+    cwd,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }).trim();
+}
+
+export function gitContextFor(cwd = process.cwd()) {
+  try {
+    const branch = gitOutput(["rev-parse", "--abbrev-ref", "HEAD"], cwd);
+    const shortSha = gitOutput(["rev-parse", "--short", "HEAD"], cwd);
+    const fullSha = gitOutput(["rev-parse", "HEAD"], cwd);
+    const status = gitOutput(["status", "--porcelain"], cwd);
+    return {
+      branch,
+      shortSha,
+      fullSha,
+      dirty: status.length > 0,
+    };
+  } catch {
+    return {
+      branch: "",
+      shortSha: "",
+      fullSha: "",
+      dirty: false,
+    };
+  }
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -402,6 +432,7 @@ export function buildQaSummary({
   startedAt,
   finishedAt,
   exitCode,
+  gitContext = null,
   smokeReport = null,
 }) {
   const requiredChecks = requiredSmokeCheckResults(config, smokeReport);
@@ -418,6 +449,12 @@ export function buildQaSummary({
       startedAt,
       finishedAt,
       durationMs: runDurationMs(startedAt, finishedAt),
+      git: gitContext || {
+        branch: "",
+        shortSha: "",
+        fullSha: "",
+        dirty: false,
+      },
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
@@ -492,6 +529,7 @@ export async function runSmokeReport(argv = process.argv, env = process.env) {
     startedAt,
     finishedAt,
     exitCode: finalExitCode,
+    gitContext: gitContextFor(process.cwd()),
     smokeReport,
   }));
 
