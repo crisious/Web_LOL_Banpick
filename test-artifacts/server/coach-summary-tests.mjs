@@ -34,12 +34,19 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
-const { buildCoachSummary } = new Function(
+const buildCoachSummarySrc = extractFunctionSource(serverSrc, "buildCoachSummary");
+const calcObjectiveScoreSrc = extractFunctionSource(serverSrc, "calcObjectiveScore");
+
+const { buildCoachSummary, calcObjectiveScore } = new Function(
   [
     extractConstSource(serverSrc, "POST_OBJECTIVE_DEATH_WINDOW_MS"),
+    extractConstSource(serverSrc, "OBJECTIVE_WIN_EVENT_TYPES"),
+    extractFunctionSource(serverSrc, "isObjectiveWinEvent"),
     extractFunctionSource(serverSrc, "filterPostObjectiveDeaths"),
+    extractFunctionSource(serverSrc, "clamp10"),
+    extractFunctionSource(serverSrc, "calcObjectiveScore"),
     extractFunctionSource(serverSrc, "buildCoachSummary"),
-    "return { buildCoachSummary };",
+    "return { buildCoachSummary, calcObjectiveScore };",
   ].join("\n"),
 )();
 
@@ -49,6 +56,10 @@ function check(label, got, expected) {
   console.log(`${ok ? "PASS" : "FAIL"}  ${label}`);
   if (!ok) console.log(`  expected ${JSON.stringify(expected)}\n  got      ${JSON.stringify(got)}`);
   ok ? pass++ : fail++;
+}
+function checkTrue(label, condition) {
+  console.log(`${condition ? "PASS" : "FAIL"}  ${label}`);
+  condition ? pass++ : fail++;
 }
 
 const T = {
@@ -62,6 +73,26 @@ const T = {
 };
 
 const objEvent = (ts) => ({ eventType: "DRAGON_FIGHT", timestampMs: ts });
+
+check("calcObjectiveScore no objective events -> neutral", calcObjectiveScore([]), 5);
+check("calcObjectiveScore 3 wins / 1 fail", calcObjectiveScore([
+  { eventType: "DRAGON_FIGHT" },
+  { eventType: "BARON_FIGHT" },
+  { eventType: "OBJECTIVE_SETUP_WIN" },
+  { eventType: "OBJECTIVE_SETUP_FAIL" },
+]), 7.2);
+check("calcObjectiveScore ignores tower take as objective win", calcObjectiveScore([
+  { eventType: "TOWER_TAKE" },
+  { eventType: "OBJECTIVE_SETUP_FAIL" },
+]), 0);
+checkTrue(
+  "buildCoachSummary uses isObjectiveWinEvent",
+  buildCoachSummarySrc.includes("timelineEvents.filter(isObjectiveWinEvent)"),
+);
+checkTrue(
+  "calcObjectiveScore uses isObjectiveWinEvent",
+  calcObjectiveScoreSrc.includes("events.filter(isObjectiveWinEvent)"),
+);
 
 // A) WIN, objectiveEvents=3 (>=3), postObjectiveDeaths=0
 check("coachSummary WIN / 3 obj / 0 postObj", buildCoachSummary({

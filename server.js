@@ -1329,7 +1329,7 @@ function calcSurvivalScore(stats, minutes) {
 }
 
 function calcObjectiveScore(events) {
-  const wins = events.filter((e) => ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(e.eventType)).length;
+  const wins = events.filter(isObjectiveWinEvent).length;
   const fails = events.filter((e) => e.eventType === "OBJECTIVE_SETUP_FAIL").length;
   const total = wins + fails;
   if (total === 0) return 5;
@@ -1616,9 +1616,7 @@ function buildEvidenceIndex(normalized) {
 
 function buildCoachSummary(normalized) {
   const isWin = normalized.matchInfo.result === "WIN";
-  const objectiveEvents = normalized.timelineEvents.filter((event) =>
-    ["DRAGON_FIGHT", "BARON_FIGHT", "OBJECTIVE_SETUP_WIN"].includes(event.eventType),
-  );
+  const objectiveEvents = normalized.timelineEvents.filter(isObjectiveWinEvent);
   const deaths = normalized.timelineEvents.filter((event) => event.eventType === "PLAYER_DEATH");
   const postObjectiveDeaths = filterPostObjectiveDeaths(deaths, objectiveEvents);
 
