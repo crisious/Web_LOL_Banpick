@@ -1553,19 +1553,21 @@ function buildWardTimeline(timeline, targetParticipantId) {
   timeline.info.frames.forEach((frame) => {
     frame.events.forEach((event) => {
       if (event.type === "WARD_PLACED" && event.creatorId === targetParticipantId) {
+        const time = rawEventTimestampMs(event);
         events.push({
-          time: event.timestamp,
-          timeLabel: timestampLabel(event.timestamp),
-          phase: phaseFor(event.timestamp),
+          time,
+          timeLabel: timestampLabel(time),
+          phase: phaseFor(time),
           action: "PLACED",
           wardType: event.wardType || "UNKNOWN",
         });
       }
       if (event.type === "WARD_KILL" && event.killerId === targetParticipantId) {
+        const time = rawEventTimestampMs(event);
         events.push({
-          time: event.timestamp,
-          timeLabel: timestampLabel(event.timestamp),
-          phase: phaseFor(event.timestamp),
+          time,
+          timeLabel: timestampLabel(time),
+          phase: phaseFor(time),
           action: "KILLED",
           wardType: event.wardType || "UNKNOWN",
         });
