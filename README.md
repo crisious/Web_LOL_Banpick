@@ -239,7 +239,7 @@ Public demo 관련 `.env` 값은 `=` 뒤 공백까지 그대로 읽습니다. �
 
 외부 접속 데모는 먼저 read-only 모드로 열어야 합니다. `PUBLIC_DEMO_MODE=readonly`에서는 저장 샘플 조회만 허용하고 `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`은 403으로 차단합니다. `PUBLIC_DEMO_MODE` 오타도 live/write API를 403 `PUBLIC_DEMO_MODE_INVALID`로 차단하므로, `/healthz`와 smoke 결과로 실제 mode를 먼저 확인하세요. 자세한 절차는 [docs/external-demo-runbook.md](docs/external-demo-runbook.md)와 [external-access-deployment-plan.md](external-access-deployment-plan.md)를 참고하세요.
 
-`SAMPLES_DIR`를 설정하면 manifest와 생성된 sample bundle JSON은 해당 경로에서 읽고 씁니다. 비워두면 기존처럼 `./data/samples`를 사용하며, manifest의 `/data/samples/...` 공개 경로 값은 UI/API 호환을 위해 그대로 유지됩니다.
+`SAMPLES_DIR`를 설정하면 manifest와 생성된 sample bundle JSON은 해당 경로에서 읽고 씁니다. Missing/empty일 때만 기존처럼 `./data/samples`를 사용하며, non-empty 값은 상대/절대 filesystem path를 그대로 사용합니다. 경로 내부 공백은 허용하지만 leading/trailing whitespace나 ASCII control character가 섞인 `SAMPLES_DIR= /var/lib/lol-ai-coach/samples` 같은 값은 서버 시작 전에 실패합니다. Manifest의 `/data/samples/...` 공개 경로 값은 UI/API 호환을 위해 그대로 유지됩니다.
 
 ### 2. 서버 실행
 

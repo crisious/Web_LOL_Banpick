@@ -119,12 +119,25 @@ if (helpers) {
   check("resolveSamplesDir defaults to app data/samples",
     resolveSamplesDir("", "/app/lol-ai-coach"),
     "/app/lol-ai-coach/data/samples");
-  check("resolveSamplesDir trims and resolves relative paths from app root",
-    resolveSamplesDir("  runtime/samples  ", "/app/lol-ai-coach"),
+  check("resolveSamplesDir resolves relative paths from app root",
+    resolveSamplesDir("runtime/samples", "/app/lol-ai-coach"),
     "/app/lol-ai-coach/runtime/samples");
+  check("resolveSamplesDir preserves internal path spaces",
+    resolveSamplesDir("runtime/sample store", "/app/lol-ai-coach"),
+    "/app/lol-ai-coach/runtime/sample store");
   check("resolveSamplesDir keeps absolute paths",
     resolveSamplesDir("/var/lib/lol-ai-coach/samples", "/app/lol-ai-coach"),
     "/var/lib/lol-ai-coach/samples");
+  const samplesDirError = "SAMPLES_DIR must be empty or a filesystem path without leading/trailing whitespace or control characters.";
+  for (const [label, rawDir] of [
+    ["leading whitespace SAMPLES_DIR is rejected", " runtime/samples"],
+    ["trailing whitespace SAMPLES_DIR is rejected", "runtime/samples "],
+    ["whitespace-only SAMPLES_DIR is rejected", "   "],
+    ["tab SAMPLES_DIR is rejected", "runtime\tsamples"],
+    ["newline SAMPLES_DIR is rejected", "runtime\nsamples"],
+  ]) {
+    checkThrows(label, () => resolveSamplesDir(rawDir, "/app/lol-ai-coach"), samplesDirError);
+  }
   check("sampleStoragePath joins under configured samplesDir",
     sampleStoragePath("sample-kr-1", "raw-match.json"),
     "/mnt/lol-ai-coach-samples/sample-kr-1/raw-match.json");

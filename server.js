@@ -37,11 +37,14 @@ const TEAMFIGHT_MIN_EVENTS = 3;
 const CLEANUP_GAP_MS = 8000;
 
 function resolveSamplesDir(configuredDir, appRoot) {
-  const raw = String(configuredDir || "").trim();
-  if (!raw) {
+  const value = configuredDir === undefined || configuredDir === null ? "" : String(configuredDir);
+  if (value === "") {
     return path.join(appRoot, "data", "samples");
   }
-  return path.resolve(appRoot, raw);
+  if (value.trim() !== value || /[\u0000-\u001F\u007F]/u.test(value)) {
+    throw new Error("SAMPLES_DIR must be empty or a filesystem path without leading/trailing whitespace or control characters.");
+  }
+  return path.resolve(appRoot, value);
 }
 
 const samplesDir = resolveSamplesDir(process.env.SAMPLES_DIR, root);

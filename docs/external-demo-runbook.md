@@ -73,6 +73,8 @@ PUBLIC_DEMO_MODE=readonly TRUST_PROXY=1 npm start
 
 `HOST` defaults to `127.0.0.1` only when it is missing or empty. Set `HOST=0.0.0.0` when the server must bind for a tunnel or external reverse proxy, and keep the value free of whitespace and control characters. Values such as `HOST= 0.0.0.0`, `HOST=0.0.0.0 `, or `HOST=local host` fail before startup instead of being normalized.
 
+`SAMPLES_DIR` defaults to `./data/samples` only when it is missing or empty. Non-empty values may be relative or absolute filesystem paths, including internal spaces, but leading/trailing whitespace and ASCII control characters fail before startup so a demo cannot silently use a different sample storage root.
+
 2. Start tunnel:
 
 ```bash
