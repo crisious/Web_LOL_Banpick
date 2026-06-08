@@ -629,6 +629,7 @@ if (fs.existsSync(runnerPath)) {
         exitCode: 0,
         startedAt: "2026-06-08T01:15:30.000Z",
         finishedAt: "2026-06-08T01:15:45.000Z",
+        durationMs: 15000,
         reportDir: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected",
         reportJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-report.json",
         smokeRunJsonPath: "test-artifacts/qa-automation/2026-06-08T01-15-30Z-external-protected/smoke-run.json",
@@ -743,6 +744,10 @@ if (fs.existsSync(runnerPath)) {
       smokeReport: "2026-06-08T06-35-00Z-readonly/smoke-report.json",
       smokeRun: "2026-06-08T06-35-00Z-readonly/smoke-run.json",
     });
+
+  check("buildQaSummary records run duration in milliseconds",
+    passingRequiredSummary?.latestRun?.durationMs,
+    10000);
 
   check("buildQaSummary records passing required check summary",
     passingRequiredSummary?.latestRun?.requiredCheckSummary,

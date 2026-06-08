@@ -387,6 +387,13 @@ function artifactRelativePathsFor(reportDir, reportJsonPath, metadataPath) {
   };
 }
 
+function runDurationMs(startedAt, finishedAt) {
+  const started = Date.parse(startedAt);
+  const finished = Date.parse(finishedAt);
+  if (!Number.isFinite(started) || !Number.isFinite(finished)) return 0;
+  return Math.max(0, finished - started);
+}
+
 export function buildQaSummary({
   config,
   reportDir,
@@ -410,6 +417,7 @@ export function buildQaSummary({
       exitCode,
       startedAt,
       finishedAt,
+      durationMs: runDurationMs(startedAt, finishedAt),
       reportDir,
       reportJsonPath,
       smokeRunJsonPath: metadataPath,
