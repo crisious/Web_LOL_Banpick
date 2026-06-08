@@ -1497,6 +1497,13 @@ function objectiveKillerTeamId(event, participantTeamMap) {
   return isKnownRawTeamId(mappedTeamId) ? mappedTeamId : null;
 }
 
+function objectiveStructureTeam(event, targetTeamId) {
+  if (!isKnownRawTeamId(event.teamId) || !isKnownRawTeamId(targetTeamId)) {
+    return "ENEMY";
+  }
+  return event.teamId === targetTeamId ? "ENEMY" : "ALLY";
+}
+
 function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
   const events = [];
   timeline.info.frames.forEach((frame) => {
@@ -1510,7 +1517,7 @@ function buildObjectiveTimeline(timeline, targetTeamId, participantTeamMap) {
           type: "STRUCTURE",
           subtype: event.towerType || event.buildingType,
           lane: event.laneType || "",
-          team: event.teamId === targetTeamId ? "ENEMY" : "ALLY",
+          team: objectiveStructureTeam(event, targetTeamId),
           label: buildStructureLabel(event),
         });
       }

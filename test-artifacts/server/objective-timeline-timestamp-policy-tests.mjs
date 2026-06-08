@@ -32,6 +32,7 @@ const { buildObjectiveTimeline } = new Function(
     extractFunctionSource(serverSrc, "buildStructureLabel"),
     extractFunctionSource(serverSrc, "buildObjectiveLabel"),
     extractFunctionSource(serverSrc, "objectiveKillerTeamId"),
+    extractFunctionSource(serverSrc, "objectiveStructureTeam"),
     buildObjectiveTimelineSrc,
     "return { buildObjectiveTimeline };",
   ].join("\n"),
