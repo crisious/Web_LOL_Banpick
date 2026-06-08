@@ -236,7 +236,7 @@ Local evidence recorded before commit:
 
 Append a cycle entry before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with local RED/GREEN evidence, `npm test`, local smoke summary, commit SHA, GitHub Actions run id, artifact id, sensitive scan result, and final `main...origin/main` sync count.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -249,7 +249,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -284,3 +284,11 @@ Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
 - Spec coverage: The plan covers the two KDA-facing consumers, `buildPhaseContext()` and `buildKdaTimeline()`, without changing deeper teamfight outcome inference.
 - Placeholder scan: No blocked placeholder wording is used.
 - Type consistency: `PLAYER_KILL_EVENT_TYPES` and `PLAYER_DEATH_EVENT_TYPES` are `Set` objects, and both helpers accept event objects.
+
+## Completion Evidence
+
+- Implementation commit: `13599098db48c2c4cc100b53c3aa3a0b846f1ca9` (`test: share player kill kda policy`) pushed to `origin/main`.
+- GitHub Actions QA run: `27155306101` passed for `13599098db48c2c4cc100b53c3aa3a0b846f1ca9`.
+- GitHub QA artifact: `7487749134` (`qa-automation-27155306101`, 3549 bytes, not expired).
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 217`, `latestRun.qaVerdict.status: "passed"`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
