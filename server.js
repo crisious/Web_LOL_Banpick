@@ -1729,13 +1729,17 @@ function buildEvidenceIndex(normalized) {
   const evidence = normalized.timelineEvents
     .filter((event) => event.importance >= 4)
     .slice(0, 10)
-    .map((event) => ({
-      eventId: event.eventId,
-      timestamp: event.timestampLabel,
-      eventType: event.eventType,
-      summary: event.summary,
-      statNote: `${event.phase} · 중요도 ${event.importance}`,
-    }));
+    .map((event) => {
+      const time = rawEventTimestampMs({ timestamp: event.timestampMs });
+      const phase = phaseFor(time);
+      return {
+        eventId: event.eventId,
+        timestamp: timestampLabel(time),
+        eventType: event.eventType,
+        summary: event.summary,
+        statNote: `${phase} · 중요도 ${event.importance}`,
+      };
+    });
 
   evidence.push({
     eventId: "stat_cs",
