@@ -652,6 +652,20 @@ function championDisplayName(name) {
     .trim();
 }
 
+function keyMomentPhase(moment) {
+  if (typeof moment?.phase === "string" && moment.phase.trim()) {
+    return moment.phase.trim();
+  }
+  const rawTimestamp = String(moment?.timestamp || moment?.timestampLabel || "");
+  const match = rawTimestamp.match(/(\d{1,3}):([0-5]\d)/);
+  if (!match) return "";
+  const minute = Number(match[1]);
+  if (!Number.isFinite(minute)) return "";
+  if (minute < 15) return "EARLY";
+  if (minute < 30) return "MID";
+  return "LATE";
+}
+
 const CHAMPION_ART_ALIASES = {
   FiddleSticks: "Fiddlesticks",
   Wukong: "MonkeyKing",
@@ -2153,7 +2167,7 @@ function renderKeyMoments(sample) {
         <article class="moment-card">
           <div class="moment-stamp">
             <span>${escapeHtml(moment.timestamp || moment.timestampLabel)}</span>
-            <strong>${escapeHtml(moment.phase)}</strong>
+            <strong>${escapeHtml(keyMomentPhase(moment))}</strong>
           </div>
           <div class="moment-copy">
             <h4>${escapeHtml(moment.label || moment.title)}</h4>

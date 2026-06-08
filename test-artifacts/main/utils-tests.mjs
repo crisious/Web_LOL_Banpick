@@ -4,6 +4,7 @@
 //   1) compactPatchLabel — Riot 시즌 ordinal → 공개 패치 연도 매핑 (S16 → 26.X)
 //   2) _computeDeltaParts — 메트릭 delta 노이즈 컷 + 부호 판정
 //   3) championDisplayName — CamelCase 챔피언명 → 공백 분리
+//   4) keyMomentPhase — legacy 핵심 장면 timestamp → phase fallback
 
 import fs from "fs";
 
@@ -28,12 +29,13 @@ function extractFunctionSource(source, name) {
 const compactSrc = extractFunctionSource(mainSrc, "compactPatchLabel");
 const deltaSrc = extractFunctionSource(mainSrc, "_computeDeltaParts");
 const champSrc = extractFunctionSource(mainSrc, "championDisplayName");
+const keyMomentPhaseSrc = extractFunctionSource(mainSrc, "keyMomentPhase");
 
 const fns = new Function(
-  `${compactSrc}\n${deltaSrc}\n${champSrc}\n` +
-  `return { compactPatchLabel, _computeDeltaParts, championDisplayName };`,
+  `${compactSrc}\n${deltaSrc}\n${champSrc}\n${keyMomentPhaseSrc}\n` +
+  `return { compactPatchLabel, _computeDeltaParts, championDisplayName, keyMomentPhase };`,
 )();
-const { compactPatchLabel, _computeDeltaParts, championDisplayName } = fns;
+const { compactPatchLabel, _computeDeltaParts, championDisplayName, keyMomentPhase } = fns;
 
 let pass = 0, fail = 0;
 
@@ -119,6 +121,32 @@ check("champion: '' → ''", championDisplayName(""), "");
 check("champion: null → ''", championDisplayName(null), "");
 check("champion: undefined → ''", championDisplayName(undefined), "");
 check("champion: '  Yone  ' (trim) → Yone", championDisplayName("  Yone  "), "Yone");
+
+// ─── keyMomentPhase ─────────────────────────────────────────────────────────
+
+check("keyMomentPhase: explicit phase wins",
+  keyMomentPhase({ phase: "MID", timestampLabel: "04:46" }), "MID");
+
+check("keyMomentPhase: trims explicit phase",
+  keyMomentPhase({ phase: " LATE ", timestampLabel: "04:46" }), "LATE");
+
+check("keyMomentPhase: timestampLabel 04:46 → EARLY",
+  keyMomentPhase({ timestampLabel: "04:46" }), "EARLY");
+
+check("keyMomentPhase: timestampLabel range uses first time",
+  keyMomentPhase({ timestampLabel: "14:59~16:00" }), "EARLY");
+
+check("keyMomentPhase: timestamp 15:00 → MID",
+  keyMomentPhase({ timestamp: "15:00" }), "MID");
+
+check("keyMomentPhase: timestampLabel 29:59 → MID",
+  keyMomentPhase({ timestampLabel: "29:59" }), "MID");
+
+check("keyMomentPhase: timestampLabel 30:00 → LATE",
+  keyMomentPhase({ timestampLabel: "30:00" }), "LATE");
+
+check("keyMomentPhase: invalid timestamp → empty string",
+  keyMomentPhase({ timestampLabel: "not-a-time" }), "");
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
 
