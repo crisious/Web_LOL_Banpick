@@ -375,7 +375,7 @@ Evidence:
 - Added the `2026-06-09 04:16 KST - Raw building team policy 보강` entry with RED/GREEN, harness adjustment, and local QA evidence.
 - Commit SHA, GitHub Actions run id, artifact id, and final sync evidence remain pending until push and CI verification complete.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -389,7 +389,10 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+Evidence:
+- Implementation commit `4bd5c66` (`test: guard raw building team policy`) was pushed to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -400,6 +403,12 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 ```
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no high-risk sensitive-value scan matches.
+
+Evidence:
+- GitHub Actions QA run `27161132208` passed for head SHA `4bd5c66f5d3a43068ff5403b75f7b3a151f8814b`.
+- Workflow artifact `7490089644` (`qa-automation-27161132208`, 3551 bytes) was downloaded and inspected.
+- Artifact `qa-summary.json`: `latestRun.qaVerdict.status: "passed"`, smoke 156 passed / 0 failed, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 202`, `latestRun.git.shortSha: "4bd5c66"`, `dirty: false`.
+- GitHub artifact high-risk sensitive pattern scan: no matches.
 
 - [ ] **Step 5: Mark plan complete and final sync**
 
