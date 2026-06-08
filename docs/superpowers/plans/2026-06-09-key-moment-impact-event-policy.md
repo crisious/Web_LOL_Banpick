@@ -247,7 +247,7 @@ Implementation evidence:
 - Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 214`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "92ad8db"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
 - Artifact high-risk sensitive pattern scan: no matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with implementation and docs completion evidence, then run:
 
@@ -264,6 +264,14 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
+
+Docs completion evidence:
+- Commit: `3a53437 docs: mark key moment impact plan complete`
+- Push: `origin/main`
+- GitHub Actions QA: run `27156786754` passed for head SHA `3a53437cda82917a3308dfc5831d3cbc4ee71864`.
+- Artifact: `7488350811` (`qa-automation-27156786754`, 3552 bytes) downloaded and inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 208`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "3a53437"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Artifact high-risk sensitive pattern scan: no matches.
 
 ## Self-Review
 
