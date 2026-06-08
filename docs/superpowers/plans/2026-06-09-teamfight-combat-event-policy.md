@@ -372,7 +372,7 @@ Implementation evidence:
 - Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 217`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "ee03a13"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
 - Artifact high-risk sensitive pattern scan: no matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with completion evidence, then run:
 
@@ -389,6 +389,14 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
+
+Docs completion evidence:
+- Commit: `e9609d5 docs: mark teamfight combat event plan complete`
+- Push: `origin/main`
+- GitHub Actions QA: run `27156161397` passed for head SHA `e9609d5fbe63af3f34c16166b2063352e5aa5838`.
+- Artifact: `7488101902` (`qa-automation-27156161397`, 3550 bytes) downloaded and inspected.
+- Artifact summary: read-only smoke 156 passed / 0 failed, `durationMs: 211`, `latestRun.qaVerdict.status: "passed"`, `latestRun.git.shortSha: "e9609d5"`, `dirty: false`, required checks total 13 / passed 13 / failed 0 / missing 0.
+- Artifact high-risk sensitive pattern scan: no matches.
 
 ## Self-Review
 
