@@ -5,7 +5,7 @@
 //   - bestObjectiveSummary / bestFightSummary: 임계 분기
 //   - lowFarmThreshold (+ CS_LOW_FARM_THRESHOLDS): 포지션별 저파밍 바닥선
 //   - buildStrengths: 4분기 + while 패딩 → 항상 길이 3
-//   - buildWeaknesses: 4분기, while 없음 → 길이 1~3 가변 (감사 제안의 "항상 3"은 오류)
+//   - buildWeaknesses: 4분기 + while 패딩 → 항상 길이 3
 //   - buildActionChecklist: index 기반 액션 매핑
 //   - filterPostObjectiveDeaths (+ POST_OBJECTIVE_DEATH_WINDOW_MS): 120s 윈도 경계
 
@@ -143,7 +143,7 @@ checkTrue("buildStrengths JUNGLE vision 35 → vision strength present", strJ35.
 const strJ34 = buildStrengths({ timelineEvents: [], matchInfo: { result: "LOSS", position: "JUNGLE" }, playerStats: { visionScore: 34, killParticipation: 0 } });
 checkTrue("buildStrengths JUNGLE vision 34 → no vision strength", !strJ34.some((s) => s.title === "시야 투자량이 높은 편이었음"));
 
-// ─── buildWeaknesses — while 없음 → 길이 1~3 가변 ─────────────────────────────
+// ─── buildWeaknesses — 항상 길이 3 (while 패딩) ─────────────────────────────
 // A) early(2) + cs(ADC csPerMinute 3<6.5) + postObjective → weak_01/02/03
 const wkA = buildWeaknesses({
   timelineEvents: [
@@ -163,24 +163,24 @@ check("buildWeaknesses A titles", wkA.map((w) => w.title), [
   "오브젝트 이후 생존과 전환이 아쉬웠음",
 ]);
 
-// B) SUPPORT는 CS 약점 안 만듦(임계 0). 모든 분기 skip → 단일 fallback 1개만.
+// B) SUPPORT는 CS 약점 안 만듦(임계 0). 모든 분기 skip → fallback 3개로 패딩.
 const wkB = buildWeaknesses({
   timelineEvents: [],
   matchInfo: { result: "WIN", position: "SUPPORT" },
   playerStats: { csPerMinute: 0.5, cs: 10, deaths: 2 },
 });
-check("buildWeaknesses B length 1 (가변, not 3)", wkB.length, 1);
-check("buildWeaknesses B id weak_01", wkB[0].id, "weak_01");
-check("buildWeaknesses B fallback title", wkB[0].title, "중요 구도 판단을 더 빠르게 정리할 필요가 있음");
+check("buildWeaknesses B padded length 3", wkB.length, 3);
+check("buildWeaknesses B ids sequential", wkB.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
+check("buildWeaknesses B all fallback title", wkB.every((w) => w.title === "중요 구도 판단을 더 빠르게 정리할 필요가 있음"), true);
 
-// C) WIN deaths>=5 → 3번 분기, then <3 fallback. cs는 SUPPORT라 skip.
+// C) WIN deaths>=5 → 3번 분기, then fallback으로 3개까지 패딩. cs는 SUPPORT라 skip.
 const wkC = buildWeaknesses({
   timelineEvents: [],
   matchInfo: { result: "WIN", position: "SUPPORT" },
   playerStats: { csPerMinute: 1, cs: 20, deaths: 5 },
 });
-check("buildWeaknesses C length 2", wkC.length, 2);
-check("buildWeaknesses C ids", wkC.map((w) => w.id), ["weak_01", "weak_02"]);
+check("buildWeaknesses C padded length 3", wkC.length, 3);
+check("buildWeaknesses C ids", wkC.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
 check("buildWeaknesses C first title (objective-after via death count)", wkC[0].title, "오브젝트 이후 생존과 전환이 아쉬웠음");
 
 // LOSS deaths>=4 경계: 4 발동 / 3 미발동(SUPPORT, 다른 분기 모두 skip 시 fallback만)

@@ -135,8 +135,16 @@ function validFixture() {
       { phase: "MID", summary: "..." },
       { phase: "LATE", summary: "..." },
     ],
-    strengths: [{ id: "str_1", title: "t", description: "d", relatedEventIds: [] }],
-    weaknesses: [{ id: "wk_1", title: "t", description: "d", relatedEventIds: [] }],
+    strengths: [
+      { id: "str_1", title: "t1", description: "d1", relatedEventIds: [] },
+      { id: "str_2", title: "t2", description: "d2", relatedEventIds: [] },
+      { id: "str_3", title: "t3", description: "d3", relatedEventIds: [] },
+    ],
+    weaknesses: [
+      { id: "wk_1", title: "t1", description: "d1", relatedEventIds: [] },
+      { id: "wk_2", title: "t2", description: "d2", relatedEventIds: [] },
+      { id: "wk_3", title: "t3", description: "d3", relatedEventIds: [] },
+    ],
     actionChecklist: [{ id: "act_1", text: "t" }],
     keyMoments: [
       { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "t", description: "d", relatedEventIds: ["evt_001"] },
@@ -250,6 +258,12 @@ expectThrows("strengths empty throws", () => {
   validateAnalysisOutput(f);
 }, "strengths");
 
+expectThrows("strengths only 2 throws", () => {
+  const f = validFixture();
+  f.strengths = f.strengths.slice(0, 2);
+  validateAnalysisOutput(f);
+}, "strengths");
+
 expectThrows("strengths item missing id throws", () => {
   const f = validFixture();
   f.strengths = [{ title: "좋은 합류", description: "설명", relatedEventIds: [] }];
@@ -287,6 +301,12 @@ expectThrows("strengths over 3 throws", () => {
 
 expectThrows("weaknesses empty throws", () => {
   const f = validFixture(); f.weaknesses = [];
+  validateAnalysisOutput(f);
+}, "weaknesses");
+
+expectThrows("weaknesses only 2 throws", () => {
+  const f = validFixture();
+  f.weaknesses = f.weaknesses.slice(0, 2);
   validateAnalysisOutput(f);
 }, "weaknesses");
 
