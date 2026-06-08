@@ -36,6 +36,8 @@ const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 
 const TEAMFIGHT_MIN_EVENTS = 3;
 // 한타 정리 단계 추격사 판정용 시간 간격(ms).
 const CLEANUP_GAP_MS = 8000;
+// AI 출력 계약과 최종 validator가 공유하는 핵심 장면 최소 개수.
+const KEY_MOMENTS_MIN = 4;
 
 function resolveSamplesDir(configuredDir, appRoot) {
   const value = configuredDir === undefined || configuredDir === null ? "" : String(configuredDir);
@@ -1874,7 +1876,7 @@ function buildLlmPayload(normalized) {
     outputContract: {
       schemaVersion: "1.0",
       requiredTopLevelFields: ["analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis"],
-      requiredArrayCounts: { strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: 4 },
+      requiredArrayCounts: { strengths: 3, weaknesses: 3, actionChecklistMin: 3, actionChecklistMax: 5, keyMomentsMin: KEY_MOMENTS_MIN },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
   };
@@ -2067,6 +2069,10 @@ async function callCodexAgent(payload, timeoutMs = 300000) {
 
 // ─── Output schema validator ──────────────────────────────────────────────────
 
+function hasMinimumKeyMoments(keyMoments) {
+  return Array.isArray(keyMoments) && keyMoments.length >= KEY_MOMENTS_MIN;
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!json?.matchSummary?.headline) throw new Error("missing matchSummary.headline");
@@ -2074,7 +2080,7 @@ function validateAnalysisOutput(json) {
   if (!Array.isArray(json?.strengths) || json.strengths.length < 1) throw new Error("strengths empty");
   if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
   if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
-  if (!Array.isArray(json?.keyMoments) || json.keyMoments.length < 2) throw new Error("keyMoments < 2");
+  if (!hasMinimumKeyMoments(json?.keyMoments)) throw new Error(`keyMoments < ${KEY_MOMENTS_MIN}`);
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
   // 있으면 배열 타입과 각 항목 필수 필드만 검증.
   if (json.combatAnalysis !== undefined && json.combatAnalysis !== null) {
@@ -2233,9 +2239,9 @@ async function buildAnalysis(normalized, sampleId) {
       });
     violations.push("type.phaseSummaries.object");
   }
-  if (!Array.isArray(primary.keyMoments) || primary.keyMoments.length < 2) {
+  if (!hasMinimumKeyMoments(primary.keyMoments)) {
     primary.keyMoments = buildKeyMoments(normalized);
-    violations.push("count.keyMoments<2");
+    violations.push(`count.keyMoments<${KEY_MOMENTS_MIN}`);
   }
   if (!Array.isArray(primary.actionChecklist) || primary.actionChecklist.length < 1) {
     primary.actionChecklist = buildActionChecklist(normalized, primary.weaknesses ?? []);

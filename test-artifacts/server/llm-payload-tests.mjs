@@ -46,6 +46,7 @@ const teamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhase
 const tfConstants = [
   extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
   extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
+  extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(

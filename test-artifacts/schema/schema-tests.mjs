@@ -30,9 +30,22 @@ function extractFunctionSource(source, name) {
   throw new Error(`function ${name} not closed`);
 }
 
+function extractConstSource(source, name) {
+  const m = source.match(new RegExp(`const ${name} = [^;]*;`));
+  if (!m) throw new Error(`const ${name} not found`);
+  return m[0];
+}
+
+const keyMomentsSupportSrc = serverSrc.includes("const KEY_MOMENTS_MIN =")
+  ? [
+      extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
+      extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
+    ].join("\n")
+  : "";
+
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
-  `${validateSrc}\nreturn validateAnalysisOutput;`,
+  `${keyMomentsSupportSrc}\n${validateSrc}\nreturn validateAnalysisOutput;`,
 )();
 
 let pass = 0, fail = 0;
@@ -78,7 +91,9 @@ function validFixture() {
     actionChecklist: [{ id: "act_1", text: "t" }],
     keyMoments: [
       { id: "km_1", timestampLabel: "08:00", title: "t", description: "d" },
-      { id: "km_2", timestampLabel: "20:00", title: "t", description: "d" },
+      { id: "km_2", timestampLabel: "12:00", title: "t", description: "d" },
+      { id: "km_3", timestampLabel: "16:00", title: "t", description: "d" },
+      { id: "km_4", timestampLabel: "20:00", title: "t", description: "d" },
     ],
     evidenceIndex: [],
   };
@@ -120,6 +135,11 @@ expectThrows("actionChecklist empty throws", () => {
 
 expectThrows("keyMoments only 1 throws (need ≥2)", () => {
   const f = validFixture(); f.keyMoments = [f.keyMoments[0]];
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments only 3 throws (need >=4)", () => {
+  const f = validFixture(); f.keyMoments = f.keyMoments.slice(0, 3);
   validateAnalysisOutput(f);
 }, "keyMoments");
 
