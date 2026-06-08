@@ -217,11 +217,11 @@ Expected:
 - Read-only smoke report exits 0.
 - `git diff --check` exits 0.
 
-- [ ] **Step 2: Update Obsidian QA log**
+- [x] **Step 2: Update Obsidian QA log**
 
 Append a cycle entry before `## 리스크 관리` in `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with local RED/GREEN evidence, `npm test`, local smoke summary, commit SHA, GitHub Actions run id, artifact id, sensitive scan result, and final `main...origin/main` sync count.
 
-- [ ] **Step 3: Commit implementation**
+- [x] **Step 3: Commit implementation**
 
 Run:
 
@@ -234,7 +234,7 @@ git push origin main
 
 Expected: commit and push succeed on `main`.
 
-- [ ] **Step 4: Verify GitHub QA**
+- [x] **Step 4: Verify GitHub QA**
 
 Run:
 
@@ -246,7 +246,7 @@ gh run download <run-id> --name qa-automation-<run-id> --dir test-artifacts/tmp/
 
 Expected: QA run for the pushed commit passes, artifact summary reports smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, dirty `false`, and no sensitive-value scan matches.
 
-- [ ] **Step 5: Mark plan complete and final sync**
+- [x] **Step 5: Mark plan complete and final sync**
 
 Update this plan with completion evidence, then run:
 
@@ -269,3 +269,21 @@ Expected: final status is `## main...origin/main` and rev-list output is `0 0`.
 - Spec coverage: The plan covers the four current objective-fail consumers that count `OBJECTIVE_SETUP_FAIL` events.
 - Placeholder scan: No blocked placeholder wording is used.
 - Type consistency: `OBJECTIVE_FAIL_EVENT_TYPES` is a `Set`, `isObjectiveFailEvent(event)` accepts event objects, and every updated consumer passes event objects directly to `Array.prototype.filter`.
+
+## Completion Evidence
+
+- RED check: `node test-artifacts/server/strength-weakness-tests.mjs` exited 1 with `77 passed, 5 failed`. The failing checks were `server defines OBJECTIVE_FAIL_EVENT_TYPES`, `server defines isObjectiveFailEvent`, `buildDerivedSignals uses isObjectiveFailEvent`, `buildPhaseSummaries uses isObjectiveFailEvent`, and `buildWeaknesses objective fails use isObjectiveFailEvent`.
+- RED check: `node test-artifacts/server/coach-summary-tests.mjs` exited 1 with `9 passed, 1 failed`. The failing check was `calcObjectiveScore objective fails use isObjectiveFailEvent`.
+- GREEN check: `node test-artifacts/server/strength-weakness-tests.mjs` exited 0 with `82 passed, 0 failed`.
+- GREEN check: `node test-artifacts/server/coach-summary-tests.mjs` exited 0 with `10 passed, 0 failed`.
+- Syntax checks: `node --check server.js`, `node --check test-artifacts/server/strength-weakness-tests.mjs`, and `node --check test-artifacts/server/coach-summary-tests.mjs` exited 0.
+- Diff hygiene: `git diff --check` exited 0.
+- Placeholder scan: the plan document scan exited 0 with no blocked placeholder strings.
+- Full local tests: `npm test` exited 0 with `1492 passed, 0 failed across 41 test file(s)`.
+- Local read-only smoke: `SMOKE_REPORT_OUTPUT_ROOT=test-artifacts/tmp/objective-fail-event-policy-local npm run smoke:report:readonly` exited 0 with smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, and `qaVerdict.status: "passed"`.
+- Local smoke sensitive scan: no matches for secret/token/API-key/path patterns.
+- Implementation commit: `69bb8f9 test: share objective fail event policy`.
+- GitHub Actions QA: run `27153563983` passed for SHA `69bb8f911d44d55e8acc0ceddda7d2d140de1d91`.
+- GitHub QA artifact: `7487033022` (`qa-automation-27153563983`, 3550 bytes) reported read-only smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, `latestRun.git.shortSha: "69bb8f9"`, and `dirty: false`.
+- GitHub artifact sensitive scan: no matches for secret/token/API-key/path patterns.
+- Obsidian project log updated at `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`.
