@@ -130,7 +130,7 @@ Pre-commit recheck, 2026-06-09 06:29 KST:
 - Pre-commit smoke summary: QA verdict `passed`, required checks `13/13`, smoke `156 passed, 0 failed`, duration `201ms`.
 - Pre-commit smoke artifact sensitive scan found no high-risk sensitive patterns.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -141,6 +141,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence, 2026-06-09 06:31 KST:
+- Commit `799c315` (`test: guard raw building target teams`) pushed to `origin/main`.
+- GitHub Actions `QA` run `27168171420` completed with conclusion `success`.
+- Artifact `qa-automation-27168171420` id `7492894911`, size `3546` bytes, expired `false`.
+- Downloaded `qa-summary.json`, `smoke-report.json`, and `smoke-run.json`.
+- Remote smoke summary: QA verdict `passed`, required checks `13/13`, smoke `156 passed, 0 failed`, duration `205ms`, git dirty `false`.
+- Remote artifact sensitive scan found no high-risk sensitive patterns.
 
 ## Self-Review
 
