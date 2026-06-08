@@ -724,7 +724,7 @@ function buildEventType(rawEvent, targetParticipantId, targetTeamId, playerWonOb
       return playerWonObjective ? "DRAGON_FIGHT" : "OBJECTIVE_SETUP_FAIL";
     }
     if (rawEvent.monsterType === "BARON_NASHOR") {
-      return "BARON_FIGHT";
+      return playerWonObjective ? "BARON_FIGHT" : "OBJECTIVE_SETUP_FAIL";
     }
     return playerWonObjective ? "OBJECTIVE_SETUP_WIN" : "OBJECTIVE_SETUP_FAIL";
   }

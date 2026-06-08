@@ -110,7 +110,8 @@ check("buildEventType player death", buildEventType(playerDeath, 2, 100, false),
 check("buildEventType assisted multi fight", buildEventType(championKill, 2, 100, false), "TEAMFIGHT_FOLLOWUP");
 check("buildEventType dragon won", buildEventType(dragon, 2, 100, true), "DRAGON_FIGHT");
 check("buildEventType dragon lost", buildEventType(dragon, 2, 100, false), "OBJECTIVE_SETUP_FAIL");
-check("buildEventType baron", buildEventType(baron, 2, 100, false), "BARON_FIGHT");
+check("buildEventType baron won", buildEventType(baron, 2, 100, true), "BARON_FIGHT");
+check("buildEventType baron lost", buildEventType(baron, 2, 100, false), "OBJECTIVE_SETUP_FAIL");
 check("buildEventType horde won", buildEventType(horde, 2, 100, true), "OBJECTIVE_SETUP_WIN");
 check("buildEventType enemy tower", buildEventType(enemyTower, 2, 100, false), "TOWER_TAKE");
 check("buildEventType own tower lost", buildEventType(ownTower, 2, 100, false), "OBJECTIVE_SETUP_FAIL");
