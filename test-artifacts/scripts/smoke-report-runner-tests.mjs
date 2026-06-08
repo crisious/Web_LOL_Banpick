@@ -635,6 +635,7 @@ if (fs.existsSync(runnerPath)) {
         smokeSummary: { passed: 42, failed: 0 },
         checkCount: 1,
         requiredChecks: commonMissingFullRequiredChecks,
+        requiredCheckStatus: "failed",
         requiredCheckSummary: {
           total: 7,
           passed: 0,
@@ -739,6 +740,10 @@ if (fs.existsSync(runnerPath)) {
       missing: 0,
     });
 
+  check("buildQaSummary records passing required check status",
+    passingRequiredSummary?.latestRun?.requiredCheckStatus,
+    "passed");
+
   check("buildQaSummary records no required check failures when required checks pass",
     passingRequiredSummary?.latestRun?.requiredCheckFailures,
     []);
@@ -766,6 +771,10 @@ if (fs.existsSync(runnerPath)) {
       failed: 0,
       missing: 13,
     });
+
+  check("buildQaSummary records missing required check status",
+    missingRequiredSummary?.latestRun?.requiredCheckStatus,
+    "failed");
 
   check("buildQaSummary records missing required check failures",
     missingRequiredSummary?.latestRun?.requiredCheckFailures,
@@ -798,6 +807,10 @@ if (fs.existsSync(runnerPath)) {
       failed: 1,
       missing: 11,
     });
+
+  check("buildQaSummary records mixed required check status",
+    mixedRequiredSummary?.latestRun?.requiredCheckStatus,
+    "failed");
 
   check("buildQaSummary records mixed required check failures",
     mixedRequiredSummary?.latestRun?.requiredCheckFailures,
@@ -845,6 +858,10 @@ if (fs.existsSync(runnerPath)) {
       failed: 0,
       missing: 0,
     });
+
+  check("sample list error smoke reports record skipped required check status",
+    sampleListErrorSummary?.latestRun?.requiredCheckStatus,
+    "skipped");
 
   check("sample list error smoke reports record no required check failures",
     sampleListErrorSummary?.latestRun?.requiredCheckFailures,

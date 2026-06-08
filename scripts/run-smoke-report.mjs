@@ -355,6 +355,11 @@ function summarizeRequiredSmokeChecks(requiredChecks) {
   return summary;
 }
 
+function requiredSmokeCheckStatus(requiredChecks) {
+  if (!requiredChecks.length) return "skipped";
+  return requiredChecks.every((check) => check?.status === "pass") ? "passed" : "failed";
+}
+
 function requiredSmokeCheckFailureMessages(requiredChecks) {
   return requiredChecks
     .filter((check) => check.status !== "pass")
@@ -398,6 +403,7 @@ export function buildQaSummary({
       smokeSummary: smokeReport?.summary || null,
       checkCount: Array.isArray(smokeReport?.checks) ? smokeReport.checks.length : 0,
       requiredChecks,
+      requiredCheckStatus: requiredSmokeCheckStatus(requiredChecks),
       requiredCheckSummary: summarizeRequiredSmokeChecks(requiredChecks),
       requiredCheckFailures: requiredSmokeCheckFailureMessages(requiredChecks),
     },
