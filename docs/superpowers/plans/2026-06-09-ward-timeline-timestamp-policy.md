@@ -125,7 +125,7 @@ Evidence (2026-06-09 06:09 KST):
 - Local smoke artifact sensitive scan: no high-risk sensitive patterns found.
 - `git diff --check` exited 0.
 
-- [ ] **Step 6: Commit, push, and verify GitHub Actions**
+- [x] **Step 6: Commit, push, and verify GitHub Actions**
 
 Stage only:
 
@@ -136,6 +136,14 @@ git push origin main
 ```
 
 Then watch the `QA` workflow for the pushed commit, download the smoke artifact, inspect `qa-summary.json`, scan the artifact for high-risk sensitive patterns, and update the Obsidian project plan with the local and GitHub evidence.
+
+Evidence (2026-06-09 06:11 KST):
+- Implementation commit: `500e7b6e02a703ca1fce1c6e063bd6af3a8d0a1b` (`test: guard ward timeline timestamps`).
+- Push target: `origin/main`.
+- GitHub QA run: `27167160595`, conclusion `success`.
+- GitHub artifact: `qa-automation-27167160595`, id `7492489621`, size `3544` bytes.
+- Artifact `qa-summary.json`: QA verdict `passed`, required checks `13/13`, smoke `156 passed, 0 failed`, duration `240 ms`, git dirty `false`, short SHA `500e7b6`.
+- GitHub artifact sensitive scan: no high-risk sensitive patterns found.
 
 ## Self-Review
 
