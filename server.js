@@ -1116,7 +1116,7 @@ function buildStrengths(normalized) {
     });
   }
 
-  while (strengths.length < 3) {
+  while (strengths.length < INSIGHT_LIST_MIN) {
     strengths.push({
       id: `str_0${strengths.length + 1}`,
       title: "주요 구도에 계속 합류했음",
@@ -1184,7 +1184,7 @@ function buildWeaknesses(normalized) {
     });
   }
 
-  while (weaknesses.length < 3) {
+  while (weaknesses.length < INSIGHT_LIST_MIN) {
     const objectiveFails = events.filter((event) => event.eventType === "OBJECTIVE_SETUP_FAIL");
     const linked = objectiveFails.length ? objectiveFails.slice(0, 2) : deaths.slice(0, 2);
     weaknesses.push({

@@ -45,6 +45,7 @@ const env = new Function(
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
     extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
+    extractConstSource(serverSrc, "INSIGHT_LIST_MIN"),
     extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
@@ -132,6 +133,10 @@ const strB = buildStrengths({
 check("buildStrengths B padded length 3", strB.length, 3);
 check("buildStrengths B all padding title", strB.every((s) => s.title === "주요 구도에 계속 합류했음"), true);
 check("buildStrengths B ids sequential", strB.map((s) => s.id), ["str_01", "str_02", "str_03"]);
+checkTrue(
+  "buildStrengths uses INSIGHT_LIST_MIN padding",
+  buildStrengthsSrc.includes("while (strengths.length < INSIGHT_LIST_MIN)"),
+);
 
 // C) tower fallback (WIN + TOWER_TAKE, objective<2)
 const strC = buildStrengths({
@@ -181,6 +186,10 @@ const wkB = buildWeaknesses({
 check("buildWeaknesses B padded length 3", wkB.length, 3);
 check("buildWeaknesses B ids sequential", wkB.map((w) => w.id), ["weak_01", "weak_02", "weak_03"]);
 check("buildWeaknesses B all fallback title", wkB.every((w) => w.title === "중요 구도 판단을 더 빠르게 정리할 필요가 있음"), true);
+checkTrue(
+  "buildWeaknesses uses INSIGHT_LIST_MIN padding",
+  buildWeaknessesSrc.includes("while (weaknesses.length < INSIGHT_LIST_MIN)"),
+);
 
 // C) WIN deaths>=5 → 3번 분기, then fallback으로 3개까지 패딩. cs는 SUPPORT라 skip.
 const wkC = buildWeaknesses({
