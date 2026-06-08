@@ -37,6 +37,7 @@ const MACRO_OBJECTIVE_WIN_EVENT_TYPES = new Set([...OBJECTIVE_WIN_EVENT_TYPES, "
 const STRUCTURE_TAKE_EVENT_TYPES = new Set(["TOWER_TAKE"]);
 const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);
 const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);
+const PLAYER_COMBAT_EVENT_TYPES = new Set([...PLAYER_KILL_EVENT_TYPES, ...PLAYER_DEATH_EVENT_TYPES]);
 const FIGHT_CONTRIBUTION_EVENT_TYPES = new Set(["CHAMPION_KILL", "TEAMFIGHT_FOLLOWUP", "SKIRMISH_WIN"]);
 // calcIncomeScore 만점 기준선 — 의도적으로 저파밍 바닥선보다 높음 (점수 벤치마크 ≠ 약점 바닥선).
 const CS_FULL_SCORE_TARGETS = { TOP: 6.5, MID: 7, ADC: 7.5, JUNGLE: 5, SUPPORT: 1.5 };
@@ -1074,6 +1075,10 @@ function isPlayerDeathEvent(event) {
   return PLAYER_DEATH_EVENT_TYPES.has(event.eventType);
 }
 
+function isPlayerCombatEvent(event) {
+  return PLAYER_COMBAT_EVENT_TYPES.has(event.eventType);
+}
+
 function isFightContributionEvent(event) {
   return FIGHT_CONTRIBUTION_EVENT_TYPES.has(event.eventType);
 }
@@ -1722,12 +1727,11 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
 // 한타·교전 단위 "encounter"로 만들어 AI에게 컨텍스트로 전달.
 // 플레이어 관여(isPlayerInvolved=true) 이벤트가 1개 이상인 그룹만 채택.
 function detectCombatEncounters(timelineEvents) {
-  const COMBAT_TYPES = new Set(["CHAMPION_KILL", "PLAYER_DEATH"]);
   const WINDOW_MS = 25000;
   const MAX_ENCOUNTERS = 8;
 
   const combatEvts = timelineEvents
-    .filter((e) => COMBAT_TYPES.has(e.eventType))
+    .filter(isPlayerCombatEvent)
     .sort((a, b) => (a.timestampMs ?? 0) - (b.timestampMs ?? 0));
 
   const groups = [];
@@ -1753,8 +1757,8 @@ function detectCombatEncounters(timelineEvents) {
     let playerDeaths = 0;
     for (const e of g.events) {
       if (!e.isPlayerInvolved) continue;
-      if (e.eventType === "CHAMPION_KILL") playerKills += 1;
-      else if (e.eventType === "PLAYER_DEATH") playerDeaths += 1;
+      if (isPlayerKillEvent(e)) playerKills += 1;
+      else if (isPlayerDeathEvent(e)) playerDeaths += 1;
     }
     let situation;
     if (playerKills > playerDeaths) situation = "PLAYER_DOMINANT";
@@ -1794,8 +1798,8 @@ function buildTeamfightPhases(encounters, timelineEvents) {
       let pk = 0, pd = 0;
       for (const e of evs) {
         if (!e.isPlayerInvolved) continue;
-        if (e.eventType === "CHAMPION_KILL") pk += 1;
-        else if (e.eventType === "PLAYER_DEATH") pd += 1;
+        if (isPlayerKillEvent(e)) pk += 1;
+        else if (isPlayerDeathEvent(e)) pd += 1;
       }
       return {
         phase: name,
@@ -1812,18 +1816,18 @@ function buildTeamfightPhases(encounters, timelineEvents) {
     const trade = phaseObj("TRADE", events.slice(1, last));
     const cleanup = phaseObj("CLEANUP", [events[last]]);
 
-    engage.outcomeTag = events[0].eventType === "CHAMPION_KILL" ? "INITIATED_KILL" : "CAUGHT_OUT";
+    engage.outcomeTag = isPlayerKillEvent(events[0]) ? "INITIATED_KILL" : "CAUGHT_OUT";
     trade.outcomeTag =
       trade.playerKills > trade.playerDeaths ? "TRADE_WON"
         : trade.playerDeaths > trade.playerKills ? "TRADE_LOST" : "TRADE_EVEN";
     const lastEvt = events[last];
     const prevEvt = events[last - 1];
-    if (lastEvt.eventType === "CHAMPION_KILL") {
+    if (isPlayerKillEvent(lastEvt)) {
       cleanup.outcomeTag = "CLOSED_OUT";
     } else {
       const gap = (lastEvt.timestampMs ?? 0) - (prevEvt.timestampMs ?? 0);
       cleanup.outcomeTag =
-        prevEvt.eventType === "CHAMPION_KILL" || gap > CLEANUP_GAP_MS ? "OVERCHASE_DEATH" : "DIED_IN_FIGHT";
+        isPlayerKillEvent(prevEvt) || gap > CLEANUP_GAP_MS ? "OVERCHASE_DEATH" : "DIED_IN_FIGHT";
     }
 
     const phases = [engage, trade, cleanup].filter((p) => p.relatedEventIds.length > 0);

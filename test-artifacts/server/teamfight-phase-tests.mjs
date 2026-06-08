@@ -20,18 +20,54 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const playerKillPolicySources = serverSrc.includes("const PLAYER_KILL_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_KILL_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerKillEvent"),
+    ]
+  : [
+      'const PLAYER_KILL_EVENT_TYPES = new Set(["CHAMPION_KILL"]);',
+      'function isPlayerKillEvent(event) { return PLAYER_KILL_EVENT_TYPES.has(event.eventType); }',
+    ];
+
+const playerDeathPolicySources = serverSrc.includes("const PLAYER_DEATH_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
+    ]
+  : [
+      'const PLAYER_DEATH_EVENT_TYPES = new Set(["PLAYER_DEATH"]);',
+      'function isPlayerDeathEvent(event) { return PLAYER_DEATH_EVENT_TYPES.has(event.eventType); }',
+    ];
+
+const playerCombatPolicySources = serverSrc.includes("const PLAYER_COMBAT_EVENT_TYPES =")
+  ? [
+      extractConstSource(serverSrc, "PLAYER_COMBAT_EVENT_TYPES"),
+      extractFunctionSource(serverSrc, "isPlayerCombatEvent"),
+    ]
+  : [
+      'const PLAYER_COMBAT_EVENT_TYPES = new Set([...PLAYER_KILL_EVENT_TYPES, ...PLAYER_DEATH_EVENT_TYPES]);',
+      'function isPlayerCombatEvent(event) { return PLAYER_COMBAT_EVENT_TYPES.has(event.eventType); }',
+    ];
+
 const env = new Function(
   [
     extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
     extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
+    ...playerKillPolicySources,
+    ...playerDeathPolicySources,
+    ...playerCombatPolicySources,
+    extractFunctionSource(serverSrc, "detectCombatEncounters"),
     extractFunctionSource(serverSrc, "buildTeamfightPhases"),
     extractFunctionSource(serverSrc, "teamfightPhaseCoaching"),
     extractFunctionSource(serverSrc, "teamfightTakeaway"),
     extractFunctionSource(serverSrc, "mergeTeamfightCoaching"),
-    "return { buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching };",
+    "return { detectCombatEncounters, buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching };",
   ].join("\n"),
 )();
-const { buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching } = env;
+const { detectCombatEncounters, buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching } = env;
+const detectCombatEncountersSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
+const buildTeamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
 
 let pass = 0, fail = 0;
 function check(label, got, expected) {
@@ -44,6 +80,25 @@ function checkTrue(label, cond) { console.log(`${cond ? "PASS" : "FAIL"}  ${labe
 
 const ev = (eventId, t, eventType, label) => ({ eventId, timestampMs: t, timestampLabel: label, eventType, isPlayerInvolved: true });
 const enc = (id, ids, over = {}) => ({ encounterId: id, phase: "MID", eventCount: ids.length, playerKills: 0, playerDeaths: 0, situation: "TRADED", relatedEventIds: ids, startLabel: "", endLabel: "", ...over });
+
+const detected = detectCombatEncounters([
+  { eventId: "d0", timestampMs: 1000, timestampLabel: "0:01", phase: "EARLY", eventType: "TOWER_TAKE", isPlayerInvolved: true },
+  { eventId: "d1", timestampMs: 2000, timestampLabel: "0:02", phase: "EARLY", eventType: "CHAMPION_KILL", isPlayerInvolved: true },
+  { eventId: "d2", timestampMs: 5000, timestampLabel: "0:05", phase: "EARLY", eventType: "PLAYER_DEATH", isPlayerInvolved: true },
+]);
+check("detectCombatEncounters keeps only player combat events", detected.map((row) => ({
+  eventCount: row.eventCount,
+  playerKills: row.playerKills,
+  playerDeaths: row.playerDeaths,
+  situation: row.situation,
+  relatedEventIds: row.relatedEventIds,
+})), [{
+  eventCount: 2,
+  playerKills: 1,
+  playerDeaths: 1,
+  situation: "TRADED",
+  relatedEventIds: ["d1", "d2"],
+}]);
 
 const tf1Events = [ev("a", 10000, "CHAMPION_KILL", "0:10"), ev("b", 15000, "PLAYER_DEATH", "0:15"), ev("c", 18000, "CHAMPION_KILL", "0:18")];
 const tf1 = buildTeamfightPhases([enc("enc_001", ["a", "b", "c"], { situation: "PLAYER_DOMINANT", playerKills: 2, playerDeaths: 1 })], tf1Events);
@@ -67,6 +122,42 @@ check("TF4 cleanup OVERCHASE_DEATH (간격>8s)", tf4[0].phases[2].outcomeTag, "O
 
 const small = buildTeamfightPhases([enc("enc_005", ["a", "b"])], [ev("a", 1, "CHAMPION_KILL", "0:01"), ev("b", 2, "PLAYER_DEATH", "0:02")]);
 check("eventCount<3 제외", small.length, 0);
+checkTrue(
+  "server defines PLAYER_COMBAT_EVENT_TYPES",
+  serverSrc.includes("const PLAYER_COMBAT_EVENT_TYPES = new Set([...PLAYER_KILL_EVENT_TYPES, ...PLAYER_DEATH_EVENT_TYPES]);"),
+);
+checkTrue(
+  "server defines isPlayerCombatEvent",
+  serverSrc.includes("function isPlayerCombatEvent(event)"),
+);
+checkTrue(
+  "detectCombatEncounters uses isPlayerCombatEvent",
+  detectCombatEncountersSrc.includes(".filter(isPlayerCombatEvent)"),
+);
+checkTrue(
+  "detectCombatEncounters counts kills with isPlayerKillEvent",
+  detectCombatEncountersSrc.includes("if (isPlayerKillEvent(e)) playerKills += 1;"),
+);
+checkTrue(
+  "detectCombatEncounters counts deaths with isPlayerDeathEvent",
+  detectCombatEncountersSrc.includes("else if (isPlayerDeathEvent(e)) playerDeaths += 1;"),
+);
+checkTrue(
+  "buildTeamfightPhases counts kills with isPlayerKillEvent",
+  buildTeamfightPhasesSrc.includes("if (isPlayerKillEvent(e)) pk += 1;"),
+);
+checkTrue(
+  "buildTeamfightPhases counts deaths with isPlayerDeathEvent",
+  buildTeamfightPhasesSrc.includes("else if (isPlayerDeathEvent(e)) pd += 1;"),
+);
+checkTrue(
+  "buildTeamfightPhases engage tag uses isPlayerKillEvent",
+  buildTeamfightPhasesSrc.includes('isPlayerKillEvent(events[0]) ? "INITIATED_KILL" : "CAUGHT_OUT"'),
+);
+checkTrue(
+  "buildTeamfightPhases cleanup tag uses isPlayerKillEvent",
+  buildTeamfightPhasesSrc.includes("if (isPlayerKillEvent(lastEvt))"),
+);
 
 for (const tag of ["INITIATED_KILL", "CAUGHT_OUT", "TRADE_WON", "TRADE_LOST", "TRADE_EVEN", "CLOSED_OUT", "OVERCHASE_DEATH", "DIED_IN_FIGHT"]) {
   checkTrue(`coaching(${tag}) 비어있지 않음`, typeof teamfightPhaseCoaching(tag) === "string" && teamfightPhaseCoaching(tag).length > 0);

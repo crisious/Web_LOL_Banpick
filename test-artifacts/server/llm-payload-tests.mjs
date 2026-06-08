@@ -63,6 +63,14 @@ const { INSIGHT_LIST_MIN, INSIGHT_LIST_MAX } = new Function(
   `${insightListCountConstantsSrc}\nreturn { INSIGHT_LIST_MIN, INSIGHT_LIST_MAX };`,
 )();
 
+const playerCombatPolicySources = [
+  extractConstSource(serverSrc, "PLAYER_KILL_EVENT_TYPES"),
+  extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
+  extractConstSource(serverSrc, "PLAYER_COMBAT_EVENT_TYPES"),
+  extractFunctionSource(serverSrc, "isPlayerKillEvent"),
+  extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
+  extractFunctionSource(serverSrc, "isPlayerCombatEvent"),
+].join("\n") + "\n";
 const buildSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 const detectSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
 const teamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
@@ -78,7 +86,7 @@ const tfConstants = [
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
-  `${tfConstants}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
+  `${tfConstants}${playerCombatPolicySources}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
 )();
 
 let pass = 0, fail = 0;
