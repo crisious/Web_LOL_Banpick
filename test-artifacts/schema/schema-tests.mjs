@@ -52,6 +52,9 @@ if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {
 if (serverSrc.includes("function hasAnalysisMetaObject(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasAnalysisMetaObject"));
 }
+if (serverSrc.includes("function hasValidEvidenceIndex(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidEvidenceIndex"));
+}
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
@@ -105,7 +108,7 @@ function validFixture() {
       { id: "km_3", timestampLabel: "16:00", title: "t", description: "d" },
       { id: "km_4", timestampLabel: "20:00", title: "t", description: "d" },
     ],
-    evidenceIndex: [],
+    evidenceIndex: [{ eventId: "evt_001", summary: "핵심 근거" }],
   };
 }
 
@@ -188,6 +191,36 @@ expectThrows("keyMoments only 3 throws (need >=4)", () => {
   const f = validFixture(); f.keyMoments = f.keyMoments.slice(0, 3);
   validateAnalysisOutput(f);
 }, "keyMoments");
+
+expectThrows("evidenceIndex missing throws", () => {
+  const f = validFixture();
+  delete f.evidenceIndex;
+  validateAnalysisOutput(f);
+}, "evidenceIndex");
+
+expectThrows("evidenceIndex object throws", () => {
+  const f = validFixture();
+  f.evidenceIndex = { evt_001: { summary: "x" } };
+  validateAnalysisOutput(f);
+}, "evidenceIndex");
+
+expectThrows("evidenceIndex empty throws", () => {
+  const f = validFixture();
+  f.evidenceIndex = [];
+  validateAnalysisOutput(f);
+}, "evidenceIndex");
+
+expectThrows("evidenceIndex item missing eventId throws", () => {
+  const f = validFixture();
+  f.evidenceIndex = [{ summary: "근거" }];
+  validateAnalysisOutput(f);
+}, "evidenceIndex");
+
+expectThrows("evidenceIndex item missing summary throws", () => {
+  const f = validFixture();
+  f.evidenceIndex = [{ eventId: "evt_001" }];
+  validateAnalysisOutput(f);
+}, "evidenceIndex");
 
 expectThrows("phaseSummaries as object throws", () => {
   const f = validFixture();

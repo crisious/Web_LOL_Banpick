@@ -2091,6 +2091,18 @@ function hasAnalysisMetaObject(analysisMeta) {
   return Boolean(analysisMeta) && typeof analysisMeta === "object" && !Array.isArray(analysisMeta);
 }
 
+function hasValidEvidenceIndex(evidenceIndex) {
+  return Array.isArray(evidenceIndex) &&
+    evidenceIndex.length > 0 &&
+    evidenceIndex.every((item) =>
+      item &&
+      typeof item.eventId === "string" &&
+      item.eventId &&
+      typeof item.summary === "string" &&
+      item.summary
+    );
+}
+
 function validateAnalysisOutput(json) {
   if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
@@ -2103,6 +2115,7 @@ function validateAnalysisOutput(json) {
   if (!Array.isArray(json?.weaknesses) || json.weaknesses.length < 1) throw new Error("weaknesses empty");
   if (!Array.isArray(json?.actionChecklist) || json.actionChecklist.length < 1) throw new Error("actionChecklist empty");
   if (!hasMinimumKeyMoments(json?.keyMoments)) throw new Error(`keyMoments < ${KEY_MOMENTS_MIN}`);
+  if (!hasValidEvidenceIndex(json?.evidenceIndex)) throw new Error("evidenceIndex invalid");
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
   // 있으면 배열 타입과 각 항목 필수 필드만 검증.
   if (json.combatAnalysis !== undefined && json.combatAnalysis !== null) {
@@ -2280,6 +2293,10 @@ async function buildAnalysis(normalized, sampleId) {
   if (!hasMinimumKeyMoments(primary.keyMoments)) {
     primary.keyMoments = buildKeyMoments(normalized);
     violations.push(`count.keyMoments<${KEY_MOMENTS_MIN}`);
+  }
+  if (!hasValidEvidenceIndex(primary.evidenceIndex)) {
+    primary.evidenceIndex = buildEvidenceIndex(normalized);
+    violations.push("missing.evidenceIndex");
   }
   if (!Array.isArray(primary.actionChecklist) || primary.actionChecklist.length < 1) {
     primary.actionChecklist = buildActionChecklist(normalized, primary.weaknesses ?? []);
