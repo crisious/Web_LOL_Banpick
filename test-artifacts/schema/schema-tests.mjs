@@ -468,9 +468,21 @@ expectThrows("keyMoments item missing id/eventId throws", () => {
   validateAnalysisOutput(f);
 }, "keyMoments");
 
+expectThrows("keyMoments item whitespace id/eventId throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { ...f.keyMoments[0], id: "   " };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
 expectThrows("keyMoments item missing timestamp throws", () => {
   const f = validFixture();
   f.keyMoments[0] = { id: "km_1", phase: "EARLY", title: "장면", description: "설명", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item whitespace timestamp throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { ...f.keyMoments[0], timestampLabel: "   " };
   validateAnalysisOutput(f);
 }, "keyMoments");
 
@@ -492,9 +504,21 @@ expectThrows("keyMoments item missing title/label throws", () => {
   validateAnalysisOutput(f);
 }, "keyMoments");
 
+expectThrows("keyMoments item whitespace title/label throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { ...f.keyMoments[0], title: "   " };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
 expectThrows("keyMoments item missing description/reason throws", () => {
   const f = validFixture();
   f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "장면", relatedEventIds: [] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item whitespace description/reason throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { ...f.keyMoments[0], description: "   " };
   validateAnalysisOutput(f);
 }, "keyMoments");
 
@@ -507,6 +531,12 @@ expectThrows("keyMoments item missing relatedEventIds throws", () => {
 expectThrows("keyMoments item invalid relatedEventIds throws", () => {
   const f = validFixture();
   f.keyMoments[0] = { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "장면", description: "설명", relatedEventIds: [""] };
+  validateAnalysisOutput(f);
+}, "keyMoments");
+
+expectThrows("keyMoments item whitespace relatedEventIds throws", () => {
+  const f = validFixture();
+  f.keyMoments[0] = { ...f.keyMoments[0], relatedEventIds: ["evt_001", "   "] };
   validateAnalysisOutput(f);
 }, "keyMoments");
 

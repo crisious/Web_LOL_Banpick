@@ -2305,24 +2305,24 @@ function hasValidKeyMoments(keyMoments) {
     keyMoments.every((item) =>
       item &&
       (
-        (typeof item.id === "string" && item.id) ||
-        (typeof item.eventId === "string" && item.eventId)
+        isNonBlankString(item.id) ||
+        isNonBlankString(item.eventId)
       ) &&
       (
-        (typeof item.timestampLabel === "string" && item.timestampLabel) ||
-        (typeof item.timestamp === "string" && item.timestamp)
+        isNonBlankString(item.timestampLabel) ||
+        isNonBlankString(item.timestamp)
       ) &&
       isValidGamePhase(item.phase) &&
       (
-        (typeof item.title === "string" && item.title) ||
-        (typeof item.label === "string" && item.label)
+        isNonBlankString(item.title) ||
+        isNonBlankString(item.label)
       ) &&
       (
-        (typeof item.description === "string" && item.description) ||
-        (typeof item.reason === "string" && item.reason)
+        isNonBlankString(item.description) ||
+        isNonBlankString(item.reason)
       ) &&
       Array.isArray(item.relatedEventIds) &&
-      item.relatedEventIds.every((id) => typeof id === "string" && id)
+      item.relatedEventIds.every((id) => isNonBlankString(id))
     );
 }
 
