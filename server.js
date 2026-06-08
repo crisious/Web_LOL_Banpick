@@ -21,7 +21,7 @@ const publicDemoModeValid = publicDemoModeConfig.valid;
 const publicDemoTokenConfig = parsePublicDemoTokenConfig(process.env.PUBLIC_DEMO_TOKEN);
 const publicDemoToken = publicDemoTokenConfig.value;
 const publicDemoTokenValid = publicDemoTokenConfig.valid;
-const trustProxy = String(process.env.TRUST_PROXY || "").trim() === "1";
+const trustProxy = parseTrustProxyConfig(process.env.TRUST_PROXY);
 // Champions tab: Riot match-v5/ids?startTime 필터용 시즌 시작 epoch.
 // S16 split 1 시작 시각 (Riot 패치노트 기준). 시즌 갱신 시 1회 업데이트.
 const SEASON_START_EPOCH = Date.UTC(2026, 0, 9) / 1000;
@@ -137,6 +137,10 @@ function parsePublicDemoTokenConfig(rawToken) {
     return { value: "", valid: false };
   }
   return { value, valid: true };
+}
+
+function parseTrustProxyConfig(rawTrustProxy) {
+  return String(rawTrustProxy || "") === "1";
 }
 
 function getClientIp(req) {
