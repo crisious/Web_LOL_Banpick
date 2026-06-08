@@ -232,7 +232,7 @@ rg sensitive-output scan over test-artifacts/tmp/key-moments-nonblank-policy-loc
 # no matches
 ```
 
-- [ ] **Step 6: Commit and push implementation**
+- [x] **Step 6: Commit and push implementation**
 
 Run:
 
@@ -242,9 +242,43 @@ git commit -m "test: guard key moment strings"
 git push origin main
 ```
 
-- [ ] **Step 7: Verify GitHub QA and finalize docs**
+Actual implementation publish evidence:
+
+```text
+git commit -m "test: guard key moment strings"
+# 0969ceb test: guard key moment strings
+git push origin main
+# pushed 941b1bc..0969ceb main -> main
+```
+
+- [x] **Step 7: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the final evidence.
+
+Actual implementation GitHub QA evidence:
+
+```text
+gh run watch 27174395635 --exit-status
+# success
+
+artifact: qa-automation-27174395635
+artifact id: 7495207360
+artifact size: 3550 bytes
+artifact digest: sha256:012a729a9c318372110178b3d089896f005a3b5391f45fd13ae77ae40f39d31d
+
+qa-summary.json
+# qaVerdict.status=passed
+# requiredChecks=13/13
+# smoke=156 passed / 0 failed
+# durationMs=199
+# mode=readonly
+# ci.sha=0969ceb6ea38a385d535d4e78fb1402c21f8a98c
+# git.shortSha=0969ceb
+# git.dirty=false
+
+rg sensitive-output scan over test-artifacts/tmp/gh-run-27174395635
+# no matches
+```
 
 - [ ] **Step 8: Commit final documentation and sync main**
 
