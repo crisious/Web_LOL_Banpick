@@ -53,6 +53,8 @@ const manifestFileLockPath = path.join(samplesDir, ".manifest.lock");
 const MANIFEST_FILE_LOCK_TIMEOUT_MS = 10000;
 const MANIFEST_FILE_LOCK_RETRY_MS = 50;
 const MANIFEST_FILE_LOCK_STALE_MS = 5 * 60 * 1000;
+const SAMPLE_DETAIL_PATH_PREFIX = "/api/samples/";
+const SAMPLE_DETAIL_ID_PATTERN = /^sample-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function sampleStoragePath(sampleId, ...segments) {
   return path.join(samplesDir, sampleId, ...segments);
@@ -3106,6 +3108,26 @@ async function handleGenerateSample(req, res) {
   }
 }
 
+function invalidSampleIdPayload() {
+  return {
+    ok: false,
+    code: "INVALID_SAMPLE_ID",
+    error: "샘플 ID가 올바르지 않습니다.",
+  };
+}
+
+function sampleDetailIdFromPathname(pathname) {
+  const pathValue = String(pathname || "");
+  if (!pathValue.startsWith(SAMPLE_DETAIL_PATH_PREFIX)) {
+    return null;
+  }
+  const sampleId = pathValue.slice(SAMPLE_DETAIL_PATH_PREFIX.length);
+  if (!SAMPLE_DETAIL_ID_PATTERN.test(sampleId)) {
+    return null;
+  }
+  return sampleId;
+}
+
 async function handleApi(req, res, url) {
   if (req.method === "GET" && url.pathname === "/healthz") {
     sendJson(res, 200, {
@@ -3130,8 +3152,12 @@ async function handleApi(req, res, url) {
     return true;
   }
 
-  if (req.method === "GET" && url.pathname.startsWith("/api/samples/")) {
-    const sampleId = url.pathname.split("/").pop();
+  if (req.method === "GET" && url.pathname.startsWith(SAMPLE_DETAIL_PATH_PREFIX)) {
+    const sampleId = sampleDetailIdFromPathname(url.pathname);
+    if (!sampleId) {
+      sendJson(res, 400, invalidSampleIdPayload());
+      return true;
+    }
     const bundle = await loadSampleBundle(sampleId);
     if (!bundle) {
       sendJson(res, 404, { ok: false, error: "Sample not found." });

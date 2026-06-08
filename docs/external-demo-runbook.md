@@ -64,6 +64,7 @@ Expected:
 - malformed live API JSON bodies fail as HTTP 400 `INVALID_JSON_BODY`; request bodies over 1MB fail as HTTP 413 `REQUEST_BODY_TOO_LARGE`, without leaking parser stack details
 - read-only mode is inferred from `publicDemoMode: "readonly"` or the legacy `readonly: true` health field
 - targeted sample list/detail error smoke can verify `/api/samples` or `/api/samples/:id` returns JSON `ok=false`, a stable `code`, and `X-Content-Type-Options: nosniff` before running the full sample flow
+- malformed `/api/samples/:id` values, including empty ids, encoded slashes, spaces, or uppercase ids, fail as HTTP 400 `INVALID_SAMPLE_ID` before manifest lookup
 
 ## Cloudflare Tunnel Demo
 
