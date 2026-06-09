@@ -151,7 +151,7 @@ rg sensitive-output scan over test-artifacts/tmp/phase-summaries-nonblank-policy
 # no matches
 ```
 
-- [ ] **Step 6: Commit and push implementation**
+- [x] **Step 6: Commit and push implementation**
 
 Run:
 
@@ -161,9 +161,43 @@ git commit -m "test: guard phase summary strings"
 git push origin main
 ```
 
-- [ ] **Step 7: Verify GitHub QA and finalize docs**
+Actual implementation publish evidence:
+
+```text
+git commit -m "test: guard phase summary strings"
+# cc2ae7a test: guard phase summary strings
+git push origin main
+# pushed 61c1c5f..cc2ae7a main -> main
+```
+
+- [x] **Step 7: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the final evidence.
+
+Actual implementation GitHub QA evidence:
+
+```text
+gh run watch 27174793115 --exit-status
+# success
+
+artifact: qa-automation-27174793115
+artifact id: 7495339228
+artifact size: 3547 bytes
+artifact digest: sha256:408a7f0bb59ecfc8ec13ed66755107769aeec7a5bf63698f95b9f3fc8778a9d4
+
+qa-summary.json
+# qaVerdict.status=passed
+# requiredChecks=13/13
+# smoke=156 passed / 0 failed
+# durationMs=182
+# mode=readonly
+# ci.sha=cc2ae7ac4773cc28dec320bbacb662024040a04c
+# git.shortSha=cc2ae7a
+# git.dirty=false
+
+rg sensitive-output scan over test-artifacts/tmp/gh-run-27174793115
+# no matches
+```
 
 - [ ] **Step 8: Commit final documentation and sync main**
 
