@@ -136,7 +136,7 @@ function Invoke-BrowserDomDump {
   Assert-Condition (Test-Path $domPath) "DOM dump was not created."
 
   $dom = Get-Content $domPath -Raw
-  Assert-Condition ($dom -match "<title>LoL Replay Coach Report</title>") "DOM dump is missing the expected title."
+  Assert-Condition ($dom -match "<title>LoL 리플레이 코치 리포트</title>") "DOM dump is missing the expected title."
   Assert-Condition ($dom -match "LoL Replay Coach") "DOM dump is missing the login title."
   Assert-Condition ($dom -match "Replay Coach Dashboard") "DOM dump is missing the dashboard heading."
   # Phase 32: combat-analysis 섹션이 DOM에 포함되는지 검증
@@ -202,7 +202,7 @@ try {
 
   $homeResponse = Wait-ForUrl -Url "$BaseUrl/"
   Assert-Condition ($homeResponse.StatusCode -eq 200) "Home page did not return HTTP 200."
-  Assert-Condition ($homeResponse.Content -match "<title>LoL Replay Coach Report</title>") "Home page title did not match."
+  Assert-Condition ($homeResponse.Content -match "<title>LoL 리플레이 코치 리포트</title>") "Home page title did not match."
   $summary.assertions += "Home page responded with expected title"
 
   $samplesResponse = Invoke-RestMethod -Uri "$BaseUrl/api/samples" -Method Get
