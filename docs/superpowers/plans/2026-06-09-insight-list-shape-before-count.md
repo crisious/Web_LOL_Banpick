@@ -306,7 +306,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riot
 
 Obsidian project improvement note updated with the insight list shape-before-count implementation record.
 
-- [ ] **Step 7: Commit final documentation and sync main**
+- [x] **Step 7: Commit final documentation and sync main**
 
 Run:
 
@@ -320,6 +320,41 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final GitHub QA passes, `main...origin/main` is `0 0`, and the worktree is clean after removing temporary QA artifacts.
+
+Final documentation and sync evidence (2026-06-09 12:50 KST):
+
+```text
+git commit -m "docs: finalize insight list shape tracking"
+# [main 4b5a6da] docs: finalize insight list shape tracking
+# 1 file changed, 38 insertions(+), 2 deletions(-)
+
+git push origin main
+# ee56a06..4b5a6da  main -> main
+
+gh run watch 27182607601 --exit-status
+# main QA passed
+# test-and-smoke completed in 24s
+
+gh api repos/crisious/Web_LOL_Banpick/actions/runs/27182607601/artifacts --jq '.artifacts[] | {id, name, size_in_bytes, expired}'
+# {"expired":false,"id":7498079032,"name":"qa-automation-27182607601","size_in_bytes":3552}
+
+qa-summary.json
+# latestRun.status: passed
+# latestRun.qaVerdict.status: passed
+# latestRun.smokeSummary: 156 passed, 0 failed
+# latestRun.requiredCheckSummary: 13 passed, 0 failed, 0 missing
+# latestRun.durationMs: 212
+# latestRun.git.shortSha: 4b5a6da
+# latestRun.git.dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riotgames\.com|americas\.api\.riotgames\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27182607601
+# no matches
+
+git fetch origin --prune
+git merge --ff-only origin/main
+git rev-list --left-right --count main...origin/main
+# 0 0
+```
 
 ### Plan Self-Review
 
