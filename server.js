@@ -2694,7 +2694,12 @@ async function buildAnalysis(normalized, sampleId) {
       )
     )
       ? "missing.keyMoments"
-      : "shape.keyMoments.invalid";
+      : (
+        Array.isArray(primary.keyMoments) &&
+        primary.keyMoments.length < KEY_MOMENTS_MIN
+      )
+        ? `count.keyMoments<${KEY_MOMENTS_MIN}`
+        : "shape.keyMoments.invalid";
     primary.keyMoments = buildKeyMoments(normalized);
     violations.push(keyMomentsViolation);
   }
