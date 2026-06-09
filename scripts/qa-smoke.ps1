@@ -138,7 +138,8 @@ function Invoke-BrowserDomDump {
   $dom = Get-Content $domPath -Raw
   Assert-Condition ($dom -match "<title>LoL 리플레이 코치 리포트</title>") "DOM dump is missing the expected title."
   Assert-Condition ($dom -match "LoL Replay Coach") "DOM dump is missing the login title."
-  Assert-Condition ($dom -match "Replay Coach Dashboard") "DOM dump is missing the dashboard heading."
+  Assert-Condition ($dom -match "리플레이 리뷰") "DOM dump is missing the localized login eyebrow."
+  Assert-Condition ($dom -match "저장 샘플 열기") "DOM dump is missing the stored sample entry action."
   # Phase 32: combat-analysis 섹션이 DOM에 포함되는지 검증
   Assert-Condition ($dom -match 'data-combat-analysis') "DOM dump is missing data-combat-analysis container."
   Assert-Condition ($dom -match '전투 KDA 상황별 집중 분석') "DOM dump is missing combat-analysis section heading."
