@@ -1420,9 +1420,9 @@ function renderTrendPanel() {
     .map(
       (item) => `
         <article class="trend-stat">
-          <span class="meta-label">${item.label}</span>
-          <strong>${item.value}</strong>
-          <span class="trend-stat__note">${item.note}</span>
+          <span class="meta-label">${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.value)}</strong>
+          <span class="trend-stat__note">${escapeHtml(item.note)}</span>
         </article>
       `,
     )
@@ -1430,20 +1430,20 @@ function renderTrendPanel() {
 
   dom.trendTags.innerHTML =
     trend.tags.length > 0
-      ? trend.tags.map((tag) => `<span class="trend-tag">${tag}</span>`).join("")
+      ? trend.tags.map((tag) => `<span class="trend-tag">${escapeHtml(tag)}</span>`).join("")
       : `<span class="trend-tag">표본 적음</span>`;
 
   if (dom.trendStrengths) {
     dom.trendStrengths.innerHTML =
       trend.positiveTags.length > 0
-        ? trend.positiveTags.map((tag) => `<div class="trend-list__item">${tag}</div>`).join("")
+        ? trend.positiveTags.map((tag) => `<div class="trend-list__item">${escapeHtml(tag)}</div>`).join("")
         : `<div class="trend-list__item">반복 강점 표본 적음</div>`;
   }
 
   if (dom.trendWeaknesses) {
     dom.trendWeaknesses.innerHTML =
       trend.negativeTags.length > 0
-        ? trend.negativeTags.map((tag) => `<div class="trend-list__item">${tag}</div>`).join("")
+        ? trend.negativeTags.map((tag) => `<div class="trend-list__item">${escapeHtml(tag)}</div>`).join("")
         : `<div class="trend-list__item">반복 약점 표본 적음</div>`;
   }
 }
