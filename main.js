@@ -394,6 +394,10 @@ function resultLabel(result) {
   return "결과 미상";
 }
 
+function reportStateLabel(isCurrent) {
+  return isCurrent ? "현재" : "보관";
+}
+
 function roleLabel(role) {
   const key = String(role || "").trim();
   const labels = {
@@ -1099,10 +1103,10 @@ function buildTrendSnapshot() {
     headline,
     summary,
     stats: [
-      { label: "Reports", value: `${samples.length}개`, note: "저장된 리포트 수" },
-      { label: "Record", value: `${wins}승 ${losses}패`, note: "저장 샘플 기준" },
-      { label: "Main Role", value: roleLabel(dominantRole), note: `가장 많이 나온 포지션 ${dominantRoleCount}회` },
-      { label: "Current", value: current?.id || "-", note: "현재 보고 있는 샘플" },
+      { label: "리포트", value: `${samples.length}개`, note: "저장된 리포트 수" },
+      { label: "전적", value: `${wins}승 ${losses}패`, note: "저장 샘플 기준" },
+      { label: "주 역할", value: roleLabel(dominantRole), note: `가장 많이 나온 포지션 ${dominantRoleCount}회` },
+      { label: "현재 샘플", value: current?.id || "-", note: "현재 보고 있는 샘플" },
     ],
     tags: recurringTags,
     positiveTags,
@@ -1927,7 +1931,7 @@ function renderSampleSwitcher() {
           <button class="report-card" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
             <div class="report-card__top">
               <span class="meta-label">${sample.id}</span>
-              <span class="report-card__state">${sample.id === state.currentSampleId ? "CURRENT" : "ARCHIVE"}</span>
+              <span class="report-card__state">${reportStateLabel(sample.id === state.currentSampleId)}</span>
             </div>
             <div class="report-card__title">
               ${championAvatarMarkup(sample.champion, "medium")}
