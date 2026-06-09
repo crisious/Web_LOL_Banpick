@@ -2351,6 +2351,16 @@ body::after {
   border-left-color: var(--mint);
 }
 
+.kda-evt--assist {
+  background: var(--amber-bg-soft);
+  border-left-color: var(--accent);
+}
+
+.kda-evt--neutral {
+  background: var(--surface-2);
+  border-left-color: var(--line);
+}
+
 .kda-evt-time {
   color: var(--muted);
   font-weight: 600;
@@ -2362,6 +2372,8 @@ body::after {
 
 .kda-evt--death .kda-evt-type { color: var(--rose); }
 .kda-evt--kill .kda-evt-type { color: var(--mint); }
+.kda-evt--assist .kda-evt-type { color: var(--accent); }
+.kda-evt--neutral .kda-evt-type { color: var(--muted); }
 
 .kda-evt-kda {
   font-family: monospace;

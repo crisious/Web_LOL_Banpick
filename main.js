@@ -433,6 +433,25 @@ function wardActionClass(action) {
   return "unknown";
 }
 
+function kdaEventTypeLabel(eventType) {
+  const key = String(eventType || "").trim();
+  const labels = {
+    PLAYER_DEATH: "데스",
+    CHAMPION_KILL: "킬",
+    TEAMFIGHT_FOLLOWUP: "어시스트",
+    SKIRMISH_WIN: "어시스트",
+  };
+  return labels[key] || "KDA 변화";
+}
+
+function kdaEventTypeClass(eventType) {
+  const key = String(eventType || "").trim();
+  if (key === "PLAYER_DEATH") return "death";
+  if (key === "CHAMPION_KILL") return "kill";
+  if (key === "TEAMFIGHT_FOLLOWUP" || key === "SKIRMISH_WIN") return "assist";
+  return "neutral";
+}
+
 function combatSituationLabel(situation) {
   if (situation === "PLAYER_DOMINANT") return "우세";
   if (situation === "PLAYER_DOWN") return "열세";
@@ -3086,18 +3105,19 @@ function renderKdaTimeline(sample) {
   }
 
   // KDA 수치 바 차트 (SVG)
-  const maxKda = Math.max(...points.map((p) => p.kda), 1);
+  const maxKda = Math.max(...points.map((p) => Number.isFinite(Number(p.kda)) ? Number(p.kda) : 0), 1);
   const barWidth = Math.max(28, Math.floor(600 / points.length));
   const svgW = barWidth * points.length + 20;
   const svgH = 120;
 
   const bars = points.map((p, i) => {
-    const h = Math.round((p.kda / maxKda) * (svgH - 30));
+    const pointKda = Number.isFinite(Number(p.kda)) ? Number(p.kda) : 0;
+    const h = Math.round((pointKda / maxKda) * (svgH - 30));
     const x = i * barWidth + 10;
     const color = p.eventType === "PLAYER_DEATH" ? "var(--rose)" : p.eventType === "CHAMPION_KILL" ? "var(--mint)" : "var(--accent)";
     return `<rect x="${x}" y="${svgH - h - 20}" width="${barWidth - 4}" height="${h}" rx="3" fill="${color}" opacity="0.7"/>
-      <text x="${x + (barWidth - 4) / 2}" y="${svgH - h - 24}" text-anchor="middle" fill="var(--text)" font-size="10">${p.kda}</text>
-      <text x="${x + (barWidth - 4) / 2}" y="${svgH - 6}" text-anchor="middle" fill="var(--muted)" font-size="9">${p.timeLabel}</text>`;
+      <text x="${x + (barWidth - 4) / 2}" y="${svgH - h - 24}" text-anchor="middle" fill="var(--text)" font-size="10">${escapeHtml(pointKda)}</text>
+      <text x="${x + (barWidth - 4) / 2}" y="${svgH - 6}" text-anchor="middle" fill="var(--muted)" font-size="9">${escapeHtml(p.timeLabel || "")}</text>`;
   }).join("");
 
   dom.kdaChart.innerHTML = `
@@ -3107,21 +3127,15 @@ function renderKdaTimeline(sample) {
   `;
 
   // KDA 변화 이벤트 리스트
-  const eventTypeLabel = {
-    PLAYER_DEATH: "데스",
-    CHAMPION_KILL: "킬",
-    TEAMFIGHT_FOLLOWUP: "어시스트",
-    SKIRMISH_WIN: "어시스트",
-  };
-
   dom.kdaEvents.innerHTML = points.slice(1).map((p) => {
-    const typeClass = p.eventType === "PLAYER_DEATH" ? "kda-evt--death" : "kda-evt--kill";
+    const typeClass = kdaEventTypeClass(p.eventType);
+    const kdaText = `${p.kills}/${p.deaths}/${p.assists} (${p.kda})`;
     return `
-      <div class="kda-evt ${typeClass}">
-        <span class="kda-evt-time">${p.timeLabel}</span>
-        <span class="kda-evt-type">${eventTypeLabel[p.eventType] || p.eventType}</span>
-        <span class="kda-evt-kda">${p.kills}/${p.deaths}/${p.assists} (${p.kda})</span>
-        <span class="kda-evt-desc">${p.event}</span>
+      <div class="kda-evt kda-evt--${escapeAttr(typeClass)}">
+        <span class="kda-evt-time">${escapeHtml(p.timeLabel || "")}</span>
+        <span class="kda-evt-type">${escapeHtml(kdaEventTypeLabel(p.eventType))}</span>
+        <span class="kda-evt-kda">${escapeHtml(kdaText)}</span>
+        <span class="kda-evt-desc">${escapeHtml(p.event || "")}</span>
       </div>
     `;
   }).join("");
