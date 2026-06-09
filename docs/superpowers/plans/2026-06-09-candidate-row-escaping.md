@@ -148,7 +148,7 @@ Actual browser QA result:
 - Stored sample UI raw dangerous markup scan: false for `<script`, `<svg`, `onerror=`, `onclick=`, `onload=`.
 - Console warn/error log: `[]`.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -158,9 +158,33 @@ git commit -m "test: escape candidate row content"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub Actions artifact**
+Actual implementation commit:
+
+- Commit: `0af0293 test: escape candidate row content`
+- Push target: `origin/main`
+
+- [x] **Step 4: Verify GitHub Actions artifact**
 
 Watch the resulting `main` workflow run, download its `qa-automation-*` artifact, inspect `qa-summary.json`, and run the sensitive-string scan against the downloaded artifact.
+
+Actual GitHub QA result:
+
+- Run: `27204402627` (`QA`, `main`, commit `0af029349cc2eed6c5427445edb62a91c0da4a05`)
+- URL: `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27204402627`
+- Conclusion: success.
+- Artifact: `qa-automation-27204402627`
+- Artifact id: `7506832219`
+- Artifact digest: `sha256:10b7d73dcb930440cc343f5ab52202b7891eb863246f57956443875c4f61ced7`
+- `qa-summary.json latestRun.status`: `passed`.
+- `qaVerdict.status`: `passed`.
+- `exitCode`: `0`.
+- `git.shortSha`: `0af0293`; `dirty`: `false`.
+- Smoke summary: `156 passed, 0 failed`.
+- Required checks: `13 pass`.
+- Artifact integrity: `passed`.
+- Sample evidence: `passed`.
+- Demo safety evidence: `passed`.
+- Artifact sensitive scan: no `RGAPI`, `api_key`, `RIOT_API_KEY`, `Authorization`, `Bearer`, Riot host, `/lol/`, live Riot, or sample-generation matches.
 
 - [ ] **Step 5: Record the cycle**
 
