@@ -392,6 +392,27 @@ function combatSituationLabel(situation) {
   return "교전";
 }
 
+function teamfightPhaseLabel(phase) {
+  if (phase === "ENGAGE") return "진입";
+  if (phase === "TRADE") return "딜교환";
+  if (phase === "CLEANUP") return "정리";
+  return "한타";
+}
+
+function teamfightOutcomeLabel(outcomeTag) {
+  const labels = {
+    INITIATED_KILL: "선제 이니시",
+    CAUGHT_OUT: "먼저 잘림",
+    TRADE_WON: "딜교환 우위",
+    TRADE_LOST: "딜교환 손해",
+    TRADE_EVEN: "딜교환 비등",
+    CLOSED_OUT: "마무리 성공",
+    OVERCHASE_DEATH: "추격사",
+    DIED_IN_FIGHT: "교전 중 사망",
+  };
+  return labels[outcomeTag] || "판단";
+}
+
 function compactQueueLabel(queueLabel) {
   const map = {
     RANKED_SOLO: "솔랭",
@@ -2234,13 +2255,6 @@ function renderTeamfightPhases(sample) {
     dom.teamfightPhases.innerHTML = '<p class="muted">분석할 만한 대규모 한타가 없었습니다.</p>';
     return;
   }
-  const phaseLabel = (p) => (p === "ENGAGE" ? "진입" : p === "TRADE" ? "딜교환" : p === "CLEANUP" ? "정리" : p || "");
-  const tagLabel = (t) =>
-    ({
-      INITIATED_KILL: "선제 이니시", CAUGHT_OUT: "먼저 잘림",
-      TRADE_WON: "딜교환 우위", TRADE_LOST: "딜교환 손해", TRADE_EVEN: "딜교환 비등",
-      CLOSED_OUT: "마무리 성공", OVERCHASE_DEATH: "추격사", DIED_IN_FIGHT: "교전 중 사망",
-    }[t] || "");
   dom.teamfightPhases.innerHTML = items
     .map((tf) => {
       const rows = (Array.isArray(tf.phases) ? tf.phases : [])
@@ -2248,8 +2262,8 @@ function renderTeamfightPhases(sample) {
           (p) => `
             <div class="tf-phase-row" data-outcome="${escapeAttr(p.outcomeTag || "")}">
               <div class="tf-phase-head">
-                <strong>${escapeHtml(phaseLabel(p.phase))}</strong>
-                <span class="tf-tag">${escapeHtml(tagLabel(p.outcomeTag))}</span>
+                <strong>${escapeHtml(teamfightPhaseLabel(p.phase))}</strong>
+                <span class="tf-tag">${escapeHtml(teamfightOutcomeLabel(p.outcomeTag))}</span>
                 <span class="tf-kd">${escapeHtml(String(p.playerKills ?? 0))}K ${escapeHtml(String(p.playerDeaths ?? 0))}D</span>
               </div>
               <p>${escapeHtml(p.coaching || "")}</p>
