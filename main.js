@@ -410,6 +410,29 @@ function roleLabel(role) {
   return labels[key] || "역할 미상";
 }
 
+function wardTypeLabel(wardType) {
+  const key = String(wardType || "").trim();
+  const labels = {
+    YELLOW_TRINKET: "노랑 와드",
+    CONTROL_WARD: "컨트롤 와드",
+    SIGHT_WARD: "시야 와드",
+    BLUE_TRINKET: "파랑 와드",
+  };
+  return labels[key] || "와드";
+}
+
+function wardActionLabel(action) {
+  if (action === "PLACED") return "설치";
+  if (action === "KILLED") return "제거";
+  return "와드 활동";
+}
+
+function wardActionClass(action) {
+  if (action === "PLACED") return "placed";
+  if (action === "KILLED") return "killed";
+  return "unknown";
+}
+
 function combatSituationLabel(situation) {
   if (situation === "PLAYER_DOMINANT") return "우세";
   if (situation === "PLAYER_DOWN") return "열세";
@@ -2952,11 +2975,10 @@ function renderWardTimeline(sample) {
     </div>
   `;
 
-  const wardLabel = { YELLOW_TRINKET: "노랑 와드", CONTROL_WARD: "컨트롤 와드", SIGHT_WARD: "시야 와드", BLUE_TRINKET: "파랑 와드" };
   dom.wardEvents.innerHTML = ward.events.length > 0
     ? ward.events.slice(0, 30).map((e) => `
-      <span class="ward-event-chip ward-event-chip--${e.action === "PLACED" ? "placed" : "killed"}">
-        ${e.timeLabel} ${e.action === "PLACED" ? "설치" : "제거"} ${wardLabel[e.wardType] || e.wardType}
+      <span class="ward-event-chip ward-event-chip--${escapeAttr(wardActionClass(e.action))}">
+        ${escapeHtml(e.timeLabel || "")} ${escapeHtml(wardActionLabel(e.action))} ${escapeHtml(wardTypeLabel(e.wardType))}
       </span>
     `).join("")
     : '<p class="muted">와드 이벤트 없음</p>';

@@ -2269,6 +2269,11 @@ body::after {
   color: var(--rose);
 }
 
+.ward-event-chip--unknown {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
 /* ─── Build Timeline ──────────────────────────────────────────────────────── */
 
 .build-scroll {
