@@ -224,7 +224,7 @@ No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnam
 - Commit: this plan document
 - Update outside git: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -234,9 +234,54 @@ git commit -m "test: track short phase summaries"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub Actions**
+- [x] **Step 2: Verify GitHub Actions**
 
 Use `gh run list`, `gh run watch`, `gh run view`, artifact download, and artifact sensitive scans to confirm the pushed commit passes GitHub QA.
+
+Implementation publish evidence:
+
+```text
+git commit -m "test: track short phase summaries"
+[main 23bb6de] test: track short phase summaries
+
+git push origin main
+df8a8bb..23bb6de main -> main
+
+git rev-list --left-right --count main...origin/main
+0 0
+```
+
+Implementation GitHub QA evidence:
+
+```text
+gh run watch 27183975618 --exit-status
+PASS
+
+Run:
+- id: 27183975618
+- workflow: QA
+- job: test-and-smoke
+- head SHA: 23bb6deeff42c57c87b6e74129281a23ce71c97d
+- URL: https://github.com/crisious/Web_LOL_Banpick/actions/runs/27183975618
+
+Artifact:
+- id: 7498546810
+- name: qa-automation-27183975618
+- size: 3549 bytes
+
+Artifact qa-summary:
+- smokeSummary: 156 passed, 0 failed
+- durationMs: 206
+- qaVerdict.status: passed
+- sampleEvidence.detailChecks: 19 passed, 0 failed
+- demoSafetyEvidence.status: passed
+- latestRun.git.shortSha: 23bb6de
+- latestRun.git.dirty: false
+- requiredCheckSummary: total 13 / passed 13 / failed 0 / missing 0
+
+Artifact sensitive scan:
+No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnames, /lol/, live Riot, or sample generation.
+```
 
 - [ ] **Step 3: Final docs commit**
 
