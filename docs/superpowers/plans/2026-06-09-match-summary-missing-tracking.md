@@ -149,7 +149,7 @@ rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/match-summary-m
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -159,9 +159,36 @@ git commit -m "test: track missing match summary"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation commit:
+
+```text
+b30a798 test: track missing match summary
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence at 2026-06-09 11:07 KST:
+
+```text
+gh run watch 27179328859 --exit-status
+# success, job test-and-smoke in 22s
+
+artifact: qa-automation-27179328859
+artifact id: 7496928682
+headSha: b30a79844ae4d05e8e9d46de41700a6ec21593a1
+qaVerdict.status=passed
+requiredChecks=13/13
+smokeSummary=156 passed / 0 failed
+mode=readonly
+durationMs=212
+latestRun.git.shortSha=b30a798
+latestRun.git.dirty=false
+
+rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/gh-run-27179328859
+# no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
