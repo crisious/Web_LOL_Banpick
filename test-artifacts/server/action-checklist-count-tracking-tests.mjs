@@ -256,9 +256,41 @@ checkTrue(
   !result.analysisMeta?.schemaViolations?.includes("shape.actionChecklist.invalid"),
 );
 check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
+
+state.primaryResponse = primaryAnalysisFixture();
+state.primaryResponse.actionChecklist = [
+  { id: "act_over_1", text: "over action 1" },
+  { id: "act_over_2", text: "over action 2" },
+  { id: "act_over_3", text: "over action 3" },
+  { id: "act_over_4", text: "over action 4" },
+  { id: "act_over_5", text: "over action 5" },
+  { id: "act_over_6", text: "over action 6" },
+];
+state.fallbackCalls = 0;
+state.actionRepairCalls = 0;
+
+const overActionResult = await buildAnalysis(normalizedFixture(), "sample-action-overcount");
+
+check("overfull action checklist primary analysis is preserved", overActionResult.matchSummary?.headline, "primary headline");
+check("overfull action checklist fallback is not used", state.fallbackCalls, 0);
+check("overfull action checklist is repaired", overActionResult.actionChecklist?.map((item) => item.id), ["act_1", "act_2", "act_3"]);
+check("overfull action repair called once", state.actionRepairCalls, 1);
+checkTrue(
+  "schemaViolations include overfull action checklist count",
+  overActionResult.analysisMeta?.schemaViolations?.includes("count.actionChecklist>5"),
+);
+checkTrue(
+  "schemaViolations do not misclassify overfull checklist as malformed",
+  !overActionResult.analysisMeta?.schemaViolations?.includes("shape.actionChecklist.invalid"),
+);
+check("overfull action checklist schemaViolationCount", overActionResult.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
   "buildAnalysis tracks short action checklists separately",
   buildAnalysisSrc.includes("count.actionChecklist<${ACTION_CHECKLIST_MIN}"),
+);
+checkTrue(
+  "buildAnalysis tracks overfull action checklists separately",
+  buildAnalysisSrc.includes("count.actionChecklist>${ACTION_CHECKLIST_MAX}"),
 );
 checkTrue(
   "server defines shared action checklist minimum helper",

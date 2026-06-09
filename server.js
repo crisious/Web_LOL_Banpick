@@ -2828,7 +2828,13 @@ async function buildAnalysis(normalized, sampleId) {
         actionChecklistHasValidItemShapes
       )
         ? `count.actionChecklist<${ACTION_CHECKLIST_MIN}`
-        : "shape.actionChecklist.invalid";
+        : (
+          Array.isArray(primary.actionChecklist) &&
+          primary.actionChecklist.length > ACTION_CHECKLIST_MAX &&
+          actionChecklistHasValidItemShapes
+        )
+          ? `count.actionChecklist>${ACTION_CHECKLIST_MAX}`
+          : "shape.actionChecklist.invalid";
     const checklistWeaknesses = Array.isArray(primary.weaknesses) && primary.weaknesses.length > 0
       ? primary.weaknesses
       : buildWeaknesses(normalized);
