@@ -378,7 +378,9 @@ function comparisonRatePercent(value) {
 }
 
 function comparisonItems(value) {
-  return Array.isArray(value) ? value : [];
+  return Array.isArray(value)
+    ? value.filter((item) => item && typeof item === "object" && !Array.isArray(item))
+    : [];
 }
 
 function formatNumber(value) {

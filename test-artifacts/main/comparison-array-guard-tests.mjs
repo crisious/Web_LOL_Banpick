@@ -93,6 +93,11 @@ check("comparisonItems keeps arrays", comparisonItems([{ topic: "ok" }]).length,
 check("comparisonItems guards null", comparisonItems(null), []);
 check("comparisonItems guards objects", comparisonItems({ topic: "not array" }), []);
 check("comparisonItems guards missing values", comparisonItems(undefined), []);
+check(
+  "comparisonItems filters malformed array entries",
+  comparisonItems([null, "bad", 7, [], { topic: "ok" }]),
+  [{ topic: "ok" }],
+);
 
 checkNoThrow("renderComparison tolerates malformed comparison buckets", () => {
   renderComparison({
@@ -149,6 +154,50 @@ checkTrue("valid comparison renders agreement count", dom.comparisonOverview.inn
 checkTrue("valid comparison renders Claude-only count", dom.comparisonOverview.innerHTML.includes("Claude 1건"));
 checkTrue("valid comparison renders Codex-only count", dom.comparisonOverview.innerHTML.includes("Codex 1건"));
 check("valid comparison renders three cards", (dom.comparisonGrid.innerHTML.match(/comparison-card/g) || []).length, 3);
+
+checkNoThrow("renderComparison skips malformed comparison items", () => {
+  renderComparison({
+    comparison: {
+      comparison: {
+        agreementRate: 88,
+        agreements: [
+          null,
+          "bad",
+          {
+            category: "strength",
+            topic: "공통",
+            claudeNote: "C",
+            codexNote: "D",
+          },
+        ],
+        claudeOnly: [
+          7,
+          {
+            category: "weakness",
+            topic: "Claude",
+            note: "only",
+          },
+        ],
+        codexOnly: [
+          [],
+          {
+            category: "strength",
+            topic: "Codex",
+            note: "only",
+          },
+        ],
+      },
+    },
+  });
+});
+
+checkTrue("mixed item comparison renders agreement count", dom.comparisonOverview.innerHTML.includes("동의 1건"));
+checkTrue("mixed item comparison renders Claude-only count", dom.comparisonOverview.innerHTML.includes("Claude 1건"));
+checkTrue("mixed item comparison renders Codex-only count", dom.comparisonOverview.innerHTML.includes("Codex 1건"));
+check("mixed item comparison renders only valid cards", (dom.comparisonGrid.innerHTML.match(/comparison-card/g) || []).length, 3);
+checkTrue("mixed item comparison does not leak undefined text", !dom.comparisonGrid.innerHTML.includes("undefined"));
+checkTrue("mixed item comparison does not leak null text", !dom.comparisonGrid.innerHTML.includes("null"));
+
 checkTrue("renderComparison derives agreement local array", renderComparisonSrc.includes("const agreements = comparisonItems(comp.agreements)"));
 checkTrue("renderComparison derives Claude-only local array", renderComparisonSrc.includes("const claudeOnly = comparisonItems(comp.claudeOnly)"));
 checkTrue("renderComparison derives Codex-only local array", renderComparisonSrc.includes("const codexOnly = comparisonItems(comp.codexOnly)"));
