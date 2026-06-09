@@ -28,6 +28,7 @@ function extractConstSource(source, name) {
 }
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
+const hasValidKeyMomentsSrc = extractFunctionSource(serverSrc, "hasValidKeyMoments");
 
 const supportSources = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
@@ -251,6 +252,18 @@ check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
   "buildAnalysis tracks short key moments separately",
   buildAnalysisSrc.includes("count.keyMoments<${KEY_MOMENTS_MIN}"),
+);
+checkTrue(
+  "server defines shared key moments minimum helper",
+  serverSrc.includes("function hasMinimumKeyMoments"),
+);
+checkTrue(
+  "hasValidKeyMoments reuses minimum helper",
+  hasValidKeyMomentsSrc.includes("hasMinimumKeyMoments(keyMoments)"),
+);
+checkTrue(
+  "buildAnalysis checks key moments minimum helper for count",
+  buildAnalysisSrc.includes("hasMinimumKeyMoments(primary.keyMoments)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

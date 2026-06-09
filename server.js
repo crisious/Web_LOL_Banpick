@@ -2326,8 +2326,7 @@ function hasValidKeyMomentItemShapes(keyMoments) {
 }
 
 function hasValidKeyMoments(keyMoments) {
-  return Array.isArray(keyMoments) &&
-    keyMoments.length >= KEY_MOMENTS_MIN &&
+  return hasMinimumKeyMoments(keyMoments) &&
     hasValidKeyMomentItemShapes(keyMoments);
 }
 
@@ -2722,7 +2721,7 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.keyMoments"
       : (
         Array.isArray(primary.keyMoments) &&
-        primary.keyMoments.length < KEY_MOMENTS_MIN &&
+        !hasMinimumKeyMoments(primary.keyMoments) &&
         keyMomentsHaveValidItemShapes
       )
         ? `count.keyMoments<${KEY_MOMENTS_MIN}`
