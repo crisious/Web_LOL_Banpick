@@ -284,7 +284,7 @@ Artifact sensitive scan:
 No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnames, /lol/, live Riot, or sample generation.
 ```
 
-- [ ] **Step 3: Final docs commit**
+- [x] **Step 3: Final docs commit**
 
 After QA evidence is recorded in this plan and Obsidian, commit plan completion updates:
 
@@ -294,7 +294,45 @@ git commit -m "docs: finalize phase summaries shape tracking"
 git push origin main
 ```
 
-- [ ] **Step 4: Final sync check**
+Final docs evidence:
+
+```text
+git commit -m "docs: finalize phase summaries shape tracking"
+[main 00d6210] docs: finalize phase summaries shape tracking
+
+git push origin main
+5b3ece9..00d6210 main -> main
+
+gh run watch 27183581763 --exit-status
+PASS
+
+Run:
+- id: 27183581763
+- workflow: QA
+- job: test-and-smoke
+- head SHA: 00d6210df160c4d3788d278602d32b230101b656
+- URL: https://github.com/crisious/Web_LOL_Banpick/actions/runs/27183581763
+
+Artifact:
+- id: 7498400230
+- name: qa-automation-27183581763
+- size: 3550 bytes
+
+Artifact qa-summary:
+- smokeSummary: 156 passed, 0 failed
+- durationMs: 211
+- qaVerdict.status: passed
+- sampleEvidence.detailChecks: 19 passed, 0 failed
+- demoSafetyEvidence.status: passed
+- latestRun.git.shortSha: 00d6210
+- latestRun.git.dirty: false
+- requiredCheckSummary: total 13 / passed 13 / failed 0 / missing 0
+
+Artifact sensitive scan:
+No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnames, /lol/, live Riot, or sample generation.
+```
+
+- [x] **Step 4: Final sync check**
 
 Run:
 
@@ -306,3 +344,26 @@ git status --short --branch
 ```
 
 Expected: `0 0` and clean `main`.
+
+Sync evidence after final docs commit:
+
+```text
+git fetch origin --prune
+PASS
+
+git merge --ff-only origin/main
+Already up to date.
+
+git rev-list --left-right --count main...origin/main
+0 0
+
+git status --short --branch
+## main...origin/main
+
+git log --oneline --decorate --max-count=5
+00d6210 (HEAD -> main, origin/main, origin/HEAD) docs: finalize phase summaries shape tracking
+5b3ece9 test: track malformed short phase summaries
+54cd369 docs: mark key moments plan complete
+7c849b2 docs: finalize key moments shape tracking
+74a1c5f test: track malformed short key moments
+```
