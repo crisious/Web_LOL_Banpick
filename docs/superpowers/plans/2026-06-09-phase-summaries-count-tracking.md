@@ -283,7 +283,7 @@ Artifact sensitive scan:
 No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnames, /lol/, live Riot, or sample generation.
 ```
 
-- [ ] **Step 3: Final docs commit**
+- [x] **Step 3: Final docs commit**
 
 After QA evidence is recorded in this plan and Obsidian, commit plan completion updates:
 
@@ -293,7 +293,45 @@ git commit -m "docs: finalize phase summaries count tracking"
 git push origin main
 ```
 
-- [ ] **Step 4: Final sync check**
+Final docs evidence:
+
+```text
+git commit -m "docs: finalize phase summaries count tracking"
+[main 594d2f4] docs: finalize phase summaries count tracking
+
+git push origin main
+23bb6de..594d2f4 main -> main
+
+gh run watch 27184034631 --exit-status
+PASS
+
+Run:
+- id: 27184034631
+- workflow: QA
+- job: test-and-smoke
+- head SHA: 594d2f4f0a7c122b0538f8012804bbf1b26d507f
+- URL: https://github.com/crisious/Web_LOL_Banpick/actions/runs/27184034631
+
+Artifact:
+- id: 7498568672
+- name: qa-automation-27184034631
+- size: 3549 bytes
+
+Artifact qa-summary:
+- smokeSummary: 156 passed, 0 failed
+- durationMs: 208
+- qaVerdict.status: passed
+- sampleEvidence.detailChecks: 19 passed, 0 failed
+- demoSafetyEvidence.status: passed
+- latestRun.git.shortSha: 594d2f4
+- latestRun.git.dirty: false
+- requiredCheckSummary: total 13 / passed 13 / failed 0 / missing 0
+
+Artifact sensitive scan:
+No matches for RGAPI, api_key, RIOT_API_KEY, Authorization, Bearer, Riot hostnames, /lol/, live Riot, or sample generation.
+```
+
+- [x] **Step 4: Final sync check**
 
 Run:
 
@@ -305,3 +343,13 @@ git status --short --branch
 ```
 
 Expected: `0 0` and clean `main`.
+
+Sync evidence after final docs commit:
+
+```text
+git rev-list --left-right --count main...origin/main
+0 0
+
+git status --short --branch
+## main...origin/main
+```
