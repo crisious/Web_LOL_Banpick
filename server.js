@@ -2385,10 +2385,8 @@ function hasValidActionChecklist(actionChecklist) {
     );
 }
 
-function hasValidInsightList(items) {
+function hasValidInsightItemShapes(items) {
   return Array.isArray(items) &&
-    items.length >= INSIGHT_LIST_MIN &&
-    items.length <= INSIGHT_LIST_MAX &&
     items.every((item) =>
       item &&
       isNonBlankString(item.id) &&
@@ -2397,6 +2395,13 @@ function hasValidInsightList(items) {
       Array.isArray(item.relatedEventIds) &&
       item.relatedEventIds.every((id) => isNonBlankString(id))
     );
+}
+
+function hasValidInsightList(items) {
+  return Array.isArray(items) &&
+    items.length >= INSIGHT_LIST_MIN &&
+    items.length <= INSIGHT_LIST_MAX &&
+    hasValidInsightItemShapes(items);
 }
 
 function hasValidCombatAnalysis(combatAnalysis) {
@@ -2723,6 +2728,7 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(evidenceIndexViolation);
   }
   if (!hasValidInsightList(primary.strengths)) {
+    const strengthsHaveValidItemShapes = hasValidInsightItemShapes(primary.strengths);
     const strengthsViolation = (
       primary.strengths === undefined ||
       primary.strengths === null ||
@@ -2734,7 +2740,8 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.strengths"
       : (
         Array.isArray(primary.strengths) &&
-        primary.strengths.length < INSIGHT_LIST_MIN
+        primary.strengths.length < INSIGHT_LIST_MIN &&
+        strengthsHaveValidItemShapes
       )
         ? `count.strengths<${INSIGHT_LIST_MIN}`
         : "shape.strengths.invalid";
@@ -2742,6 +2749,7 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(strengthsViolation);
   }
   if (!hasValidInsightList(primary.weaknesses)) {
+    const weaknessesHaveValidItemShapes = hasValidInsightItemShapes(primary.weaknesses);
     const weaknessesViolation = (
       primary.weaknesses === undefined ||
       primary.weaknesses === null ||
@@ -2753,7 +2761,8 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.weaknesses"
       : (
         Array.isArray(primary.weaknesses) &&
-        primary.weaknesses.length < INSIGHT_LIST_MIN
+        primary.weaknesses.length < INSIGHT_LIST_MIN &&
+        weaknessesHaveValidItemShapes
       )
         ? `count.weaknesses<${INSIGHT_LIST_MIN}`
         : "shape.weaknesses.invalid";

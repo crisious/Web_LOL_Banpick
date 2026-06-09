@@ -26,6 +26,7 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const hasValidInsightItemShapesSrc = extractFunctionSource(serverSrc, "hasValidInsightItemShapes");
 const hasValidInsightListSrc = extractFunctionSource(serverSrc, "hasValidInsightList");
 
 const supportSources = [
@@ -47,6 +48,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasValidCoachSummary"),
   extractFunctionSource(serverSrc, "hasValidEvidenceIndex"),
   extractFunctionSource(serverSrc, "hasValidActionChecklist"),
+  hasValidInsightItemShapesSrc,
   hasValidInsightListSrc,
   extractFunctionSource(serverSrc, "hasValidCombatAnalysis"),
   extractFunctionSource(serverSrc, "hasValidTeamfightPhaseAnalysis"),
@@ -151,20 +153,24 @@ expectThrows("strengths rejects whitespace relatedEventIds", () => {
 }, "strengths");
 
 checkTrue(
-  "hasValidInsightList uses nonblank ids",
-  hasValidInsightListSrc.includes("isNonBlankString(item.id)"),
+  "hasValidInsightItemShapes uses nonblank ids",
+  hasValidInsightItemShapesSrc.includes("isNonBlankString(item.id)"),
 );
 checkTrue(
-  "hasValidInsightList uses nonblank titles",
-  hasValidInsightListSrc.includes("isNonBlankString(item.title)"),
+  "hasValidInsightItemShapes uses nonblank titles",
+  hasValidInsightItemShapesSrc.includes("isNonBlankString(item.title)"),
 );
 checkTrue(
-  "hasValidInsightList uses nonblank descriptions",
-  hasValidInsightListSrc.includes("isNonBlankString(item.description)"),
+  "hasValidInsightItemShapes uses nonblank descriptions",
+  hasValidInsightItemShapesSrc.includes("isNonBlankString(item.description)"),
 );
 checkTrue(
-  "hasValidInsightList uses nonblank related event ids",
-  hasValidInsightListSrc.includes("item.relatedEventIds.every((id) => isNonBlankString(id))"),
+  "hasValidInsightItemShapes uses nonblank related event ids",
+  hasValidInsightItemShapesSrc.includes("item.relatedEventIds.every((id) => isNonBlankString(id))"),
+);
+checkTrue(
+  "hasValidInsightList reuses item shape helper",
+  hasValidInsightListSrc.includes("hasValidInsightItemShapes(items)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

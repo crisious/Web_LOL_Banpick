@@ -47,6 +47,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasValidCoachSummary"),
   extractFunctionSource(serverSrc, "hasValidEvidenceIndex"),
   hasValidActionChecklistSrc,
+  extractFunctionSource(serverSrc, "hasValidInsightItemShapes"),
   extractFunctionSource(serverSrc, "hasValidInsightList"),
   extractFunctionSource(serverSrc, "hasValidCombatAnalysis"),
   extractFunctionSource(serverSrc, "hasValidTeamfightPhaseAnalysis"),

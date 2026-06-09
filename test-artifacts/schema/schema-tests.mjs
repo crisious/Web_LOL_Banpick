@@ -93,6 +93,9 @@ if (serverSrc.includes("const INSIGHT_LIST_MIN =")) {
 if (serverSrc.includes("const INSIGHT_LIST_MAX =")) {
   validatorSupportSources.push(extractConstSource(serverSrc, "INSIGHT_LIST_MAX"));
 }
+if (serverSrc.includes("function hasValidInsightItemShapes(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidInsightItemShapes"));
+}
 if (serverSrc.includes("function hasValidInsightList(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidInsightList"));
 }
