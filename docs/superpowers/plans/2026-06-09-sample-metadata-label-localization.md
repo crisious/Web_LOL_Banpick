@@ -294,7 +294,7 @@ Result 2026-06-09:
 - Modify: `docs/superpowers/plans/2026-06-09-sample-metadata-label-localization.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -304,13 +304,17 @@ git commit -m "test: localize sample metadata labels"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
 
-- [ ] **Step 3: Run Browser QA**
+Result 2026-06-09: Implementation commit `73c5dfd` pushed to `main`. GitHub QA run `27191055847` completed successfully. Artifact `7501265213` (`qa-automation-27191055847`) reported `status: passed`, `dirty: false`, smoke 156/0, required checks 13/13, artifact integrity passed, QA verdict passed/shareable. Sensitive scan over downloaded artifact had no matches.
+
+- [x] **Step 3: Run Browser QA**
 
 Open the read-only local app at `http://127.0.0.1:8123/`, open stored samples, and inspect the sample list/report cards. Confirm `서포터 패배` or `서포터 승리` appears, raw `SUPPORT LOSS` / `SUPPORT WIN` does not appear in visible sample metadata, and console warn/error logs are empty.
+
+Result 2026-06-09: Browser QA on `http://127.0.0.1:8123/` read-only app passed. Stored sample list, report cards, trend summary, snapshot role, and load status showed localized labels such as `sample-kr-8242613150 · 서포터 패배` and `Nautilus 서포터 패배`; scoped visible metadata checks found no raw `SUPPORT LOSS`, `SUPPORT WIN`, `SUPPORT`, `LOSS`, or `WIN` tokens; console warn/error count was 0.
 
 - [ ] **Step 4: Update Obsidian and final sync**
 
