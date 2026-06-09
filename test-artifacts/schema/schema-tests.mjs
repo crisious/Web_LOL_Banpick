@@ -44,6 +44,7 @@ if (serverSrc.includes("const KEY_MOMENTS_MIN =")) {
   );
 }
 if (serverSrc.includes("function hasValidKeyMoments(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"));
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidKeyMoments"));
 }
 if (serverSrc.includes("const PHASE_SUMMARIES_MIN =")) {

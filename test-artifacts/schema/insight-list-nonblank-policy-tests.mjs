@@ -40,6 +40,7 @@ const supportSources = [
   extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
   extractFunctionSource(serverSrc, "isValidGamePhase"),
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
+  extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
   extractFunctionSource(serverSrc, "hasValidKeyMoments"),
   extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),

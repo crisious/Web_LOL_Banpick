@@ -26,6 +26,7 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const hasValidKeyMomentItemShapesSrc = extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes");
 const hasValidKeyMomentsSrc = extractFunctionSource(serverSrc, "hasValidKeyMoments");
 const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
 
@@ -40,6 +41,7 @@ const supportSources = [
   serverSrc.includes("const GAME_PHASES =") ? extractConstSource(serverSrc, "GAME_PHASES") : "",
   serverSrc.includes("function isValidGamePhase(") ? extractFunctionSource(serverSrc, "isValidGamePhase") : "",
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
+  hasValidKeyMomentItemShapesSrc,
   hasValidKeyMomentsSrc,
   hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
@@ -165,8 +167,8 @@ checkTrue(
   hasValidPhaseSummariesSrc.includes("isValidGamePhase(item.phase)"),
 );
 checkTrue(
-  "hasValidKeyMoments uses game phase enum",
-  hasValidKeyMomentsSrc.includes("isValidGamePhase(item.phase)"),
+  "hasValidKeyMomentItemShapes uses game phase enum",
+  hasValidKeyMomentItemShapesSrc.includes("isValidGamePhase(item.phase)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

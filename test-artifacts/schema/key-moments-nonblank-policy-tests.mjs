@@ -26,6 +26,7 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const hasValidKeyMomentItemShapesSrc = extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes");
 const hasValidKeyMomentsSrc = extractFunctionSource(serverSrc, "hasValidKeyMoments");
 
 const supportSources = [
@@ -40,6 +41,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "isValidGamePhase"),
   extractFunctionSource(serverSrc, "isNonBlankString"),
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
+  hasValidKeyMomentItemShapesSrc,
   hasValidKeyMomentsSrc,
   extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
@@ -171,28 +173,32 @@ expectThrows("keyMoments rejects whitespace relatedEventIds", () => {
 }, "keyMoments");
 
 checkTrue(
-  "hasValidKeyMoments uses nonblank id alternate",
-  hasValidKeyMomentsSrc.includes("isNonBlankString(item.id)") &&
-    hasValidKeyMomentsSrc.includes("isNonBlankString(item.eventId)"),
+  "hasValidKeyMomentItemShapes uses nonblank id alternate",
+  hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.id)") &&
+    hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.eventId)"),
 );
 checkTrue(
-  "hasValidKeyMoments uses nonblank timestamp alternate",
-  hasValidKeyMomentsSrc.includes("isNonBlankString(item.timestampLabel)") &&
-    hasValidKeyMomentsSrc.includes("isNonBlankString(item.timestamp)"),
+  "hasValidKeyMomentItemShapes uses nonblank timestamp alternate",
+  hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.timestampLabel)") &&
+    hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.timestamp)"),
 );
 checkTrue(
-  "hasValidKeyMoments uses nonblank title alternate",
-  hasValidKeyMomentsSrc.includes("isNonBlankString(item.title)") &&
-    hasValidKeyMomentsSrc.includes("isNonBlankString(item.label)"),
+  "hasValidKeyMomentItemShapes uses nonblank title alternate",
+  hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.title)") &&
+    hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.label)"),
 );
 checkTrue(
-  "hasValidKeyMoments uses nonblank description alternate",
-  hasValidKeyMomentsSrc.includes("isNonBlankString(item.description)") &&
-    hasValidKeyMomentsSrc.includes("isNonBlankString(item.reason)"),
+  "hasValidKeyMomentItemShapes uses nonblank description alternate",
+  hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.description)") &&
+    hasValidKeyMomentItemShapesSrc.includes("isNonBlankString(item.reason)"),
 );
 checkTrue(
-  "hasValidKeyMoments uses nonblank related event ids",
-  hasValidKeyMomentsSrc.includes("item.relatedEventIds.every((id) => isNonBlankString(id))"),
+  "hasValidKeyMomentItemShapes uses nonblank related event ids",
+  hasValidKeyMomentItemShapesSrc.includes("item.relatedEventIds.every((id) => isNonBlankString(id))"),
+);
+checkTrue(
+  "hasValidKeyMoments reuses item shape helper",
+  hasValidKeyMomentsSrc.includes("hasValidKeyMomentItemShapes(keyMoments)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

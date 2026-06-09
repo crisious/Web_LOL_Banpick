@@ -1,4 +1,4 @@
-// server.js buildAnalysis phaseSummaries shape tracking regression tests
+// server.js buildAnalysis keyMoments shape-before-count regression tests
 
 import fs from "fs";
 
@@ -28,6 +28,36 @@ function extractConstSource(source, name) {
 }
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
+const hasValidKeyMomentsSrc = extractFunctionSource(serverSrc, "hasValidKeyMoments");
+const keyMomentItemShapesSource = serverSrc.includes("function hasValidKeyMomentItemShapes(")
+  ? extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes")
+  : `
+function hasValidKeyMomentItemShapes(keyMoments) {
+  return Array.isArray(keyMoments) &&
+    keyMoments.every((item) =>
+      item &&
+      (
+        isNonBlankString(item.id) ||
+        isNonBlankString(item.eventId)
+      ) &&
+      (
+        isNonBlankString(item.timestampLabel) ||
+        isNonBlankString(item.timestamp)
+      ) &&
+      isValidGamePhase(item.phase) &&
+      (
+        isNonBlankString(item.title) ||
+        isNonBlankString(item.label)
+      ) &&
+      (
+        isNonBlankString(item.description) ||
+        isNonBlankString(item.reason)
+      ) &&
+      Array.isArray(item.relatedEventIds) &&
+      item.relatedEventIds.every((id) => isNonBlankString(id))
+    );
+}
+`;
 
 const supportSources = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
@@ -41,8 +71,8 @@ const supportSources = [
   extractFunctionSource(serverSrc, "isValidGamePhase"),
   extractFunctionSource(serverSrc, "isNonBlankString"),
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
-  extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
-  extractFunctionSource(serverSrc, "hasValidKeyMoments"),
+  keyMomentItemShapesSource,
+  hasValidKeyMomentsSrc,
   extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
   extractFunctionSource(serverSrc, "hasValidMatchSummary"),
@@ -58,7 +88,7 @@ const supportSources = [
 
 const state = {
   fallbackCalls: 0,
-  phaseRepairCalls: 0,
+  keyMomentRepairCalls: 0,
   primaryResponse: primaryAnalysisFixture(),
   console: { log() {}, error() {} },
 };
@@ -92,7 +122,11 @@ const buildAnalysis = new Function("state", `
       analysisMeta: { sourceType: "rule_based", language: "ko" },
       matchSummary: { headline: "fallback headline" },
       coachSummary: { overallSummary: "fallback coach summary" },
-      phaseSummaries: repairedPhaseSummaries(),
+      phaseSummaries: [
+        { phase: "EARLY", summary: "fallback early" },
+        { phase: "MID", summary: "fallback mid" },
+        { phase: "LATE", summary: "fallback late" },
+      ],
       strengths: [
         { id: "str_1", title: "fallback strength 1", description: "fallback strength description 1", relatedEventIds: [] },
         { id: "str_2", title: "fallback strength 2", description: "fallback strength description 2", relatedEventIds: [] },
@@ -108,12 +142,7 @@ const buildAnalysis = new Function("state", `
         { id: "act_2", text: "fallback action 2" },
         { id: "act_3", text: "fallback action 3" },
       ],
-      keyMoments: [
-        { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "fallback moment 1", description: "fallback moment description 1", relatedEventIds: ["evt_001"] },
-        { id: "km_2", timestampLabel: "12:00", phase: "MID", title: "fallback moment 2", description: "fallback moment description 2", relatedEventIds: ["evt_001"] },
-        { id: "km_3", timestampLabel: "16:00", phase: "MID", title: "fallback moment 3", description: "fallback moment description 3", relatedEventIds: ["evt_001"] },
-        { id: "km_4", timestampLabel: "20:00", phase: "LATE", title: "fallback moment 4", description: "fallback moment description 4", relatedEventIds: ["evt_001"] },
-      ],
+      keyMoments: repairedKeyMoments(),
       evidenceIndex: [{ eventId: "evt_001", summary: "fallback evidence" }],
       combatAnalysis: [],
       teamfightPhaseAnalysis: [],
@@ -122,19 +151,24 @@ const buildAnalysis = new Function("state", `
   function buildCoachSummary() {
     return { overallSummary: "fallback coach summary" };
   }
-  function repairedPhaseSummaries() {
+  function buildPhaseSummaries() {
     return [
-      { phase: "EARLY", summary: "repaired early summary" },
-      { phase: "MID", summary: "repaired mid summary" },
-      { phase: "LATE", summary: "repaired late summary" },
+      { phase: "EARLY", summary: "fallback early" },
+      { phase: "MID", summary: "fallback mid" },
+      { phase: "LATE", summary: "fallback late" },
     ];
   }
-  function buildPhaseSummaries() {
-    state.phaseRepairCalls += 1;
-    return repairedPhaseSummaries();
+  function repairedKeyMoments() {
+    return [
+      { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "repaired moment 1", description: "repaired moment description 1", relatedEventIds: ["evt_001"] },
+      { id: "km_2", timestampLabel: "12:00", phase: "MID", title: "repaired moment 2", description: "repaired moment description 2", relatedEventIds: ["evt_001"] },
+      { id: "km_3", timestampLabel: "16:00", phase: "MID", title: "repaired moment 3", description: "repaired moment description 3", relatedEventIds: ["evt_001"] },
+      { id: "km_4", timestampLabel: "20:00", phase: "LATE", title: "repaired moment 4", description: "repaired moment description 4", relatedEventIds: ["evt_001"] },
+    ];
   }
   function buildKeyMoments() {
-    return buildRuleBasedAnalysis().keyMoments;
+    state.keyMomentRepairCalls += 1;
+    return repairedKeyMoments();
   }
   function buildEvidenceIndex() {
     return [{ eventId: "evt_001", summary: "fallback evidence" }];
@@ -181,9 +215,9 @@ function primaryAnalysisFixture() {
     matchSummary: { headline: "primary headline" },
     coachSummary: { overallSummary: "primary coach summary" },
     phaseSummaries: [
-      { phase: "LANING", summary: "invalid phase summary 1" },
-      { phase: "MIDGAME", summary: "invalid phase summary 2" },
-      { phase: "LATEGAME", summary: "invalid phase summary 3" },
+      { phase: "EARLY", summary: "primary early summary" },
+      { phase: "MID", summary: "primary mid summary" },
+      { phase: "LATE", summary: "primary late summary" },
     ],
     strengths: [
       { id: "str_1", title: "primary strength 1", description: "primary strength description 1", relatedEventIds: [] },
@@ -201,10 +235,7 @@ function primaryAnalysisFixture() {
       { id: "act_3", text: "primary action 3" },
     ],
     keyMoments: [
-      { id: "km_1", timestampLabel: "08:00", phase: "EARLY", title: "primary moment 1", description: "primary moment description 1", relatedEventIds: ["evt_001"] },
-      { id: "km_2", timestampLabel: "12:00", phase: "MID", title: "primary moment 2", description: "primary moment description 2", relatedEventIds: ["evt_001"] },
-      { id: "km_3", timestampLabel: "16:00", phase: "MID", title: "primary moment 3", description: "primary moment description 3", relatedEventIds: ["evt_001"] },
-      { id: "km_4", timestampLabel: "20:00", phase: "LATE", title: "primary moment 4", description: "primary moment description 4", relatedEventIds: ["evt_001"] },
+      { id: "", timestampLabel: "08:00", phase: "EARLY", title: "malformed short moment", description: "malformed moment description", relatedEventIds: ["evt_001"] },
     ],
     evidenceIndex: [{ eventId: "evt_001", summary: "primary evidence" }],
     combatAnalysis: [],
@@ -214,8 +245,8 @@ function primaryAnalysisFixture() {
 
 function normalizedFixture() {
   return {
-    matchInfo: { matchId: "KR_PHASE_SUMMARIES_SHAPE", queueLabel: "RANKED_SOLO" },
-    playerContext: { riotId: "PhaseSummary#KR1", participantId: 1 },
+    matchInfo: { matchId: "KR_KEY_MOMENTS_SHAPE_BEFORE_COUNT", queueLabel: "RANKED_SOLO" },
+    playerContext: { riotId: "KeyMoment#KR1", participantId: 1 },
     timelineEvents: [],
     phaseContext: {},
     playerStats: {},
@@ -224,28 +255,36 @@ function normalizedFixture() {
   };
 }
 
-const result = await buildAnalysis(normalizedFixture(), "sample-phase-summaries-shape");
+const result = await buildAnalysis(normalizedFixture(), "sample-key-moments-shape-before-count");
 
 check("primary analysis is preserved", result.matchSummary?.headline, "primary headline");
 check("fallback is not used", state.fallbackCalls, 0);
-check("phase summaries are repaired", result.phaseSummaries?.map((item) => item.phase), ["EARLY", "MID", "LATE"]);
-check("phase repair called once", state.phaseRepairCalls, 1);
+check("key moments are repaired", result.keyMoments?.map((item) => item.id), ["km_1", "km_2", "km_3", "km_4"]);
+check("key moment repair called once", state.keyMomentRepairCalls, 1);
 checkTrue(
-  "schemaViolations include malformed phase summaries",
-  result.analysisMeta?.schemaViolations?.includes("shape.phaseSummaries.invalid"),
+  "schemaViolations include malformed key moments",
+  result.analysisMeta?.schemaViolations?.includes("shape.keyMoments.invalid"),
 );
 checkTrue(
-  "schemaViolations do not misclassify malformed phase summaries as missing",
-  !result.analysisMeta?.schemaViolations?.includes("missing.phaseSummaries"),
+  "schemaViolations do not misclassify malformed short key moments as missing",
+  !result.analysisMeta?.schemaViolations?.includes("missing.keyMoments"),
 );
 checkTrue(
-  "schemaViolations do not misclassify malformed phase summaries as count",
-  !result.analysisMeta?.schemaViolations?.includes("count.phaseSummaries<3"),
+  "schemaViolations do not misclassify malformed short key moments as count",
+  !result.analysisMeta?.schemaViolations?.includes("count.keyMoments<4"),
 );
 check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
-  "buildAnalysis tracks malformed phase summaries separately",
-  buildAnalysisSrc.includes("\"shape.phaseSummaries.invalid\""),
+  "server defines shared key moment item shape helper",
+  serverSrc.includes("function hasValidKeyMomentItemShapes"),
+);
+checkTrue(
+  "hasValidKeyMoments reuses item shape helper",
+  hasValidKeyMomentsSrc.includes("hasValidKeyMomentItemShapes(keyMoments)"),
+);
+checkTrue(
+  "buildAnalysis checks key moment item shape before count",
+  buildAnalysisSrc.includes("hasValidKeyMomentItemShapes(primary.keyMoments)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

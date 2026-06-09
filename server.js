@@ -2299,9 +2299,8 @@ function hasMinimumKeyMoments(keyMoments) {
   return Array.isArray(keyMoments) && keyMoments.length >= KEY_MOMENTS_MIN;
 }
 
-function hasValidKeyMoments(keyMoments) {
+function hasValidKeyMomentItemShapes(keyMoments) {
   return Array.isArray(keyMoments) &&
-    keyMoments.length >= KEY_MOMENTS_MIN &&
     keyMoments.every((item) =>
       item &&
       (
@@ -2324,6 +2323,12 @@ function hasValidKeyMoments(keyMoments) {
       Array.isArray(item.relatedEventIds) &&
       item.relatedEventIds.every((id) => isNonBlankString(id))
     );
+}
+
+function hasValidKeyMoments(keyMoments) {
+  return Array.isArray(keyMoments) &&
+    keyMoments.length >= KEY_MOMENTS_MIN &&
+    hasValidKeyMomentItemShapes(keyMoments);
 }
 
 function hasValidPhaseSummaries(phaseSummaries) {
@@ -2695,6 +2700,7 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(phaseSummariesViolation);
   }
   if (!hasValidKeyMoments(primary.keyMoments)) {
+    const keyMomentsHaveValidItemShapes = hasValidKeyMomentItemShapes(primary.keyMoments);
     const keyMomentsViolation = (
       primary.keyMoments === undefined ||
       primary.keyMoments === null ||
@@ -2706,7 +2712,8 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.keyMoments"
       : (
         Array.isArray(primary.keyMoments) &&
-        primary.keyMoments.length < KEY_MOMENTS_MIN
+        primary.keyMoments.length < KEY_MOMENTS_MIN &&
+        keyMomentsHaveValidItemShapes
       )
         ? `count.keyMoments<${KEY_MOMENTS_MIN}`
         : "shape.keyMoments.invalid";
