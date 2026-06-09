@@ -2676,11 +2676,21 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push("shape.weaknesses.invalid");
   }
   if (!hasValidActionChecklist(primary.actionChecklist)) {
+    const actionChecklistViolation = (
+      primary.actionChecklist === undefined ||
+      primary.actionChecklist === null ||
+      (
+        Array.isArray(primary.actionChecklist) &&
+        primary.actionChecklist.length === 0
+      )
+    )
+      ? "missing.actionChecklist"
+      : "shape.actionChecklist.invalid";
     const checklistWeaknesses = Array.isArray(primary.weaknesses) && primary.weaknesses.length > 0
       ? primary.weaknesses
       : buildWeaknesses(normalized);
     primary.actionChecklist = buildActionChecklist(normalized, checklistWeaknesses);
-    violations.push("shape.actionChecklist.invalid");
+    violations.push(actionChecklistViolation);
   }
   // Phase 32: combatAnalysis 정규화 — 선택 필드이므로 깨진 AI 응답은 빈 배열로 복구.
   const hasCombatPayload = Array.isArray(payload.combatEncounters) && payload.combatEncounters.length > 0;
