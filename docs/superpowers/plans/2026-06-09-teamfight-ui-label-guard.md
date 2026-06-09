@@ -208,7 +208,7 @@ Result: `npm test` passed with `2298 passed, 0 failed across 101 test file(s)`. 
 - Modify: `docs/superpowers/plans/2026-06-09-teamfight-ui-label-guard.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -218,13 +218,19 @@ git commit -m "test: guard teamfight labels"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+Result: Implementation commit `fa9c46f` (`test: guard teamfight labels`) was pushed to `origin/main`.
+
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
 
-- [ ] **Step 3: Run Browser QA**
+Result: GitHub QA run `27188884321` passed for `fa9c46f`. Artifact `qa-automation-27188884321` downloaded and `qa-summary.json` confirmed `status: passed`, `shortSha: fa9c46f`, `dirty: false`, smoke `156 passed, 0 failed`, required checks `13 passed, 0 failed, 0 missing`, artifact integrity `passed`, and QA verdict `passed/shareable`. Sensitive scan over `test-artifacts/tmp/github-qa-27188884321` returned no matches.
+
+- [x] **Step 3: Run Browser QA**
 
 Open the read-only local app at `http://127.0.0.1:8123/`, open a stored sample, switch to the analysis tab, and inspect teamfight phase rows. Confirm localized phase/outcome labels are visible, raw enum strings are not visible in teamfight rows, and console warn/error logs are empty.
+
+Result: Browser QA opened `http://127.0.0.1:8123/` in read-only mode and loaded the stored `sample-kr-8242613150` report on the selected `분석` tab. The `[data-teamfight-phases]` section rendered the empty state `분석할 만한 대규모 한타가 없었습니다.`, `rowCount: 0`, raw enum tokens were not visible, and console warn/error logs were empty. A server-side scan of all 19 stored samples reported `samplesWithTeamfightRows=0`, so visible row label coverage remains enforced by the frontend source-extracted unit test and GitHub QA artifact for this cycle.
 
 - [ ] **Step 4: Update Obsidian and final sync**
 
