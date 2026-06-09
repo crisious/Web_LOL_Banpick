@@ -2634,13 +2634,21 @@ async function buildAnalysis(normalized, sampleId) {
     primary.coachSummary = { overallSummary: primary.coachSummary };
     violations.push("type.coachSummary.string");
   } else if (!primary.coachSummary || typeof primary.coachSummary !== "object" || Array.isArray(primary.coachSummary)) {
+    const coachSummaryViolation = (
+      primary.coachSummary === undefined ||
+      primary.coachSummary === null
+    )
+      ? "missing.coachSummary"
+      : "type.coachSummary.invalid";
     primary.coachSummary = {};
-    violations.push("type.coachSummary.invalid");
+    violations.push(coachSummaryViolation);
   }
   if (!hasValidCoachSummary(primary.coachSummary)) {
     const fb = buildCoachSummary(normalized);
     primary.coachSummary.overallSummary = fb.overallSummary;
-    violations.push("missing.coachSummary.overallSummary");
+    if (!violations.includes("missing.coachSummary")) {
+      violations.push("missing.coachSummary.overallSummary");
+    }
   }
   // phaseSummaries: AI가 배열 대신 객체로 반환하는 경우 → 배열로 정규화
   if (primary.phaseSummaries && !Array.isArray(primary.phaseSummaries)) {
