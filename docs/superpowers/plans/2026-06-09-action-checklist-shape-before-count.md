@@ -220,7 +220,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riot
 
 Obsidian project improvement note updated with the action checklist shape-before-count implementation record.
 
-- [ ] **Step 7: Commit final documentation and sync main**
+- [x] **Step 7: Commit final documentation and sync main**
 
 Run:
 
@@ -234,6 +234,41 @@ git rev-list --left-right --count main...origin/main
 ```
 
 Expected: final GitHub QA passes, `main...origin/main` is `0 0`, and the worktree is clean after removing temporary QA artifacts.
+
+Final documentation and sync evidence (2026-06-09 12:35 KST):
+
+```text
+git commit -m "docs: finalize action checklist shape tracking"
+# [main 18ec179] docs: finalize action checklist shape tracking
+# 1 file changed, 38 insertions(+), 2 deletions(-)
+
+git push origin main
+# 83c98f7..18ec179  main -> main
+
+gh run watch 27182148956 --exit-status
+# main QA passed
+# test-and-smoke completed in 21s
+
+gh api repos/crisious/Web_LOL_Banpick/actions/runs/27182148956/artifacts --jq '.artifacts[] | {id, name, size_in_bytes, expired}'
+# {"expired":false,"id":7497918416,"name":"qa-automation-27182148956","size_in_bytes":3551}
+
+qa-summary.json
+# latestRun.status: passed
+# latestRun.qaVerdict.status: passed
+# latestRun.smokeSummary: 156 passed, 0 failed
+# latestRun.requiredCheckSummary: 13 passed, 0 failed, 0 missing
+# latestRun.durationMs: 229
+# latestRun.git.shortSha: 18ec179
+# latestRun.git.dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riotgames\.com|americas\.api\.riotgames\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27182148956
+# no matches
+
+git fetch origin --prune
+git merge --ff-only origin/main
+git rev-list --left-right --count main...origin/main
+# 0 0
+```
 
 ### Plan Self-Review
 
