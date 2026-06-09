@@ -169,7 +169,7 @@ Actual browser QA result:
 - Avatar inline style encoded unsafe champion asset key as `Ahri%22%3E%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E.png`; avatar `onerror` attribute false.
 - Console warn/error log: `[]`.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -179,9 +179,33 @@ git commit -m "test: escape sample switcher content"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub Actions artifact**
+Actual implementation commit:
+
+- Commit: `1075ebf test: escape sample switcher content`
+- Push target: `origin/main`
+
+- [x] **Step 4: Verify GitHub Actions artifact**
 
 Watch the resulting `main` workflow run, download its `qa-automation-*` artifact, inspect `qa-summary.json`, and run the sensitive-string scan against the downloaded artifact.
+
+Actual GitHub QA result:
+
+- Run: `27205951679` (`QA`, `main`, commit `1075ebf4d8614b10f7595e8461306498bef798a3`)
+- URL: `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27205951679`
+- Conclusion: success.
+- Artifact: `qa-automation-27205951679`
+- Artifact id: `7507499757`
+- Artifact digest: `sha256:d3ee4cfcf92b52e4ba520563fd8ba4d7f93dda847cadb3070132175b50420801`
+- `qa-summary.json latestRun.status`: `passed`.
+- `qaVerdict.status`: `passed`.
+- `exitCode`: `0`.
+- `git.shortSha`: `1075ebf`; `dirty`: `false`.
+- Smoke summary: `156 passed, 0 failed`.
+- Required checks: `13 pass`.
+- Artifact integrity: `passed`.
+- Sample evidence: `passed`.
+- Demo safety evidence: `passed`.
+- Artifact sensitive scan: no `RGAPI`, `api_key`, `RIOT_API_KEY`, `Authorization`, `Bearer`, Riot host, `/lol/`, live Riot, or sample-generation matches.
 
 - [ ] **Step 5: Record the cycle**
 
