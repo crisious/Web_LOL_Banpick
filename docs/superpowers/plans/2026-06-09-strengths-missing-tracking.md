@@ -146,7 +146,7 @@ rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/strengths-missi
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -156,9 +156,34 @@ git commit -m "test: track missing strengths"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation commit:
+
+```text
+42764f1 test: track missing strengths
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence at 2026-06-09 10:43 KST:
+
+```text
+gh run watch 27178492759 --exit-status
+# success, job test-and-smoke in 21s
+
+artifact: qa-automation-27178492759
+artifact id: 7496633341
+headSha: 42764f1c81547117ba45be915f41779bb6f36cdb
+qaVerdict.status=passed
+requiredChecks=13/13
+smokeSummary=156 passed / 0 failed
+mode=readonly
+durationMs=217
+
+rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/gh-run-27178492759
+# no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
