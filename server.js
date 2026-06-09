@@ -2680,7 +2680,12 @@ async function buildAnalysis(normalized, sampleId) {
         )
       )
         ? "missing.phaseSummaries"
-        : `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`;
+        : (
+          Array.isArray(primary.phaseSummaries) &&
+          primary.phaseSummaries.length < PHASE_SUMMARIES_MIN
+        )
+          ? `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`
+          : "shape.phaseSummaries.invalid";
     primary.phaseSummaries = buildPhaseSummaries(normalized);
     violations.push(phaseSummariesViolation);
   }
