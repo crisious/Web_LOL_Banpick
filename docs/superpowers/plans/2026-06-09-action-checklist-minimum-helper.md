@@ -173,7 +173,7 @@ sensitive artifact scan
 no matches
 ```
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Commit and push:
 
@@ -183,6 +183,32 @@ git commit -m "test: reuse action checklist minimum helper"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA**
+- [x] **Step 3: Verify GitHub QA**
 
 Watch the pushed `QA` workflow, download the uploaded `qa-automation-*` artifact, inspect `qa-summary.json`, and scan the artifact for the same sensitive patterns.
+
+Result:
+
+```text
+implementation commit
+569039c test: reuse action checklist minimum helper
+
+GitHub QA run
+27184746983 success
+headSha: 569039c42e9f148328a339af49cef3cd9b90ca9f
+
+artifact
+7498827438 qa-automation-27184746983, 3549 bytes
+
+qa-summary
+read-only smoke 156 passed, 0 failed
+durationMs: 198
+latestRun.qaVerdict.status: passed
+latestRun.ci.provider: github-actions
+latestRun.git.shortSha: 569039c
+dirty: false
+requiredCheckSummary total 13 / passed 13 / failed 0 / missing 0
+
+sensitive artifact scan
+no matches
+```
