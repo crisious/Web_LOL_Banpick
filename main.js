@@ -1007,7 +1007,7 @@ function championAvatarMarkup(name, size = "medium") {
     ? ` style="--champion-art:${artValue};--champion-art-position:${championAvatarPosition(name, size)}"`
     : "";
   queueChampionVersionLoad();
-  return `<span class="champion-avatar champion-avatar--${size}" aria-hidden="true" title="${display}" data-champion-name="${name || ""}" data-monogram="${monogram}"${artStyle}></span>`;
+  return `<span class="champion-avatar champion-avatar--${size}" aria-hidden="true" title="${escapeAttr(display)}" data-champion-name="${escapeAttr(name || "")}" data-monogram="${escapeAttr(monogram)}"${artStyle}></span>`;
 }
 
 function candidateResultToken(match) {
@@ -4507,9 +4507,9 @@ function renderChampionSummary(stats) {
   dom.championHistorySummary.innerHTML = cards
     .map((c) => `
       <article class="champion-history-summary__card">
-        <span class="champion-history-summary__label">${c.label}</span>
-        <strong class="champion-history-summary__value">${c.value}</strong>
-        <span class="champion-history-summary__note">${c.note}</span>
+        <span class="champion-history-summary__label">${escapeHtml(c.label)}</span>
+        <strong class="champion-history-summary__value">${escapeHtml(c.value)}</strong>
+        <span class="champion-history-summary__note">${escapeHtml(c.note)}</span>
       </article>
     `)
     .join("");
@@ -4554,7 +4554,7 @@ function renderChampionTable(byChampion, sortKey, sortDir) {
       <tr>
         <td class="champion-table__champion">
           ${championAvatarMarkup(c.champion, "small")}
-          <span>${championDisplayName(c.champion)}</span>
+          <span>${escapeHtml(championDisplayName(c.champion))}</span>
         </td>
         <td>${c.count}</td>
         <td class="${c.wrPct >= 60 ? "wr-strong" : c.wrPct < 50 ? "wr-weak" : ""}">${c.wrPct.toFixed(1)}%</td>
