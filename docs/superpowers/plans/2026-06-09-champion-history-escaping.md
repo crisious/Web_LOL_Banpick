@@ -140,7 +140,7 @@ Actual browser QA result:
 - Console warn/error log: `[]`.
 - Attempted localStorage fixture injection for unsafe champion-history payloads, but the Browser read-only evaluation scope does not expose `localStorage`/`window.localStorage`; unsafe payload rendering remains covered by the focused source-extraction regression test above.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -150,9 +150,33 @@ git commit -m "test: escape champion history content"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub Actions artifact**
+Actual implementation commit:
+
+- Commit: `060fa7e test: escape champion history content`
+- Push target: `origin/main`
+
+- [x] **Step 4: Verify GitHub Actions artifact**
 
 Watch the resulting `main` workflow run, download its `qa-automation-*` artifact, inspect `qa-summary.json`, and run the sensitive-string scan against the downloaded artifact.
+
+Actual GitHub QA result:
+
+- Run: `27203126737` (`QA`, `main`, commit `060fa7e4ac284606f3e5a4c34499a0678bdca880`)
+- URL: `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27203126737`
+- Conclusion: success.
+- Artifact: `qa-automation-27203126737`
+- Artifact id: `7506303303`
+- Artifact digest: `sha256:8b34273f1aafaafab55a4a4220d215239de64d13beeaede9740734cfaa6a1531`
+- `qa-summary.json latestRun.status`: `passed`.
+- `qaVerdict.status`: `passed`.
+- `exitCode`: `0`.
+- `git.shortSha`: `060fa7e`; `dirty`: `false`.
+- Smoke summary: `156 passed, 0 failed`.
+- Required checks: `13 pass`.
+- Artifact integrity: `passed`.
+- Sample evidence: `passed`.
+- Demo safety evidence: `passed`.
+- Artifact sensitive scan: no `RGAPI`, `api_key`, `RIOT_API_KEY`, `Authorization`, `Bearer`, Riot host, `/lol/`, live Riot, or sample-generation matches.
 
 - [ ] **Step 5: Record the cycle**
 
