@@ -2761,6 +2761,15 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(weaknessesViolation);
   }
   if (!hasValidActionChecklist(primary.actionChecklist)) {
+    const actionChecklistHasValidItemShapes = Array.isArray(primary.actionChecklist) &&
+      primary.actionChecklist.every((item) =>
+        item &&
+        isNonBlankString(item.id) &&
+        (
+          isNonBlankString(item.text) ||
+          isNonBlankString(item.action)
+        )
+      );
     const actionChecklistViolation = (
       primary.actionChecklist === undefined ||
       primary.actionChecklist === null ||
@@ -2772,7 +2781,8 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.actionChecklist"
       : (
         Array.isArray(primary.actionChecklist) &&
-        primary.actionChecklist.length < ACTION_CHECKLIST_MIN
+        primary.actionChecklist.length < ACTION_CHECKLIST_MIN &&
+        actionChecklistHasValidItemShapes
       )
         ? `count.actionChecklist<${ACTION_CHECKLIST_MIN}`
         : "shape.actionChecklist.invalid";
