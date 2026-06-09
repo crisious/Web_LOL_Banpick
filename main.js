@@ -1893,7 +1893,7 @@ function evidenceMap(sample) {
         timestamp: entry.timestampLabel || entry.timestamp || "-",
         eventType: entry.eventType || "-",
         summary: entry.summary || "",
-        statNote: entry.laneHint ? `위치 ${entry.laneHint}` : entry.phase ? `${entry.phase} 구간` : "",
+        statNote: entry.laneHint ? `위치 ${entry.laneHint}` : entry.phase ? `${gamePhaseLabel(entry.phase)} 구간` : "",
       },
     ]),
   );
@@ -2231,7 +2231,7 @@ function renderKeyMoments(sample) {
         <article class="moment-card">
           <div class="moment-stamp">
             <span>${escapeHtml(moment.timestamp || moment.timestampLabel)}</span>
-            <strong>${escapeHtml(keyMomentPhase(moment))}</strong>
+            <strong>${escapeHtml(gamePhaseLabel(keyMomentPhase(moment)))}</strong>
           </div>
           <div class="moment-copy">
             <h4>${escapeHtml(moment.label || moment.title)}</h4>
@@ -2361,7 +2361,7 @@ function renderEvidence(sample) {
         timestamp: entry.timestamp || entry.timestampLabel || tl?.timestamp || "—",
         eventType: entry.eventType || tl?.eventType || "—",
         summary: entry.shortNote || entry.note || entry.summary || tl?.summary || "",
-        statNote: entry.statNote || (entry.phase ? `${entry.phase} 구간` : tl?.statNote || ""),
+        statNote: entry.statNote || (entry.phase ? `${gamePhaseLabel(entry.phase)} 구간` : tl?.statNote || ""),
       };
     });
   } else {
