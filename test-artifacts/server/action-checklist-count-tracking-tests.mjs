@@ -28,6 +28,14 @@ function extractConstSource(source, name) {
 }
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
+const hasValidActionChecklistSrc = extractFunctionSource(serverSrc, "hasValidActionChecklist");
+const actionChecklistMinimumSource = serverSrc.includes("function hasMinimumActionChecklist(")
+  ? extractFunctionSource(serverSrc, "hasMinimumActionChecklist")
+  : `
+function hasMinimumActionChecklist(actionChecklist) {
+  return Array.isArray(actionChecklist) && actionChecklist.length >= ACTION_CHECKLIST_MIN;
+}
+`;
 
 const supportSources = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
@@ -50,7 +58,8 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasValidMatchSummary"),
   extractFunctionSource(serverSrc, "hasValidCoachSummary"),
   extractFunctionSource(serverSrc, "hasValidEvidenceIndex"),
-  extractFunctionSource(serverSrc, "hasValidActionChecklist"),
+  actionChecklistMinimumSource,
+  hasValidActionChecklistSrc,
   extractFunctionSource(serverSrc, "hasValidInsightItemShapes"),
   extractFunctionSource(serverSrc, "hasValidInsightList"),
   extractFunctionSource(serverSrc, "hasValidCombatAnalysis"),
@@ -249,6 +258,18 @@ check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
   "buildAnalysis tracks short action checklists separately",
   buildAnalysisSrc.includes("count.actionChecklist<${ACTION_CHECKLIST_MIN}"),
+);
+checkTrue(
+  "server defines shared action checklist minimum helper",
+  serverSrc.includes("function hasMinimumActionChecklist"),
+);
+checkTrue(
+  "hasValidActionChecklist reuses minimum helper",
+  hasValidActionChecklistSrc.includes("hasMinimumActionChecklist(actionChecklist)"),
+);
+checkTrue(
+  "buildAnalysis checks action checklist minimum helper for count",
+  buildAnalysisSrc.includes("hasMinimumActionChecklist(primary.actionChecklist)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

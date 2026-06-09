@@ -2383,9 +2383,12 @@ function hasValidEvidenceIndex(evidenceIndex) {
     );
 }
 
+function hasMinimumActionChecklist(actionChecklist) {
+  return Array.isArray(actionChecklist) && actionChecklist.length >= ACTION_CHECKLIST_MIN;
+}
+
 function hasValidActionChecklist(actionChecklist) {
-  return Array.isArray(actionChecklist) &&
-    actionChecklist.length >= ACTION_CHECKLIST_MIN &&
+  return hasMinimumActionChecklist(actionChecklist) &&
     actionChecklist.length <= ACTION_CHECKLIST_MAX &&
     actionChecklist.every((item) =>
       item &&
@@ -2806,7 +2809,7 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.actionChecklist"
       : (
         Array.isArray(primary.actionChecklist) &&
-        primary.actionChecklist.length < ACTION_CHECKLIST_MIN &&
+        !hasMinimumActionChecklist(primary.actionChecklist) &&
         actionChecklistHasValidItemShapes
       )
         ? `count.actionChecklist<${ACTION_CHECKLIST_MIN}`

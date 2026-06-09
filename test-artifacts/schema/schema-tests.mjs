@@ -91,6 +91,9 @@ if (serverSrc.includes("const ACTION_CHECKLIST_MIN =")) {
 if (serverSrc.includes("const ACTION_CHECKLIST_MAX =")) {
   validatorSupportSources.push(extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"));
 }
+if (serverSrc.includes("function hasMinimumActionChecklist(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasMinimumActionChecklist"));
+}
 if (serverSrc.includes("function hasValidActionChecklist(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidActionChecklist"));
 }
