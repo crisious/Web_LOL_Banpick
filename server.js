@@ -2650,8 +2650,18 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(`count.phaseSummaries<${PHASE_SUMMARIES_MIN}`);
   }
   if (!hasValidKeyMoments(primary.keyMoments)) {
+    const keyMomentsViolation = (
+      primary.keyMoments === undefined ||
+      primary.keyMoments === null ||
+      (
+        Array.isArray(primary.keyMoments) &&
+        primary.keyMoments.length === 0
+      )
+    )
+      ? "missing.keyMoments"
+      : "shape.keyMoments.invalid";
     primary.keyMoments = buildKeyMoments(normalized);
-    violations.push("shape.keyMoments.invalid");
+    violations.push(keyMomentsViolation);
   }
   if (!hasValidEvidenceIndex(primary.evidenceIndex)) {
     const evidenceIndexViolation = (
