@@ -156,7 +156,7 @@ rg sensitive-output scan on test-artifacts/tmp/teamfight-analysis-violation-trac
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -166,9 +166,31 @@ git commit -m "test: track malformed teamfight analysis"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation commit evidence:
+
+```text
+commit d57e54a test: track malformed teamfight analysis
+push: 9aa8e5c..d57e54a main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Actual implementation GitHub QA evidence at 2026-06-09 09:32 KST:
+
+```text
+workflow: QA
+run: 27175978961
+headSha: d57e54acf9a455c73391b0db97368e60093148d9
+artifact: qa-automation-27175978961 / 7495734394
+qaStatus: passed
+requiredChecks: 13/13
+smoke: 156 passed / 0 failed
+durationMs: 188
+mode: readonly
+artifact sensitive-output scan: no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
