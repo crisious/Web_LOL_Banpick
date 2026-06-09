@@ -2646,8 +2646,18 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push("type.phaseSummaries.object");
   }
   if (!hasValidPhaseSummaries(primary.phaseSummaries)) {
+    const phaseSummariesViolation = (
+      primary.phaseSummaries === undefined ||
+      primary.phaseSummaries === null ||
+      (
+        Array.isArray(primary.phaseSummaries) &&
+        primary.phaseSummaries.length === 0
+      )
+    )
+      ? "missing.phaseSummaries"
+      : `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`;
     primary.phaseSummaries = buildPhaseSummaries(normalized);
-    violations.push(`count.phaseSummaries<${PHASE_SUMMARIES_MIN}`);
+    violations.push(phaseSummariesViolation);
   }
   if (!hasValidKeyMoments(primary.keyMoments)) {
     const keyMomentsViolation = (
