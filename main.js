@@ -381,6 +381,13 @@ function ratingLabel(rating) {
   return "보통";
 }
 
+function gamePhaseLabel(phase) {
+  if (phase === "EARLY") return "초반";
+  if (phase === "MID") return "중반";
+  if (phase === "LATE") return "후반";
+  return "구간";
+}
+
 function resultLabel(result) {
   return result === "WIN" ? "승리" : "패배";
 }
@@ -2090,7 +2097,7 @@ function renderPhaseCard(phase) {
   return `
         <article class="phase-card" data-rating="${escapeAttr(phase?.rating || "")}">
           <div class="phase-card__top">
-            <span class="phase-tag">${escapeHtml(phase?.phase || "")}</span>
+            <span class="phase-tag">${escapeHtml(gamePhaseLabel(phase?.phase))}</span>
             <span class="phase-rating">${ratingLabel(phase?.rating)}</span>
           </div>
           <p class="phase-summary">${escapeHtml(phase?.summary || "")}</p>${focusHtml}

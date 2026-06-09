@@ -35,12 +35,13 @@ const htmlEscapeSrc = extractConstSource(mainSrc, "HTML_ESCAPE");
 const escapeHtmlSrc = extractFunctionSource(mainSrc, "escapeHtml");
 const escapeAttrSrc = extractFunctionSource(mainSrc, "escapeAttr");
 const ratingLabelSrc = extractFunctionSource(mainSrc, "ratingLabel");
+const gamePhaseLabelSrc = extractFunctionSource(mainSrc, "gamePhaseLabel");
 const phaseFocusTextSrc = extractFunctionSource(mainSrc, "phaseFocusText");
 const renderPhaseCardSrc = extractFunctionSource(mainSrc, "renderPhaseCard");
 const renderPhasesSrc = extractFunctionSource(mainSrc, "renderPhases");
 
 const { phaseFocusText, renderPhaseCard } = new Function(
-  `${htmlEscapeSrc}\n${escapeHtmlSrc}\n${escapeAttrSrc}\n${ratingLabelSrc}\n${phaseFocusTextSrc}\n${renderPhaseCardSrc}\nreturn { phaseFocusText, renderPhaseCard };`,
+  `${htmlEscapeSrc}\n${escapeHtmlSrc}\n${escapeAttrSrc}\n${ratingLabelSrc}\n${gamePhaseLabelSrc}\n${phaseFocusTextSrc}\n${renderPhaseCardSrc}\nreturn { phaseFocusText, renderPhaseCard };`,
 )();
 
 let pass = 0;
@@ -88,7 +89,8 @@ const unsafeHtml = renderPhaseCard({
   summary: "후반 <위험> & 확인",
   focus: "다음 <체크>",
 });
-checkTrue("card escapes phase text", unsafeHtml.includes("LATE&lt;script&gt;"));
+checkTrue("card uses fallback phase label for unsafe phase text", unsafeHtml.includes('<span class="phase-tag">구간</span>'));
+checkTrue("card does not leak unsafe raw phase text", !unsafeHtml.includes("LATE&lt;script&gt;"));
 checkTrue("card escapes summary text", unsafeHtml.includes("후반 &lt;위험&gt; &amp; 확인"));
 checkTrue("card escapes focus text", unsafeHtml.includes("다음 &lt;체크&gt;"));
 checkTrue("card escapes rating attribute", unsafeHtml.includes('data-rating="BAD&quot; data-x=&quot;1"'));
