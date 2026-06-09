@@ -2613,13 +2613,21 @@ async function buildAnalysis(normalized, sampleId) {
     primary.matchSummary = { headline: primary.matchSummary };
     violations.push("type.matchSummary.string");
   } else if (!primary.matchSummary || typeof primary.matchSummary !== "object" || Array.isArray(primary.matchSummary)) {
+    const matchSummaryViolation = (
+      primary.matchSummary === undefined ||
+      primary.matchSummary === null
+    )
+      ? "missing.matchSummary"
+      : "type.matchSummary.invalid";
     primary.matchSummary = {};
-    violations.push("type.matchSummary.invalid");
+    violations.push(matchSummaryViolation);
   }
   if (!hasValidMatchSummary(primary.matchSummary)) {
     const fb = buildRuleBasedAnalysis(normalized, sampleId);
     primary.matchSummary.headline = fb.matchSummary.headline;
-    violations.push("missing.matchSummary.headline");
+    if (!violations.includes("missing.matchSummary")) {
+      violations.push("missing.matchSummary.headline");
+    }
   }
   // coachSummary: AI가 string으로 반환하는 경우 → 객체로 정규화
   if (typeof primary.coachSummary === "string") {
