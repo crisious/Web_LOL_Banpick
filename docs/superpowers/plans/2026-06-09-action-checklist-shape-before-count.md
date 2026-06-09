@@ -170,7 +170,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riot
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -180,9 +180,45 @@ git commit -m "test: track malformed short action checklists"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Implementation commit evidence (2026-06-09 12:32 KST):
+
+```text
+git commit -m "test: track malformed short action checklists"
+# [main 83c98f7] test: track malformed short action checklists
+# 3 files changed, 470 insertions(+), 1 deletion(-)
+
+git push origin main
+# 649b7ee..83c98f7  main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence (2026-06-09 12:33 KST):
+
+```text
+gh run watch 27182064203 --exit-status
+# main QA passed
+# test-and-smoke completed in 21s
+
+gh api repos/crisious/Web_LOL_Banpick/actions/runs/27182064203/artifacts --jq '.artifacts[] | {id, name, size_in_bytes, expired}'
+# {"expired":false,"id":7497890625,"name":"qa-automation-27182064203","size_in_bytes":3549}
+
+qa-summary.json
+# latestRun.status: passed
+# latestRun.qaVerdict.status: passed
+# latestRun.smokeSummary: 156 passed, 0 failed
+# latestRun.requiredCheckSummary: 13 passed, 0 failed, 0 missing
+# latestRun.durationMs: 214
+# latestRun.git.shortSha: 83c98f7
+# latestRun.git.dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riotgames\.com|americas\.api\.riotgames\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27182064203
+# no matches
+```
+
+Obsidian project improvement note updated with the action checklist shape-before-count implementation record.
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
