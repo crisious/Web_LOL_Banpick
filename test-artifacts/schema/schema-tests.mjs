@@ -834,6 +834,22 @@ expectOk("teamfightPhaseAnalysis: valid item passes", () => {
   validateAnalysisOutput(withTeamfightPhaseAnalysis([teamfightPhaseItem()]));
 });
 
+expectThrows("teamfightPhaseAnalysis: invalid phase enum throws",
+  () => {
+    const item = teamfightPhaseItem();
+    item.phases[0].phase = "LANING";
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "phase");
+
+expectThrows("teamfightPhaseAnalysis: invalid outcomeTag enum throws",
+  () => {
+    const item = teamfightPhaseItem();
+    item.phases[0].outcomeTag = "UNKNOWN_OUTCOME";
+    validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
+  },
+  "outcomeTag");
+
 expectThrows("teamfightPhaseAnalysis: object instead of array throws",
   () => validateAnalysisOutput(withTeamfightPhaseAnalysis({ enc_001: teamfightPhaseItem() })),
   "teamfightPhaseAnalysis not array");

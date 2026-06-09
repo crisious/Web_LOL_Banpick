@@ -2489,6 +2489,20 @@ function hasValidCombatAnalysis(combatAnalysis) {
 }
 
 function hasValidTeamfightPhaseAnalysis(teamfightPhaseAnalysis) {
+  const teamfightPhases = new Set(["ENGAGE", "TRADE", "CLEANUP"]);
+  const teamfightOutcomeTags = new Set([
+    "INITIATED_KILL",
+    "CAUGHT_OUT",
+    "TRADE_WON",
+    "TRADE_LOST",
+    "TRADE_EVEN",
+    "CLOSED_OUT",
+    "OVERCHASE_DEATH",
+    "DIED_IN_FIGHT",
+  ]);
+  const isValidTeamfightPhaseValue = (value) => isNonBlankString(value) && teamfightPhases.has(value);
+  const isValidTeamfightOutcomeTagValue = (value) => isNonBlankString(value) && teamfightOutcomeTags.has(value);
+
   return teamfightPhaseAnalysis === undefined ||
     teamfightPhaseAnalysis === null ||
     (
@@ -2501,8 +2515,8 @@ function hasValidTeamfightPhaseAnalysis(teamfightPhaseAnalysis) {
         tf.phases.length > 0 &&
         tf.phases.every((phase) =>
           phase &&
-          isNonBlankString(phase.phase) &&
-          isNonBlankString(phase.outcomeTag) &&
+          isValidTeamfightPhaseValue(phase.phase) &&
+          isValidTeamfightOutcomeTagValue(phase.outcomeTag) &&
           Number.isInteger(phase.playerKills) &&
           phase.playerKills >= 0 &&
           Number.isInteger(phase.playerDeaths) &&
@@ -2544,14 +2558,28 @@ function validateAnalysisOutput(json) {
   }
   // 한타 단계별 분석은 선택적 — 있으면 UI가 렌더링하는 phase/coaching shape까지 검증.
   if (!hasValidTeamfightPhaseAnalysis(json.teamfightPhaseAnalysis)) {
+    const teamfightPhases = new Set(["ENGAGE", "TRADE", "CLEANUP"]);
+    const teamfightOutcomeTags = new Set([
+      "INITIATED_KILL",
+      "CAUGHT_OUT",
+      "TRADE_WON",
+      "TRADE_LOST",
+      "TRADE_EVEN",
+      "CLOSED_OUT",
+      "OVERCHASE_DEATH",
+      "DIED_IN_FIGHT",
+    ]);
+    const isValidTeamfightPhaseValue = (value) => isNonBlankString(value) && teamfightPhases.has(value);
+    const isValidTeamfightOutcomeTagValue = (value) => isNonBlankString(value) && teamfightOutcomeTags.has(value);
+
     if (!Array.isArray(json.teamfightPhaseAnalysis)) throw new Error("teamfightPhaseAnalysis not array");
     for (const tf of json.teamfightPhaseAnalysis) {
       if (!tf || !isNonBlankString(tf.teamfightId)) throw new Error("teamfightPhaseAnalysis item missing teamfightId");
       if (!isNonBlankString(tf.takeaway)) throw new Error("teamfightPhaseAnalysis item missing takeaway");
       if (!Array.isArray(tf.phases) || tf.phases.length === 0) throw new Error("teamfightPhaseAnalysis item phases not array");
       for (const phase of tf.phases) {
-        if (!phase || !isNonBlankString(phase.phase)) throw new Error("teamfightPhaseAnalysis phase missing phase");
-        if (!isNonBlankString(phase.outcomeTag)) throw new Error("teamfightPhaseAnalysis phase missing outcomeTag");
+        if (!phase || !isValidTeamfightPhaseValue(phase.phase)) throw new Error("teamfightPhaseAnalysis phase missing phase");
+        if (!isValidTeamfightOutcomeTagValue(phase.outcomeTag)) throw new Error("teamfightPhaseAnalysis phase missing outcomeTag");
         if (!Number.isInteger(phase.playerKills) || phase.playerKills < 0) throw new Error("teamfightPhaseAnalysis phase missing playerKills");
         if (!Number.isInteger(phase.playerDeaths) || phase.playerDeaths < 0) throw new Error("teamfightPhaseAnalysis phase missing playerDeaths");
         if (!isNonBlankString(phase.coaching)) throw new Error("teamfightPhaseAnalysis phase missing coaching");
