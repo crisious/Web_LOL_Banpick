@@ -157,7 +157,8 @@
       "takeaway": "초반 유리한 구도에서 공격적으로 플레이한 좋은 판단이다. 이런 성공 패턴을 유지하자.",
       "relatedEventIds": [
         "evt_008"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     },
     {
       "encounterId": "enc_002",
@@ -167,7 +168,8 @@
       "relatedEventIds": [
         "evt_015",
         "evt_016"
-      ]
+      ],
+      "situation": "TRADED"
     },
     {
       "encounterId": "enc_003",
@@ -176,7 +178,8 @@
       "takeaway": "중반 이후 혼자 시야가 없는 구역에 진입하지 않는다. 항상 팀원 근처에서 행동한다.",
       "relatedEventIds": [
         "evt_021"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_004",
@@ -185,7 +188,8 @@
       "takeaway": "오브젝트 주변에서의 CC 활용과 포지셔닝이 잘 된 사례. 이 거리감을 기억하자.",
       "relatedEventIds": [
         "evt_027"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     },
     {
       "encounterId": "enc_005",
@@ -194,7 +198,8 @@
       "takeaway": "바론 스폰 1분 전부터는 절대 혼자 움직이지 않는다. 팀과 함께 시야 확보 후 이동한다.",
       "relatedEventIds": [
         "evt_029"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_006",
@@ -203,7 +208,8 @@
       "takeaway": "팀과 함께하는 교전에서 모르가나의 가치가 극대화된다. 단독 행동보다 팀 합류를 우선한다.",
       "relatedEventIds": [
         "evt_034"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     },
     {
       "encounterId": "enc_007",
@@ -212,7 +218,8 @@
       "takeaway": "타워 다이브나 압박 후 반드시 후퇴 타이밍을 정해두고, 존야를 방어적으로 활용한다.",
       "relatedEventIds": [
         "evt_037"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_008",
@@ -221,7 +228,8 @@
       "takeaway": "후반 교전에서는 R+존야 진입보다 후방에서 Q로 이니시 보조 역할을 고려한다.",
       "relatedEventIds": [
         "evt_041"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     }
   ],
   "teamfightPhaseAnalysis": [],

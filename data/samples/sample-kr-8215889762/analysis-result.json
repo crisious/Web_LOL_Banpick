@@ -173,7 +173,8 @@
       "takeaway": "초반 오브젝트 손실 직후 90초는 라인 1.5칸 뒤·제어 와드 우선으로 안전 거리 확보.",
       "relatedEventIds": [
         "evt_004"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_002",
@@ -182,7 +183,8 @@
       "takeaway": "같은 시간대 데스가 반복되면 라인 우선순위를 한 단계 낮추고 정글 동선 확인 후 진입.",
       "relatedEventIds": [
         "evt_005"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_003",
@@ -191,7 +193,8 @@
       "takeaway": "셋업 단계 시야는 팀과 2인 1조로 — 단독 와딩은 16분 이후 위험도가 급증한다.",
       "relatedEventIds": [
         "evt_007"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_004",
@@ -200,7 +203,8 @@
       "takeaway": "교전 승리 후 30초는 무조건 후퇴/리셋 — 추격 본능을 한 박자 늦추기.",
       "relatedEventIds": [
         "evt_013"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_005",
@@ -209,7 +213,8 @@
       "takeaway": "바론·드래곤 손실 직후 30~60초는 본진 라인 안쪽 리셋 — 시야 갱신은 다음 셋업으로 미룬다.",
       "relatedEventIds": [
         "evt_017"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     }
   ],
   "evidenceIndex": [

@@ -2216,7 +2216,7 @@ phaseSummaries는 3개 이상의 배열이다 (객체 아님). keyMoments는 4�
 strengths와 weaknesses는 각각 3개의 배열이다.
 actionChecklist는 3~5개의 배열이다.
 evidenceIndex는 1개 이상의 배열이며 각 항목은 eventId와 shortNote 또는 summary를 포함한다.
-combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당 1개씩 작성하되, 입력에 encounter가 없으면 빈 배열을 반환한다.
+combatAnalysis는 배열이다. 입력 payload의 combatEncounters 각 항목당 1개씩 작성하되, 입력에 encounter가 없으면 빈 배열을 반환한다. situation은 PLAYER_DOMINANT, PLAYER_DOWN, TRADED 중 하나다.
 teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 항목당 1개씩 작성하되, 입력에 teamfightPhases가 없으면 빈 배열을 반환한다.
 
 {
@@ -2233,7 +2233,7 @@ teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 �
   "weaknesses": [{ "id": "wk_1", "title": "...", "description": "...", "relatedEventIds": ["evt_002"] }],
   "actionChecklist": [{ "id": "act_1", "text": "...", "linkedWeaknessId": "wk_1" }],
   "keyMoments": [{ "id": "km_1", "timestampLabel": "...", "phase": "EARLY", "title": "...", "description": "...", "relatedEventIds": ["evt_003"] }],
-  "combatAnalysis": [{ "encounterId": "enc_001", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
+  "combatAnalysis": [{ "encounterId": "enc_001", "situation": "PLAYER_DOWN", "situationLabel": "초반 갱킹 손실", "playerDecision": "정글 시야 없이 라인 푸시 진입", "takeaway": "갱킹 위험 시간대(2~5분)에는 부쉬 핑크 와드 우선", "relatedEventIds": ["evt_004"] }],
   "teamfightPhaseAnalysis": [{
     "teamfightId": "enc_001",
     "phases": [
@@ -2256,7 +2256,8 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상.
 모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "claude_ai".
 
-combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. situationLabel은
+combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. situation은 입력 encounter의
+\`situation\` 값을 그대로 반영하며 PLAYER_DOMINANT, PLAYER_DOWN, TRADED 중 하나여야 한다. situationLabel은
 교전 상황(예: "초반 라인전 솔로킬", "오브젝트 셋업 중 cut off", "한타 백라인 진입 후 cut off")을 한 줄로 요약,
 playerDecision은 그 순간 플레이어의 판단/포지셔닝을 사실 기반으로 기술, takeaway는 다음에 같은 상황에서
 적용할 짧은 교훈. encounterId와 relatedEventIds는 입력값을 그대로 반영. 입력 encounter가 0개면
@@ -2301,7 +2302,8 @@ ${OUTPUT_SCHEMA_EXAMPLE}
 장점 3개, 단점 3개, 다음 게임 체크리스트 3~5개, 핵심 장면 4개 이상.
 모든 장점/단점에 relatedEventIds 포함. analysisMeta.sourceType = "codex_redteam".
 
-combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. 레드팀 관점으로
+combatAnalysis: 입력 payload의 combatEncounters 각 encounter마다 1개 항목 작성. \`situation\`은 입력
+encounter의 값을 그대로 반영하며 PLAYER_DOMINANT, PLAYER_DOWN, TRADED 중 하나여야 한다. 레드팀 관점으로
 판단 실수와 구조적 약점을 더 날카롭게 지적. 입력 encounter가 0개면 빈 배열.
 
 teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(\`teamfightId\`)마다 1개씩 작성. 각 \`phases\` row는 입력 phase row의 \`phase\`, \`outcomeTag\`, \`playerKills\`, \`playerDeaths\`, \`relatedEventIds\`를 그대로 반영하고, \`coaching\`은 레드팀 관점에서 국면별 판단 실수를 날카롭게 지적. \`takeaway\`는 이 한타의 핵심 교훈 한 줄. 입력 teamfightPhases가 0개면 빈 배열.
@@ -2472,6 +2474,9 @@ function hasValidInsightList(items) {
 }
 
 function hasValidCombatAnalysis(combatAnalysis) {
+  const combatSituations = new Set(["PLAYER_DOMINANT", "PLAYER_DOWN", "TRADED"]);
+  const isValidCombatSituation = (value) => isNonBlankString(value) && combatSituations.has(value);
+
   return combatAnalysis === undefined ||
     combatAnalysis === null ||
     (
@@ -2479,6 +2484,7 @@ function hasValidCombatAnalysis(combatAnalysis) {
       combatAnalysis.every((item) =>
         item &&
         isNonBlankString(item.encounterId) &&
+        isValidCombatSituation(item.situation) &&
         isNonBlankString(item.situationLabel) &&
         isNonBlankString(item.playerDecision) &&
         isNonBlankString(item.takeaway) &&
@@ -2545,9 +2551,13 @@ function validateAnalysisOutput(json) {
   // Phase 32: combatAnalysis는 선택적 — 없거나 빈 배열이면 통과 (기존 코호트 backward-compat).
   // 있으면 UI가 렌더링하는 판단/교훈/근거 링크 필드까지 검증.
   if (json.combatAnalysis !== undefined && json.combatAnalysis !== null) {
+    const combatSituations = new Set(["PLAYER_DOMINANT", "PLAYER_DOWN", "TRADED"]);
+    const isValidCombatSituation = (value) => isNonBlankString(value) && combatSituations.has(value);
+
     if (!Array.isArray(json.combatAnalysis)) throw new Error("combatAnalysis not array");
     for (const item of json.combatAnalysis) {
       if (!item || !isNonBlankString(item.encounterId)) throw new Error("combatAnalysis item missing encounterId");
+      if (!isValidCombatSituation(item.situation)) throw new Error("combatAnalysis item missing situation");
       if (!isNonBlankString(item.situationLabel)) throw new Error("combatAnalysis item missing situationLabel");
       if (!isNonBlankString(item.playerDecision)) throw new Error("combatAnalysis item missing playerDecision");
       if (!isNonBlankString(item.takeaway)) throw new Error("combatAnalysis item missing takeaway");

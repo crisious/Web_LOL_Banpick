@@ -694,6 +694,7 @@ expectOk("combatAnalysis: valid item passes", () => {
   validateAnalysisOutput(withCombat([
     {
       encounterId: "enc_001",
+      situation: "PLAYER_DOWN",
       situationLabel: "초반 갱킹 손실",
       playerDecision: "시야 없이 라인 압박을 유지",
       takeaway: "와드 우선",
@@ -706,17 +707,39 @@ expectThrows("combatAnalysis: object instead of array throws",
   () => validateAnalysisOutput(withCombat({ enc_001: { takeaway: "x" } })),
   "combatAnalysis not array");
 
+expectThrows("combatAnalysis: missing situation throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situationLabel: "초반 갱킹 손실",
+    playerDecision: "판단",
+    takeaway: "교훈",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "situation");
+
+expectThrows("combatAnalysis: invalid situation enum throws",
+  () => validateAnalysisOutput(withCombat([{
+    encounterId: "enc_001",
+    situation: "UNKNOWN",
+    situationLabel: "초반 갱킹 손실",
+    playerDecision: "판단",
+    takeaway: "교훈",
+    relatedEventIds: ["evt_001"],
+  }])),
+  "situation");
+
 expectThrows("combatAnalysis: missing encounterId throws",
-  () => validateAnalysisOutput(withCombat([{ situationLabel: "x", takeaway: "y" }])),
+  () => validateAnalysisOutput(withCombat([{ situation: "PLAYER_DOWN", situationLabel: "x", takeaway: "y" }])),
   "encounterId");
 
 expectThrows("combatAnalysis: missing situationLabel throws",
-  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", takeaway: "y" }])),
+  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situation: "PLAYER_DOWN", takeaway: "y" }])),
   "situationLabel");
 
 expectThrows("combatAnalysis: missing takeaway throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "판단",
     relatedEventIds: ["evt_001"],
@@ -726,6 +749,7 @@ expectThrows("combatAnalysis: missing takeaway throws",
 expectThrows("combatAnalysis: blank encounterId throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "   ",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "판단",
     takeaway: "y",
@@ -736,6 +760,7 @@ expectThrows("combatAnalysis: blank encounterId throws",
 expectThrows("combatAnalysis: missing playerDecision throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     takeaway: "y",
     relatedEventIds: ["evt_001"],
@@ -745,6 +770,7 @@ expectThrows("combatAnalysis: missing playerDecision throws",
 expectThrows("combatAnalysis: blank playerDecision throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "   ",
     takeaway: "y",
@@ -755,6 +781,7 @@ expectThrows("combatAnalysis: blank playerDecision throws",
 expectThrows("combatAnalysis: blank takeaway throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "판단",
     takeaway: "   ",
@@ -765,6 +792,7 @@ expectThrows("combatAnalysis: blank takeaway throws",
 expectThrows("combatAnalysis: missing relatedEventIds throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "판단",
     takeaway: "y",
@@ -774,6 +802,7 @@ expectThrows("combatAnalysis: missing relatedEventIds throws",
 expectThrows("combatAnalysis: invalid relatedEventIds throws",
   () => validateAnalysisOutput(withCombat([{
     encounterId: "enc_001",
+    situation: "PLAYER_DOWN",
     situationLabel: "x",
     playerDecision: "판단",
     takeaway: "y",
@@ -782,7 +811,7 @@ expectThrows("combatAnalysis: invalid relatedEventIds throws",
   "relatedEventIds");
 
 expectThrows("combatAnalysis: empty string situationLabel throws",
-  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situationLabel: "", takeaway: "y" }])),
+  () => validateAnalysisOutput(withCombat([{ encounterId: "enc_001", situation: "PLAYER_DOWN", situationLabel: "", takeaway: "y" }])),
   "situationLabel");
 
 // ─── teamfightPhaseAnalysis 검증 (선택적 필드, shape contract) ───────────────

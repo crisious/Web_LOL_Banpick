@@ -158,7 +158,8 @@
       "takeaway": "노틸러스 Q 진입 전 ADC 위치와 스킬 쿨타임을 확인하고, 아군이 따라올 수 없는 상황이면 진입을 참는다.",
       "relatedEventIds": [
         "evt_002"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_002",
@@ -167,7 +168,8 @@
       "takeaway": "아군이 근처에 있는 상황에서의 적극적 진입은 효과적이다. 이런 조건을 만들어 진입하는 습관을 유지한다.",
       "relatedEventIds": [
         "evt_009"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     },
     {
       "encounterId": "enc_003",
@@ -176,7 +178,8 @@
       "takeaway": "같은 패턴의 데스가 반복되고 있다. 진입 전 '아군이 2명 이상 근처에 있는가'를 체크리스트로 삼는다.",
       "relatedEventIds": [
         "evt_011"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_004",
@@ -185,7 +188,8 @@
       "takeaway": "교전 승리 후 추가 킬까지 만든 좋은 판단이었다. 이후 오브젝트 전환(타워·드래곤)까지 연결하면 완벽하다.",
       "relatedEventIds": [
         "evt_016"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     }
   ],
   "teamfightPhaseAnalysis": [],

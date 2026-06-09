@@ -183,7 +183,8 @@
       "takeaway": "초반 레벨링 구간에서는 상대 스킬 쿨타임과 소환사 주문을 확인한 뒤 교전을 시도한다.",
       "relatedEventIds": [
         "evt_001"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_002",
@@ -192,7 +193,8 @@
       "takeaway": "CC 연계가 확실할 때 공격적으로 진입하는 판단은 정확했다. 이 타이밍 감각을 유지한다.",
       "relatedEventIds": [
         "evt_009"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     },
     {
       "encounterId": "enc_003",
@@ -201,7 +203,8 @@
       "takeaway": "킬 획득 후에는 체력/쿨타임을 점검하고 무리한 추가 교전을 피한다.",
       "relatedEventIds": [
         "evt_011"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_004",
@@ -210,7 +213,8 @@
       "takeaway": "중반 전환기에는 시야가 부족한 구간을 혼자 이동하지 않는다.",
       "relatedEventIds": [
         "evt_019"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_005",
@@ -219,7 +223,8 @@
       "takeaway": "로테이션 시 팀원과의 거리를 항상 확인하고, 2인 이상 동행한다.",
       "relatedEventIds": [
         "evt_026"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_006",
@@ -228,7 +233,8 @@
       "takeaway": "진입 깊이를 W 이탈 가능 범위 내로 제한한다.",
       "relatedEventIds": [
         "evt_030"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_007",
@@ -237,7 +243,8 @@
       "takeaway": "부활 후 바로 전선에 복귀하기보다 팀 상황을 파악한 뒤 안전하게 합류한다.",
       "relatedEventIds": [
         "evt_032"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_008",
@@ -246,7 +253,8 @@
       "takeaway": "25분 이후에는 혼자 와딩하러 가지 않고, 팀원의 엄호 하에 시야를 설치한다.",
       "relatedEventIds": [
         "evt_039"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     }
   ],
   "evidenceIndex": [

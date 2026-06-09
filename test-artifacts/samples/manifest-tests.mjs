@@ -45,6 +45,8 @@ const invalidPublicPaths = [];
 const rawExposures = [];
 const invalidBundles = [];
 const invalidPhaseSummaries = [];
+const validCombatSituations = new Set(["PLAYER_DOMINANT", "PLAYER_DOWN", "TRADED"]);
+const invalidCombatSituations = [];
 
 try {
   validateManifest(manifest);
@@ -94,6 +96,13 @@ for (const sample of samples) {
     ) {
       invalidPhaseSummaries.push(`${sample.id}:analysis.phaseSummaries`);
     }
+    if (Array.isArray(analysis.combatAnalysis)) {
+      analysis.combatAnalysis.forEach((item, index) => {
+        if (!validCombatSituations.has(item?.situation)) {
+          invalidCombatSituations.push(`${sample.id}:combatAnalysis[${index}].situation`);
+        }
+      });
+    }
   } catch (error) {
     invalidBundles.push(`${sample.id}:${error.message}`);
   }
@@ -112,6 +121,9 @@ check("normalized and analysis bundles have report essentials", invalidBundles.l
 check("analysis phase summaries match UI display contract",
   invalidPhaseSummaries.length === 0,
   invalidPhaseSummaries.slice(0, 10).join(", "));
+check("stored combat analysis includes valid situation chips",
+  invalidCombatSituations.length === 0,
+  invalidCombatSituations.slice(0, 10).join(", "));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

@@ -159,7 +159,8 @@
       "takeaway": "오브젝트 확보 직후에는 반드시 팀 합류 거리를 유지하고, 시야가 없는 방향으로 전진하지 않는다.",
       "relatedEventIds": [
         "evt_020"
-      ]
+      ],
+      "situation": "PLAYER_DOWN"
     },
     {
       "encounterId": "enc_002",
@@ -168,7 +169,8 @@
       "takeaway": "이처럼 유리한 상황에서의 적극적 교전 참여를 꾸준히 유지하되, 킬 후 즉시 다음 오브젝트 콜을 연결한다.",
       "relatedEventIds": [
         "evt_023"
-      ]
+      ],
+      "situation": "PLAYER_DOMINANT"
     }
   ],
   "teamfightPhaseAnalysis": [],

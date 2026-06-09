@@ -115,6 +115,13 @@ function finalTeamfightInstructionSnippet(prompt) {
   return prompt.slice(start, end);
 }
 
+function finalCombatInstructionSnippet(prompt) {
+  const start = prompt.lastIndexOf("combatAnalysis:");
+  const end = prompt.indexOf("teamfightPhaseAnalysis:", start);
+  if (start < 0 || end < 0 || end <= start) return "";
+  return prompt.slice(start, end);
+}
+
 // 최소 정규화 fixture (필수 필드만)
 function baseFixture() {
   return {
@@ -374,6 +381,19 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
 // ─── 케이스 15: teamfight prompt 예시는 validator/UI phase row 필드를 모두 보여줘야 함 ──
 
 {
+  const start = OUTPUT_SCHEMA_EXAMPLE.indexOf('"combatAnalysis"');
+  const end = OUTPUT_SCHEMA_EXAMPLE.indexOf('"teamfightPhaseAnalysis"', start);
+  const snippet = OUTPUT_SCHEMA_EXAMPLE.slice(start, end);
+  checkTrue("combat prompt includes situation", snippet.includes('"situation"'));
+  checkTrue(
+    "combat prompt includes situation enum",
+    OUTPUT_SCHEMA_EXAMPLE.includes("PLAYER_DOMINANT") &&
+      OUTPUT_SCHEMA_EXAMPLE.includes("PLAYER_DOWN") &&
+      OUTPUT_SCHEMA_EXAMPLE.includes("TRADED"),
+  );
+}
+
+{
   const start = OUTPUT_SCHEMA_EXAMPLE.indexOf('"teamfightPhaseAnalysis"');
   const end = OUTPUT_SCHEMA_EXAMPLE.indexOf('"evidenceIndex"', start);
   const snippet = OUTPUT_SCHEMA_EXAMPLE.slice(start, end);
@@ -400,6 +420,17 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
 }
 
 // ─── 케이스 17: teamfight 지시문 본문은 필수 phase row 필드를 명시해야 함 ──
+
+{
+  for (const [label, prompt] of [
+    ["Claude", CLAUDE_COACHING_PROMPT],
+    ["Codex", CODEX_REDTEAM_PROMPT],
+  ]) {
+    const snippet = finalCombatInstructionSnippet(prompt);
+    checkTrue(`${label} combat instruction names situation`, snippet.includes("situation"));
+    checkTrue(`${label} combat instruction names situation enum`, snippet.includes("PLAYER_DOMINANT") && snippet.includes("PLAYER_DOWN") && snippet.includes("TRADED"));
+  }
+}
 
 {
   const requiredFields = [
