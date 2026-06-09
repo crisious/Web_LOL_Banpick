@@ -137,7 +137,7 @@ sensitive artifact scan
 no matches
 ```
 
-- [ ] **Step 2: Mark plan complete and commit**
+- [x] **Step 2: Mark plan complete and commit**
 
 Mark this plan's checklist complete after local QA passes, then commit:
 
@@ -147,6 +147,32 @@ git commit -m "test: reuse key moments minimum helper"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA**
+- [x] **Step 3: Verify GitHub QA**
 
 Watch the pushed `QA` workflow, download the uploaded `qa-automation-*` artifact, inspect `qa-summary.json`, and scan the artifact for the same sensitive patterns.
+
+Result:
+
+```text
+implementation commit
+edd5e98 test: reuse key moments minimum helper
+
+GitHub QA run
+27184404239 success
+headSha: edd5e9879428cfe531b944bfacafef7c851e6202
+
+artifact
+7498701083 qa-automation-27184404239, 3551 bytes
+
+qa-summary
+read-only smoke 156 passed, 0 failed
+durationMs: 229
+latestRun.qaVerdict.status: passed
+latestRun.ci.provider: github-actions
+latestRun.git.shortSha: edd5e98
+dirty: false
+requiredCheckSummary total 13 / passed 13 / failed 0 / missing 0
+
+sensitive artifact scan
+no matches
+```
