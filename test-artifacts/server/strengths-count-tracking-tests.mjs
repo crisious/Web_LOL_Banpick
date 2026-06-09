@@ -254,9 +254,39 @@ checkTrue(
   !result.analysisMeta?.schemaViolations?.includes("shape.strengths.invalid"),
 );
 check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
+
+state.primaryResponse = primaryAnalysisFixture();
+state.primaryResponse.strengths = [
+  { id: "str_over_1", title: "over strength 1", description: "over strength description 1", relatedEventIds: [] },
+  { id: "str_over_2", title: "over strength 2", description: "over strength description 2", relatedEventIds: [] },
+  { id: "str_over_3", title: "over strength 3", description: "over strength description 3", relatedEventIds: [] },
+  { id: "str_over_4", title: "over strength 4", description: "over strength description 4", relatedEventIds: [] },
+];
+state.fallbackCalls = 0;
+state.strengthRepairCalls = 0;
+
+const overStrengthsResult = await buildAnalysis(normalizedFixture(), "sample-strengths-overcount");
+
+check("overfull strengths primary analysis is preserved", overStrengthsResult.matchSummary?.headline, "primary headline");
+check("overfull strengths fallback is not used", state.fallbackCalls, 0);
+check("overfull strengths are repaired", overStrengthsResult.strengths?.map((item) => item.id), ["str_1", "str_2", "str_3"]);
+check("overfull strength repair called once", state.strengthRepairCalls, 1);
+checkTrue(
+  "schemaViolations include overfull strengths count",
+  overStrengthsResult.analysisMeta?.schemaViolations?.includes("count.strengths>3"),
+);
+checkTrue(
+  "schemaViolations do not misclassify overfull strengths as malformed",
+  !overStrengthsResult.analysisMeta?.schemaViolations?.includes("shape.strengths.invalid"),
+);
+check("overfull strengths schemaViolationCount", overStrengthsResult.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
   "buildAnalysis tracks short strengths separately",
   buildAnalysisSrc.includes("count.strengths<${INSIGHT_LIST_MIN}"),
+);
+checkTrue(
+  "buildAnalysis tracks overfull strengths separately",
+  buildAnalysisSrc.includes("count.strengths>${INSIGHT_LIST_MAX}"),
 );
 checkTrue(
   "server defines shared insight list minimum helper",

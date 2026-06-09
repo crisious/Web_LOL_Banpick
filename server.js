@@ -2766,7 +2766,13 @@ async function buildAnalysis(normalized, sampleId) {
         strengthsHaveValidItemShapes
       )
         ? `count.strengths<${INSIGHT_LIST_MIN}`
-        : "shape.strengths.invalid";
+        : (
+          Array.isArray(primary.strengths) &&
+          primary.strengths.length > INSIGHT_LIST_MAX &&
+          strengthsHaveValidItemShapes
+        )
+          ? `count.strengths>${INSIGHT_LIST_MAX}`
+          : "shape.strengths.invalid";
     primary.strengths = buildStrengths(normalized);
     violations.push(strengthsViolation);
   }
@@ -2787,7 +2793,13 @@ async function buildAnalysis(normalized, sampleId) {
         weaknessesHaveValidItemShapes
       )
         ? `count.weaknesses<${INSIGHT_LIST_MIN}`
-        : "shape.weaknesses.invalid";
+        : (
+          Array.isArray(primary.weaknesses) &&
+          primary.weaknesses.length > INSIGHT_LIST_MAX &&
+          weaknessesHaveValidItemShapes
+        )
+          ? `count.weaknesses>${INSIGHT_LIST_MAX}`
+          : "shape.weaknesses.invalid";
     primary.weaknesses = buildWeaknesses(normalized);
     violations.push(weaknessesViolation);
   }
