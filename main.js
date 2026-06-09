@@ -2744,9 +2744,9 @@ function renderDualTimeline(sample) {
   const phaseBands = phases.map((p) => {
     const widthPct = ((p.endMs - p.startMs) / totalMs) * 100;
     const phaseClass = p.phase === "EARLY" ? "early" : p.phase === "MID" ? "mid" : "late";
-    const label = p.phase === "EARLY" ? "\uCD08\uBC18" : p.phase === "MID" ? "\uC911\uBC18" : "\uD6C4\uBC18";
+    const label = gamePhaseLabel(p.phase);
     return `<div class="dual-tl-phase dual-tl-phase--${phaseClass}" style="width:${widthPct}%">
-      <span class="dual-tl-phase-label">${label}</span>
+      <span class="dual-tl-phase-label">${escapeHtml(label)}</span>
     </div>`;
   }).join("");
 
@@ -2887,7 +2887,7 @@ function renderDualTimelineDetail(startMs, endMs, data, momentum, analysis) {
     const phaseEnd = ps.phase === "EARLY" ? 900000 : ps.phase === "MID" ? 1800000 : Infinity;
     if (startMs < phaseEnd && endMs > phaseStart) {
       const ratingEmoji = ps.rating === "GOOD" ? "\uD83D\uDFE2" : ps.rating === "BAD" ? "\uD83D\uDD34" : "\uD83D\uDFE1";
-      const phaseLabel = ps.phase === "EARLY" ? "\uCD08\uBC18" : ps.phase === "MID" ? "\uC911\uBC18" : "\uD6C4\uBC18";
+      const phaseLabel = gamePhaseLabel(ps.phase);
       phaseNote = `<div class="dual-tl-detail-phase">
         ${ratingEmoji} <strong>${escapeHtml(phaseLabel)}</strong>: ${escapeHtml(ps.summary || "")}
         ${ps.focus ? `<br><em>${escapeHtml(ps.focus)}</em>` : ""}
@@ -3025,11 +3025,11 @@ function renderObjectiveTimeline(sample) {
   `;
 
   const laneLabel = { TOP_LANE: "탑", MID_LANE: "미드", BOT_LANE: "봇" };
-  const phaseLabel = { EARLY: "초반", MID: "중반", LATE: "후반" };
 
   let lastPhase = "";
   const rows = timeline.map((e) => {
-    const phaseDivider = e.phase !== lastPhase ? `<tr class="obj-phase-divider"><td colspan="6">${phaseLabel[e.phase] || e.phase} (${e.phase})</td></tr>` : "";
+    const phaseName = gamePhaseLabel(e.phase);
+    const phaseDivider = e.phase !== lastPhase ? `<tr class="obj-phase-divider"><td colspan="6">${escapeHtml(phaseName)}</td></tr>` : "";
     lastPhase = e.phase;
     const teamClass = e.team === "ALLY" ? "obj-row--ally" : "obj-row--enemy";
     const teamText = e.team === "ALLY" ? "아군" : "적";
@@ -3037,7 +3037,7 @@ function renderObjectiveTimeline(sample) {
     return `${phaseDivider}
       <tr class="${teamClass}">
         <td>${e.timeLabel}</td>
-        <td>${phaseLabel[e.phase] || e.phase}</td>
+        <td>${escapeHtml(phaseName)}</td>
         <td>${typeIcon} ${e.type === "STRUCTURE" ? "구조물" : "오브젝트"}</td>
         <td>${e.label}</td>
         <td>${laneLabel[e.lane] || e.lane || "—"}</td>
