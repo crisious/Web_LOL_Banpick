@@ -2412,9 +2412,12 @@ function hasValidInsightItemShapes(items) {
     );
 }
 
+function hasMinimumInsightList(items) {
+  return Array.isArray(items) && items.length >= INSIGHT_LIST_MIN;
+}
+
 function hasValidInsightList(items) {
-  return Array.isArray(items) &&
-    items.length >= INSIGHT_LIST_MIN &&
+  return hasMinimumInsightList(items) &&
     items.length <= INSIGHT_LIST_MAX &&
     hasValidInsightItemShapes(items);
 }
@@ -2759,7 +2762,7 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.strengths"
       : (
         Array.isArray(primary.strengths) &&
-        primary.strengths.length < INSIGHT_LIST_MIN &&
+        !hasMinimumInsightList(primary.strengths) &&
         strengthsHaveValidItemShapes
       )
         ? `count.strengths<${INSIGHT_LIST_MIN}`
@@ -2780,7 +2783,7 @@ async function buildAnalysis(normalized, sampleId) {
       ? "missing.weaknesses"
       : (
         Array.isArray(primary.weaknesses) &&
-        primary.weaknesses.length < INSIGHT_LIST_MIN &&
+        !hasMinimumInsightList(primary.weaknesses) &&
         weaknessesHaveValidItemShapes
       )
         ? `count.weaknesses<${INSIGHT_LIST_MIN}`

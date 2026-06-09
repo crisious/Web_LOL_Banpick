@@ -28,6 +28,14 @@ function extractConstSource(source, name) {
 }
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
+const hasValidInsightListSrc = extractFunctionSource(serverSrc, "hasValidInsightList");
+const insightListMinimumSource = serverSrc.includes("function hasMinimumInsightList(")
+  ? extractFunctionSource(serverSrc, "hasMinimumInsightList")
+  : `
+function hasMinimumInsightList(items) {
+  return Array.isArray(items) && items.length >= INSIGHT_LIST_MIN;
+}
+`;
 
 const supportSources = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
@@ -53,7 +61,8 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumActionChecklist"),
   extractFunctionSource(serverSrc, "hasValidActionChecklist"),
   extractFunctionSource(serverSrc, "hasValidInsightItemShapes"),
-  extractFunctionSource(serverSrc, "hasValidInsightList"),
+  insightListMinimumSource,
+  hasValidInsightListSrc,
   extractFunctionSource(serverSrc, "hasValidCombatAnalysis"),
   extractFunctionSource(serverSrc, "hasValidTeamfightPhaseAnalysis"),
   extractFunctionSource(serverSrc, "validateAnalysisOutput"),
@@ -248,6 +257,18 @@ check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
   "buildAnalysis tracks short strengths separately",
   buildAnalysisSrc.includes("count.strengths<${INSIGHT_LIST_MIN}"),
+);
+checkTrue(
+  "server defines shared insight list minimum helper",
+  serverSrc.includes("function hasMinimumInsightList"),
+);
+checkTrue(
+  "hasValidInsightList reuses minimum helper",
+  hasValidInsightListSrc.includes("hasMinimumInsightList(items)"),
+);
+checkTrue(
+  "buildAnalysis checks strengths minimum helper for count",
+  buildAnalysisSrc.includes("hasMinimumInsightList(primary.strengths)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

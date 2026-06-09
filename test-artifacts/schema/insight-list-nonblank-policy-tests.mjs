@@ -27,6 +27,7 @@ function extractConstSource(source, name) {
 }
 
 const hasValidInsightItemShapesSrc = extractFunctionSource(serverSrc, "hasValidInsightItemShapes");
+const hasMinimumInsightListSrc = extractFunctionSource(serverSrc, "hasMinimumInsightList");
 const hasValidInsightListSrc = extractFunctionSource(serverSrc, "hasValidInsightList");
 
 const supportSources = [
@@ -53,6 +54,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumActionChecklist"),
   extractFunctionSource(serverSrc, "hasValidActionChecklist"),
   hasValidInsightItemShapesSrc,
+  hasMinimumInsightListSrc,
   hasValidInsightListSrc,
   extractFunctionSource(serverSrc, "hasValidCombatAnalysis"),
   extractFunctionSource(serverSrc, "hasValidTeamfightPhaseAnalysis"),
@@ -175,6 +177,10 @@ checkTrue(
 checkTrue(
   "hasValidInsightList reuses item shape helper",
   hasValidInsightListSrc.includes("hasValidInsightItemShapes(items)"),
+);
+checkTrue(
+  "hasValidInsightList reuses minimum helper",
+  hasValidInsightListSrc.includes("hasMinimumInsightList(items)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);
