@@ -2651,10 +2651,14 @@ async function buildAnalysis(normalized, sampleId) {
     }
   }
   // phaseSummaries: AI가 배열 대신 객체로 반환하는 경우 → 배열로 정규화
+  let phaseSummariesWasObject = false;
+  let phaseSummariesObjectHadUsableEntries = false;
   if (primary.phaseSummaries && !Array.isArray(primary.phaseSummaries)) {
+    phaseSummariesWasObject = typeof primary.phaseSummaries === "object";
     const ps = primary.phaseSummaries;
-    primary.phaseSummaries = ["early", "mid", "late"]
-      .filter((k) => ps[k])
+    const phaseSummaryObjectKeys = ["early", "mid", "late"].filter((k) => ps[k]);
+    phaseSummariesObjectHadUsableEntries = phaseSummaryObjectKeys.length > 0;
+    primary.phaseSummaries = phaseSummaryObjectKeys
       .map((k) => {
         const v = ps[k];
         return typeof v === "string" ? { phase: k.toUpperCase(), summary: v } : { phase: k.toUpperCase(), ...v };
@@ -2663,15 +2667,20 @@ async function buildAnalysis(normalized, sampleId) {
   }
   if (!hasValidPhaseSummaries(primary.phaseSummaries)) {
     const phaseSummariesViolation = (
-      primary.phaseSummaries === undefined ||
-      primary.phaseSummaries === null ||
-      (
-        Array.isArray(primary.phaseSummaries) &&
-        primary.phaseSummaries.length === 0
-      )
+      phaseSummariesWasObject &&
+      !phaseSummariesObjectHadUsableEntries
     )
-      ? "missing.phaseSummaries"
-      : `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`;
+      ? "shape.phaseSummaries.object.invalid"
+      : (
+        primary.phaseSummaries === undefined ||
+        primary.phaseSummaries === null ||
+        (
+          Array.isArray(primary.phaseSummaries) &&
+          primary.phaseSummaries.length === 0
+        )
+      )
+        ? "missing.phaseSummaries"
+        : `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`;
     primary.phaseSummaries = buildPhaseSummaries(normalized);
     violations.push(phaseSummariesViolation);
   }
