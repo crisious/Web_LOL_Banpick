@@ -259,7 +259,7 @@ Result: `npm test` passed with `2269 passed, 0 failed across 99 test file(s)`. `
 - Modify: `docs/superpowers/plans/2026-06-09-combat-situation-contract.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -269,9 +269,13 @@ git commit -m "test: require combat situation chips"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+Result: Implementation commit `9bb3152 test: require combat situation chips` was created on `main` and pushed to `origin/main`.
+
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
+
+Result: GitHub QA run `27187805148` completed with conclusion `success` for `9bb3152df09e6cd8eabf360c926a7405ac695161`. Artifact `qa-automation-27187805148` (`7499951920`) was downloaded and verified: `shortSha: 9bb3152`, `dirty: false`, smoke `156 passed, 0 failed`, required checks `13 passed, 0 failed, 0 missing`, artifact integrity `passed`, QA verdict `passed`. Sensitive artifact scan returned no matches.
 
 - [ ] **Step 3: Update Obsidian and final sync**
 
