@@ -2444,10 +2444,10 @@ function hasValidTeamfightPhaseAnalysis(teamfightPhaseAnalysis) {
 }
 
 function validateAnalysisOutput(json) {
-  if (typeof json?.schemaVersion !== "string") throw new Error("missing schemaVersion");
+  if (!isNonBlankString(json?.schemaVersion)) throw new Error("missing schemaVersion");
   if (!hasAnalysisMetaObject(json?.analysisMeta)) throw new Error("missing analysisMeta");
-  if (typeof json.analysisMeta.sourceType !== "string" || !json.analysisMeta.sourceType) throw new Error("missing analysisMeta.sourceType");
-  if (typeof json.analysisMeta.language !== "string" || !json.analysisMeta.language) throw new Error("missing analysisMeta.language");
+  if (!isNonBlankString(json.analysisMeta.sourceType)) throw new Error("missing analysisMeta.sourceType");
+  if (!isNonBlankString(json.analysisMeta.language)) throw new Error("missing analysisMeta.language");
   if (!hasValidMatchSummary(json?.matchSummary)) throw new Error("missing matchSummary.headline");
   if (!hasValidCoachSummary(json?.coachSummary)) throw new Error("missing coachSummary.overallSummary");
   if (!hasValidPhaseSummaries(json?.phaseSummaries)) throw new Error(`phaseSummaries < ${PHASE_SUMMARIES_MIN}`);

@@ -192,6 +192,12 @@ expectThrows("missing schemaVersion throws", () => {
   validateAnalysisOutput(f);
 }, "schemaVersion");
 
+expectThrows("blank schemaVersion throws", () => {
+  const f = validFixture();
+  f.schemaVersion = "   ";
+  validateAnalysisOutput(f);
+}, "schemaVersion");
+
 expectThrows("missing analysisMeta throws", () => {
   const f = validFixture();
   delete f.analysisMeta;
@@ -216,6 +222,12 @@ expectThrows("analysisMeta empty sourceType throws", () => {
   validateAnalysisOutput(f);
 }, "analysisMeta.sourceType");
 
+expectThrows("analysisMeta whitespace sourceType throws", () => {
+  const f = validFixture();
+  f.analysisMeta.sourceType = "   ";
+  validateAnalysisOutput(f);
+}, "analysisMeta.sourceType");
+
 expectThrows("analysisMeta missing language throws", () => {
   const f = validFixture();
   delete f.analysisMeta.language;
@@ -225,6 +237,12 @@ expectThrows("analysisMeta missing language throws", () => {
 expectThrows("analysisMeta empty language throws", () => {
   const f = validFixture();
   f.analysisMeta.language = "";
+  validateAnalysisOutput(f);
+}, "analysisMeta.language");
+
+expectThrows("analysisMeta tab-only language throws", () => {
+  const f = validFixture();
+  f.analysisMeta.language = "\t";
   validateAnalysisOutput(f);
 }, "analysisMeta.language");
 
