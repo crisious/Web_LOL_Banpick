@@ -2702,8 +2702,18 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(strengthsViolation);
   }
   if (!hasValidInsightList(primary.weaknesses)) {
+    const weaknessesViolation = (
+      primary.weaknesses === undefined ||
+      primary.weaknesses === null ||
+      (
+        Array.isArray(primary.weaknesses) &&
+        primary.weaknesses.length === 0
+      )
+    )
+      ? "missing.weaknesses"
+      : "shape.weaknesses.invalid";
     primary.weaknesses = buildWeaknesses(normalized);
-    violations.push("shape.weaknesses.invalid");
+    violations.push(weaknessesViolation);
   }
   if (!hasValidActionChecklist(primary.actionChecklist)) {
     const actionChecklistViolation = (
