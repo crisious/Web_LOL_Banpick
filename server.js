@@ -2331,6 +2331,10 @@ function hasValidKeyMoments(keyMoments) {
     hasValidKeyMomentItemShapes(keyMoments);
 }
 
+function hasMinimumPhaseSummaries(phaseSummaries) {
+  return Array.isArray(phaseSummaries) && phaseSummaries.length >= PHASE_SUMMARIES_MIN;
+}
+
 function hasValidPhaseSummaryItemShapes(phaseSummaries) {
   return Array.isArray(phaseSummaries) &&
     phaseSummaries.every((item) =>
@@ -2341,8 +2345,7 @@ function hasValidPhaseSummaryItemShapes(phaseSummaries) {
 }
 
 function hasValidPhaseSummaries(phaseSummaries) {
-  return Array.isArray(phaseSummaries) &&
-    phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
+  return hasMinimumPhaseSummaries(phaseSummaries) &&
     hasValidPhaseSummaryItemShapes(phaseSummaries);
 }
 
@@ -2698,7 +2701,7 @@ async function buildAnalysis(normalized, sampleId) {
         ? "missing.phaseSummaries"
         : (
           Array.isArray(primary.phaseSummaries) &&
-          primary.phaseSummaries.length < PHASE_SUMMARIES_MIN &&
+          !hasMinimumPhaseSummaries(primary.phaseSummaries) &&
           phaseSummariesHaveValidItemShapes
         )
           ? `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`

@@ -1,4 +1,4 @@
-// server.js buildAnalysis strengths count tracking regression tests
+// server.js buildAnalysis phaseSummaries count tracking regression tests
 
 import fs from "fs";
 
@@ -28,6 +28,14 @@ function extractConstSource(source, name) {
 }
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
+const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
+const phaseSummaryMinimumSource = serverSrc.includes("function hasMinimumPhaseSummaries(")
+  ? extractFunctionSource(serverSrc, "hasMinimumPhaseSummaries")
+  : `
+function hasMinimumPhaseSummaries(phaseSummaries) {
+  return Array.isArray(phaseSummaries) && phaseSummaries.length >= PHASE_SUMMARIES_MIN;
+}
+`;
 
 const supportSources = [
   extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
@@ -43,9 +51,9 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
   extractFunctionSource(serverSrc, "hasValidKeyMoments"),
-  extractFunctionSource(serverSrc, "hasMinimumPhaseSummaries"),
+  phaseSummaryMinimumSource,
   extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes"),
-  extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
+  hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
   extractFunctionSource(serverSrc, "hasValidMatchSummary"),
   extractFunctionSource(serverSrc, "hasValidCoachSummary"),
@@ -60,7 +68,7 @@ const supportSources = [
 
 const state = {
   fallbackCalls: 0,
-  strengthRepairCalls: 0,
+  phaseRepairCalls: 0,
   primaryResponse: primaryAnalysisFixture(),
   console: { log() {}, error() {} },
 };
@@ -87,13 +95,6 @@ const buildAnalysis = new Function("state", `
   async function callCodexAgent() {
     throw new Error("codex unavailable");
   }
-  function repairedStrengths() {
-    return [
-      { id: "str_1", title: "repaired strength 1", description: "repaired strength description 1", relatedEventIds: [] },
-      { id: "str_2", title: "repaired strength 2", description: "repaired strength description 2", relatedEventIds: [] },
-      { id: "str_3", title: "repaired strength 3", description: "repaired strength description 3", relatedEventIds: [] },
-    ];
-  }
   function buildRuleBasedAnalysis() {
     state.fallbackCalls += 1;
     return {
@@ -101,12 +102,12 @@ const buildAnalysis = new Function("state", `
       analysisMeta: { sourceType: "rule_based", language: "ko" },
       matchSummary: { headline: "fallback headline" },
       coachSummary: { overallSummary: "fallback coach summary" },
-      phaseSummaries: [
-        { phase: "EARLY", summary: "fallback early" },
-        { phase: "MID", summary: "fallback mid" },
-        { phase: "LATE", summary: "fallback late" },
+      phaseSummaries: repairedPhaseSummaries(),
+      strengths: [
+        { id: "str_1", title: "fallback strength 1", description: "fallback strength description 1", relatedEventIds: [] },
+        { id: "str_2", title: "fallback strength 2", description: "fallback strength description 2", relatedEventIds: [] },
+        { id: "str_3", title: "fallback strength 3", description: "fallback strength description 3", relatedEventIds: [] },
       ],
-      strengths: repairedStrengths(),
       weaknesses: [
         { id: "wk_1", title: "fallback weakness 1", description: "fallback weakness description 1", relatedEventIds: [] },
         { id: "wk_2", title: "fallback weakness 2", description: "fallback weakness description 2", relatedEventIds: [] },
@@ -131,8 +132,16 @@ const buildAnalysis = new Function("state", `
   function buildCoachSummary() {
     return { overallSummary: "fallback coach summary" };
   }
+  function repairedPhaseSummaries() {
+    return [
+      { phase: "EARLY", summary: "repaired early summary" },
+      { phase: "MID", summary: "repaired mid summary" },
+      { phase: "LATE", summary: "repaired late summary" },
+    ];
+  }
   function buildPhaseSummaries() {
-    return buildRuleBasedAnalysis().phaseSummaries;
+    state.phaseRepairCalls += 1;
+    return repairedPhaseSummaries();
   }
   function buildKeyMoments() {
     return buildRuleBasedAnalysis().keyMoments;
@@ -141,8 +150,7 @@ const buildAnalysis = new Function("state", `
     return [{ eventId: "evt_001", summary: "fallback evidence" }];
   }
   function buildStrengths() {
-    state.strengthRepairCalls += 1;
-    return repairedStrengths();
+    return buildRuleBasedAnalysis().strengths;
   }
   function buildWeaknesses() {
     return buildRuleBasedAnalysis().weaknesses;
@@ -183,13 +191,13 @@ function primaryAnalysisFixture() {
     matchSummary: { headline: "primary headline" },
     coachSummary: { overallSummary: "primary coach summary" },
     phaseSummaries: [
-      { phase: "EARLY", summary: "primary early summary" },
-      { phase: "MID", summary: "primary mid summary" },
-      { phase: "LATE", summary: "primary late summary" },
+      { phase: "EARLY", summary: "valid early summary" },
+      { phase: "MID", summary: "valid mid summary" },
     ],
     strengths: [
-      { id: "str_short_1", title: "short strength 1", description: "short strength description 1", relatedEventIds: [] },
-      { id: "str_short_2", title: "short strength 2", description: "short strength description 2", relatedEventIds: [] },
+      { id: "str_1", title: "primary strength 1", description: "primary strength description 1", relatedEventIds: [] },
+      { id: "str_2", title: "primary strength 2", description: "primary strength description 2", relatedEventIds: [] },
+      { id: "str_3", title: "primary strength 3", description: "primary strength description 3", relatedEventIds: [] },
     ],
     weaknesses: [
       { id: "wk_1", title: "primary weakness 1", description: "primary weakness description 1", relatedEventIds: [] },
@@ -215,8 +223,8 @@ function primaryAnalysisFixture() {
 
 function normalizedFixture() {
   return {
-    matchInfo: { matchId: "KR_STRENGTHS_COUNT", queueLabel: "RANKED_SOLO" },
-    playerContext: { riotId: "Strength#KR1", participantId: 1 },
+    matchInfo: { matchId: "KR_PHASE_SUMMARIES_COUNT", queueLabel: "RANKED_SOLO" },
+    playerContext: { riotId: "PhaseSummary#KR1", participantId: 1 },
     timelineEvents: [],
     phaseContext: {},
     playerStats: {},
@@ -225,28 +233,36 @@ function normalizedFixture() {
   };
 }
 
-const result = await buildAnalysis(normalizedFixture(), "sample-strengths-count");
+const result = await buildAnalysis(normalizedFixture(), "sample-phase-summaries-count");
 
 check("primary analysis is preserved", result.matchSummary?.headline, "primary headline");
 check("fallback is not used", state.fallbackCalls, 0);
-check("strengths are repaired", result.strengths?.map((item) => item.id), ["str_1", "str_2", "str_3"]);
-check("strength repair called once", state.strengthRepairCalls, 1);
+check("phase summaries are repaired", result.phaseSummaries?.map((item) => item.phase), ["EARLY", "MID", "LATE"]);
+check("phase repair called once", state.phaseRepairCalls, 1);
 checkTrue(
-  "schemaViolations include short strengths count",
-  result.analysisMeta?.schemaViolations?.includes("count.strengths<3"),
+  "schemaViolations include short phase summaries count",
+  result.analysisMeta?.schemaViolations?.includes("count.phaseSummaries<3"),
 );
 checkTrue(
-  "schemaViolations do not misclassify short strengths as missing",
-  !result.analysisMeta?.schemaViolations?.includes("missing.strengths"),
+  "schemaViolations do not misclassify short phase summaries as missing",
+  !result.analysisMeta?.schemaViolations?.includes("missing.phaseSummaries"),
 );
 checkTrue(
-  "schemaViolations do not misclassify short strengths as malformed",
-  !result.analysisMeta?.schemaViolations?.includes("shape.strengths.invalid"),
+  "schemaViolations do not misclassify short phase summaries as malformed",
+  !result.analysisMeta?.schemaViolations?.includes("shape.phaseSummaries.invalid"),
 );
 check("schemaViolationCount", result.analysisMeta?.schemaViolationCount, 1);
 checkTrue(
-  "buildAnalysis tracks short strengths separately",
-  buildAnalysisSrc.includes("count.strengths<${INSIGHT_LIST_MIN}"),
+  "server defines shared phase summary minimum helper",
+  serverSrc.includes("function hasMinimumPhaseSummaries"),
+);
+checkTrue(
+  "hasValidPhaseSummaries reuses minimum helper",
+  hasValidPhaseSummariesSrc.includes("hasMinimumPhaseSummaries(phaseSummaries)"),
+);
+checkTrue(
+  "buildAnalysis checks phase summary minimum helper for count",
+  buildAnalysisSrc.includes("hasMinimumPhaseSummaries(primary.phaseSummaries)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

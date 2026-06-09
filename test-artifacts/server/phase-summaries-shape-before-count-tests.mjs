@@ -29,6 +29,13 @@ function extractConstSource(source, name) {
 
 const buildAnalysisSrc = extractFunctionSource(serverSrc, "buildAnalysis");
 const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
+const phaseSummaryMinimumSource = serverSrc.includes("function hasMinimumPhaseSummaries(")
+  ? extractFunctionSource(serverSrc, "hasMinimumPhaseSummaries")
+  : `
+function hasMinimumPhaseSummaries(phaseSummaries) {
+  return Array.isArray(phaseSummaries) && phaseSummaries.length >= PHASE_SUMMARIES_MIN;
+}
+`;
 const phaseSummaryItemShapesSource = serverSrc.includes("function hasValidPhaseSummaryItemShapes(")
   ? extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes")
   : `
@@ -56,6 +63,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
   extractFunctionSource(serverSrc, "hasValidKeyMoments"),
+  phaseSummaryMinimumSource,
   phaseSummaryItemShapesSource,
   hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),

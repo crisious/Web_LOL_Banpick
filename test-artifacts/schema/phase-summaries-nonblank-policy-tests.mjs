@@ -26,6 +26,7 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const hasMinimumPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasMinimumPhaseSummaries");
 const hasValidPhaseSummaryItemShapesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes");
 const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
 
@@ -43,6 +44,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
   extractFunctionSource(serverSrc, "hasValidKeyMoments"),
+  hasMinimumPhaseSummariesSrc,
   hasValidPhaseSummaryItemShapesSrc,
   hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
@@ -155,6 +157,11 @@ checkTrue(
 checkTrue(
   "hasValidPhaseSummaries reuses phase summary item shape helper",
   hasValidPhaseSummariesSrc.includes("hasValidPhaseSummaryItemShapes(phaseSummaries)"),
+);
+
+checkTrue(
+  "hasValidPhaseSummaries reuses phase summary minimum helper",
+  hasValidPhaseSummariesSrc.includes("hasMinimumPhaseSummaries(phaseSummaries)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);
