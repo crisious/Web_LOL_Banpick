@@ -2746,7 +2746,12 @@ async function buildAnalysis(normalized, sampleId) {
       )
     )
       ? "missing.weaknesses"
-      : "shape.weaknesses.invalid";
+      : (
+        Array.isArray(primary.weaknesses) &&
+        primary.weaknesses.length < INSIGHT_LIST_MIN
+      )
+        ? `count.weaknesses<${INSIGHT_LIST_MIN}`
+        : "shape.weaknesses.invalid";
     primary.weaknesses = buildWeaknesses(normalized);
     violations.push(weaknessesViolation);
   }
