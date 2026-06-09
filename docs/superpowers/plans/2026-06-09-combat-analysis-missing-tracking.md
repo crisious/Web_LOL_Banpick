@@ -163,7 +163,7 @@ rg -n --hidden -S "<sensitive-output-pattern>" test-artifacts/tmp/combat-analysi
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -173,9 +173,43 @@ git commit -m "test: track missing combat analysis"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Implementation commit evidence at 2026-06-09 09:51 KST:
+
+```text
+git commit -m "test: track missing combat analysis"
+# 17d71e1 test: track missing combat analysis
+
+git push origin main
+# e84fd03..17d71e1 main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence at 2026-06-09 09:52 KST:
+
+```text
+gh run watch 27176677737 --exit-status
+# success
+
+QA run: 27176677737
+QA artifact: 7495985688 (qa-automation-27176677737)
+Head SHA: 17d71e1f70503d39e32ac430ccd731f08c33deed
+
+qa-summary.json
+# qaStatus: passed
+# requiredChecks: 13/13
+# smoke: 156 passed, 0 failed
+# durationMs: 221
+# mode: readonly
+# ci.provider: github-actions
+# git.shortSha: 17d71e1
+# git.dirty: false
+
+rg -n --hidden -S "<sensitive-output-pattern>" test-artifacts/tmp/gh-run-27176677737
+# no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
