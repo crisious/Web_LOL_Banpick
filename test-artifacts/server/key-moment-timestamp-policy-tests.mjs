@@ -52,6 +52,7 @@ const { buildKeyMoments } = new Function(
     extractFunctionSource(serverSrc, "isStructureTakeEvent"),
     extractFunctionSource(serverSrc, "labelForMoment"),
     extractFunctionSource(serverSrc, "impactForMoment"),
+    extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
     buildKeyMomentsSrc,
     "return { buildKeyMoments };",
   ].join("\n"),
@@ -156,6 +157,52 @@ checkTrue(
 checkTrue(
   "buildKeyMoments no longer copies event.phase",
   !buildKeyMomentsSrc.includes("phase: event.phase"),
+);
+
+const emptyTimelineMoments = buildKeyMoments({
+  matchInfo: { result: "LOSS", position: "SUPPORT" },
+  playerStats: { cs: 0, csPerMinute: 0, visionScore: 0, killParticipation: 0 },
+  timelineEvents: [],
+});
+check("empty timeline pads key moments to minimum", emptyTimelineMoments.length, 4);
+check("empty timeline fallback ids", emptyTimelineMoments.map((moment) => moment.eventId), [
+  "fallback_key_moment_01",
+  "fallback_key_moment_02",
+  "fallback_key_moment_03",
+  "fallback_key_moment_04",
+]);
+check("empty timeline fallback phases", emptyTimelineMoments.map((moment) => moment.phase), ["EARLY", "MID", "LATE", "LATE"]);
+checkTrue(
+  "empty timeline fallback moments have nonblank related evidence ids",
+  emptyTimelineMoments.every((moment) =>
+    Array.isArray(moment.relatedEventIds) &&
+    moment.relatedEventIds.every((id) => typeof id === "string" && id.length > 0)
+  ),
+);
+
+const shortTimelineMoments = buildKeyMoments({
+  matchInfo: { result: "WIN", position: "MID" },
+  playerStats: { cs: 90, csPerMinute: 6, visionScore: 12, killParticipation: 0.5 },
+  timelineEvents: [
+    {
+      eventId: "evt_real",
+      eventType: "CHAMPION_KILL",
+      timestampMs: 60000,
+      importance: 5,
+      summary: "real event remains first",
+    },
+  ],
+});
+check("short timeline pads after real key moment", shortTimelineMoments.length, 4);
+check("short timeline keeps real moment first", shortTimelineMoments[0]?.eventId, "evt_real");
+check("short timeline fallback tail ids", shortTimelineMoments.slice(1).map((moment) => moment.eventId), [
+  "fallback_key_moment_02",
+  "fallback_key_moment_03",
+  "fallback_key_moment_04",
+]);
+checkTrue(
+  "buildKeyMoments pads with shared minimum constant",
+  buildKeyMomentsSrc.includes("while (moments.length < KEY_MOMENTS_MIN)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

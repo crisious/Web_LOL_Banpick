@@ -1713,7 +1713,8 @@ function impactForMoment(event, result) {
 }
 
 function buildKeyMoments(normalized) {
-  return normalized.timelineEvents
+  const timelineEvents = Array.isArray(normalized.timelineEvents) ? normalized.timelineEvents : [];
+  const moments = timelineEvents
     .slice()
     .sort((a, b) => {
       if (b.importance !== a.importance) {
@@ -1742,6 +1743,54 @@ function buildKeyMoments(normalized) {
         relatedEventIds: [event.eventId],
       };
     });
+
+  const fallbackTemplates = [
+    {
+      phase: "EARLY",
+      label: "초반 흐름 점검",
+      reason: "핵심 이벤트가 부족해 초반 안정성과 첫 전환 루틴을 기본 점검 항목으로 보완했다.",
+      impact: "짧은 경기에서도 초반 판단 기준을 남긴다.",
+      relatedEventIds: ["stat_cs"],
+    },
+    {
+      phase: "MID",
+      label: "중반 자원 전환 점검",
+      reason: `총 CS ${normalized.playerStats?.cs ?? 0}, 분당 CS ${normalized.playerStats?.csPerMinute ?? 0} 기준으로 자원 전환을 확인한다.`,
+      impact: "이벤트가 적어도 성장 흐름을 복기할 수 있게 한다.",
+      relatedEventIds: ["stat_cs"],
+    },
+    {
+      phase: "LATE",
+      label: "시야와 합류 점검",
+      reason: `비전 점수 ${normalized.playerStats?.visionScore ?? 0}, 킬 관여율 ${Math.round((normalized.playerStats?.killParticipation ?? 0) * 100)}% 기준으로 합류 품질을 확인한다.`,
+      impact: "근거 이벤트가 부족한 경기에서도 시야와 합류 축을 유지한다.",
+      relatedEventIds: ["stat_vision"],
+    },
+    {
+      phase: "LATE",
+      label: "다음 경기 루틴",
+      reason: "타임라인 근거가 적을 때는 라인 정리, 시야 확보, 오브젝트 전 리콜 타이밍을 기본 루틴으로 점검한다.",
+      impact: "리포트가 최소 코칭 카드 수를 유지하면서 다음 행동으로 연결된다.",
+      relatedEventIds: ["stat_vision"],
+    },
+  ];
+
+  while (moments.length < KEY_MOMENTS_MIN) {
+    const index = moments.length;
+    const template = fallbackTemplates[index % fallbackTemplates.length];
+    moments.push({
+      eventId: `fallback_key_moment_${String(index + 1).padStart(2, "0")}`,
+      timestamp: "FULL",
+      phase: template.phase,
+      label: template.label,
+      reason: template.reason,
+      impact: template.impact,
+      importance: 1,
+      relatedEventIds: template.relatedEventIds,
+    });
+  }
+
+  return moments;
 }
 
 function buildEvidenceIndex(normalized) {
