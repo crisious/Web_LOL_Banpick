@@ -2078,6 +2078,26 @@ function renderStats(sample) {
     .join("");
 }
 
+function phaseFocusText(phase) {
+  return String(phase?.focus ?? "").trim();
+}
+
+function renderPhaseCard(phase) {
+  const focus = phaseFocusText(phase);
+  const focusHtml = focus ? `
+          <p class="phase-focus">${escapeHtml(focus)}</p>` : "";
+
+  return `
+        <article class="phase-card" data-rating="${escapeAttr(phase?.rating || "")}">
+          <div class="phase-card__top">
+            <span class="phase-tag">${escapeHtml(phase?.phase || "")}</span>
+            <span class="phase-rating">${ratingLabel(phase?.rating)}</span>
+          </div>
+          <p class="phase-summary">${escapeHtml(phase?.summary || "")}</p>${focusHtml}
+        </article>
+      `;
+}
+
 function renderPhases(sample) {
   const phaseCards =
     sample.analysis.phaseSummaries && sample.analysis.phaseSummaries.length > 0
@@ -2089,20 +2109,7 @@ function renderPhases(sample) {
           focus: `주요 이벤트 ${info.notableEventCount}건`,
         }));
 
-  dom.phaseGrid.innerHTML = phaseCards
-    .map(
-      (phase) => `
-        <article class="phase-card" data-rating="${phase.rating}">
-          <div class="phase-card__top">
-            <span class="phase-tag">${phase.phase}</span>
-            <span class="phase-rating">${ratingLabel(phase.rating)}</span>
-          </div>
-          <p class="phase-summary">${phase.summary}</p>
-          <p class="phase-focus">${phase.focus}</p>
-        </article>
-      `,
-    )
-    .join("");
+  dom.phaseGrid.innerHTML = phaseCards.map(renderPhaseCard).join("");
 }
 
 function renderInsightCards(host, items, kind, sample) {
