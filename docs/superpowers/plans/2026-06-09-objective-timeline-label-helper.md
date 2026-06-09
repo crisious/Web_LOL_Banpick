@@ -311,21 +311,25 @@ Open `http://127.0.0.1:8123/?qa=objective-timeline-label`, click `저장 샘플 
 
 Observed 2026-06-09 18:42 KST: Browser QA on `http://127.0.0.1:8123/?qa=objective-timeline-label` passed. Stored sample opened, `타임라인` tab became active, `.obj-table` row count was 20, visible rows included Korean type/lane/team labels such as `🐉 오브젝트`, `🏛 구조물`, `봇`, `미드`, `아군`, and `적`; scoped objective table visible-text raw token checks for `OBJECTIVE`, `STRUCTURE`, `TOP_LANE`, `MID_LANE`, `BOT_LANE`, `VOIDGRUB`, `RIVER`, and unsafe tags were empty. `data-team="ALLY/ENEMY"` remained only as non-visible style keys. Console warn/error count was 0.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
 ```bash
-git add main.js styles.css test-artifacts/main/objective-timeline-label-tests.mjs docs/superpowers/plans/2026-06-09-objective-timeline-label-helper.md
+git add main.js styles.css test-artifacts/main/objective-timeline-label-tests.mjs test-artifacts/main/timeline-phase-label-tests.mjs docs/superpowers/plans/2026-06-09-objective-timeline-label-helper.md
 git commit -m "test: reuse objective timeline labels"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub QA artifact**
+Observed 2026-06-09 18:43 KST: implementation commit `7948a55 test: reuse objective timeline labels` was pushed to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA artifact**
 
 Run `gh run list`, watch the latest `main` run for the pushed commit, download `qa-automation-<run-id>`, inspect `qa-summary.json`, and run the same sensitive scan on the artifact directory.
 
-- [ ] **Step 5: Record Obsidian evidence and finalize plan**
+Observed 2026-06-09 18:44 KST: GitHub Actions QA run `27197660131` for `7948a55` passed. Artifact `7504056600` (`qa-automation-27197660131`, 3549 bytes, digest `sha256:66eb7d9825cbc12c038c8a0270b60fd2a0acedf3ec6ea824ed861b614bace2e7`) downloaded successfully. `qa-summary.json` reported `status: "passed"`, `exitCode: 0`, `latestRun.git.shortSha: "7948a55"`, `dirty: false`, smoke `156 passed / 0 failed`, required checks `13 passed / 0 failed / 0 missing`, artifact integrity `passed`, and QA verdict `passed`. Sensitive pattern scan over `test-artifacts/tmp/github-qa-27197660131` had no matches.
+
+- [x] **Step 5: Record Obsidian evidence and finalize plan**
 
 Append an objective timeline label helper entry to `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, sensitive scan, and final sync evidence. Then mark completed plan steps in this file, commit with:
 
@@ -334,6 +338,8 @@ git add docs/superpowers/plans/2026-06-09-objective-timeline-label-helper.md
 git commit -m "docs: finalize objective timeline label plan"
 git push origin main
 ```
+
+Observed 2026-06-09 18:45 KST: Obsidian project log was updated with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, and sensitive scan evidence. This repository plan finalization is committed separately so the final docs-only GitHub QA run can be recorded in Obsidian without creating another documentation loop.
 
 - [ ] **Step 6: Final sync**
 
