@@ -259,7 +259,7 @@ Observed: `npm test` passed with `2435 passed, 0 failed across 111 test file(s)`
 - Modify: `docs/superpowers/plans/2026-06-09-ward-timeline-label-helper.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -269,9 +269,13 @@ git commit -m "test: reuse ward timeline labels"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+Observed: committed and pushed `12f4e79 test: reuse ward timeline labels` to `main`.
+
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
+
+Observed: GitHub QA run `27195895996` passed for `12f4e79`; artifact `7503305153` (`qa-automation-27195895996`) downloaded successfully; `qa-summary.json` reported `dirty: false`, smoke `156 passed / 0 failed`, required checks `13 passed / 0 failed / 0 missing`, artifact integrity `passed`, QA verdict `passed`; sensitive scan exited with no matches.
 
 - [ ] **Step 3: Update Obsidian and final sync**
 
