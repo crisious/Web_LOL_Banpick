@@ -46,12 +46,18 @@ const comparisonRatePercentSrc = optionalFunctionSource(
   "comparisonRatePercent",
   "function comparisonRatePercent(value) { return value ?? 0; }",
 );
+const comparisonItemsSrc = optionalFunctionSource(
+  mainSrc,
+  "comparisonItems",
+  "function comparisonItems(value) { return Array.isArray(value) ? value : []; }",
+);
 const renderComparisonSrc = extractFunctionSource(mainSrc, "renderComparison");
 
 const { comparisonRatePercent, renderComparison, dom } = new Function(
   `${htmlEscapeSrc}
 ${escapeHtmlSrc}
 ${comparisonRatePercentSrc}
+${comparisonItemsSrc}
 const dom = {
   comparisonStatus: { textContent: "" },
   comparisonOverview: { innerHTML: "" },

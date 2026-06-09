@@ -377,6 +377,10 @@ function comparisonRatePercent(value) {
   return Math.max(0, Math.min(100, Math.round(numeric)));
 }
 
+function comparisonItems(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
@@ -3200,6 +3204,9 @@ function renderComparison(sample) {
   dom.comparisonStatus.textContent = "";
 
   const rate = comparisonRatePercent(comp.agreementRate);
+  const agreements = comparisonItems(comp.agreements);
+  const claudeOnly = comparisonItems(comp.claudeOnly);
+  const codexOnly = comparisonItems(comp.codexOnly);
   dom.comparisonOverview.innerHTML = `
     <div class="comparison-rate-bar">
       <div class="comparison-rate-label">
@@ -3210,9 +3217,9 @@ function renderComparison(sample) {
         <div class="comparison-rate-fill" style="width: ${rate}%"></div>
       </div>
       <div class="comparison-rate-meta">
-        <span>동의 ${comp.agreements.length}건</span>
-        <span>Claude ${comp.claudeOnly.length}건</span>
-        <span>Codex ${comp.codexOnly.length}건</span>
+        <span>동의 ${agreements.length}건</span>
+        <span>Claude ${claudeOnly.length}건</span>
+        <span>Codex ${codexOnly.length}건</span>
       </div>
     </div>
   `;
@@ -3223,7 +3230,7 @@ function renderComparison(sample) {
       : '<span class="comparison-badge comparison-badge--weakness">약점</span>';
   }
 
-  const agreementCards = comp.agreements.map((a) => `
+  const agreementCards = agreements.map((a) => `
     <article class="comparison-card" data-source="agree">
       ${categoryBadge(a.category)}
       <h4>${escapeHtml(a.topic || "")}</h4>
@@ -3234,7 +3241,7 @@ function renderComparison(sample) {
     </article>
   `).join("");
 
-  const claudeCards = comp.claudeOnly.map((c) => `
+  const claudeCards = claudeOnly.map((c) => `
     <article class="comparison-card" data-source="claude">
       ${categoryBadge(c.category)}
       <h4>${escapeHtml(c.topic || "")}</h4>
@@ -3242,7 +3249,7 @@ function renderComparison(sample) {
     </article>
   `).join("");
 
-  const codexCards = comp.codexOnly.map((c) => `
+  const codexCards = codexOnly.map((c) => `
     <article class="comparison-card" data-source="codex">
       ${categoryBadge(c.category)}
       <h4>${escapeHtml(c.topic || "")}</h4>
