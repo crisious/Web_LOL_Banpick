@@ -2681,6 +2681,13 @@ async function buildAnalysis(normalized, sampleId) {
   }
 
   // 한타 단계별 분석: payload의 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
+  if (
+    primary.teamfightPhaseAnalysis !== undefined &&
+    primary.teamfightPhaseAnalysis !== null &&
+    !hasValidTeamfightPhaseAnalysis(primary.teamfightPhaseAnalysis)
+  ) {
+    violations.push("shape.teamfightPhaseAnalysis.invalid");
+  }
   primary.teamfightPhaseAnalysis = mergeTeamfightCoaching(
     payload.teamfightPhases,
     Array.isArray(primary.teamfightPhaseAnalysis) ? primary.teamfightPhaseAnalysis : [],
