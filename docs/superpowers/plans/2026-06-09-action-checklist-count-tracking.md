@@ -167,7 +167,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\\.api\\.ri
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -177,9 +177,41 @@ git commit -m "test: track short action checklists"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation publish evidence:
+
+```text
+git commit -m "test: track short action checklists"
+# [main 7c8d005] test: track short action checklists
+
+git push origin main
+# 233cabd..7c8d005 main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence:
+
+```text
+gh run watch 27180340483 --exit-status
+# success
+
+Artifact: qa-automation-27180340483
+Artifact id: 7497273417
+Commit: 7c8d005
+qaVerdict.status: passed
+smokeSummary: 156 passed / 0 failed
+requiredChecks: 13 passed / 0 failed / 0 missing
+durationMs: 214
+dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\\.api\\.riotgames\\.com|americas\\.api\\.riotgames\\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27180340483
+# no matches
+
+Obsidian project improvement note updated with implementation evidence:
+`/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
