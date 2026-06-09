@@ -385,6 +385,13 @@ function resultLabel(result) {
   return result === "WIN" ? "승리" : "패배";
 }
 
+function combatSituationLabel(situation) {
+  if (situation === "PLAYER_DOMINANT") return "우세";
+  if (situation === "PLAYER_DOWN") return "열세";
+  if (situation === "TRADED") return "교환";
+  return "교전";
+}
+
 function compactQueueLabel(queueLabel) {
   const map = {
     RANKED_SOLO: "솔랭",
@@ -2194,18 +2201,12 @@ function renderCombatAnalysis(sample) {
     return;
   }
   const evMap = evidenceMap(sample);
-  const situationLabel = (s) => {
-    if (s === "PLAYER_DOMINANT") return "우세";
-    if (s === "PLAYER_DOWN") return "열세";
-    if (s === "TRADED") return "교환";
-    return s || "";
-  };
   dom.combatAnalysis.innerHTML = items
     .map((item) => {
       const ids = Array.isArray(item.relatedEventIds) ? item.relatedEventIds : [];
       const firstEvt = ids.map((id) => evMap.get(id)).find(Boolean);
       const stampTime = firstEvt?.timestamp || "-";
-      const sit = situationLabel(item.situation);
+      const sit = combatSituationLabel(item.situation);
       return `
         <article class="moment-card">
           <div class="moment-stamp">
