@@ -277,7 +277,7 @@ Open `http://127.0.0.1:8123/?qa=kda-timeline-label`, click `저장 샘플 열기
 
 Observed 2026-06-09 18:28 KST: Browser QA on `http://127.0.0.1:8123/?qa=kda-timeline-label` passed. Stored sample opened, `타임라인` tab became active, `.kda-evt` row count was 11, row types included `어시스트`, `데스`, and `킬`, assist rows used `kda-evt--assist`, scoped KDA text/HTML raw token checks for `CHAMPION_KILL`, `PLAYER_DEATH`, `TEAMFIGHT_FOLLOWUP`, `SKIRMISH_WIN`, and `OBJECTIVE_SETUP_WIN` were empty, and console warn/error count was 0.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -287,11 +287,15 @@ git commit -m "test: reuse kda timeline labels"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub QA artifact**
+Observed 2026-06-09 18:28 KST: implementation commit `e496e6f test: reuse kda timeline labels` was pushed to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA artifact**
 
 Run `gh run list`, watch the latest `main` run for the pushed commit, download `qa-automation-<run-id>`, inspect `qa-summary.json`, and run the same sensitive scan on the artifact directory.
 
-- [ ] **Step 5: Record Obsidian evidence and finalize plan**
+Observed 2026-06-09 18:29 KST: GitHub Actions QA run `27196887900` for `e496e6f` passed. Artifact `7503734125` (`qa-automation-27196887900`, 3549 bytes) downloaded successfully. `qa-summary.json` reported `status: "passed"`, `exitCode: 0`, `latestRun.git.shortSha: "e496e6f"`, `dirty: false`, smoke `156 passed / 0 failed`, required checks `13 passed / 0 failed / 0 missing`, artifact integrity `passed`, and QA verdict `passed`. Sensitive pattern scan over `test-artifacts/tmp/github-qa-27196887900` had no matches.
+
+- [x] **Step 5: Record Obsidian evidence and finalize plan**
 
 Append a KDA timeline label helper entry to `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, sensitive scan, and final sync evidence. Then mark completed plan steps in this file, commit with:
 
@@ -300,6 +304,8 @@ git add docs/superpowers/plans/2026-06-09-kda-timeline-label-helper.md
 git commit -m "docs: finalize kda timeline label plan"
 git push origin main
 ```
+
+Observed 2026-06-09 18:30 KST: Obsidian project log was updated with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, and sensitive scan evidence. This repository plan finalization is committed separately so the final docs-only GitHub QA run can be recorded in Obsidian without creating another documentation loop.
 
 - [ ] **Step 6: Final sync**
 
