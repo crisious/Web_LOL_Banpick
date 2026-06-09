@@ -2750,7 +2750,12 @@ async function buildAnalysis(normalized, sampleId) {
       )
     )
       ? "missing.actionChecklist"
-      : "shape.actionChecklist.invalid";
+      : (
+        Array.isArray(primary.actionChecklist) &&
+        primary.actionChecklist.length < ACTION_CHECKLIST_MIN
+      )
+        ? `count.actionChecklist<${ACTION_CHECKLIST_MIN}`
+        : "shape.actionChecklist.invalid";
     const checklistWeaknesses = Array.isArray(primary.weaknesses) && primary.weaknesses.length > 0
       ? primary.weaknesses
       : buildWeaknesses(normalized);
