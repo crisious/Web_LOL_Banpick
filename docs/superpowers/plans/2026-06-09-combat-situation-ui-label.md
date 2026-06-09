@@ -171,7 +171,7 @@ Result: `npm test` passed with `2277 passed, 0 failed across 100 test file(s)`. 
 - Modify: `docs/superpowers/plans/2026-06-09-combat-situation-ui-label.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -181,9 +181,13 @@ git commit -m "test: guard combat situation labels"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+Result: Implementation commit `16e1c62 test: guard combat situation labels` was created on `main` and pushed to `origin/main`.
+
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
+
+Result: GitHub QA run `27188213108` completed with conclusion `success` for `16e1c62be7a1827e5e637fe9840392f47b762146`. Artifact `qa-automation-27188213108` (`7500111805`) was downloaded and verified: `shortSha: 16e1c62`, `dirty: false`, smoke `156 passed, 0 failed`, required checks `13 passed, 0 failed, 0 missing`, artifact integrity `passed`, QA verdict `passed`. Sensitive artifact scan returned no matches.
 
 - [ ] **Step 3: Update Obsidian and final sync**
 
