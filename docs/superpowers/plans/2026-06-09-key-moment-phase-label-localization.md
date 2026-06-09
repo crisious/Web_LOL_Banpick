@@ -230,7 +230,7 @@ Result 2026-06-09:
 - Modify: `docs/superpowers/plans/2026-06-09-key-moment-phase-label-localization.md`
 - Modify outside repo: `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md`
 
-- [ ] **Step 1: Commit and push implementation**
+- [x] **Step 1: Commit and push implementation**
 
 Run:
 
@@ -240,13 +240,17 @@ git commit -m "test: localize key moment phase labels"
 git push origin main
 ```
 
-- [ ] **Step 2: Verify GitHub QA artifact**
+- [x] **Step 2: Verify GitHub QA artifact**
 
 Use `gh run watch`, artifact listing, artifact download, `qa-summary.json`, and sensitive pattern scan. Confirm the pushed short SHA, `dirty: false`, smoke `156 passed / 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0.
 
-- [ ] **Step 3: Run Browser QA**
+Result 2026-06-09: Implementation commit `8a7d8cc` pushed to `main`. GitHub QA run `27191761289` completed successfully. Artifact `7501564840` (`qa-automation-27191761289`) reported `status: passed`, `dirty: false`, smoke 156/0, required checks 13/13, artifact integrity passed, QA verdict passed/shareable. Sensitive scan over downloaded artifact had no matches.
+
+- [x] **Step 3: Run Browser QA**
 
 Open the read-only local app at `http://127.0.0.1:8123/`, open stored samples, inspect the analysis tab key moment cards and evidence tab metadata. Confirm key moments show `초반` / `중반` instead of `EARLY` / `MID`, scoped raw visible token checks are empty, and console warn/error logs are empty.
+
+Result 2026-06-09: Browser QA on `http://127.0.0.1:8123/?qa=key-moment-phase-label` passed. Stored sample `sample-kr-8242613150` analysis tab key moment cards showed `초반` and `중반` badges for 4:46, 11:33, 15:27~17:30, and 22:08 moments. Scoped key moment/evidence visible text checks found no raw `EARLY`, `MID`, or `LATE` tokens; console warn/error count was 0.
 
 - [ ] **Step 4: Update Obsidian and final sync**
 
