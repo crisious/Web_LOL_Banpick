@@ -2331,14 +2331,19 @@ function hasValidKeyMoments(keyMoments) {
     hasValidKeyMomentItemShapes(keyMoments);
 }
 
-function hasValidPhaseSummaries(phaseSummaries) {
+function hasValidPhaseSummaryItemShapes(phaseSummaries) {
   return Array.isArray(phaseSummaries) &&
-    phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
     phaseSummaries.every((item) =>
       item &&
       isValidGamePhase(item.phase) &&
       isNonBlankString(item.summary)
     );
+}
+
+function hasValidPhaseSummaries(phaseSummaries) {
+  return Array.isArray(phaseSummaries) &&
+    phaseSummaries.length >= PHASE_SUMMARIES_MIN &&
+    hasValidPhaseSummaryItemShapes(phaseSummaries);
 }
 
 function hasAnalysisMetaObject(analysisMeta) {
@@ -2676,6 +2681,7 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push("type.phaseSummaries.object");
   }
   if (!hasValidPhaseSummaries(primary.phaseSummaries)) {
+    const phaseSummariesHaveValidItemShapes = hasValidPhaseSummaryItemShapes(primary.phaseSummaries);
     const phaseSummariesViolation = (
       phaseSummariesWasObject &&
       !phaseSummariesObjectHadUsableEntries
@@ -2692,7 +2698,8 @@ async function buildAnalysis(normalized, sampleId) {
         ? "missing.phaseSummaries"
         : (
           Array.isArray(primary.phaseSummaries) &&
-          primary.phaseSummaries.length < PHASE_SUMMARIES_MIN
+          primary.phaseSummaries.length < PHASE_SUMMARIES_MIN &&
+          phaseSummariesHaveValidItemShapes
         )
           ? `count.phaseSummaries<${PHASE_SUMMARIES_MIN}`
           : "shape.phaseSummaries.invalid";

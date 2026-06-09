@@ -28,6 +28,7 @@ function extractConstSource(source, name) {
 
 const hasValidKeyMomentItemShapesSrc = extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes");
 const hasValidKeyMomentsSrc = extractFunctionSource(serverSrc, "hasValidKeyMoments");
+const hasValidPhaseSummaryItemShapesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes");
 const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
 
 const supportSources = [
@@ -43,6 +44,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   hasValidKeyMomentItemShapesSrc,
   hasValidKeyMomentsSrc,
+  hasValidPhaseSummaryItemShapesSrc,
   hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
   extractFunctionSource(serverSrc, "isNonBlankString"),
@@ -163,8 +165,12 @@ checkTrue(
   serverSrc.includes("function isValidGamePhase(phase)"),
 );
 checkTrue(
-  "hasValidPhaseSummaries uses game phase enum",
-  hasValidPhaseSummariesSrc.includes("isValidGamePhase(item.phase)"),
+  "hasValidPhaseSummaryItemShapes uses game phase enum",
+  hasValidPhaseSummaryItemShapesSrc.includes("isValidGamePhase(item.phase)"),
+);
+checkTrue(
+  "hasValidPhaseSummaries reuses phase summary item shape helper",
+  hasValidPhaseSummariesSrc.includes("hasValidPhaseSummaryItemShapes(phaseSummaries)"),
 );
 checkTrue(
   "hasValidKeyMomentItemShapes uses game phase enum",

@@ -26,6 +26,7 @@ function extractConstSource(source, name) {
   return m[0];
 }
 
+const hasValidPhaseSummaryItemShapesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes");
 const hasValidPhaseSummariesSrc = extractFunctionSource(serverSrc, "hasValidPhaseSummaries");
 
 const supportSources = [
@@ -42,6 +43,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   extractFunctionSource(serverSrc, "hasValidKeyMomentItemShapes"),
   extractFunctionSource(serverSrc, "hasValidKeyMoments"),
+  hasValidPhaseSummaryItemShapesSrc,
   hasValidPhaseSummariesSrc,
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
   extractFunctionSource(serverSrc, "hasValidMatchSummary"),
@@ -141,13 +143,18 @@ expectThrows("phaseSummaries rejects tab-only summary", () => {
 }, "phaseSummaries");
 
 checkTrue(
-  "hasValidPhaseSummaries uses nonblank summary",
-  hasValidPhaseSummariesSrc.includes("isNonBlankString(item.summary)"),
+  "hasValidPhaseSummaryItemShapes uses nonblank summary",
+  hasValidPhaseSummaryItemShapesSrc.includes("isNonBlankString(item.summary)"),
 );
 
 checkTrue(
-  "hasValidPhaseSummaries keeps game phase enum validation",
-  hasValidPhaseSummariesSrc.includes("isValidGamePhase(item.phase)"),
+  "hasValidPhaseSummaryItemShapes keeps game phase enum validation",
+  hasValidPhaseSummaryItemShapesSrc.includes("isValidGamePhase(item.phase)"),
+);
+
+checkTrue(
+  "hasValidPhaseSummaries reuses phase summary item shape helper",
+  hasValidPhaseSummariesSrc.includes("hasValidPhaseSummaryItemShapes(phaseSummaries)"),
 );
 
 console.log(`\n${pass} passed, ${fail} failed`);

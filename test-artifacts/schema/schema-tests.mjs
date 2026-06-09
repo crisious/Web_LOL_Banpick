@@ -58,6 +58,9 @@ if (serverSrc.includes("const GAME_PHASES =")) {
 if (serverSrc.includes("function isValidGamePhase(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "isValidGamePhase"));
 }
+if (serverSrc.includes("function hasValidPhaseSummaryItemShapes(")) {
+  validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes"));
+}
 if (serverSrc.includes("function hasValidPhaseSummaries(")) {
   validatorSupportSources.push(extractFunctionSource(serverSrc, "hasValidPhaseSummaries"));
 }

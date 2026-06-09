@@ -43,6 +43,7 @@ const supportSources = [
   extractFunctionSource(serverSrc, "hasMinimumKeyMoments"),
   hasValidKeyMomentItemShapesSrc,
   hasValidKeyMomentsSrc,
+  extractFunctionSource(serverSrc, "hasValidPhaseSummaryItemShapes"),
   extractFunctionSource(serverSrc, "hasValidPhaseSummaries"),
   extractFunctionSource(serverSrc, "hasAnalysisMetaObject"),
   extractFunctionSource(serverSrc, "hasValidMatchSummary"),
