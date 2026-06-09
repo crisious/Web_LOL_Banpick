@@ -172,7 +172,7 @@ rg sensitive-output scan on test-artifacts/tmp/schema-metadata-nonblank-policy-l
 # no matches
 ```
 
-- [ ] **Step 6: Commit and push implementation**
+- [x] **Step 6: Commit and push implementation**
 
 Run:
 
@@ -182,9 +182,31 @@ git commit -m "test: guard schema metadata strings"
 git push origin main
 ```
 
-- [ ] **Step 7: Verify GitHub QA and finalize docs**
+Actual implementation commit evidence:
+
+```text
+commit d807cd2 test: guard schema metadata strings
+push: f9ac203..d807cd2 main -> main
+```
+
+- [x] **Step 7: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the final evidence.
+
+Actual implementation GitHub QA evidence at 2026-06-09 09:12 KST:
+
+```text
+workflow: QA
+run: 27175216796
+headSha: d807cd21232474d5bc5cfca4d1e1e29aa6f4fe29
+artifact: qa-automation-27175216796 / 7495477224
+qaStatus: passed
+requiredChecks: 13/13
+smoke: 156 passed / 0 failed
+durationMs: 207
+mode: readonly
+artifact sensitive-output scan: no matches
+```
 
 - [ ] **Step 8: Commit final documentation and sync main**
 
