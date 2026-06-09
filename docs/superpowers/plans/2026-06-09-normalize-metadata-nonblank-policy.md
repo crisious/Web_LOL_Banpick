@@ -147,7 +147,7 @@ rg sensitive-output scan on test-artifacts/tmp/normalize-metadata-nonblank-polic
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -157,9 +157,31 @@ git commit -m "fix: normalize analysis metadata strings"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation commit evidence:
+
+```text
+commit 022e679 fix: normalize analysis metadata strings
+push: 380ff08..022e679 main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Actual implementation GitHub QA evidence at 2026-06-09 09:23 KST:
+
+```text
+workflow: QA
+run: 27175641281
+headSha: 022e67930344988c375f2048457f09de2913fcd9
+artifact: qa-automation-27175641281 / 7495618684
+qaStatus: passed
+requiredChecks: 13/13
+smoke: 156 passed / 0 failed
+durationMs: 216
+mode: readonly
+artifact sensitive-output scan: no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
