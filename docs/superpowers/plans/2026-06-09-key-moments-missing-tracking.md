@@ -145,7 +145,7 @@ rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/key-moments-mis
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -155,9 +155,34 @@ git commit -m "test: track missing key moments"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Actual implementation commit:
+
+```text
+d5c1d25 test: track missing key moments
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence at 2026-06-09 10:21 KST:
+
+```text
+gh run watch 27177706331 --exit-status
+# success, job test-and-smoke in 20s
+
+artifact: qa-automation-27177706331
+artifact id: 7496352372
+headSha: d5c1d2500f2b807e7f2efce93623cfb0e018c07f
+qaVerdict.status=passed
+requiredChecks=13/13
+smokeSummary=156 passed / 0 failed
+mode=readonly
+durationMs=206
+
+rg -n --hidden -S "<sensitive/live-api scan>" test-artifacts/tmp/gh-run-27177706331
+# no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
