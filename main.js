@@ -3357,22 +3357,22 @@ function renderCandidates(matches) {
   dom.candidateList.innerHTML = matches
     .map(
       (match) => `
-        <button class="match-row" type="button" data-generate-match="${match.matchId}" data-result="${match.result}" aria-pressed="false">
+        <button class="match-row" type="button" data-generate-match="${escapeAttr(match.matchId)}" data-result="${escapeAttr(match.result)}" aria-pressed="false">
           <span class="match-row__icon">${championAvatarMarkup(match.champion, "medium")}</span>
           <div class="match-row__main">
             <div class="match-row__title">
-              <strong class="match-row__champion">${championDisplayName(match.champion)}</strong>
+              <strong class="match-row__champion">${escapeHtml(championDisplayName(match.champion))}</strong>
               <span class="match-row__role">${escapeHtml(roleLabel(match.role))}</span>
-              <span class="match-row__queue">${compactQueueLabel(match.queueType) || ""}</span>
-              <span class="match-row__patch">${matchPatchLabel(match.gameVersion) || ""}</span>
+              <span class="match-row__queue">${escapeHtml(compactQueueLabel(match.queueType) || "")}</span>
+              <span class="match-row__patch">${escapeHtml(matchPatchLabel(match.gameVersion) || "")}</span>
             </div>
             <div class="match-row__stats">
-              <span class="match-row__kda">${match.kills}/${match.deaths}/${match.assists}</span>
-              <span class="match-row__duration">${match.durationLabel || ""}</span>
-              <span class="match-row__cs">${buildCandidateCardSummary(match)}</span>
+              <span class="match-row__kda">${escapeHtml(`${match.kills}/${match.deaths}/${match.assists}`)}</span>
+              <span class="match-row__duration">${escapeHtml(match.durationLabel || "")}</span>
+              <span class="match-row__cs">${escapeHtml(buildCandidateCardSummary(match))}</span>
             </div>
           </div>
-          <span class="match-row__result" data-result="${match.result}">${resultLabel(match.result)}</span>
+          <span class="match-row__result" data-result="${escapeAttr(match.result)}">${escapeHtml(resultLabel(match.result))}</span>
         </button>
       `,
     )
