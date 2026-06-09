@@ -847,13 +847,15 @@ function championAssetKey(name) {
 }
 
 function championArtUrl(name) {
-  const key = championAssetKey(name);
+  const assetKey = championAssetKey(name);
+  const key = encodeURIComponent(assetKey);
   if (!key) return "";
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${key}_0.jpg`;
 }
 
 function championSquareUrl(name) {
-  const key = championAssetKey(name);
+  const assetKey = championAssetKey(name);
+  const key = encodeURIComponent(assetKey);
   if (!key || !championCdnVersion) return "";
   return `https://ddragon.leagueoflegends.com/cdn/${championCdnVersion}/img/champion/${key}.png`;
 }
@@ -2001,13 +2003,13 @@ function renderSampleSwitcher() {
   dom.sampleSwitcher.innerHTML = state.manifest
     .map(
       (sample) => `
-        <button class="sample-chip" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
+        <button class="sample-chip" type="button" data-sample-button="${escapeAttr(sample.id)}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
           <div class="sample-chip__row">
             ${championAvatarMarkup(sample.champion, "small")}
             <div class="sample-chip__copy">
-              <em class="sample-chip__champion">${championDisplayName(sample.champion)}</em>
+              <em class="sample-chip__champion">${escapeHtml(championDisplayName(sample.champion))}</em>
               <span>${escapeHtml(sampleReportLabel(sample))}</span>
-              <strong>${sample.publicAlias}</strong>
+              <strong>${escapeHtml(sample.publicAlias || "")}</strong>
             </div>
           </div>
         </button>
@@ -2022,24 +2024,24 @@ function renderSampleSwitcher() {
         const resultText = resultLabel(meta.result);
 
         return `
-          <button class="report-card" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
+          <button class="report-card" type="button" data-sample-button="${escapeAttr(sample.id)}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
             <div class="report-card__top">
-              <span class="meta-label">${sample.id}</span>
+              <span class="meta-label">${escapeHtml(sample.id)}</span>
               <span class="report-card__state">${reportStateLabel(sample.id === state.currentSampleId)}</span>
             </div>
             <div class="report-card__title">
               ${championAvatarMarkup(sample.champion, "medium")}
               <div>
-                <span class="report-card__champion">${championDisplayName(sample.champion)}</span>
+                <span class="report-card__champion">${escapeHtml(championDisplayName(sample.champion))}</span>
                 <h4>${escapeHtml(sampleReportLabel(sample))}</h4>
               </div>
             </div>
             <div class="report-card__badges">
               <span class="report-badge">${escapeHtml(roleLabel(meta.role))}</span>
-              <span class="report-badge report-badge--result" data-result="${meta.result}">${resultText}</span>
+              <span class="report-badge report-badge--result" data-result="${escapeAttr(meta.result)}">${escapeHtml(resultText)}</span>
             </div>
-            <p>${buildManifestCardSummary(sample)}</p>
-            <strong>${sample.publicAlias}</strong>
+            <p>${escapeHtml(buildManifestCardSummary(sample))}</p>
+            <strong>${escapeHtml(sample.publicAlias || "")}</strong>
           </button>
         `;
       })
