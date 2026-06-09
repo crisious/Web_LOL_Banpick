@@ -2396,7 +2396,7 @@ function renderTeamfightPhases(sample) {
         <article class="moment-card">
           <div class="moment-stamp">
             <span>${escapeHtml(tf.startLabel || "")}~${escapeHtml(tf.endLabel || "")}</span>
-            <strong>${escapeHtml(tf.gamePhase || "")}</strong>
+            <strong>${escapeHtml(gamePhaseLabel(tf.gamePhase))}</strong>
           </div>
           <div class="moment-copy">
             ${rows}
