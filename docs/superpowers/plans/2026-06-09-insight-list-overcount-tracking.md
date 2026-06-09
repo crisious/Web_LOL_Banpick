@@ -189,7 +189,7 @@ Expected: tests and smoke pass; the sensitive-pattern scan exits 1 with no match
 
 Result: Local QA passed on 2026-06-09 14:18 KST. `npm test` reported `2235 passed, 0 failed across 99 test file(s)`, `git diff --check` passed, read-only smoke report passed with 156 checks, and the local smoke artifact sensitive-pattern scan returned no matches.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Commit and push:
 
@@ -199,6 +199,10 @@ git commit -m "test: track overfull insight lists"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub QA**
+Result: Implementation commit `e3be2e3 test: track overfull insight lists` was pushed to `origin/main`.
+
+- [x] **Step 3: Verify GitHub QA**
 
 Watch the pushed `QA` workflow, download the uploaded `qa-automation-*` artifact, inspect `qa-summary.json`, and scan the artifact for the same sensitive patterns.
+
+Result: GitHub Actions QA run `27185581460` passed for commit `e3be2e3`. Artifact `7499123090` (`qa-automation-27185581460`, 3547 bytes) contained `qa-summary.json` with `latestRun.git.shortSha: "e3be2e3"`, `dirty: false`, smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, and sensitive-pattern scan returned no matches.
