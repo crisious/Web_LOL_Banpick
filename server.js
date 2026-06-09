@@ -2681,7 +2681,20 @@ async function buildAnalysis(normalized, sampleId) {
   }
 
   // 한타 단계별 분석: payload의 결정론적 구조 + AI 코칭 병합 (AI 누락/오형식 시 룰 기반 폴백)
+  const hasTeamfightPayload = Array.isArray(payload.teamfightPhases) && payload.teamfightPhases.length > 0;
   if (
+    hasTeamfightPayload &&
+    (
+      primary.teamfightPhaseAnalysis === undefined ||
+      primary.teamfightPhaseAnalysis === null ||
+      (
+        Array.isArray(primary.teamfightPhaseAnalysis) &&
+        primary.teamfightPhaseAnalysis.length === 0
+      )
+    )
+  ) {
+    violations.push("missing.teamfightPhaseAnalysis");
+  } else if (
     primary.teamfightPhaseAnalysis !== undefined &&
     primary.teamfightPhaseAnalysis !== null &&
     !hasValidTeamfightPhaseAnalysis(primary.teamfightPhaseAnalysis)
