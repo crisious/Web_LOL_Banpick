@@ -225,7 +225,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riot
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -235,9 +235,45 @@ git commit -m "test: track malformed short key moments"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Implementation commit evidence (2026-06-09 12:59 KST):
+
+```text
+git commit -m "test: track malformed short key moments"
+# [main 74a1c5f] test: track malformed short key moments
+# 30 files changed, 611 insertions(+), 19 deletions(-)
+
+git push origin main
+# e8e65de..74a1c5f  main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence (2026-06-09 13:00 KST):
+
+```text
+gh run watch 27182926352 --exit-status
+# main QA passed
+# test-and-smoke completed in 22s
+
+gh api repos/crisious/Web_LOL_Banpick/actions/runs/27182926352/artifacts --jq '.artifacts[] | {id, name, size_in_bytes, expired}'
+# {"expired":false,"id":7498187536,"name":"qa-automation-27182926352","size_in_bytes":3551}
+
+qa-summary.json
+# latestRun.status: passed
+# latestRun.qaVerdict.status: passed
+# latestRun.smokeSummary: 156 passed, 0 failed
+# latestRun.requiredCheckSummary: 13 passed, 0 failed, 0 missing
+# latestRun.durationMs: 203
+# latestRun.git.shortSha: 74a1c5f
+# latestRun.git.dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riotgames\.com|americas\.api\.riotgames\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27182926352
+# no matches
+```
+
+Obsidian project improvement note updated with the key moments shape-before-count implementation record.
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
