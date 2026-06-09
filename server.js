@@ -2688,8 +2688,18 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push(evidenceIndexViolation);
   }
   if (!hasValidInsightList(primary.strengths)) {
+    const strengthsViolation = (
+      primary.strengths === undefined ||
+      primary.strengths === null ||
+      (
+        Array.isArray(primary.strengths) &&
+        primary.strengths.length === 0
+      )
+    )
+      ? "missing.strengths"
+      : "shape.strengths.invalid";
     primary.strengths = buildStrengths(normalized);
-    violations.push("shape.strengths.invalid");
+    violations.push(strengthsViolation);
   }
   if (!hasValidInsightList(primary.weaknesses)) {
     primary.weaknesses = buildWeaknesses(normalized);
