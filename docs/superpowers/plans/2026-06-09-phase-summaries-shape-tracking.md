@@ -162,7 +162,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riot
 # no matches
 ```
 
-- [ ] **Step 5: Commit and push implementation**
+- [x] **Step 5: Commit and push implementation**
 
 Run:
 
@@ -172,9 +172,42 @@ git commit -m "test: track malformed phase summaries"
 git push origin main
 ```
 
-- [ ] **Step 6: Verify GitHub QA and finalize docs**
+Implementation commit evidence (2026-06-09 12:20 KST):
+
+```text
+git commit -m "test: track malformed phase summaries"
+# [main 9188991] test: track malformed phase summaries
+# 3 files changed, 454 insertions(+), 1 deletion(-)
+
+git push origin main
+# c2648de..9188991  main -> main
+```
+
+- [x] **Step 6: Verify GitHub QA and finalize docs**
 
 Use `gh run watch` for the implementation commit's QA run. Download the `qa-automation-<run-id>` artifact, inspect `qa-summary.json`, run the sensitive-output scan, then update this plan and the Obsidian project improvement note with the implementation evidence.
+
+Implementation GitHub QA evidence (2026-06-09 12:21 KST):
+
+```text
+gh run watch 27181698755 --exit-status
+# main QA 27181698755 passed
+# head SHA: 9188991a5eabb9409230fb4bc698ae247c4b96e3
+
+gh api repos/crisious/Web_LOL_Banpick/actions/runs/27181698755/artifacts --jq '.artifacts[] | {id, name, size_in_bytes, expired}'
+# {"expired":false,"id":7497756433,"name":"qa-automation-27181698755","size_in_bytes":3555}
+
+node -e '...read test-artifacts/tmp/gh-run-27181698755/.../qa-summary.json...'
+# status: passed
+# qaVerdict: passed
+# smoke: 156 passed, 0 failed
+# required: 13 passed, 0 failed, 0 missing
+# shortSha: 9188991
+# dirty: false
+
+rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|kr\.api\.riotgames\.com|americas\.api\.riotgames\.com|/lol/|live Riot|sample generation" test-artifacts/tmp/gh-run-27181698755
+# no matches
+```
 
 - [ ] **Step 7: Commit final documentation and sync main**
 
