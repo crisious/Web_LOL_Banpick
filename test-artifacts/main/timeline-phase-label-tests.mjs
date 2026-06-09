@@ -33,7 +33,14 @@ function extractFunctionSource(source, name) {
 
 const htmlEscapeSrc = extractConstSource(mainSrc, "HTML_ESCAPE");
 const escapeHtmlSrc = extractFunctionSource(mainSrc, "escapeHtml");
+const escapeAttrSrc = extractFunctionSource(mainSrc, "escapeAttr");
 const gamePhaseLabelSrc = extractFunctionSource(mainSrc, "gamePhaseLabel");
+const objectiveTypeLabelSrc = extractFunctionSource(mainSrc, "objectiveTypeLabel");
+const objectiveTypeIconSrc = extractFunctionSource(mainSrc, "objectiveTypeIcon");
+const objectiveLaneLabelSrc = extractFunctionSource(mainSrc, "objectiveLaneLabel");
+const objectiveTeamLabelSrc = extractFunctionSource(mainSrc, "objectiveTeamLabel");
+const objectiveTeamClassSrc = extractFunctionSource(mainSrc, "objectiveTeamClass");
+const objectiveTeamKeySrc = extractFunctionSource(mainSrc, "objectiveTeamKey");
 const renderDualTimelineSrc = extractFunctionSource(mainSrc, "renderDualTimeline");
 const renderDualTimelineDetailSrc = extractFunctionSource(mainSrc, "renderDualTimelineDetail");
 const renderObjectiveTimelineSrc = extractFunctionSource(mainSrc, "renderObjectiveTimeline");
@@ -41,7 +48,14 @@ const renderObjectiveTimelineSrc = extractFunctionSource(mainSrc, "renderObjecti
 const { renderObjectiveTimeline, dom } = new Function(
   `${htmlEscapeSrc}
 ${escapeHtmlSrc}
+${escapeAttrSrc}
 ${gamePhaseLabelSrc}
+${objectiveTypeLabelSrc}
+${objectiveTypeIconSrc}
+${objectiveLaneLabelSrc}
+${objectiveTeamLabelSrc}
+${objectiveTeamClassSrc}
+${objectiveTeamKeySrc}
 const dom = {
   objectiveSummary: { innerHTML: "" },
   objectiveTable: { innerHTML: "" },

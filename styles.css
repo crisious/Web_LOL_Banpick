@@ -2156,8 +2156,13 @@ body::after {
   background: var(--rose-bg-weak);
 }
 
+.obj-row--unknown {
+  background: var(--surface-2);
+}
+
 .obj-team-cell[data-team="ALLY"] { color: var(--mint); font-weight: 600; }
 .obj-team-cell[data-team="ENEMY"] { color: var(--rose); font-weight: 600; }
+.obj-team-cell[data-team="UNKNOWN"] { color: var(--muted); font-weight: 600; }
 
 .obj-phase-divider td {
   padding: 6px 10px;

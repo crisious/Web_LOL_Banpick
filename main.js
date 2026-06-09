@@ -452,6 +452,46 @@ function kdaEventTypeClass(eventType) {
   return "neutral";
 }
 
+function objectiveTypeLabel(type) {
+  if (type === "OBJECTIVE") return "오브젝트";
+  if (type === "STRUCTURE") return "구조물";
+  return "이벤트";
+}
+
+function objectiveTypeIcon(type) {
+  if (type === "OBJECTIVE") return "🐉";
+  if (type === "STRUCTURE") return "🏛";
+  return "•";
+}
+
+function objectiveLaneLabel(lane) {
+  const key = String(lane || "").trim();
+  const labels = {
+    TOP_LANE: "탑",
+    MID_LANE: "미드",
+    BOT_LANE: "봇",
+  };
+  return labels[key] || "위치 미상";
+}
+
+function objectiveTeamLabel(team) {
+  if (team === "ALLY") return "아군";
+  if (team === "ENEMY") return "적";
+  return "팀 미상";
+}
+
+function objectiveTeamClass(team) {
+  if (team === "ALLY") return "ally";
+  if (team === "ENEMY") return "enemy";
+  return "unknown";
+}
+
+function objectiveTeamKey(team) {
+  if (team === "ALLY") return "ALLY";
+  if (team === "ENEMY") return "ENEMY";
+  return "UNKNOWN";
+}
+
 function combatSituationLabel(situation) {
   if (situation === "PLAYER_DOMINANT") return "우세";
   if (situation === "PLAYER_DOWN") return "열세";
@@ -3065,24 +3105,25 @@ function renderObjectiveTimeline(sample) {
     </div>
   `;
 
-  const laneLabel = { TOP_LANE: "탑", MID_LANE: "미드", BOT_LANE: "봇" };
-
   let lastPhase = "";
   const rows = timeline.map((e) => {
     const phaseName = gamePhaseLabel(e.phase);
     const phaseDivider = e.phase !== lastPhase ? `<tr class="obj-phase-divider"><td colspan="6">${escapeHtml(phaseName)}</td></tr>` : "";
     lastPhase = e.phase;
-    const teamClass = e.team === "ALLY" ? "obj-row--ally" : "obj-row--enemy";
-    const teamText = e.team === "ALLY" ? "아군" : "적";
-    const typeIcon = e.type === "STRUCTURE" ? "🏛" : "🐉";
+    const teamClass = objectiveTeamClass(e.team);
+    const teamText = objectiveTeamLabel(e.team);
+    const teamKey = objectiveTeamKey(e.team);
+    const typeLabel = objectiveTypeLabel(e.type);
+    const typeIcon = objectiveTypeIcon(e.type);
+    const laneText = objectiveLaneLabel(e.lane);
     return `${phaseDivider}
-      <tr class="${teamClass}">
-        <td>${e.timeLabel}</td>
+      <tr class="obj-row--${escapeAttr(teamClass)}">
+        <td>${escapeHtml(e.timeLabel || "")}</td>
         <td>${escapeHtml(phaseName)}</td>
-        <td>${typeIcon} ${e.type === "STRUCTURE" ? "구조물" : "오브젝트"}</td>
-        <td>${e.label}</td>
-        <td>${laneLabel[e.lane] || e.lane || "—"}</td>
-        <td class="obj-team-cell" data-team="${e.team}">${teamText}</td>
+        <td>${escapeHtml(typeIcon)} ${escapeHtml(typeLabel)}</td>
+        <td>${escapeHtml(e.label || "")}</td>
+        <td>${escapeHtml(laneText)}</td>
+        <td class="obj-team-cell" data-team="${escapeAttr(teamKey)}">${escapeHtml(teamText)}</td>
       </tr>`;
   }).join("");
 
