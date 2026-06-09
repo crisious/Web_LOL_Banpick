@@ -184,6 +184,17 @@ Actual GitHub QA result:
 - Demo safety evidence: `passed`.
 - Artifact sensitive scan: no `RGAPI`, `api_key`, `RIOT_API_KEY`, `Authorization`, `Bearer`, Riot host, `/lol/`, live Riot, or sample-generation matches.
 
-- [ ] **Step 5: Record the cycle**
+- [x] **Step 5: Record the cycle**
 
 Update the repository plan and Obsidian project plan with RED/GREEN evidence, local QA, browser QA, GitHub run/artifact identifiers, and final sync status.
+
+Repository plan record:
+
+- Final docs commit: `bac8cc3 docs: finalize recent breakdown escaping plan`
+- Final docs QA run: `27203863806`
+- Final docs QA URL: `https://github.com/crisious/Web_LOL_Banpick/actions/runs/27203863806`
+- Final docs artifact: `qa-automation-27203863806`
+- Final docs artifact id: `7506611482`
+- Final docs artifact digest: `sha256:abc4da7960aa609c6a4ad0d151d3515e29c27c3a06e08958562cd4328d91f7a2`
+- Final docs artifact summary: `latestRun.status=passed`, `qaVerdict=passed`, `exitCode=0`, `shortSha=bac8cc3`, `dirty=false`, smoke `156 passed / 0 failed`, required checks `13 pass`, artifact integrity `passed`, sample evidence `passed`, demo safety `passed`.
+- Final docs artifact sensitive scan: no `RGAPI`, `api_key`, `RIOT_API_KEY`, `Authorization`, `Bearer`, Riot host, `/lol/`, live Riot, or sample-generation matches.
