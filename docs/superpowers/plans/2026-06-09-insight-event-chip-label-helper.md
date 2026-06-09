@@ -127,9 +127,9 @@ Observed 2026-06-09 18:58 KST: `npm test` reported `2512 passed, 0 failed across
 
 Open `http://127.0.0.1:8123/?qa=insight-event-chip-label`, click `저장 샘플 열기`, inspect visible `.event-chip` text in insight cards, and confirm Korean event labels are visible, raw event tokens are absent from scoped chip text, and console warn/error count is 0.
 
-Observed 2026-06-09 19:00 KST: Browser QA on `http://127.0.0.1:8123/?qa=insight-event-chip-label` passed. Stored sample opened, report content became visible, `.insight-card` count was 6, `.event-chip` count was 12, visible chip labels included `드래곤 교전`, `오브젝트 준비 성공`, `한타 후속`, `소규모 교전 승리`, `데스`, `오브젝트 준비 실패`, and `바론 교전`; scoped chip visible-text raw token checks for timeline event enums were empty. Console warn/error count was 0.
+Observed 2026-06-09 18:56 KST: Browser QA on `http://127.0.0.1:8123/?qa=insight-event-chip-label` passed. Stored sample opened, report content became visible, `.insight-card` count was 6, `.event-chip` count was 12, visible chip labels included `드래곤 교전`, `오브젝트 준비 성공`, `한타 후속`, `소규모 교전 승리`, `데스`, `오브젝트 준비 실패`, and `바론 교전`; scoped chip visible-text raw token checks for timeline event enums were empty. Console warn/error count was 0.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -139,11 +139,15 @@ git commit -m "test: reuse insight event chip labels"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub QA artifact**
+Observed 2026-06-09 18:57 KST: implementation commit `493baf9 test: reuse insight event chip labels` was pushed to `origin/main`.
+
+- [x] **Step 4: Verify GitHub QA artifact**
 
 Run `gh run list`, watch the latest `main` run for the pushed commit, download `qa-automation-<run-id>`, inspect `qa-summary.json`, and run the same sensitive scan on the artifact directory.
 
-- [ ] **Step 5: Record Obsidian evidence and finalize plan**
+Observed 2026-06-09 18:58 KST: GitHub Actions QA run `27198440443` for `493baf9` passed. Artifact `7504378975` (`qa-automation-27198440443`, 3549 bytes, digest `sha256:d5a83c50ce7af021d05e6fa45879bb4c13bd69ddb3e78148c18d3067b354d21d`) downloaded successfully. `qa-summary.json` reported `status: "passed"`, `exitCode: 0`, `latestRun.git.shortSha: "493baf9"`, `dirty: false`, smoke `156 passed / 0 failed`, required checks `13 passed / 0 failed / 0 missing`, artifact integrity `passed`, and QA verdict `passed`. Sensitive pattern scan over `test-artifacts/tmp/github-qa-27198440443` had no matches.
+
+- [x] **Step 5: Record Obsidian evidence and finalize plan**
 
 Append an insight event chip label helper entry to `/Users/a1234/Documents/Obsidian Cloud/게임 기획/LOL AI Coach - 프로젝트 개선 계획.md` with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, sensitive scan, and final sync evidence. Then mark completed plan steps in this file, commit with:
 
@@ -152,6 +156,8 @@ git add docs/superpowers/plans/2026-06-09-insight-event-chip-label-helper.md
 git commit -m "docs: finalize insight event chip label plan"
 git push origin main
 ```
+
+Observed 2026-06-09 18:59 KST: Obsidian project log was updated with RED/GREEN/full QA, browser QA, implementation commit, GitHub run/artifact, and sensitive scan evidence. This repository plan finalization is committed separately so the final docs-only GitHub QA run can be recorded in Obsidian without creating another documentation loop.
 
 - [ ] **Step 6: Final sync**
 
