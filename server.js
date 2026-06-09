@@ -2332,8 +2332,7 @@ function hasValidPhaseSummaries(phaseSummaries) {
     phaseSummaries.every((item) =>
       item &&
       isValidGamePhase(item.phase) &&
-      typeof item.summary === "string" &&
-      item.summary
+      isNonBlankString(item.summary)
     );
 }
 

@@ -611,6 +611,18 @@ expectThrows("phaseSummaries item missing summary throws", () => {
   validateAnalysisOutput(f);
 }, "phaseSummaries");
 
+expectThrows("phaseSummaries item whitespace summary throws", () => {
+  const f = validFixture();
+  f.phaseSummaries[0] = { ...f.phaseSummaries[0], summary: "   " };
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
+expectThrows("phaseSummaries item tab-only summary throws", () => {
+  const f = validFixture();
+  f.phaseSummaries[1] = { ...f.phaseSummaries[1], summary: "\t" };
+  validateAnalysisOutput(f);
+}, "phaseSummaries");
+
 expectThrows("phaseSummaries item object missing throws", () => {
   const f = validFixture();
   f.phaseSummaries = [null, { phase: "MID", summary: "mid" }, { phase: "LATE", summary: "late" }];
