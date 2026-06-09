@@ -105,7 +105,7 @@ Use an isolated temporary sample root with an unsafe manifest entry, open the re
 
 Actual browser QA: ran `PUBLIC_DEMO_MODE=readonly PORT=8124 SAMPLES_DIR=test-artifacts/tmp/trend-panel-browser-samples npm start`, opened `http://127.0.0.1:8124`, loaded the stored sample, switched to `추세`, and verified the trend panel with unsafe manifest theme strings. `dangerousElementCounts` for `img`, `script`, `svg`, and `b` were all `0`; escaped `svg`, `script`, and `b` payload strings were present in `innerHTML`; raw payload markers were absent; console warn/error count was `0`. The browser tab and temporary server were closed after verification.
 
-- [ ] **Step 3: Commit and push implementation**
+- [x] **Step 3: Commit and push implementation**
 
 Run:
 
@@ -115,10 +115,14 @@ git commit -m "test: escape trend panel content"
 git push origin main
 ```
 
-- [ ] **Step 4: Verify GitHub Actions artifact**
+- [x] **Step 4: Verify GitHub Actions artifact**
 
 Watch the resulting `main` workflow run, download its `qa-automation-*` artifact, inspect `qa-summary.json`, and run the sensitive-string scan against the downloaded artifact.
 
-- [ ] **Step 5: Record the cycle**
+Actual implementation publish QA: commit `841d630 test: escape trend panel content` pushed to `origin/main`. GitHub Actions QA run `27202293060` completed with `success`; artifact `7505969110` (`qa-automation-27202293060`, digest `sha256:174c92b7f8280a05db974427f0224de123a5b5abb64539304439da60926e4550`) was downloaded and parsed. `qa-summary.json` reported `status: passed`, `exitCode: 0`, `shortSha: "841d630"`, `dirty: false`, smoke `156 passed / 0 failed`, required checks `13 passed / 0 failed / 0 missing`, artifact integrity `passed`, and QA verdict `passed`. Sensitive-pattern scan over `test-artifacts/tmp/github-qa-27202293060` returned no matches.
+
+- [x] **Step 5: Record the cycle**
 
 Update the repository plan and Obsidian project plan with RED/GREEN evidence, local QA, browser QA, GitHub run/artifact identifiers, and final sync status.
+
+Actual record: repository plan was updated with the trend panel escaping scope, RED/GREEN evidence, local QA, browser QA, implementation GitHub run/artifact identifiers, and artifact scan result. Obsidian will be updated after final docs QA so it can reference the final synced main commit.
