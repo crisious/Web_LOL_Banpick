@@ -2262,7 +2262,7 @@ function renderInsightCards(host, items, kind, sample) {
             ${linkedEvidence
               .map(
                 (entry) => `
-                  <span class="event-chip">${escapeHtml(entry.timestamp)} · ${escapeHtml(entry.eventType)}</span>
+                  <span class="event-chip">${escapeHtml(entry.timestamp)} · ${escapeHtml(compactEventTypeLabel(entry.eventType))}</span>
                 `,
               )
               .join("")}
@@ -2490,6 +2490,7 @@ function renderEvidence(sample) {
 }
 
 function compactEventTypeLabel(eventType) {
+  const key = String(eventType || "").trim();
   const labels = {
     CHAMPION_KILL: "킬 관여",
     PLAYER_DEATH: "데스",
@@ -2506,7 +2507,7 @@ function compactEventTypeLabel(eventType) {
     BAD_ENGAGE: "불리한 진입",
     LANE_PRIORITY: "라인 주도권",
   };
-  return labels[eventType] || String(eventType || "—").replace(/_/g, " ");
+  return labels[key] || "이벤트";
 }
 
 function evidenceTone(eventType) {
