@@ -2654,8 +2654,18 @@ async function buildAnalysis(normalized, sampleId) {
     violations.push("shape.keyMoments.invalid");
   }
   if (!hasValidEvidenceIndex(primary.evidenceIndex)) {
+    const evidenceIndexViolation = (
+      primary.evidenceIndex === undefined ||
+      primary.evidenceIndex === null ||
+      (
+        Array.isArray(primary.evidenceIndex) &&
+        primary.evidenceIndex.length === 0
+      )
+    )
+      ? "missing.evidenceIndex"
+      : "shape.evidenceIndex.invalid";
     primary.evidenceIndex = buildEvidenceIndex(normalized);
-    violations.push("missing.evidenceIndex");
+    violations.push(evidenceIndexViolation);
   }
   if (!hasValidInsightList(primary.strengths)) {
     primary.strengths = buildStrengths(normalized);
