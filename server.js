@@ -2727,7 +2727,12 @@ async function buildAnalysis(normalized, sampleId) {
       )
     )
       ? "missing.strengths"
-      : "shape.strengths.invalid";
+      : (
+        Array.isArray(primary.strengths) &&
+        primary.strengths.length < INSIGHT_LIST_MIN
+      )
+        ? `count.strengths<${INSIGHT_LIST_MIN}`
+        : "shape.strengths.invalid";
     primary.strengths = buildStrengths(normalized);
     violations.push(strengthsViolation);
   }
