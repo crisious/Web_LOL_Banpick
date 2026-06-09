@@ -389,7 +389,21 @@ function gamePhaseLabel(phase) {
 }
 
 function resultLabel(result) {
-  return result === "WIN" ? "승리" : "패배";
+  if (result === "WIN") return "승리";
+  if (result === "LOSS") return "패배";
+  return "결과 미상";
+}
+
+function roleLabel(role) {
+  const key = String(role || "").trim();
+  const labels = {
+    TOP: "탑",
+    JUNGLE: "정글",
+    MID: "미드",
+    ADC: "원딜",
+    SUPPORT: "서포터",
+  };
+  return labels[key] || "역할 미상";
 }
 
 function combatSituationLabel(situation) {
@@ -914,7 +928,7 @@ function candidateIdentityMetaMarkup(match) {
   const result = candidateResultToken(match);
 
   if (role) {
-    tokens.push(`<span class="candidate-head__tag">${role}</span>`);
+    tokens.push(`<span class="candidate-head__tag">${escapeHtml(roleLabel(role))}</span>`);
   }
 
   if (result) {
@@ -930,6 +944,14 @@ function parseReportMeta(sample) {
   const detail = String(sample.label || "").split("·")[1]?.trim() || "";
   const [role = "UNKNOWN", result = "UNKNOWN"] = detail.split(/\s+/);
   return { role, result };
+}
+
+function sampleReportLabel(sample) {
+  const rawLabel = String(sample?.label || sample?.id || "").trim();
+  const base = (rawLabel.split("·")[0] || sample?.id || "").trim();
+  const meta = parseReportMeta(sample || {});
+  const detail = [roleLabel(meta.role), resultLabel(meta.result)].filter(Boolean).join(" ");
+  return [base, detail].filter(Boolean).join(" · ");
 }
 
 function classifyTheme(theme) {
@@ -1000,7 +1022,7 @@ function buildManifestCardSummary(sample) {
     return parts.slice(0, 2).join(" · ");
   }
 
-  return compactInsightLabel(text).slice(0, 42) || sample.label;
+  return compactInsightLabel(text).slice(0, 42) || sampleReportLabel(sample);
 }
 
 function buildCandidateCardSummary(match) {
@@ -1067,7 +1089,7 @@ function buildTrendSnapshot() {
     .slice(0, 3)
     .map(([tag, count]) => `${tag} ${count}회`);
 
-  const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${dominantRole} 비중 ${dominantRoleCount}회`;
+  const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${roleLabel(dominantRole)} 비중 ${dominantRoleCount}회`;
   const summary =
     recurringTags.length > 0
       ? `반복 신호: ${recurringTags.slice(0, 2).join(" / ")}. 현재 샘플 ${current?.id || "-"} 기준으로 복기 중입니다.`
@@ -1079,7 +1101,7 @@ function buildTrendSnapshot() {
     stats: [
       { label: "Reports", value: `${samples.length}개`, note: "저장된 리포트 수" },
       { label: "Record", value: `${wins}승 ${losses}패`, note: "저장 샘플 기준" },
-      { label: "Main Role", value: dominantRole, note: `가장 많이 나온 포지션 ${dominantRoleCount}회` },
+      { label: "Main Role", value: roleLabel(dominantRole), note: `가장 많이 나온 포지션 ${dominantRoleCount}회` },
       { label: "Current", value: current?.id || "-", note: "현재 보고 있는 샘플" },
     ],
     tags: recurringTags,
@@ -1561,7 +1583,7 @@ function renderRoleBreakdown() {
       (r) => `
         <li class="breakdown-row" data-role="${r.role}">
           <span class="breakdown-row__icon breakdown-row__icon--role">${ROLE_INITIAL[r.role] || r.role.slice(0, 3)}</span>
-          <span class="breakdown-row__label">${r.role}</span>
+          <span class="breakdown-row__label">${roleLabel(r.role)}</span>
           <span class="breakdown-row__count">${r.count}경기</span>
           <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${r.wrPct}%"></span></span>
           <span class="breakdown-row__wr-text">${r.wrPct}%</span>
@@ -1584,7 +1606,7 @@ function formatDurationSeconds(totalSeconds) {
 function buildCompactHeadline(sample) {
   const match = sampleMatchSummary(sample);
   const resultText = match.result ? resultLabel(match.result) : "결과 미상";
-  const base = [match.champion, match.role, resultText].filter(Boolean).join(" ");
+  const base = [match.champion, roleLabel(match.role), resultText].filter(Boolean).join(" ");
   const candidateThemes = sample.normalized.derivedSignals?.candidateThemes || [];
 
   let positive = "";
@@ -1837,7 +1859,7 @@ function renderLoginDemoStatus() {
   }
   if (dom.loginSampleMeta) {
     dom.loginSampleMeta.textContent = sample
-      ? `${sampleCount}개 보관 · ${sample.publicAlias || sample.label || sample.id}`
+      ? `${sampleCount}개 보관 · ${sample.publicAlias || sampleReportLabel(sample)}`
       : "샘플 대기 중";
   }
   if (dom.loginLiveLock) {
@@ -1886,7 +1908,7 @@ function renderSampleSwitcher() {
             ${championAvatarMarkup(sample.champion, "small")}
             <div class="sample-chip__copy">
               <em class="sample-chip__champion">${championDisplayName(sample.champion)}</em>
-              <span>${sample.label}</span>
+              <span>${escapeHtml(sampleReportLabel(sample))}</span>
               <strong>${sample.publicAlias}</strong>
             </div>
           </div>
@@ -1899,7 +1921,7 @@ function renderSampleSwitcher() {
     dom.reportStrip.innerHTML = visibleReportSamples()
       .map((sample) => {
         const meta = parseReportMeta(sample);
-        const resultText = meta.result === "WIN" ? "승리" : meta.result === "LOSS" ? "패배" : meta.result;
+        const resultText = resultLabel(meta.result);
 
         return `
           <button class="report-card" type="button" data-sample-button="${sample.id}" data-active="${sample.id === state.currentSampleId}" aria-pressed="${sample.id === state.currentSampleId}">
@@ -1911,11 +1933,11 @@ function renderSampleSwitcher() {
               ${championAvatarMarkup(sample.champion, "medium")}
               <div>
                 <span class="report-card__champion">${championDisplayName(sample.champion)}</span>
-                <h4>${sample.label}</h4>
+                <h4>${escapeHtml(sampleReportLabel(sample))}</h4>
               </div>
             </div>
             <div class="report-card__badges">
-              <span class="report-badge">${meta.role}</span>
+              <span class="report-badge">${escapeHtml(roleLabel(meta.role))}</span>
               <span class="report-badge report-badge--result" data-result="${meta.result}">${resultText}</span>
             </div>
             <p>${buildManifestCardSummary(sample)}</p>
@@ -1956,7 +1978,7 @@ function renderHero(sample) {
     applyChampionAvatarPresentation(dom.snapshotChampionIcon, match.champion);
     queueChampionVersionLoad();
   }
-  if (dom.snapshotRole) dom.snapshotRole.textContent = match.role || "—";
+  if (dom.snapshotRole) dom.snapshotRole.textContent = roleLabel(match.role);
   if (dom.snapshotQueue) dom.snapshotQueue.textContent = compactQueueLabel(match.queueType);
   dom.snapshotDuration.textContent = sample.normalized?.matchInfo?.durationLabel || "—";
   dom.snapshotPatch.textContent = compactPatchLabel(match.gameVersion);
@@ -3215,7 +3237,7 @@ async function selectSample(sampleId) {
   // (load 중인 동시 호출에서 오작동 방지).
   if (state.currentSample && state.currentSample.sampleId === sampleId) {
     const match = sampleMatchSummary(state.currentSample);
-    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
+    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, roleLabel(match.role), match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
     return;
   }
 
@@ -3228,7 +3250,7 @@ async function selectSample(sampleId) {
     const sample = await loadSampleBundle(sampleId);
     const match = sampleMatchSummary(sample);
     renderSample(sample);
-    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
+    dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, roleLabel(match.role), match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
   } catch (error) {
     dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(formatRetryMessage(error))} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
   }
@@ -3243,7 +3265,7 @@ function renderCandidates(matches) {
           <div class="match-row__main">
             <div class="match-row__title">
               <strong class="match-row__champion">${championDisplayName(match.champion)}</strong>
-              <span class="match-row__role">${match.role || ""}</span>
+              <span class="match-row__role">${escapeHtml(roleLabel(match.role))}</span>
               <span class="match-row__queue">${compactQueueLabel(match.queueType) || ""}</span>
               <span class="match-row__patch">${matchPatchLabel(match.gameVersion) || ""}</span>
             </div>
@@ -3446,7 +3468,11 @@ async function handleGenerateSample(matchId) {
       state.manifest = await loadManifest();
     } catch {}
 
-    dom.fetchStatus.textContent = `${result.sampleId} 생성 완료 · ${result.analysis.matchSummary.champion} ${result.analysis.matchSummary.role} ${result.analysis.matchSummary.result}`;
+    dom.fetchStatus.textContent = `${result.sampleId} 생성 완료 · ${[
+      result.analysis.matchSummary.champion,
+      roleLabel(result.analysis.matchSummary.role),
+      resultLabel(result.analysis.matchSummary.result),
+    ].filter(Boolean).join(" ")}`;
     return result;
   } catch (error) {
     maybeHandleRiotKeyError(error);
@@ -3674,7 +3700,7 @@ function renderMatchList() {
           <div class="role-bar-list">
             ${roleEntries.map(([role, count]) => `
               <div class="role-bar-item">
-                <span class="role-bar-label">${role}</span>
+                <span class="role-bar-label">${roleLabel(role)}</span>
                 <div class="role-bar-track">
                   <div class="role-bar-fill" style="width: ${Math.round((count / matches.length) * 100)}%"></div>
                 </div>
@@ -3723,7 +3749,7 @@ function renderMatchList() {
             ${championAvatarMarkup(m.champion, "small")}
             <div>
               <strong>${championDisplayName(m.champion)}</strong>
-              <span class="meta-label">${m.role} ${masteryBadge}</span>
+              <span class="meta-label">${escapeHtml(roleLabel(m.role))} ${masteryBadge}</span>
             </div>
           </div>
           <div class="msc-kda-block">
@@ -3870,7 +3896,7 @@ async function startDetailAnalysis(matchId) {
         skippedSteps: ["riot", "ai"],
       });
       renderSample(prefetched);
-      dom.fetchStatus.textContent = `${state.currentSampleId || matchId} 로드 완료 · ${[match.champion, match.role, match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
+      dom.fetchStatus.textContent = `${state.currentSampleId || matchId} 로드 완료 · ${[match.champion, roleLabel(match.role), match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
       setView("DETAIL_VIEW");
       completeDetailProgress("저장된 분석 리포트를 열었습니다.");
       return;
