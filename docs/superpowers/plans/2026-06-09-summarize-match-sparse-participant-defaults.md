@@ -132,7 +132,7 @@ Expected: focused tests pass, full suite passes, diff check passes, smoke report
 
 Result: `node test-artifacts/server/match-summary-tests.mjs` reported `32 passed, 0 failed`; `node test-artifacts/server/public-demo-mode-gate-tests.mjs` reported `67 passed, 0 failed`; `npm test` reported `2250 passed, 0 failed across 99 test file(s)`; `git diff --check` passed; local read-only smoke report passed 156 checks at `test-artifacts/tmp/summarize-match-sparse-defaults-local/2026-06-09T05-37-16Z-readonly`; sensitive pattern scan against `test-artifacts/tmp/summarize-match-sparse-defaults-local` had no matches.
 
-- [ ] **Step 2: Commit and push implementation**
+- [x] **Step 2: Commit and push implementation**
 
 Run:
 
@@ -142,13 +142,17 @@ git commit -m "test: default sparse match summaries"
 git push origin main
 ```
 
-- [ ] **Step 3: Verify GitHub Actions artifact**
+- [x] **Step 3: Verify GitHub Actions artifact**
 
 Use `gh run list` and `gh run download` for the pushed commit. Confirm `qa-summary.json` reports the pushed short SHA, `dirty: false`, smoke pass counts, required checks total/passed, and no sensitive pattern matches in the downloaded artifact.
 
-- [ ] **Step 4: Update Obsidian and final sync**
+Result: Implementation commit `86ffa89 test: default sparse match summaries` was pushed to `origin/main`. GitHub QA run `27186250554` completed successfully for `86ffa89`; artifact `7499371218` (`qa-automation-27186250554`, 3549 bytes) was downloaded. `qa-summary.json` reports `latestRun.git.shortSha: "86ffa89"`, `dirty: false`, smoke `156 passed, 0 failed`, required checks total 13 / passed 13 / failed 0 / missing 0, `durationMs: 208`; sensitive pattern scan against `test-artifacts/tmp/github-qa-27186250554` had no matches.
+
+- [x] **Step 4: Update Obsidian and final sync**
 
 Append a `2026-06-09 14:34 KST - Summarize match sparse participant defaults` entry with RED/GREEN/full QA, local smoke artifact, implementation commit, GitHub run/artifact, sensitive scan, and final `main...origin/main` sync count. Then run `git fetch origin --prune`, `git merge --ff-only origin/main`, `git rev-list --left-right --count main...origin/main`, and `git status --short --branch`.
+
+Result: Obsidian project log was updated with the implementation QA evidence for `86ffa89`, including RED/GREEN/full QA, local smoke, GitHub run `27186250554`, artifact `7499371218`, and sensitive scan results. This repo plan finalization is committed separately so the final docs-only GitHub QA run can be recorded in Obsidian without creating another repository documentation loop.
 
 ---
 
