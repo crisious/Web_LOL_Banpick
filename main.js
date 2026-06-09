@@ -371,6 +371,12 @@ function formatPercent(value) {
   return `${Math.round(value * 100)}%`;
 }
 
+function comparisonRatePercent(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
@@ -3193,7 +3199,7 @@ function renderComparison(sample) {
   }
   dom.comparisonStatus.textContent = "";
 
-  const rate = comp.agreementRate ?? 0;
+  const rate = comparisonRatePercent(comp.agreementRate);
   dom.comparisonOverview.innerHTML = `
     <div class="comparison-rate-bar">
       <div class="comparison-rate-label">
@@ -3220,10 +3226,10 @@ function renderComparison(sample) {
   const agreementCards = comp.agreements.map((a) => `
     <article class="comparison-card" data-source="agree">
       ${categoryBadge(a.category)}
-      <h4>${a.topic}</h4>
+      <h4>${escapeHtml(a.topic || "")}</h4>
       <div class="comparison-notes">
-        <p><strong>Claude:</strong> ${a.claudeNote}</p>
-        <p><strong>Codex:</strong> ${a.codexNote}</p>
+        <p><strong>Claude:</strong> ${escapeHtml(a.claudeNote || "")}</p>
+        <p><strong>Codex:</strong> ${escapeHtml(a.codexNote || "")}</p>
       </div>
     </article>
   `).join("");
@@ -3231,16 +3237,16 @@ function renderComparison(sample) {
   const claudeCards = comp.claudeOnly.map((c) => `
     <article class="comparison-card" data-source="claude">
       ${categoryBadge(c.category)}
-      <h4>${c.topic}</h4>
-      <p>${c.note}</p>
+      <h4>${escapeHtml(c.topic || "")}</h4>
+      <p>${escapeHtml(c.note || "")}</p>
     </article>
   `).join("");
 
   const codexCards = comp.codexOnly.map((c) => `
     <article class="comparison-card" data-source="codex">
       ${categoryBadge(c.category)}
-      <h4>${c.topic}</h4>
-      <p>${c.note}</p>
+      <h4>${escapeHtml(c.topic || "")}</h4>
+      <p>${escapeHtml(c.note || "")}</p>
     </article>
   `).join("");
 
