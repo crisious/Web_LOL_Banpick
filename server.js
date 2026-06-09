@@ -3218,6 +3218,9 @@ function summarizeMatch(match, puuid) {
   const role = normalizeRole(participant.teamPosition || participant.individualPosition);
   const dur = match.info.gameDuration || 1;
   const cs = (participant.totalMinionsKilled || 0) + (participant.neutralMinionsKilled || 0);
+  const kills = participant.kills || 0;
+  const deaths = participant.deaths || 0;
+  const assists = participant.assists || 0;
 
   const teamTotalKills = match.info.participants
     .filter((p) => p.teamId === participant.teamId)
@@ -3233,17 +3236,25 @@ function summarizeMatch(match, puuid) {
     champion: participant.championName,
     role,
     result: participant.win ? "WIN" : "LOSS",
-    kills: participant.kills,
-    deaths: participant.deaths,
-    assists: participant.assists,
+    kills,
+    deaths,
+    assists,
     csPerMin: +(cs / (dur / 60)).toFixed(1),
     visionScore: participant.visionScore || 0,
     goldEarned: participant.goldEarned || 0,
     damageToChampions: participant.totalDamageDealtToChampions || 0,
-    killParticipation: Math.min(1, +((participant.kills + participant.assists) / Math.max(1, teamTotalKills)).toFixed(2)),
+    killParticipation: Math.min(1, +((kills + assists) / Math.max(1, teamTotalKills)).toFixed(2)),
     timestamp: match.info.gameCreation,
-    items: [participant.item0, participant.item1, participant.item2, participant.item3, participant.item4, participant.item5, participant.item6],
-    summonerSpells: [participant.summoner1Id, participant.summoner2Id],
+    items: [
+      participant.item0 || 0,
+      participant.item1 || 0,
+      participant.item2 || 0,
+      participant.item3 || 0,
+      participant.item4 || 0,
+      participant.item5 || 0,
+      participant.item6 || 0,
+    ],
+    summonerSpells: [participant.summoner1Id || 0, participant.summoner2Id || 0],
   };
 
   return {

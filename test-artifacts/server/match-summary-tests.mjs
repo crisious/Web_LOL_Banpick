@@ -160,5 +160,26 @@ check("summarizeMatch csPerMin 7.5", unclamped.csPerMin, 7.5);
 check("summarizeMatch role MIDDLE→MID", unclamped.role, "MID");
 check("summarizeMatch result win→WIN", unclamped.result, "WIN");
 
+const sparse = summarizeMatch(
+  {
+    metadata: { matchId: "KR_TEST_SPARSE" },
+    info: {
+      queueId: 420, gameDuration: 1200, gameVersion: "14.2.1", gameCreation: 2,
+      participants: [
+        { puuid: "ME", teamId: 100, teamPosition: "UTILITY", championName: "Milio", win: false },
+        { puuid: "ALLY", teamId: 100, kills: 0 },
+      ],
+    },
+  },
+  "ME",
+);
+check("summarizeMatch sparse kills default", sparse.kills, 0);
+check("summarizeMatch sparse deaths default", sparse.deaths, 0);
+check("summarizeMatch sparse assists default", sparse.assists, 0);
+check("summarizeMatch sparse killParticipation default", sparse.killParticipation, 0);
+check("summarizeMatch sparse items default", sparse.items, [0, 0, 0, 0, 0, 0, 0]);
+check("summarizeMatch sparse summoner spells default", sparse.summonerSpells, [0, 0]);
+checkTrue("summarizeMatch sparse values are finite", Number.isFinite(sparse.killParticipation));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);
