@@ -2592,18 +2592,18 @@ async function buildAnalysis(normalized, sampleId) {
   const violations = [];
 
   // 모델이 생략하기 쉬운 필드 서버측 보완 (AI 콘텐츠는 최대한 유지)
-  if (!primary.schemaVersion) { primary.schemaVersion = "1.0"; violations.push("missing.schemaVersion"); }
+  if (!isNonBlankString(primary.schemaVersion)) { primary.schemaVersion = "1.0"; violations.push("missing.schemaVersion"); }
   const inferredPrimarySourceType = primary === claudeResult ? "claude_ai" : "codex_redteam";
   if (!hasAnalysisMetaObject(primary.analysisMeta)) {
     const violation = primary.analysisMeta ? "type.analysisMeta.invalid" : "missing.analysisMeta";
     primary.analysisMeta = {};
     violations.push(violation);
   }
-  if (typeof primary.analysisMeta.sourceType !== "string" || !primary.analysisMeta.sourceType) {
+  if (!isNonBlankString(primary.analysisMeta.sourceType)) {
     primary.analysisMeta.sourceType = inferredPrimarySourceType;
     violations.push("missing.analysisMeta.sourceType");
   }
-  if (typeof primary.analysisMeta.language !== "string" || !primary.analysisMeta.language) {
+  if (!isNonBlankString(primary.analysisMeta.language)) {
     primary.analysisMeta.language = "ko";
     violations.push("missing.analysisMeta.language");
   }
