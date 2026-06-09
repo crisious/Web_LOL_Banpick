@@ -1635,9 +1635,9 @@ function renderChampionBreakdown() {
   dom.championBreakdownList.innerHTML = top
     .map(
       (c) => `
-        <li class="breakdown-row" data-champion="${c.champion}">
+        <li class="breakdown-row" data-champion="${escapeAttr(c.champion)}">
           <span class="breakdown-row__icon">${championAvatarMarkup(c.champion, "small")}</span>
-          <span class="breakdown-row__label">${championDisplayName(c.champion)}</span>
+          <span class="breakdown-row__label">${escapeHtml(championDisplayName(c.champion))}</span>
           <span class="breakdown-row__count">${c.count}경기</span>
           <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${c.wrPct}%"></span></span>
           <span class="breakdown-row__wr-text">${c.wrPct}%</span>
@@ -1679,9 +1679,9 @@ function renderRoleBreakdown() {
   dom.roleBreakdownList.innerHTML = byRole
     .map(
       (r) => `
-        <li class="breakdown-row" data-role="${r.role}">
-          <span class="breakdown-row__icon breakdown-row__icon--role">${ROLE_INITIAL[r.role] || r.role.slice(0, 3)}</span>
-          <span class="breakdown-row__label">${roleLabel(r.role)}</span>
+        <li class="breakdown-row" data-role="${escapeAttr(r.role)}">
+          <span class="breakdown-row__icon breakdown-row__icon--role">${escapeHtml(ROLE_INITIAL[r.role] || r.role.slice(0, 3))}</span>
+          <span class="breakdown-row__label">${escapeHtml(roleLabel(r.role))}</span>
           <span class="breakdown-row__count">${r.count}경기</span>
           <span class="wr-bar breakdown-row__wr"><span class="wr-bar__fill" style="--wr-fill-pct: ${r.wrPct}%"></span></span>
           <span class="breakdown-row__wr-text">${r.wrPct}%</span>
