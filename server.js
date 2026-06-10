@@ -525,20 +525,37 @@ function normalizeRole(role) {
   return map[role] || role || "UNKNOWN";
 }
 
+// 플랫폼 라우팅 값 → 지역 클러스터. 이 맵의 키가 곧 허용 플랫폼 화이트리스트다.
+// 외부에서 받은 platformRegion은 반드시 이 집합으로 검증한 뒤에만 호스트명에 사용한다(SSRF 방지).
+const PLATFORM_CLUSTERS = {
+  KR: "asia",
+  JP1: "asia",
+  NA1: "americas",
+  BR1: "americas",
+  LA1: "americas",
+  LA2: "americas",
+  EUW1: "europe",
+  EUN1: "europe",
+  TR1: "europe",
+  RU: "europe",
+};
+
+function isValidPlatformRegion(platformRegion) {
+  return Object.prototype.hasOwnProperty.call(
+    PLATFORM_CLUSTERS,
+    String(platformRegion || "").toUpperCase(),
+  );
+}
+
 function regionalCluster(platformRegion) {
-  const map = {
-    KR: "asia",
-    JP1: "asia",
-    NA1: "americas",
-    BR1: "americas",
-    LA1: "americas",
-    LA2: "americas",
-    EUW1: "europe",
-    EUN1: "europe",
-    TR1: "europe",
-    RU: "europe",
-  };
-  return map[String(platformRegion || "").toUpperCase()] || "asia";
+  return PLATFORM_CLUSTERS[String(platformRegion || "").toUpperCase()] || "asia";
+}
+
+// 검증된 플랫폼 지역에 한해 Riot 플랫폼 호스트명을 돌려준다. 미허용 값은 null(호출부에서 400 처리).
+function platformHostFor(platformRegion) {
+  const region = String(platformRegion || "").toUpperCase();
+  if (!isValidPlatformRegion(region)) return null;
+  return `${region.toLowerCase()}.api.riotgames.com`;
 }
 
 function participantTeam(participantId) {
@@ -3010,6 +3027,7 @@ function writeSseHeaders(res) {
     "Cache-Control": "no-cache",
     "Connection": "keep-alive",
     "X-Accel-Buffering": "no",
+    "X-Content-Type-Options": "nosniff",
   });
 }
 
@@ -3361,13 +3379,17 @@ async function handleRecentMatches(req, res) {
     const body = await parseBody(req);
     const apiKey = resolveApiKey(body.riotApiKey);
     if (!apiKey) {
-      sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다. 로그인 화면에서 키를 입력하거나 서버 .env를 확인하세요." });
+      sendJson(res, 503, { ok: false, error: "Riot API 연동이 설정되지 않았습니다. 로그인 화면에서 키를 입력해 주세요." });
       return;
     }
 
     const gameName = String(body.gameName || "").trim();
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
+    if (!isValidPlatformRegion(platformRegion)) {
+      sendJson(res, 400, { ok: false, error: `Unsupported platformRegion: ${platformRegion}` });
+      return;
+    }
     const matchCount = Math.min(Math.max(Number(body.matchCount || 10), 1), 20);
     const start = Math.max(0, Number(body.start || 0));
 
@@ -3395,7 +3417,7 @@ async function handleRecentMatches(req, res) {
 
     // summoner + league + matchIds + mastery 병렬 호출
     // league-v4/by-puuid: Riot이 summoner-v4 id 응답 제거 이후의 신규 엔드포인트
-    const platformHost = `${platformRegion.toLowerCase()}.api.riotgames.com`;
+    const platformHost = platformHostFor(platformRegion);
     let rankedLookupError = null;
     const [matchIds, summonerData, leagueEntries, masteryData] = await Promise.all([
       requestJson(
@@ -3486,13 +3508,17 @@ async function handleChampionHistory(req, res) {
 
   const apiKey = resolveApiKey(body.riotApiKey);
   if (!apiKey) {
-    sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다." });
+    sendJson(res, 503, { ok: false, error: "Riot API 연동이 설정되지 않았습니다. 로그인 화면에서 키를 입력해 주세요." });
     return;
   }
 
   const gameName = String(body.gameName || "").trim();
   const tagLine = String(body.tagLine || "").trim();
   const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
+  if (!isValidPlatformRegion(platformRegion)) {
+    sendJson(res, 400, { ok: false, error: `Unsupported platformRegion: ${platformRegion}` });
+    return;
+  }
   if (!gameName || !tagLine) {
     sendJson(res, 400, { ok: false, error: "gameName and tagLine are required." });
     return;
@@ -3837,13 +3863,17 @@ async function handleGenerateSample(req, res) {
     const body = await parseBody(req);
     const apiKey = resolveApiKey(body.riotApiKey);
     if (!apiKey) {
-      sendJson(res, 500, { ok: false, error: "Riot API Key가 없습니다. 로그인 화면에서 키를 입력하거나 서버 .env를 확인하세요." });
+      sendJson(res, 503, { ok: false, error: "Riot API 연동이 설정되지 않았습니다. 로그인 화면에서 키를 입력해 주세요." });
       return;
     }
 
     const gameName = String(body.gameName || "").trim();
     const tagLine = String(body.tagLine || "").trim();
     const platformRegion = String(body.platformRegion || "KR").trim().toUpperCase();
+    if (!isValidPlatformRegion(platformRegion)) {
+      sendJson(res, 400, { ok: false, error: `Unsupported platformRegion: ${platformRegion}` });
+      return;
+    }
     const matchId = String(body.matchId || "").trim();
 
     if (!gameName || !tagLine || !matchId) {
