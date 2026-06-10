@@ -1,0 +1,697 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-06-09T23:24:30.025Z",
+  "sampleId": "sample-kr-8245229143",
+  "primaryAgent": "claude",
+  "redTeamAgent": "codex",
+  "claudeAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "claude_ai",
+      "language": "ko",
+      "analysisId": "ai_sample-kr-8245229143_1781047470024",
+      "generatedAt": "2026-06-09T23:24:30.024Z",
+      "schemaViolations": [],
+      "schemaViolationCount": 0
+    },
+    "matchSummary": {
+      "headline": "세라핀 서포터로 시야 장악력은 뛰어났으나, 잦은 포지셔닝 실수로 11데스를 기록하며 팀 운영 안정성을 확보하지 못한 패배"
+    },
+    "coachSummary": {
+      "overallSummary": "시야 점수 133으로 서포터 역할의 핵심인 맵 정보 제공에서는 높은 수준을 보여줬고, 어시스트 13개로 팀 합류 의지도 확인됩니다. 그러나 초반부터 반복된 데스(초반 5회)가 레인 주도권을 완전히 내줬고, 중반에도 오브젝트 셋업 타이밍에 잡히며 바론·타워 격차가 벌어졌습니다. 세라핀의 장거리 유틸리티를 살리려면 교전 진입 거리와 와드 설치 동선의 안전성을 한 단계 높여야 합니다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "4분~14분 사이 5데스를 기록하며 봇 레인 주도권을 잃었습니다. 7:43 드래곤 합류(evt_005)는 좋았으나, 직후 8:22에 다시 잡히며 얻은 템포를 바로 반납했습니다. 시야 확보 전 공격적 포지션을 잡는 패턴이 반복됐습니다."
+      },
+      {
+        "phase": "MID",
+        "summary": "어시스트 8개를 기록하며 팀 합류율이 올라갔지만, 4데스와 3회 오브젝트 손실이 겹쳤습니다. 16:44, 21:18, 23:24, 27:13에 연속 데스가 발생하며 바론 2개와 타워 격차를 허용했습니다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "데스가 2회로 줄었지만, 30:47과 35:48 두 번의 데스 모두 오브젝트 분쟁 직전에 발생해 팀이 수적 열세로 바론·타워를 내줬습니다. 후반 결정적 순간의 생존이 게임 마무리에 직결됐습니다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "뛰어난 시야 장악력",
+        "description": "시야 점수 133은 36분 게임 기준 매우 높은 수치입니다. 맵 정보 제공이라는 서포터 핵심 임무를 충실히 수행했으며, 팀이 29킬을 올릴 수 있었던 기반이 됐습니다.",
+        "relatedEventIds": [
+          "evt_005"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "꾸준한 팀 합류 의지",
+        "description": "0킬에도 불구하고 어시스트 13개, 킬 관여율 45%를 기록했습니다. 특히 중반 이후 팀파이트에 적극 합류해 딜러진의 킬을 보조했습니다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "드래곤 타이밍 합류",
+        "description": "7:43 드래곤 파이트에 타이밍 맞춰 합류하며 초반 오브젝트 템포를 챙겼습니다. 오브젝트 인식 자체는 좋은 편입니다.",
+        "relatedEventIds": [
+          "evt_005"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "초반 라인전 생존력 부족",
+        "description": "초반 14분까지 5데스를 기록했습니다. 4:16, 6:42, 8:22에 연속 데스가 발생한 것은 시야 없이 공격적 포지션을 잡거나, 쿨다운이 없는 상태에서 교전에 노출된 패턴입니다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_006"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "오브젝트 분쟁 전 포지셔닝 실수",
+        "description": "24:54 오브젝트 셋업 실패(evt_023)와 27:13 데스(evt_027) 직후 27:55 오브젝트 손실(evt_028)이 반복됐습니다. 오브젝트 분쟁 전에 먼저 잡히면서 팀이 수적 열세를 떠안았습니다.",
+        "relatedEventIds": [
+          "evt_023",
+          "evt_027",
+          "evt_028"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "후반 결정적 교전 생존 실패",
+        "description": "30:47과 35:48에 후반 핵심 교전에서 생존하지 못했습니다. 세라핀은 장거리 유틸리티 챔피언인 만큼 후방 포지션에서 스킬을 사용하며 생존해야 하는데, 전방에 노출되는 빈도가 잦았습니다.",
+        "relatedEventIds": [
+          "evt_031",
+          "evt_038"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "라인전(~14분) 교전 전 반드시 강 입구·트라이부쉬 와드 확인 후 포지션을 잡는다. 와드가 없으면 타워 사거리 안에서 플레이한다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "오브젝트 스폰 60초 전부터 셋업 와드를 설치하고, 시야가 확보되지 않은 구간으로 혼자 이동하지 않는다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "세라핀 교전 시 Q-E-R 콤보 사거리(1100+) 밖에서 시작해 진입하지 않고 후방에서 스킬만 사용하는 습관을 들인다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "데스 직후 바로 같은 라인으로 복귀하지 말고, 미니맵에서 적 정글러·로밍 위치를 확인한 뒤 안전한 동선으로 복귀한다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_5",
+        "text": "바론·드래곤 분쟁 시 탱커 뒤 2번째 줄에서 궁극기 타이밍만 노리고, 절대 최전방에 서지 않는다.",
+        "linkedWeaknessId": "wk_3"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "4:16",
+        "phase": "EARLY",
+        "title": "첫 데스 – 라인전 템포 손실",
+        "description": "초반 첫 교전에서 데스를 내주며 봇 레인 주도권이 상대로 넘어갔습니다. 이후 연쇄 데스의 시작점이 됐습니다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "7:43",
+        "phase": "EARLY",
+        "title": "드래곤 합류 – 유일한 초반 하이라이트",
+        "description": "드래곤 타이밍에 합류해 팀 오브젝트 템포를 챙긴 좋은 판단이었습니다. 오브젝트 인식이 돋보인 순간입니다.",
+        "relatedEventIds": [
+          "evt_005"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "24:54",
+        "phase": "MID",
+        "title": "오브젝트 셋업 실패 – 중반 분기점",
+        "description": "오브젝트 분쟁에서 포지셔닝 실수로 셋업에 실패하며, 이후 27분 바론 손실로 이어지는 흐름의 시작이 됐습니다.",
+        "relatedEventIds": [
+          "evt_023"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "35:48",
+        "phase": "LATE",
+        "title": "최후반 데스 – 게임 종결 허용",
+        "description": "35분 결정적 교전에서 생존하지 못하며 상대의 최종 푸시를 막지 못했습니다. 세라핀의 궁극기가 빠진 상태에서 팀이 무너졌습니다.",
+        "relatedEventIds": [
+          "evt_038",
+          "evt_037"
+        ]
+      }
+    ],
+    "combatAnalysis": [
+      {
+        "encounterId": "enc_001",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "초반 봇 라인전 첫 교전 데스",
+        "playerDecision": "레벨 3 이전 공격적 포지션에서 상대 교전에 노출됨",
+        "takeaway": "레벨 3 전까지는 타워 사거리 안에서 안전하게 플레이하고, 스펠 쿨다운을 확인한 뒤 트레이드에 들어간다",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "encounterId": "enc_002",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "6분대 봇 라인 재교전 데스",
+        "playerDecision": "첫 데스 이후 아이템 격차가 벌어진 상태에서 다시 교전 범위에 진입",
+        "takeaway": "데스 후 복귀 시 상대와의 아이템·레벨 격차를 확인하고, 불리하면 경험치만 챙기는 수비적 라인 운영을 한다",
+        "relatedEventIds": [
+          "evt_003"
+        ]
+      },
+      {
+        "encounterId": "enc_003",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "드래곤 직후 봇 복귀 중 데스",
+        "playerDecision": "7:43 드래곤 합류 후 복귀 동선에서 시야 없이 이동하다 잡힘",
+        "takeaway": "오브젝트 획득 후 복귀 시 안전한 동선(타워 아래 경유)을 선택하고, 강 입구 시야가 없으면 우회한다",
+        "relatedEventIds": [
+          "evt_006"
+        ]
+      },
+      {
+        "encounterId": "enc_004",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "11분대 봇 사이드 데스",
+        "playerDecision": "이미 0/3 상태에서 와드 설치를 위해 전방에 나갔다가 잡힘",
+        "takeaway": "불리한 상황에서 와드 설치는 정글러·미드와 동행하거나, 안전 구간에만 설치한다",
+        "relatedEventIds": [
+          "evt_009"
+        ]
+      },
+      {
+        "encounterId": "enc_005",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "14분대 초반 마지막 데스",
+        "playerDecision": "라인전 종료 전환기에 혼자 로밍 동선에서 적에게 노출",
+        "takeaway": "라인전 종료 시점에는 팀과 합류해 이동하고, 단독 로밍은 적 위치가 확인될 때만 시도한다",
+        "relatedEventIds": [
+          "evt_011"
+        ]
+      },
+      {
+        "encounterId": "enc_006",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "중반 진입 첫 데스",
+        "playerDecision": "16분대 중반 교전에서 전방 포지셔닝으로 상대 이니시에이트에 먼저 잡힘",
+        "takeaway": "중반부터는 세라핀의 사거리를 활용해 후방 2열에서 교전을 시작하고, 이니시 대상이 되지 않도록 한다",
+        "relatedEventIds": [
+          "evt_014"
+        ]
+      },
+      {
+        "encounterId": "enc_007",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "21분 중반 교전 데스",
+        "playerDecision": "팀 합류 시 진입 각도가 상대 암살자에게 노출되는 위치",
+        "takeaway": "합류 시 팀원 뒤에서 접근하고, 상대 암살자가 보이지 않으면 안전 위치에서 대기한다",
+        "relatedEventIds": [
+          "evt_019"
+        ]
+      },
+      {
+        "encounterId": "enc_008",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "23분 오브젝트 분쟁 전 데스",
+        "playerDecision": "오브젝트 셋업 중 시야 확보를 위해 전진하다 먼저 잡힘",
+        "takeaway": "오브젝트 셋업 와드는 팀이 함께 전진할 때 설치하고, 혼자 전방 와딩은 절대 하지 않는다",
+        "relatedEventIds": [
+          "evt_022"
+        ]
+      }
+    ],
+    "teamfightPhaseAnalysis": [],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "shortNote": "4:16 초반 봇 라인 첫 데스"
+      },
+      {
+        "eventId": "evt_003",
+        "shortNote": "6:42 봇 라인 연속 데스"
+      },
+      {
+        "eventId": "evt_005",
+        "shortNote": "7:43 드래곤 합류 및 오브젝트 확보"
+      },
+      {
+        "eventId": "evt_006",
+        "shortNote": "8:22 드래곤 직후 복귀 중 데스"
+      },
+      {
+        "eventId": "evt_009",
+        "shortNote": "11:56 전방 와딩 중 데스"
+      },
+      {
+        "eventId": "evt_011",
+        "shortNote": "14:27 로밍 동선 노출 데스"
+      },
+      {
+        "eventId": "evt_014",
+        "shortNote": "16:44 중반 첫 데스 – 전방 포지셔닝"
+      },
+      {
+        "eventId": "evt_015",
+        "shortNote": "18:44 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_019",
+        "shortNote": "21:18 합류 동선 노출 데스"
+      },
+      {
+        "eventId": "evt_022",
+        "shortNote": "23:24 오브젝트 셋업 중 데스"
+      },
+      {
+        "eventId": "evt_023",
+        "shortNote": "24:54 오브젝트 셋업 실패"
+      },
+      {
+        "eventId": "evt_027",
+        "shortNote": "27:13 중반 마지막 데스"
+      },
+      {
+        "eventId": "evt_028",
+        "shortNote": "27:55 바론 손실"
+      },
+      {
+        "eventId": "evt_031",
+        "shortNote": "30:47 후반 교전 데스"
+      },
+      {
+        "eventId": "evt_032",
+        "shortNote": "31:49 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_037",
+        "shortNote": "35:17 최종 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_038",
+        "shortNote": "35:48 최후반 결정적 데스"
+      }
+    ]
+  },
+  "codexAnalysis": {
+    "schemaVersion": "1.0",
+    "analysisMeta": {
+      "sourceType": "codex_redteam",
+      "language": "ko"
+    },
+    "matchSummary": {
+      "headline": "높은 시야 점수와 합류 의지에도, 세라핀 서포터가 반복적으로 먼저 끊기며 오브젝트 운영을 상대에게 넘긴 패배였다."
+    },
+    "coachSummary": {
+      "overallSummary": "이 경기는 단순히 데스가 많았던 게임이 아니라, 시야를 잡으려는 움직임과 오브젝트 합류가 생존 설계 없이 반복되면서 팀의 다음 턴을 계속 삭제한 경기다."
+    },
+    "phaseSummaries": [
+      {
+        "phase": "EARLY",
+        "summary": "초반 14분대까지 5데스가 누적되며 라인전 이후 첫 오브젝트 전환에 필요한 체력, 위치, 스펠 압박이 무너졌다. 7:43 드래곤 합류는 표면적으로 좋아 보이지만, 그 전후의 반복 데스 때문에 안정적인 주도권으로 연결되지 못했다."
+      },
+      {
+        "phase": "MID",
+        "summary": "16:44, 21:18, 23:24, 27:13에 핵심 구도 데스가 반복되며 시야 장악보다 먼저 본인이 포커싱 대상이 되는 패턴이 드러났다. 중반 8어시스트는 있었지만, 같은 구간 4데스와 오브젝트 실패가 같이 발생해 실제 운영 가치는 낮았다."
+      },
+      {
+        "phase": "LATE",
+        "summary": "후반에는 바론 2회와 타워 손실로 맵이 좁아진 상태에서 30:47, 35:48 데스가 결정타가 됐다. 세라핀의 강점인 후방 유지력과 광역 보조가 발휘되기 전에 포지션 리스크가 먼저 노출됐다."
+      }
+    ],
+    "strengths": [
+      {
+        "id": "str_1",
+        "title": "오브젝트 타이밍에 반응하는 습관",
+        "description": "7:43 드래곤 구도에 합류한 점은 최소한 오브젝트 시간을 의식하고 있다는 증거다. 다만 이 장점은 선진입 안정성이 없으면 상위 티어에서 바로 역이용된다.",
+        "relatedEventIds": [
+          "evt_005"
+        ]
+      },
+      {
+        "id": "str_2",
+        "title": "팀 교전에 붙으려는 의지",
+        "description": "0킬 13어시스트, 킬 관여율 45%는 팀 교전에 완전히 분리된 게임은 아니었음을 보여준다. 문제는 관여 방식이 생존형 백라인 지원이 아니라 먼저 맞는 방식으로 굳어졌다는 점이다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_019",
+          "evt_022"
+        ]
+      },
+      {
+        "id": "str_3",
+        "title": "시야 활동량 자체는 높음",
+        "description": "시야 점수 133은 활동량 자체가 낮은 서포터는 아니라는 신호다. 그러나 11데스와 오브젝트 실패가 동반된 시야 점수라면, 좋은 시야가 아니라 위험한 위치에 오래 노출된 결과일 가능성도 크다.",
+        "relatedEventIds": [
+          "evt_023",
+          "evt_028",
+          "evt_032"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "wk_1",
+        "title": "시야를 잡기 전에 생존 조건을 확인하지 않음",
+        "description": "초반부터 중반까지 단독 데스가 반복됐다. 이는 단순 피지컬 문제가 아니라 아군 위치, 상대 미드·정글 위치, 도주 경로를 확인하기 전에 앞으로 나가는 구조적 습관이다.",
+        "relatedEventIds": [
+          "evt_001",
+          "evt_003",
+          "evt_006",
+          "evt_014",
+          "evt_019"
+        ]
+      },
+      {
+        "id": "wk_2",
+        "title": "오브젝트 전후 턴 관리가 약함",
+        "description": "드래곤과 구조물 구도에서 합류는 하지만, 이후 생존하거나 다음 시야 라인을 유지하지 못했다. 그래서 오브젝트를 보거나 싸움에 붙는 행위가 실제 주도권으로 전환되지 않았다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_015",
+          "evt_023",
+          "evt_028",
+          "evt_032",
+          "evt_037"
+        ]
+      },
+      {
+        "id": "wk_3",
+        "title": "세라핀의 챔피언 역할과 실제 포지션이 충돌함",
+        "description": "세라핀 서포터는 후방에서 스킬 순환, 유지력, 광역 궁극기 각을 보존해야 가치가 난다. 그런데 11데스 흐름은 유틸 서포터가 탱커처럼 먼저 공간을 먹으려 한 패턴에 가깝다.",
+        "relatedEventIds": [
+          "evt_022",
+          "evt_027",
+          "evt_031",
+          "evt_038"
+        ]
+      }
+    ],
+    "actionChecklist": [
+      {
+        "id": "act_1",
+        "text": "와드 설치 전 반드시 아군 2명 이상의 거리, 상대 정글·미드 위치, 퇴로 1개를 확인하고 셋 중 하나라도 없으면 진입하지 않는다.",
+        "linkedWeaknessId": "wk_1"
+      },
+      {
+        "id": "act_2",
+        "text": "오브젝트 60초 전에는 혼자 시야를 먹지 말고, 45초 전 귀환 또는 렌즈 동행 타이밍을 먼저 맞춘다.",
+        "linkedWeaknessId": "wk_2"
+      },
+      {
+        "id": "act_3",
+        "text": "세라핀은 교전 시작 전 앞라인보다 반 화면 이상 앞서지 않는 것을 기본 규칙으로 둔다.",
+        "linkedWeaknessId": "wk_3"
+      },
+      {
+        "id": "act_4",
+        "text": "첫 10분 데스 목표를 1회 이하로 제한하고, 2데스가 발생하면 라인 푸시보다 강가 진입 금지를 우선한다.",
+        "linkedWeaknessId": "wk_1"
+      }
+    ],
+    "keyMoments": [
+      {
+        "id": "km_1",
+        "timestampLabel": "4:16",
+        "phase": "EARLY",
+        "title": "첫 데스로 초반 안정성 붕괴",
+        "description": "초반 첫 사망은 단순 손실보다 더 크다. 유틸 서포터가 먼저 끊기면 라인 주도권, 시야 주도권, 첫 귀환 템포가 동시에 흔들린다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "id": "km_2",
+        "timestampLabel": "7:43",
+        "phase": "EARLY",
+        "title": "좋아 보였지만 남는 게 적었던 드래곤 합류",
+        "description": "드래곤 타이밍 합류 자체는 장점이나, 전후 반복 데스 때문에 오브젝트 이후 맵 장악으로 이어지지 않았다. 결과보다 과정 안정성이 부족했다.",
+        "relatedEventIds": [
+          "evt_005",
+          "evt_006"
+        ]
+      },
+      {
+        "id": "km_3",
+        "timestampLabel": "18:44",
+        "phase": "MID",
+        "title": "중요 오브젝트 준비 실패",
+        "description": "중반 오브젝트 준비 실패는 이전 데스 누적의 결과로 봐야 한다. 시야를 잡을 사람이 살아 있어도, 상대 위협 구간을 먼저 지우지 못하면 시야 점수는 실질 가치가 낮다.",
+        "relatedEventIds": [
+          "evt_014",
+          "evt_015"
+        ]
+      },
+      {
+        "id": "km_4",
+        "timestampLabel": "23:24",
+        "phase": "MID",
+        "title": "데스 직후 오브젝트 손실로 이어진 구간",
+        "description": "23:24 사망과 24:54 오브젝트 실패는 연결해서 봐야 한다. 서포터 데스는 단순 1킬 헌납이 아니라 다음 90초의 시야권을 상대에게 넘기는 행동이다.",
+        "relatedEventIds": [
+          "evt_022",
+          "evt_023"
+        ]
+      },
+      {
+        "id": "km_5",
+        "timestampLabel": "30:47",
+        "phase": "LATE",
+        "title": "후반 결정 구도에서 생존 실패",
+        "description": "후반 세라핀은 살아서 두 번째 스킬 사이클을 돌리는 것이 핵심인데, 결정 구도에서 먼저 사망하며 팀의 역전 조건을 스스로 줄였다.",
+        "relatedEventIds": [
+          "evt_031"
+        ]
+      }
+    ],
+    "combatAnalysis": [
+      {
+        "encounterId": "enc_001",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "초반 첫 손실",
+        "playerDecision": "4:16에 먼저 끊기며 초반 라인 안정성과 강가 시야 주도권을 잃었다.",
+        "takeaway": "초반 유틸 서포터는 교전 개시보다 생존과 귀환 템포 보존이 우선이다.",
+        "relatedEventIds": [
+          "evt_001"
+        ]
+      },
+      {
+        "encounterId": "enc_002",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "반복된 초반 사망",
+        "playerDecision": "6:42에 다시 사망하며 첫 데스 이후 플레이 강도를 낮추지 못했다.",
+        "takeaway": "한 번 죽은 뒤에는 같은 라인 위치와 같은 강가 진입 각을 반복하지 않는 것이 핵심이다.",
+        "relatedEventIds": [
+          "evt_003"
+        ]
+      },
+      {
+        "encounterId": "enc_003",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "드래곤 전후 생존 실패",
+        "playerDecision": "8:22 사망으로 드래곤 합류의 이득을 안정적인 맵 장악으로 바꾸지 못했다.",
+        "takeaway": "오브젝트를 본 뒤에는 추가 시야보다 생존 귀환과 다음 라인 복귀가 먼저다.",
+        "relatedEventIds": [
+          "evt_006"
+        ]
+      },
+      {
+        "encounterId": "enc_004",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "초반 중후반 추가 손실",
+        "playerDecision": "11:56에 또 사망하며 라인전 이후 첫 전환 타이밍에서 몸이 먼저 노출됐다.",
+        "takeaway": "서포터가 전환 구간에서 죽으면 다음 전령·용 시야가 자동으로 밀린다.",
+        "relatedEventIds": [
+          "evt_009"
+        ]
+      },
+      {
+        "encounterId": "enc_005",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "14분대 누적 데스",
+        "playerDecision": "14:27 사망으로 초반 5데스 흐름이 완성되며 중반 운영의 출발점이 낮아졌다.",
+        "takeaway": "초반 2데스 이후에는 플레이메이킹 욕심보다 데스 차단 모드로 전환해야 한다.",
+        "relatedEventIds": [
+          "evt_011"
+        ]
+      },
+      {
+        "encounterId": "enc_006",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "중반 핵심 구도 손실",
+        "playerDecision": "16:44에 사망하며 오브젝트 준비 전 필요한 시야와 합류 안정성을 잃었다.",
+        "takeaway": "중반 첫 시야 라인은 혼자 밀지 말고 아군 딜러와 정글 위치에 맞춰 한 칸씩 올려야 한다.",
+        "relatedEventIds": [
+          "evt_014"
+        ]
+      },
+      {
+        "encounterId": "enc_007",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "21분대 운영 데스",
+        "playerDecision": "21:18 사망은 바론이 열리는 시간대에 치명적이며, 상대에게 시야·오브젝트 선택권을 넘겼다.",
+        "takeaway": "20분 이후 서포터 데스는 킬 손실이 아니라 바론 시야권 손실로 계산해야 한다.",
+        "relatedEventIds": [
+          "evt_019"
+        ]
+      },
+      {
+        "encounterId": "enc_008",
+        "situation": "PLAYER_DOWN",
+        "situationLabel": "오브젝트 직전 사망",
+        "playerDecision": "23:24 사망 후 24:54 오브젝트 실패로 이어져, 죽는 위치와 타이밍이 팀 운영을 직접 끊었다.",
+        "takeaway": "오브젝트 90초 전에는 와드 하나보다 본인 생존이 더 큰 자원이다.",
+        "relatedEventIds": [
+          "evt_022"
+        ]
+      }
+    ],
+    "teamfightPhaseAnalysis": [],
+    "evidenceIndex": [
+      {
+        "eventId": "evt_001",
+        "shortNote": "4:16 PLAYER_DEATH, 초반 첫 사망으로 라인·시야 템포 손실"
+      },
+      {
+        "eventId": "evt_003",
+        "shortNote": "6:42 PLAYER_DEATH, 초반 데스 반복"
+      },
+      {
+        "eventId": "evt_005",
+        "shortNote": "7:43 DRAGON_FIGHT, 드래곤 합류는 있었으나 이후 안정성 부족"
+      },
+      {
+        "eventId": "evt_006",
+        "shortNote": "8:22 PLAYER_DEATH, 오브젝트 전후 생존 실패"
+      },
+      {
+        "eventId": "evt_009",
+        "shortNote": "11:56 combat encounter 기준 PLAYER_DOWN"
+      },
+      {
+        "eventId": "evt_011",
+        "shortNote": "14:27 combat encounter 기준 PLAYER_DOWN"
+      },
+      {
+        "eventId": "evt_014",
+        "shortNote": "16:44 PLAYER_DEATH, 중반 핵심 구도 손실"
+      },
+      {
+        "eventId": "evt_015",
+        "shortNote": "18:44 OBJECTIVE_SETUP_FAIL, 중요 오브젝트 준비 실패"
+      },
+      {
+        "eventId": "evt_019",
+        "shortNote": "21:18 PLAYER_DEATH, 바론 시간대 운영 리스크 확대"
+      },
+      {
+        "eventId": "evt_022",
+        "shortNote": "23:24 PLAYER_DEATH, 직후 오브젝트 실패와 연결되는 사망"
+      },
+      {
+        "eventId": "evt_023",
+        "shortNote": "24:54 OBJECTIVE_SETUP_FAIL, 플레이어 관여 오브젝트 실패"
+      },
+      {
+        "eventId": "evt_027",
+        "shortNote": "27:13 PLAYER_DEATH, 중반 반복 데스"
+      },
+      {
+        "eventId": "evt_028",
+        "shortNote": "27:55 OBJECTIVE_SETUP_FAIL, 중반 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_031",
+        "shortNote": "30:47 PLAYER_DEATH, 후반 결정 구도 생존 실패"
+      },
+      {
+        "eventId": "evt_032",
+        "shortNote": "31:49 OBJECTIVE_SETUP_FAIL, 후반 오브젝트 손실"
+      },
+      {
+        "eventId": "evt_037",
+        "shortNote": "35:17 OBJECTIVE_SETUP_FAIL, 종료 전 핵심 운영 실패"
+      },
+      {
+        "eventId": "evt_038",
+        "shortNote": "35:48 PLAYER_DEATH, 후반 마지막 생존 실패"
+      }
+    ]
+  },
+  "comparison": {
+    "agreements": [
+      {
+        "category": "strength",
+        "topic": "뛰어난 시야 장악력",
+        "claudeNote": "시야 점수 133은 36분 게임 기준 매우 높은 수치입니다. 맵 정보 제공이라는 서포터 핵심 임무를 충실히 수행했으며, 팀이 29킬을 올릴 수 있었던 기반이 됐습니다.",
+        "codexNote": "시야 점수 133은 활동량 자체가 낮은 서포터는 아니라는 신호다. 그러나 11데스와 오브젝트 실패가 동반된 시야 점수라면, 좋은 시야가 아니라 위험한 위치에 오래 노출된 결과일 가능성도 크다."
+      },
+      {
+        "category": "strength",
+        "topic": "꾸준한 팀 합류 의지",
+        "claudeNote": "0킬에도 불구하고 어시스트 13개, 킬 관여율 45%를 기록했습니다. 특히 중반 이후 팀파이트에 적극 합류해 딜러진의 킬을 보조했습니다.",
+        "codexNote": "0킬 13어시스트, 킬 관여율 45%는 팀 교전에 완전히 분리된 게임은 아니었음을 보여준다. 문제는 관여 방식이 생존형 백라인 지원이 아니라 먼저 맞는 방식으로 굳어졌다는 점이다."
+      },
+      {
+        "category": "weakness",
+        "topic": "오브젝트 분쟁 전 포지셔닝 실수",
+        "claudeNote": "24:54 오브젝트 셋업 실패(evt_023)와 27:13 데스(evt_027) 직후 27:55 오브젝트 손실(evt_028)이 반복됐습니다. 오브젝트 분쟁 전에 먼저 잡히면서 팀이 수적 열세를 떠안았습니다.",
+        "codexNote": "드래곤과 구조물 구도에서 합류는 하지만, 이후 생존하거나 다음 시야 라인을 유지하지 못했다. 그래서 오브젝트를 보거나 싸움에 붙는 행위가 실제 주도권으로 전환되지 않았다."
+      },
+      {
+        "category": "weakness",
+        "topic": "후반 결정적 교전 생존 실패",
+        "claudeNote": "30:47과 35:48에 후반 핵심 교전에서 생존하지 못했습니다. 세라핀은 장거리 유틸리티 챔피언인 만큼 후방 포지션에서 스킬을 사용하며 생존해야 하는데, 전방에 노출되는 빈도가 잦았습니다.",
+        "codexNote": "초반부터 중반까지 단독 데스가 반복됐다. 이는 단순 피지컬 문제가 아니라 아군 위치, 상대 미드·정글 위치, 도주 경로를 확인하기 전에 앞으로 나가는 구조적 습관이다."
+      }
+    ],
+    "claudeOnly": [
+      {
+        "category": "strength",
+        "topic": "드래곤 타이밍 합류",
+        "note": "7:43 드래곤 파이트에 타이밍 맞춰 합류하며 초반 오브젝트 템포를 챙겼습니다. 오브젝트 인식 자체는 좋은 편입니다."
+      },
+      {
+        "category": "weakness",
+        "topic": "초반 라인전 생존력 부족",
+        "note": "초반 14분까지 5데스를 기록했습니다. 4:16, 6:42, 8:22에 연속 데스가 발생한 것은 시야 없이 공격적 포지션을 잡거나, 쿨다운이 없는 상태에서 교전에 노출된 패턴입니다."
+      }
+    ],
+    "codexOnly": [
+      {
+        "category": "strength",
+        "topic": "오브젝트 타이밍에 반응하는 습관",
+        "note": "7:43 드래곤 구도에 합류한 점은 최소한 오브젝트 시간을 의식하고 있다는 증거다. 다만 이 장점은 선진입 안정성이 없으면 상위 티어에서 바로 역이용된다."
+      },
+      {
+        "category": "weakness",
+        "topic": "세라핀의 챔피언 역할과 실제 포지션이 충돌함",
+        "note": "세라핀 서포터는 후방에서 스킬 순환, 유지력, 광역 궁극기 각을 보존해야 가치가 난다. 그런데 11데스 흐름은 유틸 서포터가 탱커처럼 먼저 공간을 먹으려 한 패턴에 가깝다."
+      }
+    ],
+    "agreementRate": 67
+  }
+}

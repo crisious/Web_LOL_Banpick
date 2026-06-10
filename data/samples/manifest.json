@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "samples": [
     {
+      "id": "sample-kr-8245229143",
+      "matchId": "KR_8245229143",
+      "label": "sample-kr-8245229143 · SUPPORT LOSS",
+      "champion": "Seraphine",
+      "publicAlias": "매운맛 비스킷#KR1",
+      "collectedDate": "2026-06-09",
+      "theme": "세라핀 서포터로 시야 장악력은 뛰어났으나, 잦은 포지셔닝 실수로 11데스를 기록하며 팀 운영 안정성을 확보하지 못한 패배",
+      "normalizedPath": "/data/samples/sample-kr-8245229143/normalized-match.json",
+      "analysisPath": "/data/samples/sample-kr-8245229143/analysis-result.json",
+      "notesPath": "/data/samples/sample-kr-8245229143/sample-kr-8245229143-notes.md"
+    },
+    {
       "id": "sample-kr-8242613150",
       "matchId": "KR_8242613150",
       "label": "sample-kr-8242613150 · SUPPORT LOSS",
