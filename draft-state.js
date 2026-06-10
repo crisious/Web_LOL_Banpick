@@ -152,10 +152,10 @@
   }
 
   function clampNumber(value, minimum, maximum, fallback) {
-    if (typeof value !== "number" || !Number.isFinite(value)) {
-      return fallback;
-    }
-    return Math.min(maximum, Math.max(minimum, value));
+    // 비수치 입력이면 fallback을 쓰되, fallback도 [min,max]로 클램프한다.
+    // (예: turnIndex fallback이 짧은 sequence의 maxTurnIndex를 초과해 범위를 벗어나는 손상 store 방지)
+    const base = typeof value !== "number" || !Number.isFinite(value) ? fallback : value;
+    return Math.min(maximum, Math.max(minimum, base));
   }
 
   function getOtherTeamKey(teamKey) {

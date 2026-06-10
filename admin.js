@@ -636,6 +636,16 @@ document.addEventListener("change", (event) => {
   saveAndRender();
 });
 
+// 관리자 패널은 innerHTML 통째 교체로 렌더한다. 사용자가 폼 컨트롤을 편집하는 동안
+// 재렌더하면 포커스와 미저장 입력이 사라지므로, 편집 중에는 재렌더를 보류한다.
+// admin.html은 전용 페이지라 포커스된 INPUT/TEXTAREA/SELECT는 곧 편집 중을 뜻한다.
+function isEditingAdminFormControl() {
+  const el = document.activeElement;
+  if (!el || !el.tagName) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+}
+
 let lastTick = performance.now();
 function animate(now) {
   const delta = Math.min(250, now - lastTick);
@@ -654,9 +664,12 @@ function animate(now) {
 
     if (turnChanged || secondsChanged || runningChanged) {
       store = draftStore.saveStore(store);
-      renderLivePanel();
-      if (turnChanged) {
-        renderPhasePanel();
+      // 편집 중이면 렌더만 보류(store 저장은 유지). blur 후 다음 틱에 재동기화.
+      if (!isEditingAdminFormControl()) {
+        renderLivePanel();
+        if (turnChanged) {
+          renderPhasePanel();
+        }
       }
     }
   }
@@ -667,6 +680,9 @@ function animate(now) {
 draftStore.subscribe((nextStore) => {
   store = coercePickOrderFlow(nextStore);
   lastTick = performance.now();
+  // 다른 탭의 running 타이머가 매초 storage 이벤트를 발생시킨다. 편집 중이면 전체 재렌더가
+  // 입력을 파괴하므로 보류한다(store는 갱신됨 — blur 후 다음 이벤트에 화면 동기화).
+  if (isEditingAdminFormControl()) return;
   renderAll();
 });
 
