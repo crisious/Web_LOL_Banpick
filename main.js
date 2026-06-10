@@ -2117,8 +2117,8 @@ function renderHero(sample) {
     banner.dataset.result = match.result || "";
     banner.innerHTML = `
       <div class="champion-hero-banner__overlay">
-        <span class="champion-hero-banner__name">${championName}</span>
-        <span class="champion-hero-banner__result" data-result="${match.result || ""}">${resultText}</span>
+        <span class="champion-hero-banner__name">${escapeHtml(championName)}</span>
+        <span class="champion-hero-banner__result" data-result="${escapeAttr(match.result || "")}">${resultText}</span>
       </div>
     `;
   }
@@ -3078,15 +3078,19 @@ function renderBuildTimeline(sample) {
   const majorItems = items.filter((i) => i.itemId >= 3000 || i.itemId === 2031 || i.itemId === 2033);
   const displayItems = majorItems.length > 0 ? majorItems : items.slice(0, 15);
 
+  const cdnVersion = escapeAttr(itemCdnVersion(sample));
   dom.buildTimeline.innerHTML = `
     <div class="build-scroll">
-      ${displayItems.map((i) => `
+      ${displayItems.map((i) => {
+        const itemId = Number(i.itemId) || 0;
+        return `
         <div class="build-item">
-          <img class="build-item-icon" src="https://ddragon.leagueoflegends.com/cdn/${itemCdnVersion(sample)}/img/item/${i.itemId}.png"
-               alt="item ${i.itemId}" onerror="this.style.display='none'" width="32" height="32" />
-          <span class="build-item-time">${i.timeLabel}</span>
+          <img class="build-item-icon" src="https://ddragon.leagueoflegends.com/cdn/${cdnVersion}/img/item/${itemId}.png"
+               alt="item ${itemId}" onerror="this.style.display='none'" width="32" height="32" />
+          <span class="build-item-time">${escapeHtml(i.timeLabel || "")}</span>
         </div>
-      `).join('<span class="build-arrow">→</span>')}
+      `;
+      }).join('<span class="build-arrow">→</span>')}
     </div>
   `;
 }
@@ -3741,12 +3745,12 @@ function renderMatchList() {
       <div class="profile-header__top">
         <div class="profile-identity">
           ${iconUrl
-            ? `<img class="profile-icon" src="${iconUrl}" alt="프로필 아이콘" onerror="this.style.display='none'" />`
-            : `<div class="profile-icon profile-icon--fallback">${(acct.riotId || acct.gameName || "?")[0]}</div>`
+            ? `<img class="profile-icon" src="${escapeAttr(iconUrl)}" alt="프로필 아이콘" onerror="this.style.display='none'" />`
+            : `<div class="profile-icon profile-icon--fallback">${escapeHtml((acct.riotId || acct.gameName || "?")[0])}</div>`
           }
           <div class="profile-identity__text">
             <h2 class="profile-name">${escapeHtml(acct.riotId || `${acct.gameName}#${acct.tagLine}`)}</h2>
-            ${acct.summonerLevel ? `<span class="level-badge">Lv. ${acct.summonerLevel}</span>` : ""}
+            ${acct.summonerLevel ? `<span class="level-badge">Lv. ${escapeHtml(acct.summonerLevel)}</span>` : ""}
           </div>
         </div>
         <button class="login-submit login-submit--small" data-logout-btn>다른 계정</button>
@@ -3835,34 +3839,34 @@ function renderMatchList() {
   dom.matchListGrid.innerHTML = matches.map((m) => {
     const masteryInfo = findMasteryForChampion(m.champion);
     const masteryBadge = masteryInfo
-      ? `<span class="msc-mastery">M${masteryInfo.championLevel}</span>`
+      ? `<span class="msc-mastery">M${escapeHtml(masteryInfo.championLevel)}</span>`
       : "";
     const kdaRatio = m.deaths > 0 ? ((m.kills + m.assists) / m.deaths).toFixed(2) : "Perfect";
     const patchLabel = matchPatchLabel(m.gameVersion);
 
     return `
-      <button class="match-summary-card" data-match-detail="${m.matchId}" data-result="${m.result}">
-        <div class="msc-result-bar" data-result="${m.result}"></div>
+      <button class="match-summary-card" data-match-detail="${escapeAttr(m.matchId)}" data-result="${escapeAttr(m.result)}">
+        <div class="msc-result-bar" data-result="${escapeAttr(m.result)}"></div>
         <div class="msc-row1">
           <div class="match-summary-champion">
             ${championAvatarMarkup(m.champion, "small")}
             <div>
-              <strong>${championDisplayName(m.champion)}</strong>
+              <strong>${escapeHtml(championDisplayName(m.champion))}</strong>
               <span class="meta-label">${escapeHtml(roleLabel(m.role))} ${masteryBadge}</span>
             </div>
           </div>
           <div class="msc-kda-block">
-            <span class="match-summary-kda"><span>${m.kills}</span>/<span class="kda-death">${m.deaths}</span>/<span>${m.assists}</span></span>
+            <span class="match-summary-kda"><span>${escapeHtml(m.kills)}</span>/<span class="kda-death">${escapeHtml(m.deaths)}</span>/<span>${escapeHtml(m.assists)}</span></span>
             <span class="msc-kda-ratio">${kdaRatio}${kdaRatio !== "Perfect" ? ":1" : ""}</span>
           </div>
-          <span class="match-summary-result" data-result="${m.result}">${resultLabel(m.result)}</span>
+          <span class="match-summary-result" data-result="${escapeAttr(m.result)}">${escapeHtml(resultLabel(m.result))}</span>
         </div>
         <div class="msc-row2">
-          <span class="match-summary-cs">${m.csPerMin} CS/m</span>
-          <span class="match-summary-duration">${m.durationLabel}</span>
-          <span class="match-summary-queue">${compactQueueLabel(m.queueLabel)}</span>
-          <span class="match-summary-patch">${patchLabel}</span>
-          <span class="match-summary-time">${timeAgo(m.timestamp)}</span>
+          <span class="match-summary-cs">${escapeHtml(m.csPerMin)} CS/m</span>
+          <span class="match-summary-duration">${escapeHtml(m.durationLabel || "")}</span>
+          <span class="match-summary-queue">${escapeHtml(compactQueueLabel(m.queueLabel) || "")}</span>
+          <span class="match-summary-patch">${escapeHtml(patchLabel || "")}</span>
+          <span class="match-summary-time">${escapeHtml(timeAgo(m.timestamp))}</span>
         </div>
       </button>
     `;
