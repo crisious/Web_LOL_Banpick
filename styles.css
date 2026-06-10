@@ -47,15 +47,6 @@
   --mint-bg-deep: rgba(89, 209, 178, 0.18);
   --amber-bg-strong: rgba(240, 179, 91, 0.3);
   --grid-line: rgba(255, 255, 255, 0.025);
-  /* Rank tier colors — iteration 10 */
-  --rank-iron: #8b7355;
-  --rank-bronze: #cd7f32;
-  --rank-silver: #c0c0c0;
-  --rank-platinum: #2cc5b8;
-  --rank-emerald: #50c878;
-  --rank-diamond: #b9f2ff;
-  --rank-master: #9d4dbb;
-  --rank-grandmaster: #ef4444;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -1900,14 +1891,6 @@ body::after {
   line-height: 1.4;
 }
 
-.fallback-shell {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  padding: 32px;
-  text-align: center;
-}
-
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -3081,20 +3064,6 @@ body::after {
   font-weight: 600;
 }
 
-/* legacy compat */
-.match-list-identity {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-5);
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.match-list-identity h2 {
-  color: var(--text);
-  font-size: var(--fs-2xl);
-}
-
 .match-list-grid {
   display: flex;
   flex-direction: column;
@@ -3231,45 +3200,6 @@ body::after {
   background: var(--mint-soft);
   color: var(--mint);
 }
-
-.analyzed-badge.badge--pending {
-  background: var(--amber-soft);
-  color: var(--accent);
-  animation: pulse-badge 1.5s ease-in-out infinite;
-}
-
-.analyzed-badge.badge--fail {
-  background: var(--rose-soft);
-  color: var(--rose);
-}
-
-@keyframes pulse-badge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.rank-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  background: var(--surface-3);
-  color: var(--text);
-  border: 1px solid var(--line);
-}
-
-.rank-badge--iron { color: var(--rank-iron); }
-.rank-badge--bronze { color: var(--rank-bronze); }
-.rank-badge--silver { color: var(--rank-silver); }
-.rank-badge--gold { color: var(--accent); border-color: var(--amber-bg-strong); }
-.rank-badge--platinum { color: var(--rank-platinum); }
-.rank-badge--emerald { color: var(--rank-emerald); }
-.rank-badge--diamond { color: var(--rank-diamond); }
-.rank-badge--master { color: var(--rank-master); }
-.rank-badge--grandmaster { color: var(--rank-grandmaster); }
-.rank-badge--challenger { color: var(--accent); background: var(--tint-amber); }
-.rank-badge--unavailable { color: var(--rose); border-color: var(--rose-bg-medium); background: var(--rose-bg-soft); }
 
 .level-badge {
   display: inline-block;
@@ -4126,12 +4056,6 @@ body::after {
     text-align: center;
   }
 
-  .obj-table-wrap {
-    overflow-x: auto;
-  }
-
-
-
   .sidebar-stack {
     position: static;
   }
@@ -4224,15 +4148,6 @@ body::after {
 
   .champion-hero-banner__name {
     font-size: var(--fs-xl);
-  }
-
-  /* 매치 리스트 헤더 고정 */
-  .match-list-identity {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--bg);
-    padding: 12px 0;
   }
 
   /* 오브젝트 테이블 수평 스크롤 */
@@ -4334,36 +4249,11 @@ body::after {
     gap: var(--space-5);
   }
 
-  .summary-copy,
-  .summary-detail {
-    font-size: var(--fs-md);
-    line-height: 1.55;
-  }
-
   .winloss-pill {
     width: 100%;
     justify-content: center;
     border-radius: var(--radius-md);
     text-align: center;
-  }
-
-  .snapshot-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-  }
-
-  .snapshot-item {
-    min-height: 76px;
-    padding: 12px;
-  }
-
-  .snapshot-item strong {
-    font-size: var(--fs-md);
-  }
-
-  .snapshot-footnote {
-    padding-top: 10px;
-    font-size: var(--fs-md);
   }
 
   /* ── Dual-track timeline responsive ───────────────────────────────────── */
@@ -4631,20 +4521,9 @@ body::after {
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
-.skeleton--line {
-  height: 12px;
-  width: 100%;
-  border-radius: var(--radius-xs);
-}
-
 .skeleton--block {
   height: 80px;
   border-radius: var(--radius-sm);
-}
-
-.skeleton--card {
-  min-height: 140px;
-  border-radius: var(--radius-md);
 }
 
 /* LOADING_DETAIL: upgrade fetch-status to a more prominent indicator */
