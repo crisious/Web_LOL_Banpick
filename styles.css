@@ -4680,3 +4680,13 @@ body::after {
 }
 .tf-kd { margin-left: auto; font-size: 0.78rem; color: var(--text-muted, #a9b3c1); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
+
+/* 저장 샘플 GUI 숨김 (2026-06-10) — 상세 페이지에서 저장 샘플 표시/열람 GUI 비노출.
+   마크업·셀렉터·JS는 보존(설계 불변식). main.js는 숨겨진 요소에 그대로 렌더하지만
+   요소가 DOM에 존재하므로 오류 없음. /api/samples·추세 집계는 유지.
+   변형 클래스를 styles.css 끝에서 타깃해 소스 순서상 우선(!important 불필요). */
+.panel--samples,
+.panel--reports,
+.login-demo-actions {
+  display: none;
+}
