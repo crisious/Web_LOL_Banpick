@@ -3053,6 +3053,10 @@ async function getCurrentSeasonRankedMatchIds(cluster, headers, puuid, queueId, 
   return ids;
 }
 
+// Riot/DDragon 응답이 조용히 멈추면(소켓 stall) https.request는 기본 타임아웃이 없어
+// 요청이 영원히 pending 상태로 남고, 그 위 핸들러는 로딩 화면에서 멈춘다. 소켓 타임아웃으로 끊는다.
+const RIOT_REQUEST_TIMEOUT_MS = 15000;
+
 function requestJson(urlString, headers = {}) {
   return new Promise((resolve, reject) => {
     const url = new URL(urlString);
@@ -3087,6 +3091,9 @@ function requestJson(urlString, headers = {}) {
       },
     );
 
+    req.setTimeout(RIOT_REQUEST_TIMEOUT_MS, () => {
+      req.destroy(new Error(`Riot API timeout after ${RIOT_REQUEST_TIMEOUT_MS}ms`));
+    });
     req.on("error", reject);
     req.end();
   });
@@ -3315,6 +3322,9 @@ function sampleFitScore(match) {
 }
 
 function summarizeMatch(match, puuid) {
+  if (!match || !match.info || !Array.isArray(match.info.participants)) {
+    return null;
+  }
   const participant = match.info.participants.find((entry) => entry.puuid === puuid);
   if (!participant) {
     return null;
@@ -3456,9 +3466,12 @@ async function handleRecentMatches(req, res) {
     }
 
 
+    // 개별 매치 상세 조회는 부분 실패를 허용한다 — 한 건이 429/타임아웃이어도 나머지 후보를
+    // 보여주는 편이 전체 500보다 낫다(summarizeMatch 뒤 filter(Boolean)이 null을 자연 제거).
     const details = await Promise.all(
       matchIds.map((matchId) =>
-        requestJson(`https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}`, headers),
+        requestJson(`https://${cluster}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(matchId)}`, headers)
+          .catch(() => null),
       ),
     );
 

@@ -152,6 +152,16 @@ function escapeAttr(value) {
   return escapeHtml(value);
 }
 
+// 손상된 localStorage 값이 throw하여 초기화/핸들러를 중단시키지 않도록 안전 파싱.
+function safeJsonParse(raw, fallback) {
+  if (raw == null) return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
 // ─── localStorage persistence ─────────────────────────────────────────────
 
 function saveAccount(account) {
@@ -1497,10 +1507,13 @@ async function fetchRecentStats({ force = false } = {}) {
   toggleRefreshButton(true);
   showRecentAggregateStatus("최근 20경기 불러오는 중…");
 
+  const statsController = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const statsTimer = statsController ? setTimeout(() => statsController.abort(), DEFAULT_FETCH_TIMEOUT_MS) : null;
   try {
     const res = await fetch("/api/recent-matches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: statsController ? statsController.signal : undefined,
       body: JSON.stringify({
         gameName: state.account.gameName,
         tagLine: state.account.tagLine,
@@ -1551,6 +1564,7 @@ async function fetchRecentStats({ force = false } = {}) {
     state.recentStatsError = formatRetryMessage(error);
     renderRecentStatsError(state.recentStatsError);
   } finally {
+    if (statsTimer) clearTimeout(statsTimer);
     state.recentStatsLoading = false;
     toggleRefreshButton(false);
   }
@@ -1793,23 +1807,52 @@ function visibleReportSamples() {
   return visible;
 }
 
-async function fetchJson(path, options) {
-  const response = await fetch(path, options);
-  const payload = await response.json();
-  if (!response.ok) {
-    const error = new Error(payload.error || `${path} 요청 실패`);
-    if (payload && typeof payload.code === "string") error.code = payload.code;
-    if (payload && typeof payload.hint === "string") error.hint = payload.hint;
-    throw error;
+const DEFAULT_FETCH_TIMEOUT_MS = 30000;
+
+// options.timeoutMs: 명시 타임아웃(ms). 0이면 타임아웃 없음(예: 장시간 AI 분석).
+// 호출부가 자체 signal을 넘기면 타임아웃을 주입하지 않는다(취소를 호출부가 제어).
+async function fetchJson(path, options = {}) {
+  const { timeoutMs, ...fetchOptions } = options;
+  const effectiveTimeout = timeoutMs === undefined ? DEFAULT_FETCH_TIMEOUT_MS : timeoutMs;
+
+  let timer = null;
+  let finalOptions = fetchOptions;
+  if (!fetchOptions.signal && effectiveTimeout > 0 && typeof AbortController !== "undefined") {
+    const controller = new AbortController();
+    timer = setTimeout(() => controller.abort(), effectiveTimeout);
+    finalOptions = { ...fetchOptions, signal: controller.signal };
   }
-  // 200 OK여도 ok=false + code 케이스 (현재는 미사용이지만 방어적)
-  if (payload && payload.ok === false && payload.code) {
-    const error = new Error(payload.error || `${path} 요청 실패`);
-    error.code = payload.code;
-    if (typeof payload.hint === "string") error.hint = payload.hint;
+
+  try {
+    const response = await fetch(path, finalOptions);
+    // ok 검사 전에 .json()을 호출하면 비-JSON 에러 본문(502/504 HTML, 빈 본문)에서
+    // SyntaxError가 던져져 서버가 보낸 code/hint와 실제 status를 잃는다. text로 받아 안전 파싱.
+    const raw = await response.text();
+    let payload = null;
+    try { payload = raw ? JSON.parse(raw) : null; } catch { payload = null; }
+
+    if (!response.ok) {
+      const error = new Error((payload && payload.error) || `${path} 요청 실패 (HTTP ${response.status})`);
+      if (payload && typeof payload.code === "string") error.code = payload.code;
+      if (payload && typeof payload.hint === "string") error.hint = payload.hint;
+      throw error;
+    }
+    // 200 OK여도 ok=false + code 케이스 (현재는 미사용이지만 방어적)
+    if (payload && payload.ok === false && payload.code) {
+      const error = new Error(payload.error || `${path} 요청 실패`);
+      error.code = payload.code;
+      if (typeof payload.hint === "string") error.hint = payload.hint;
+      throw error;
+    }
+    return payload;
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      throw new Error("요청 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
+    }
     throw error;
+  } finally {
+    if (timer !== null) clearTimeout(timer);
   }
-  return payload;
 }
 
 // Track B: Riot 키 만료 배너. fetchJson 에러의 code === "RIOT_KEY_EXPIRED" 시 표시.
@@ -3574,6 +3617,7 @@ async function handleGenerateSample(matchId) {
   try {
     const result = await fetchJson("/api/generate-sample", {
       method: "POST",
+      timeoutMs: 0, // 서버측 AI 분석은 장시간 — 클라이언트 타임아웃 비활성(서버가 단계별 타임아웃 보유)
       headers: {
         "Content-Type": "application/json",
       },
@@ -4303,14 +4347,14 @@ function initTabSystem() {
         card.setAttribute("data-collapsed", "");
       }
       // Persist
-      const store = JSON.parse(localStorage.getItem("lol-coach-collapsed") || "{}");
+      const store = safeJsonParse(localStorage.getItem("lol-coach-collapsed"), {});
       if (isCollapsed) { delete store[id]; } else { store[id] = true; }
       localStorage.setItem("lol-coach-collapsed", JSON.stringify(store));
     });
   });
 
   // Restore collapsed states
-  const collapsed = JSON.parse(localStorage.getItem("lol-coach-collapsed") || "{}");
+  const collapsed = safeJsonParse(localStorage.getItem("lol-coach-collapsed"), {});
   Object.keys(collapsed).forEach((id) => {
     const card = document.querySelector(`[data-card-id="${id}"]`);
     if (card) card.setAttribute("data-collapsed", "");
