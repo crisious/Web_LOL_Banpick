@@ -337,15 +337,16 @@
 타입:
 - `array<object>`
 
-배열 원소 필드:
+배열 원소 필드 (별칭 허용 — 둘 중 하나가 non-blank이면 통과):
 
-- `eventId`: `string`
-- `timestamp`: `string`
-- `phase`: `string`
-- `label`: `string`
-- `reason`: `string`
-- `impact`: `string`
-- `importance`: `number`
+- `eventId`: `string` (별칭 `id`) — 필수
+- `timestamp`: `string` (별칭 `timestampLabel`) — 필수
+- `phase`: `string` — `EARLY`/`MID`/`LATE` 필수
+- `label`: `string` (별칭 `title`) — 필수
+- `reason`: `string` (별칭 `description`) — 필수
+- `relatedEventIds`: `array<string>` — **필수.** 비어 있지 않은 evidenceIndex `eventId` 참조 (누락 시 `keyMoments invalid` throw)
+- `impact`: `string` — 선택 (검증 안 함)
+- `importance`: `number` — 선택 (검증 안 함, 1~5 권장)
 
 예시:
 
@@ -357,6 +358,7 @@
     "phase": "EARLY",
     "label": "첫 로밍 관여 성공",
     "reason": "라인 주도권을 활용해 먼저 합류하면서 수적 우위를 만들었다.",
+    "relatedEventIds": ["evt_006"],
     "impact": "초반 템포를 잡는 계기가 됐다.",
     "importance": 4
   },
@@ -366,6 +368,7 @@
     "phase": "MID",
     "label": "드래곤 전 시야 손실",
     "reason": "강가 시야가 없는 상태에서 늦게 진입해 상대에게 선포지션을 줬다.",
+    "relatedEventIds": ["evt_014"],
     "impact": "중반 주도권이 넘어가는 결정적 장면이었다.",
     "importance": 5
   }
@@ -374,8 +377,9 @@
 
 규칙:
 
-- 4~8개 권장
+- 최소 4개 (`KEY_MOMENTS_MIN`), 4~8개 권장
 - 중요도는 1~5 범위 사용
+- 각 항목에 `relatedEventIds` 필수
 
 ## 4.10 `evidenceIndex`
 
@@ -433,11 +437,12 @@
 
 배열 원소 필드:
 
-- `encounterId`: `string` — 입력 payload의 encounterId와 동일 (예: `"enc_001"`)
-- `situationLabel`: `string` — 교전 상황을 한 줄로 요약 (예: "초반 라인전 솔로킬", "오브젝트 셋업 중 cut off")
-- `playerDecision`: `string` — 그 순간 플레이어의 판단/포지셔닝 (사실 기반)
-- `takeaway`: `string` — 다음에 같은 상황에서 적용할 짧은 교훈
-- `relatedEventIds`: `array<string>` — encounter에 포함된 timeline 이벤트 ID 목록
+- `encounterId`: `string` — 입력 payload의 encounterId와 동일 (예: `"enc_001"`) — 필수
+- `situation`: `"PLAYER_DOMINANT"` \| `"PLAYER_DOWN"` \| `"TRADED"` — encounter의 KDA 결과 enum, 입력값 그대로 반영 — **필수**
+- `situationLabel`: `string` — 교전 상황을 한 줄로 요약 (예: "초반 라인전 솔로킬", "오브젝트 셋업 중 cut off") — 필수
+- `playerDecision`: `string` — 그 순간 플레이어의 판단/포지셔닝 (사실 기반) — 필수
+- `takeaway`: `string` — 다음에 같은 상황에서 적용할 짧은 교훈 — 필수
+- `relatedEventIds`: `array<string>` — encounter에 포함된 timeline 이벤트 ID 목록 (비어 있지 않은 string) — 필수
 
 예시:
 
@@ -445,6 +450,7 @@
 [
   {
     "encounterId": "enc_001",
+    "situation": "PLAYER_DOMINANT",
     "situationLabel": "초반 라인전 솔로킬",
     "playerDecision": "상대 정글 동선이 탑으로 빠진 타이밍에 E 가드 후 W 진입",
     "takeaway": "초반 솔로킬은 정글 시야 + W 쿨다운이 갖춰진 타이밍에만 시도",
@@ -455,9 +461,9 @@
 
 검증 규칙 (`validateAnalysisOutput`):
 
-- 필드 누락/`null`/빈 배열 → 통과 (선택적, 기존 코호트 backward-compat)
+- 필드 누락(`undefined`)/`null`/빈 배열 → 통과 (선택적, 기존 코호트 backward-compat)
 - 배열이 아닌 값 → throw `"combatAnalysis not array"`
-- 각 항목의 `encounterId`/`situationLabel`/`takeaway`가 비어 있으면 throw
+- 항목별로 다음이 비면 throw: `encounterId`(missing encounterId), `situation`(missing situation — enum 외 값도 throw), `situationLabel`, `playerDecision`, `takeaway`, `relatedEventIds`(빈 배열 또는 non-string 포함 시 throw)
 
 역할:
 
@@ -488,22 +494,23 @@
 
 ## 5. 최소 유효 응답 조건
 
-아래 조건을 만족해야 `유효한 분석 결과`로 간주한다.
+아래 조건을 **모두** 만족해야 `validateAnalysisOutput`이 통과한다(하나라도 어기면 throw).
 
-- `schemaVersion` 존재
+- `schemaVersion` 존재 (non-blank)
+- `analysisMeta.sourceType` 존재 (non-blank)
+- `analysisMeta.language` 존재 (non-blank)
 - `matchSummary.headline` 존재
 - `coachSummary.overallSummary` 존재
-- `strengths` 최소 1개
-- `weaknesses` 최소 1개
-- `actionChecklist` 최소 1개
-- `keyMoments` 최소 2개
-
-MVP 권장 기준은 아래와 같다.
-
-- `strengths` 3개
-- `weaknesses` 3개
+- `phaseSummaries` 최소 3개 (각 항목 `phase`는 EARLY/MID/LATE, `summary` 필수)
+- `strengths` 정확히 3개 (min = max = 3)
+- `weaknesses` 정확히 3개 (min = max = 3)
 - `actionChecklist` 3~5개
-- `keyMoments` 4개 이상
+- `keyMoments` 최소 4개 (각 항목 shape는 §4.9 참조 — `relatedEventIds` 필수)
+- `evidenceIndex` 최소 1개 (각 항목 `eventId` + `summary`|`shortNote`)
+- `combatAnalysis` (있는 경우) 각 항목에 `situation`(enum)·`situationLabel`·`playerDecision`·`takeaway`·`relatedEventIds` 필수 (§4.11)
+
+> 위 수치는 `server.js` 상수에서 파생된다: `PHASE_SUMMARIES_MIN = 3`, `INSIGHT_LIST_MIN = INSIGHT_LIST_MAX = 3`,
+> `ACTION_CHECKLIST_MIN = 3` / `ACTION_CHECKLIST_MAX = 5`, `KEY_MOMENTS_MIN = 4`, `EVIDENCE_INDEX_MIN = 1`.
 
 ## 6. 타입 규칙
 
@@ -661,6 +668,7 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
       "phase": "EARLY",
       "label": "첫 로밍 관여 성공",
       "reason": "라인 주도권을 활용해 먼저 합류하면서 수적 우위를 만들었다.",
+      "relatedEventIds": ["evt_006"],
       "impact": "초반 템포를 잡는 계기가 됐다.",
       "importance": 4
     },
@@ -670,6 +678,7 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
       "phase": "MID",
       "label": "드래곤 전 시야 손실",
       "reason": "강가 시야가 없는 상태에서 늦게 진입해 상대에게 선포지션을 줬다.",
+      "relatedEventIds": ["evt_014"],
       "impact": "중반 주도권이 넘어가는 결정적 장면이었다.",
       "importance": 5
     },
@@ -679,6 +688,7 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
       "phase": "MID",
       "label": "무리한 선진입으로 교전 손해",
       "reason": "아군과의 거리 차이가 있는 상태에서 먼저 각을 보며 위험한 진입이 됐다.",
+      "relatedEventIds": ["evt_018"],
       "impact": "불리한 흐름을 더 크게 만들었다.",
       "importance": 4
     },
@@ -688,6 +698,7 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
       "phase": "MID",
       "label": "바론 시야 열세 누적",
       "reason": "바론 주변 시야 장악이 늦어 상대의 압박에 대응만 하게 됐다.",
+      "relatedEventIds": ["evt_022"],
       "impact": "후반 주도권 회복 기회를 잃었다.",
       "importance": 5
     }

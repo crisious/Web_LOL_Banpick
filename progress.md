@@ -65,9 +65,11 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 
 ### 현재 API
 
+- `GET /healthz`
 - `GET /api/samples`
 - `GET /api/samples/:id`
 - `POST /api/recent-matches`
+- `POST /api/champion-history`
 - `POST /api/generate-sample`
 
 ### `POST /api/recent-matches`
@@ -76,7 +78,7 @@ Original prompt pivot: LoL 밴픽 방송 화면 와이어프레임 -> LoL 리플
 - 페이지네이션: `start` (기본 0), `matchCount` (≤20, 기본 10), 응답에 `hasMore` 포함
 - 후보별 `champion / role / result / duration / KDA / sampleFitScore` 반환
 - 랭크 조회: `league-v4/entries/by-puuid/{puuid}` (summoner-v4의 encryptedSummonerId 제거 대응)
-- 챔피언 숙련도: `champion-mastery/v4/by-puuid/{puuid}/top?count=20` 포함
+- 챔피언 숙련도: `champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top?count=20` 포함
 - IP 기반 rate-limit 10초
 
 ### `POST /api/generate-sample`

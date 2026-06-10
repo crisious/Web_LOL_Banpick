@@ -153,9 +153,9 @@
 
 ```bash
 npm test                 # 모든 테스트 일괄 실행 (test-artifacts/run-tests.mjs)
-npm run test:schema      # validateAnalysisOutput 위반 패턴 86건
+npm run test:schema      # validateAnalysisOutput 위반 패턴 109건
 npm run test:champions   # aggregateChampionHistory 11건
-npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 84건
+npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 90건
 npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:protected  # 로컬 protected 외부 데모 안전성/API smoke
 npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 20개 상세 기준 read-only smoke
@@ -271,6 +271,7 @@ PUBLIC_DEMO_TOKEN=replace-with-long-random-token TRUST_PROXY=1 npm run start:pro
 | GET | `/api/samples` | 저장된 샘플 목록 |
 | GET | `/api/samples/:id` | 샘플 번들 (normalized + analysis + comparison) |
 | POST | `/api/recent-matches` | Riot ID 기준 최근 경기 요약 (body: `start`, `matchCount` ≤ 20, 응답: `hasMore`) |
+| POST | `/api/champion-history` | 현재 시즌 랭크 경기 챔피언별 집계 (SSE 스트림, IP당 60초 rate-limit, read-only 모드 차단) |
 | POST | `/api/generate-sample` | 선택한 경기 AI 분석 + 샘플 생성 |
 
 ## AI 에이전트 아키텍처
