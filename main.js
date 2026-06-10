@@ -1505,12 +1505,14 @@ async function fetchRecentStats({ force = false } = {}) {
         gameName: state.account.gameName,
         tagLine: state.account.tagLine,
         platformRegion: state.account.platformRegion,
-        riotApiKey: state.account.riotApiKey || undefined,
+        riotApiKey: getUserApiKey() || undefined,
         start: 0,
         matchCount: 20,
       }),
     });
     const data = await res.json();
+    // 페치 도중 계정이 바뀌었으면 이전 계정 응답이니 폐기(championHistory와 동일한 가드).
+    if (currentAccountKey() !== accountKey) return;
     if (!res.ok || data.ok === false) {
       const error = new Error(data?.error || `요청 실패 (HTTP ${res.status})`);
       if (data?.code) error.code = data.code;
@@ -1527,6 +1529,9 @@ async function fetchRecentStats({ force = false } = {}) {
       };
       state.recentStatsAccount = accountKey;
       renderRecentStatsEmpty("최근 경기 없음");
+      // 빈 byChampion/byRole로 다시 그려, 계정 전환 후 이전 계정의 챔피언/역할 리스트가 남지 않게 한다.
+      if (typeof renderChampionBreakdown === "function") renderChampionBreakdown();
+      if (typeof renderRoleBreakdown === "function") renderRoleBreakdown();
       return;
     }
 
@@ -2796,10 +2801,13 @@ function buildDualTimelineData(sample) {
   events.sort((a, b) => a.timestampMs - b.timestampMs);
 
   const totalMs = (norm.matchInfo?.durationSeconds || 1800) * 1000;
+  // 15분 미만 경기는 MID/LATE 밴드를 만들지 않는다(음수 폭 렌더 방지).
   const phases = [
     { phase: "EARLY", startMs: 0, endMs: Math.min(900000, totalMs) },
-    { phase: "MID", startMs: 900000, endMs: Math.min(1800000, totalMs) },
   ];
+  if (totalMs > 900000) {
+    phases.push({ phase: "MID", startMs: 900000, endMs: Math.min(1800000, totalMs) });
+  }
   if (totalMs > 1800000) {
     phases.push({ phase: "LATE", startMs: 1800000, endMs: totalMs });
   }
@@ -3345,16 +3353,21 @@ async function selectSample(sampleId) {
   }
 
   state.currentSampleId = sampleId;
+  // 연속 선택 시 늦게 도착한 이전 로드가 새 샘플 UI를 덮어쓰지 않도록 요청 토큰으로 폐기.
+  const loadToken = (state.sampleLoadSeq = (state.sampleLoadSeq || 0) + 1);
   dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
 
   try {
     state.manifest = await loadManifest();
+    if (loadToken !== state.sampleLoadSeq) return;
     renderLoginDemoStatus();
     const sample = await loadSampleBundle(sampleId);
+    if (loadToken !== state.sampleLoadSeq) return;
     const match = sampleMatchSummary(sample);
     renderSample(sample);
     dom.fetchStatus.textContent = `${sampleId} 로드 완료 · ${[match.champion, roleLabel(match.role), match.result ? resultLabel(match.result) : "결과 미상"].filter(Boolean).join(" ")}`;
   } catch (error) {
+    if (loadToken !== state.sampleLoadSeq) return;
     dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(formatRetryMessage(error))} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
   }
 }
@@ -3935,6 +3948,9 @@ async function loadMoreRecentMatches() {
     alert(`이전 경기 불러오기 실패: ${formatRetryMessage(error)}`);
   } finally {
     state.isLoadMorePending = false;
+    // 성공 경로의 renderMatchList()는 플래그가 아직 true일 때 푸터를 그리므로,
+    // 플래그 해제 후 푸터를 다시 그려 버튼이 '불러오는 중...' disabled로 고착되지 않게 한다.
+    renderMatchListFooter();
   }
 }
 
@@ -4388,7 +4404,7 @@ async function startChampionHistoryFetch(force) {
       gameName: state.account.gameName,
       tagLine: state.account.tagLine,
       platformRegion: state.account.platformRegion,
-      riotApiKey: state.account.riotApiKey || undefined,
+      riotApiKey: getUserApiKey() || undefined,
       signal: state.championHistoryAbort.signal,
       onProgress,
     });
