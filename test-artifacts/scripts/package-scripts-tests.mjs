@@ -41,7 +41,7 @@ check("smoke:readonly pins local URL and expected mode",
   /scripts\/external-demo-smoke\.mjs/.test(scripts["smoke:readonly"] || "") &&
     /http:\/\/127\.0\.0\.1:8123/.test(scripts["smoke:readonly"] || "") &&
     /--expect-mode=readonly/.test(scripts["smoke:readonly"] || "") &&
-    /--min-samples=19/.test(scripts["smoke:readonly"] || ""),
+    /--min-samples=20/.test(scripts["smoke:readonly"] || ""),
   scripts["smoke:readonly"] || "(missing)");
 
 check("smoke:protected script exists",
@@ -53,7 +53,7 @@ check("smoke:protected pins local URL, token requirement, and protected mode",
     /http:\/\/127\.0\.0\.1:8123/.test(scripts["smoke:protected"] || "") &&
     /--require-token/.test(scripts["smoke:protected"] || "") &&
     /--expect-mode=protected/.test(scripts["smoke:protected"] || "") &&
-    /--min-samples=19/.test(scripts["smoke:protected"] || ""),
+    /--min-samples=20/.test(scripts["smoke:protected"] || ""),
   scripts["smoke:protected"] || "(missing)");
 
 check("smoke:external:readonly script exists",
@@ -65,7 +65,7 @@ check("smoke:external:readonly requires explicit external URL and readonly mode"
     /--require-url/.test(scripts["smoke:external:readonly"] || "") &&
     /--require-https/.test(scripts["smoke:external:readonly"] || "") &&
     /--expect-mode=readonly/.test(scripts["smoke:external:readonly"] || "") &&
-    /--min-samples=19/.test(scripts["smoke:external:readonly"] || ""),
+    /--min-samples=20/.test(scripts["smoke:external:readonly"] || ""),
   scripts["smoke:external:readonly"] || "(missing)");
 
 check("smoke:external:protected script exists",
@@ -78,7 +78,7 @@ check("smoke:external:protected requires explicit external URL, token, and prote
     /--require-https/.test(scripts["smoke:external:protected"] || "") &&
     /--require-token/.test(scripts["smoke:external:protected"] || "") &&
     /--expect-mode=protected/.test(scripts["smoke:external:protected"] || "") &&
-    /--min-samples=19/.test(scripts["smoke:external:protected"] || ""),
+    /--min-samples=20/.test(scripts["smoke:external:protected"] || ""),
   scripts["smoke:external:protected"] || "(missing)");
 
 check("smoke:report:readonly script exists",

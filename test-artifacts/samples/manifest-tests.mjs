@@ -111,7 +111,7 @@ for (const sample of samples) {
 check("manifest exposes samples array", Array.isArray(manifest.samples));
 check("manifest declares schemaVersion 1", manifest.schemaVersion === 1, `schemaVersion=${manifest.schemaVersion}`);
 check("stored manifest passes shared runtime validation", !validationError, validationError?.message || "");
-check("manifest keeps at least 19 stored samples", samples.length >= 19, `count=${samples.length}`);
+check("manifest keeps at least 20 stored samples", samples.length >= 20, `count=${samples.length}`);
 check("sample ids are unique", duplicateIds.length === 0, duplicateIds.join(", "));
 check("sample entries include required metadata", missingFieldEntries.length === 0, missingFieldEntries.slice(0, 10).join(", "));
 check("manifest paths stay under each sample directory", invalidPublicPaths.length === 0, invalidPublicPaths.slice(0, 10).join(", "));

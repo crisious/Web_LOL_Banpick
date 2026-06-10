@@ -10,7 +10,7 @@ import { validateExternalSmokeUrl } from "./validate-external-smoke-url.mjs";
 
 const LOCAL_BASE_URL = "http://127.0.0.1:8123";
 const DEFAULT_OUTPUT_ROOT = "test-artifacts/qa-automation";
-const MIN_SAMPLES = 19;
+const MIN_SAMPLES = 20;
 const VALID_MODES = ["readonly", "protected", "external-readonly", "external-protected"];
 const SMOKE_PASSTHROUGH_VALUE_OPTIONS = [
   "--token=",

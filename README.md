@@ -158,7 +158,7 @@ npm run test:champions   # aggregateChampionHistory 11건
 npm run test:llm-payload # buildLlmPayload importance/cap/sort/필드 추출 84건
 npm run smoke:readonly   # 로컬 read-only 외부 데모 안전성/API smoke
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:protected  # 로컬 protected 외부 데모 안전성/API smoke
-npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 19개 상세 기준 read-only smoke
+npm run smoke:external:readonly -- https://your-demo-url.example  # 외부 HTTPS URL + 저장 샘플 20개 상세 기준 read-only smoke
 npm run smoke:external:protected -- https://your-demo-url.example --token=your-demo-token  # 외부 HTTPS URL + 토큰 기준 protected smoke
 npm run smoke:report:readonly  # qa-summary.json + timestamp 디렉터리에 smoke-report.json/smoke-run.json 저장
 PUBLIC_DEMO_TOKEN=your-demo-token npm run smoke:report:protected

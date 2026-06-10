@@ -52,7 +52,7 @@ Expected:
 - smoke stops immediately on `--expect-mode` mismatch before it can touch live/write API probes
 - `/api/samples` 200
 - `/healthz`, `/api/samples`, sample details, and live/write API responses use a JSON content type and return `X-Content-Type-Options: nosniff`
-- `/api/samples` includes at least 19 stored samples
+- `/api/samples` includes at least 20 stored samples
 - first 19 sample details return 200
 - first 19 sample details include `matchSummary`, `coachSummary`, strengths, weaknesses, actions, and key moments
 - `/api/samples` list entries omit explicit `matchId`; smoke fails on any list entry that reintroduces the field, while sample detail fetches continue to use public `sample-*` ids and must not require match IDs from the list payload. Smoke report summaries must include the required sample-list privacy, core sensitive static block, static block `nosniff`, and read-only live/write block check results so CI artifacts prove those gates were part of the run.
@@ -97,7 +97,7 @@ cloudflared tunnel --url http://localhost:8123
 npm run smoke:external:readonly -- https://your-tunnel-url.trycloudflare.com
 ```
 
-`smoke:external:readonly` requires an explicit `https://` URL and at least 19 stored samples. Invalid or non-http(s) base URLs fail before any network request with `FAIL base URL must be an http(s) URL`. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
+`smoke:external:readonly` requires an explicit `https://` URL and at least 20 stored samples. Invalid or non-http(s) base URLs fail before any network request with `FAIL base URL must be an http(s) URL`. Use `npm run smoke:readonly` for local `http://127.0.0.1:8123` checks.
 
 If the external URL is unreachable, the smoke should fail fast on the first network request with `FAIL request /healthz failed` rather than a Node stack trace or a long cascade of endpoint failures.
 Each smoke request times out after 10 seconds by default; use `--timeout-ms=<ms>` only when debugging slow tunnels. Numeric smoke options such as `--min-samples`, `--timeout-ms`, and sample error statuses must be plain decimal digits; whitespace, decimal notation, and exponential notation fail before network probes or artifact creation.
@@ -218,7 +218,7 @@ The first cloud deploy should stay read-only. `PUBLIC_DEMO_MODE` defaults to `fu
 - [ ] `npm test` passes
 - [ ] `npm run smoke:external:readonly -- <https-url>` passes for external HTTPS URLs
 - [ ] `npm run smoke:readonly` passes for local read-only smoke
-- [ ] External `/api/samples` exposes at least 19 stored samples
+- [ ] External `/api/samples` exposes at least 20 stored samples
 - [ ] `curl <url>/.env` returns 403 or 404
 - [ ] `curl <url>/server.js` returns 403 or 404
 - [ ] `curl <url>/data/samples/manifest.json` returns 403 or 404

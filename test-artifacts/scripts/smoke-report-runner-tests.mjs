@@ -421,7 +421,7 @@ if (fs.existsSync(runnerPath)) {
       "scripts/external-demo-smoke.mjs",
       "http://127.0.0.1:8123",
       "--expect-mode=readonly",
-      "--min-samples=19",
+      "--min-samples=20",
       "--report-json=/tmp/smoke-report.json",
     ]);
 
@@ -434,7 +434,7 @@ if (fs.existsSync(runnerPath)) {
       "--require-https",
       "--require-token",
       "--expect-mode=protected",
-      "--min-samples=19",
+      "--min-samples=20",
       "--token=secret",
       "--report-json=/tmp/smoke-report.json",
     ]);
@@ -769,7 +769,7 @@ if (fs.existsSync(runnerPath)) {
         },
         sampleEvidence: {
           status: "failed",
-          requiredMin: 19,
+          requiredMin: 20,
           listedSamples: null,
           detailChecks: {
             passed: 0,
@@ -871,8 +871,8 @@ if (fs.existsSync(runnerPath)) {
     summary: { passed: 82, failed: 0 },
     checks: [
       { status: "pass", label: "GET /healthz returns 200" },
-      { status: "pass", label: "/api/samples has at least 19 samples" },
-      ...sampleEvidenceChecks(19),
+      { status: "pass", label: "/api/samples has at least 20 samples" },
+      ...sampleEvidenceChecks(20),
       ...demoSafetyChecks(),
       { status: "pass", label: "/api/samples list entries omit explicit matchId" },
       { status: "pass", label: "/.env is not publicly served" },
@@ -992,14 +992,14 @@ if (fs.existsSync(runnerPath)) {
     passingRequiredSummary?.latestRun?.sampleEvidence,
     {
       status: "passed",
-      requiredMin: 19,
+      requiredMin: 20,
       listedSamples: null,
       detailChecks: {
-        passed: 19,
+        passed: 20,
         failed: 0,
       },
       reportEssentialChecks: {
-        passed: 19,
+        passed: 20,
         failed: 0,
       },
       failures: [],
@@ -1240,7 +1240,7 @@ if (fs.existsSync(runnerPath)) {
       actualMode: "readonly",
       summary: { passed: 20, failed: 0 },
       checks: [
-        { status: "fail", label: "/api/samples has at least 19 samples", detail: "count=18" },
+        { status: "fail", label: "/api/samples has at least 20 samples", detail: "count=18" },
         ...sampleEvidenceChecks(18),
       ],
     },
@@ -1250,7 +1250,7 @@ if (fs.existsSync(runnerPath)) {
     partialSampleEvidenceSummary?.latestRun?.sampleEvidence,
     {
       status: "failed",
-      requiredMin: 19,
+      requiredMin: 20,
       listedSamples: 18,
       detailChecks: {
         passed: 18,
@@ -1292,8 +1292,8 @@ if (fs.existsSync(runnerPath)) {
       actualMode: "readonly",
       summary: { passed: 70, failed: 1 },
       checks: [
-        { status: "pass", label: "/api/samples has at least 19 samples" },
-        ...sampleEvidenceChecks(19),
+        { status: "pass", label: "/api/samples has at least 20 samples" },
+        ...sampleEvidenceChecks(20),
         ...demoSafetyChecks().filter((check) => check.label !== "/server.js is not publicly served"),
         { status: "fail", label: "/server.js is not publicly served" },
       ],
