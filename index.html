@@ -68,7 +68,7 @@
             <span>이 계정 기억하기</span>
           </label>
           <button type="submit" class="login-submit">최근 10게임 분석 시작</button>
-          <p class="login-status" data-login-status></p>
+          <p class="login-status" data-login-status role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -223,7 +223,7 @@
             <div class="section-heading">
               <h2 id="comparison-title">AI 비교 분석</h2>
             </div>
-            <p class="muted" data-comparison-status></p>
+            <p class="muted" data-comparison-status aria-live="polite"></p>
             <div class="comparison-overview" data-comparison-overview></div>
             <div class="comparison-grid" data-comparison-grid></div>
           </section>
@@ -363,7 +363,7 @@
                   <strong data-overall-duration>—</strong>
                 </div>
               </div>
-              <p class="panel--recent-aggregate__status muted" data-recent-aggregate-status hidden></p>
+              <p class="panel--recent-aggregate__status muted" data-recent-aggregate-status role="status" aria-live="polite" hidden></p>
             </div>
           </section>
 

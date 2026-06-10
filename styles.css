@@ -1007,6 +1007,12 @@ body::after {
   background: var(--surface-2);
 }
 
+/* 키보드 포커스 가시화 — 구간이 role="button" tabindex="0"로 포커스를 받음 */
+.dual-tl-segment:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
 .dual-tl-segment--active {
   background: var(--amber-bg-soft);
   border-left: 1px solid var(--accent);
@@ -2597,8 +2603,13 @@ body::after {
 
 .login-form input[type="text"]:focus,
 .login-form select:focus {
-  outline: none;
   border-color: var(--accent);
+}
+
+/* 마우스 포커스에서만 outline 제거 — 키보드 포커스는 전역 :focus-visible 링을 유지(WCAG 2.4.7) */
+.login-form input[type="text"]:focus:not(:focus-visible),
+.login-form select:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .login-remember {
@@ -2691,8 +2702,11 @@ body::after {
 }
 
 .api-key-details input:focus {
-  outline: none;
   border-color: var(--accent);
+}
+
+.api-key-details input:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .login-status {

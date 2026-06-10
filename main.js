@@ -1720,6 +1720,12 @@ function formatDurationSeconds(totalSeconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+// ms → "M:SS" (0 포함). 듀얼 타임라인 구간 aria-label 등 표시용.
+function msToClock(ms) {
+  const total = Math.max(0, Math.round((Number(ms) || 0) / 1000));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 function buildCompactHeadline(sample) {
@@ -2954,7 +2960,9 @@ function renderDualTimeline(sample) {
   const segmentZones = momentum.map((seg, i) => {
     const leftPct = (seg.start / totalMs) * 100;
     const widthPct = ((seg.end - seg.start) / totalMs) * 100;
+    const segLabel = `${msToClock(seg.start)}~${msToClock(seg.end)} 구간 상세 분석`;
     return `<div class="dual-tl-segment" data-seg-index="${i}" data-seg-start="${seg.start}" data-seg-end="${seg.end}"
+        role="button" tabindex="0" aria-label="${escapeAttr(segLabel)}"
         style="left:${leftPct}%; width:${widthPct}%"></div>`;
   }).join("");
 
@@ -2991,15 +2999,15 @@ function renderDualTimeline(sample) {
   dom.dualTimeline._analysis = sample.analysis;
 }
 
-function handleDualTimelineClick(event) {
-  if (!dom.dualTimeline) return;
-  const seg = event.target.closest(".dual-tl-segment");
-  if (!seg || !dom.dualTimeline.contains(seg)) return;
+function activateDualTimelineSegment(seg) {
+  if (!seg || !dom.dualTimeline || !dom.dualTimeline.contains(seg)) return;
 
   dom.dualTimeline.querySelectorAll(".dual-tl-segment").forEach((segment) => {
     segment.classList.remove("dual-tl-segment--active");
+    segment.setAttribute("aria-pressed", "false");
   });
   seg.classList.add("dual-tl-segment--active");
+  seg.setAttribute("aria-pressed", "true");
 
   renderDualTimelineDetail(
     parseInt(seg.dataset.segStart, 10),
@@ -3010,9 +3018,26 @@ function handleDualTimelineClick(event) {
   );
 }
 
+function handleDualTimelineClick(event) {
+  if (!dom.dualTimeline) return;
+  const seg = event.target.closest(".dual-tl-segment");
+  activateDualTimelineSegment(seg);
+}
+
+// 구간이 role="button" tabindex="0"이므로 Enter/Space로도 활성화되게 한다(키보드 접근성).
+function handleDualTimelineKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+  if (!dom.dualTimeline) return;
+  const seg = event.target.closest(".dual-tl-segment");
+  if (!seg || !dom.dualTimeline.contains(seg)) return;
+  event.preventDefault();
+  activateDualTimelineSegment(seg);
+}
+
 function bindDualTimelineEvents() {
   if (!dom.dualTimeline || dom.dualTimeline.dataset.bound === "true") return;
   dom.dualTimeline.addEventListener("click", handleDualTimelineClick);
+  dom.dualTimeline.addEventListener("keydown", handleDualTimelineKeydown);
   dom.dualTimeline.dataset.bound = "true";
 }
 
@@ -3137,11 +3162,11 @@ function renderBuildTimeline(sample) {
         return `
         <div class="build-item">
           <img class="build-item-icon" src="https://ddragon.leagueoflegends.com/cdn/${cdnVersion}/img/item/${itemId}.png"
-               alt="item ${itemId}" onerror="this.style.display='none'" width="32" height="32" />
+               alt="" onerror="this.style.display='none'" width="32" height="32" />
           <span class="build-item-time">${escapeHtml(i.timeLabel || "")}</span>
         </div>
       `;
-      }).join('<span class="build-arrow">→</span>')}
+      }).join('<span class="build-arrow" aria-hidden="true">→</span>')}
     </div>
   `;
 }
