@@ -199,6 +199,43 @@ or:
 X-Demo-Token: replace-with-long-random-token
 ```
 
+## Protected External Save Mode
+
+Use this only for invited testers who are allowed to create stored analysis samples from the external page.
+Anonymous external access should remain `PUBLIC_DEMO_MODE=readonly`.
+
+```bash
+mkdir -p runtime/samples
+cp -R data/samples/* runtime/samples/
+PUBLIC_DEMO_MODE=protected \
+PUBLIC_DEMO_TOKEN='replace-with-long-random-token' \
+SAMPLES_DIR=runtime/samples \
+TRUST_PROXY=1 \
+npm start
+```
+
+Then create an HTTPS tunnel:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8123 --no-autoupdate
+```
+
+Validate the protected external endpoint:
+
+```bash
+npm run smoke:external:protected -- https://demo.example.com --token=replace-with-long-random-token
+```
+
+Browser flow:
+
+- Open the external URL and confirm the page shows `보호 모드`.
+- Enter the invited tester token in `외부 저장 토큰`.
+- Confirm the status changes to `저장 권한이 연결되었습니다.`
+- Use Riot ID lookup, choose a candidate match, and generate/save the analysis sample.
+- Confirm the saved sample list refreshes and the generated sample opens.
+
+Share the token out of band, never put it in a URL, and rotate it after the session. Do not use `PUBLIC_DEMO_MODE=full` for external save testing.
+
 ## Cloud Host Notes
 
 For Render/Fly/Railway-like environments:
