@@ -7,6 +7,7 @@
 import fs from "fs";
 
 const mainSrc = fs.readFileSync(new URL("../../main.js", import.meta.url), "utf8");
+const indexSrc = fs.readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 
 function extractFunctionSource(source, name) {
   const startIdx = source.indexOf(`function ${name}(`);
@@ -25,7 +26,14 @@ function extractFunctionSource(source, name) {
 }
 
 const serverModeUiSrc = extractFunctionSource(mainSrc, "serverModeUi");
-const { serverModeUi } = new Function(`${serverModeUiSrc}\nreturn { serverModeUi };`)();
+function makeServerModeUi(hasToken = false) {
+  return new Function(
+    "hasDemoToken",
+    `${serverModeUiSrc}\nreturn { serverModeUi };`,
+  )(() => hasToken).serverModeUi;
+}
+const serverModeUi = makeServerModeUi(false);
+const serverModeUiWithToken = makeServerModeUi(true);
 const nonRetryablePublicDemoMessageSrc = extractFunctionSource(mainSrc, "isNonRetryablePublicDemoMessage");
 const formatRetryMessageSrc = extractFunctionSource(mainSrc, "formatRetryMessage");
 const { formatRetryMessage } = new Function(`${nonRetryablePublicDemoMessageSrc}\n${formatRetryMessageSrc}\nreturn { formatRetryMessage };`)();
@@ -52,9 +60,37 @@ check("full mode keeps live controls available",
   serverModeUi({ readonly: false, protected: false }).lockLiveControls,
   false);
 
-check("protected mode keeps live controls available for token-gated use",
+check("protected mode locks live controls until token is connected",
   serverModeUi({ readonly: false, protected: true }).lockLiveControls,
+  true);
+
+check("protected mode unlocks live controls once a token exists",
+  serverModeUiWithToken({ readonly: false, protected: true }).lockLiveControls,
   false);
+
+check("protected mode locks live controls when server token config is invalid",
+  serverModeUiWithToken({ readonly: false, protected: true, publicDemoTokenValid: false }).lockLiveControls,
+  true);
+
+check("index has protected token form",
+  indexSrc.includes("data-demo-token-form"),
+  true);
+
+check("index has protected token input",
+  indexSrc.includes("data-demo-token-input"),
+  true);
+
+check("index has protected token clear button",
+  indexSrc.includes("data-demo-token-clear"),
+  true);
+
+check("main renders protected token panel",
+  mainSrc.includes("renderDemoTokenPanel()"),
+  true);
+
+check("main verifies protected token through demo auth endpoint",
+  mainSrc.includes('fetchJson("/api/demo-auth"'),
+  true);
 
 check("readonly demo block message is not presented as retryable",
   formatRetryMessage(new Error("외부 데모 모드에서는 라이브 Riot API/샘플 생성 기능이 비활성화되어 있습니다.")),

@@ -295,6 +295,7 @@ function publicDemoModeHealth() {
   return {
     publicDemoMode,
     publicDemoModeValid,
+    publicDemoTokenConfigured: Boolean(publicDemoToken),
     publicDemoTokenValid,
     readonly: isReadOnlyDemoMode(),
     protected: isProtectedDemoMode(),
@@ -3938,6 +3939,19 @@ function sampleDetailIdFromPathname(pathname) {
   return sampleId;
 }
 
+async function handleDemoAuth(req, res) {
+  if (!requireLiveApiAccess(req, res)) {
+    return true;
+  }
+  sendJson(res, 200, {
+    ok: true,
+    mode: publicDemoMode,
+    protected: isProtectedDemoMode(),
+    readonly: isReadOnlyDemoMode(),
+  });
+  return true;
+}
+
 async function handleApi(req, res, url) {
   if (req.method === "GET" && url.pathname === "/healthz") {
     sendJson(res, 200, {
@@ -3971,6 +3985,11 @@ async function handleApi(req, res, url) {
       return true;
     }
     sendJson(res, 200, bundle);
+    return true;
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/demo-auth") {
+    await handleDemoAuth(req, res);
     return true;
   }
 

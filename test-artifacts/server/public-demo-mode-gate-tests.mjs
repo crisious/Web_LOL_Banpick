@@ -363,5 +363,12 @@ if (invalidModeGate) {
     null);
 }
 
+checkTrue("server handles /api/demo-auth",
+  serverSrc.includes('url.pathname === "/api/demo-auth"'));
+checkTrue("demo auth uses requireLiveApiAccess",
+  serverSrc.includes("handleDemoAuth(req, res)"));
+checkTrue("server defines handleDemoAuth",
+  serverSrc.includes("async function handleDemoAuth(req, res)"));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

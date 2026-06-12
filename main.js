@@ -48,6 +48,10 @@ const dom = {
   loginSampleButton: document.querySelector("[data-login-sample-button]"),
   loginSampleMeta: document.querySelector("[data-login-sample-meta]"),
   loginLiveLock: document.querySelector("[data-login-live-lock]"),
+  demoTokenForm: document.querySelector("[data-demo-token-form]"),
+  demoTokenInput: document.querySelector("[data-demo-token-input]"),
+  demoTokenClear: document.querySelector("[data-demo-token-clear]"),
+  demoTokenStatus: document.querySelector("[data-demo-token-status]"),
   matchListView: document.querySelector("[data-match-list-view]"),
   matchListGrid: document.querySelector("[data-match-list-grid]"),
   matchListHeader: document.querySelector("[data-match-list-header]"),
@@ -99,6 +103,29 @@ const dom = {
   championHistoryTable: document.querySelector("[data-champion-history-table]"),
 };
 
+const DEMO_TOKEN_STORAGE_KEY = "lol-coach-demo-token";
+
+function loadDemoToken() {
+  try {
+    return sessionStorage.getItem(DEMO_TOKEN_STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function saveDemoToken(token) {
+  const value = String(token || "");
+  try {
+    if (value) sessionStorage.setItem(DEMO_TOKEN_STORAGE_KEY, value);
+    else sessionStorage.removeItem(DEMO_TOKEN_STORAGE_KEY);
+  } catch {}
+  return value;
+}
+
+function hasDemoToken() {
+  return Boolean(String(state.demoToken || "").trim());
+}
+
 const state = {
   manifest: [],
   currentSample: null,
@@ -106,6 +133,9 @@ const state = {
   view: "LOGGED_OUT",
   serverStatus: null,
   serverStatusError: null,
+  demoToken: loadDemoToken(),
+  demoTokenStatus: "",
+  demoTokenPending: false,
   account: null,
   recentMatches: [],
   recentMatchesHasMore: false,
@@ -1814,6 +1844,30 @@ function visibleReportSamples() {
 }
 
 const DEFAULT_FETCH_TIMEOUT_MS = 30000;
+const PROTECTED_API_PATHS = new Set([
+  "/api/demo-auth",
+  "/api/recent-matches",
+  "/api/champion-history",
+  "/api/generate-sample",
+]);
+
+function isProtectedApiPath(path) {
+  if (typeof path !== "string") return false;
+  try {
+    const url = new URL(path, window.location.origin);
+    return url.origin === window.location.origin && PROTECTED_API_PATHS.has(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function headersWithDemoToken(path, headers, headerName = "x-demo-token") {
+  const next = headers instanceof Headers ? headers : new Headers(headers || {});
+  if (isProtectedApiPath(path) && state.demoToken) {
+    next.set(headerName, state.demoToken);
+  }
+  return next;
+}
 
 // options.timeoutMs: 명시 타임아웃(ms). 0이면 타임아웃 없음(예: 장시간 AI 분석).
 // 호출부가 자체 signal을 넘기면 타임아웃을 주입하지 않는다(취소를 호출부가 제어).
@@ -1828,6 +1882,16 @@ async function fetchJson(path, options = {}) {
     timer = setTimeout(() => controller.abort(), effectiveTimeout);
     finalOptions = { ...fetchOptions, signal: controller.signal };
   }
+
+  const requestHeaders = new Headers(fetchOptions.headers || {});
+  if (
+    typeof isProtectedApiPath === "function" &&
+    typeof headersWithDemoToken === "function" &&
+    isProtectedApiPath(path)
+  ) {
+    headersWithDemoToken(path, requestHeaders, "x-demo-token");
+  }
+  finalOptions = { ...finalOptions, headers: requestHeaders };
 
   try {
     const response = await fetch(path, finalOptions);
@@ -1962,12 +2026,19 @@ function serverModeUi(status, error) {
   }
 
   if (status.protected) {
+    const configured = status.publicDemoTokenValid !== false && status.publicDemoTokenConfigured !== false;
+    const connected = hasDemoToken();
     return {
       mode: "protected",
-      label: "보호 모드",
-      note: "접속 토큰이 확인되면 라이브 Riot 조회와 샘플 열람을 사용할 수 있습니다.",
-      lockLiveControls: false,
-      liveControlMessage: "",
+      label: connected ? "저장 가능" : "보호 모드",
+      note: connected
+        ? "저장 토큰이 연결되어 live 조회와 분석 저장을 사용할 수 있습니다."
+        : "초대받은 저장 토큰을 입력하면 live 조회와 분석 저장을 사용할 수 있습니다.",
+      lockLiveControls: !configured || !connected,
+      demoTokenConfigured: configured,
+      liveControlMessage: configured
+        ? "저장 토큰을 연결하면 Riot ID 조회와 분석 저장을 사용할 수 있습니다."
+        : "서버 저장 토큰 설정이 올바르지 않습니다. 운영자에게 문의하세요.",
     };
   }
 
@@ -2023,6 +2094,46 @@ function renderLoginDemoStatus() {
   if (dom.fetchLiveLock) {
     dom.fetchLiveLock.textContent = mode.liveControlMessage || "";
     dom.fetchLiveLock.hidden = !mode.lockLiveControls;
+  }
+  renderDemoTokenPanel();
+}
+
+function renderDemoTokenPanel() {
+  if (!dom.demoTokenForm) return;
+  const mode = currentServerModeUi();
+  const visible = mode.mode === "protected";
+  dom.demoTokenForm.hidden = !visible;
+  if (!visible) return;
+  if (dom.demoTokenInput && dom.demoTokenInput.value !== state.demoToken) {
+    dom.demoTokenInput.value = state.demoToken || "";
+  }
+  if (dom.demoTokenStatus) {
+    dom.demoTokenStatus.textContent = state.demoTokenStatus ||
+      (hasDemoToken() ? "저장 토큰이 이 탭에 연결되어 있습니다." : "저장하려면 초대 토큰을 입력하세요.");
+  }
+}
+
+async function verifyDemoToken(token) {
+  state.demoToken = saveDemoToken(token);
+  state.demoTokenPending = true;
+  state.demoTokenStatus = "저장 권한을 확인하는 중입니다.";
+  renderDemoTokenPanel();
+  applyPendingUi();
+  try {
+    await fetchJson("/api/demo-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    state.demoTokenStatus = "저장 권한이 연결되었습니다.";
+  } catch (error) {
+    state.demoToken = saveDemoToken("");
+    state.demoTokenStatus = `저장 권한 확인 실패: ${formatRetryMessage(error)}`;
+  } finally {
+    state.demoTokenPending = false;
+    renderLoginDemoStatus();
+    renderDemoTokenPanel();
+    applyPendingUi();
   }
 }
 
@@ -3536,8 +3647,9 @@ function toggleDisabled(elements, disabled) {
 
 function applyPendingUi() {
   const liveLocked = isLiveControlLocked();
-  const loginDisabled = Boolean(state.isLoginPending || liveLocked);
-  const liveActionDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending || liveLocked);
+  const demoTokenPending = Boolean(state.demoTokenPending);
+  const loginDisabled = Boolean(state.isLoginPending || liveLocked || demoTokenPending);
+  const liveActionDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending || liveLocked || demoTokenPending);
   const sampleSwitcherDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending);
   const detailDisabled = Boolean(state.isDetailPending || state.isGeneratePending);
   const sampleLoginDisabled = Boolean(state.isLoginPending || state.isSampleLoginPending || !firstManifestSample());
@@ -3550,14 +3662,16 @@ function applyPendingUi() {
   toggleDisabled(Array.from(dom.matchListGrid.querySelectorAll("[data-match-detail]")), detailDisabled);
   toggleDisabled(Array.from(dom.matchListHeader.querySelectorAll("button")), detailDisabled);
   toggleDisabled([dom.backToListBtn], detailDisabled);
+  toggleDisabled(Array.from(dom.demoTokenForm?.querySelectorAll("input, button") || []), demoTokenPending);
   if (dom.loginForm) dom.loginForm.dataset.liveLocked = liveLocked ? "true" : "false";
   if (dom.fetcherDetails) {
     dom.fetcherDetails.dataset.liveLocked = liveLocked ? "true" : "false";
     dom.fetcherDetails.setAttribute("aria-disabled", liveLocked ? "true" : "false");
   }
   toggleRefreshButton(Boolean(state.recentStatsLoading));
-  if (dom.championHistoryAction) dom.championHistoryAction.disabled = Boolean(state.championHistoryLoading || liveLocked);
+  if (dom.championHistoryAction) dom.championHistoryAction.disabled = Boolean(state.championHistoryLoading || liveLocked || demoTokenPending);
   renderLoginDemoStatus();
+  renderDemoTokenPanel();
 }
 
 async function handleRecentMatchesSubmit(event) {
@@ -3651,13 +3765,14 @@ async function handleGenerateSample(matchId) {
 
     try {
       state.manifest = await loadManifest();
+      renderSampleSwitcher();
     } catch {}
 
-    dom.fetchStatus.textContent = `${result.sampleId} 생성 완료 · ${[
+    dom.fetchStatus.textContent = `${result.sampleId} 저장 완료 · ${[
       result.analysis.matchSummary.champion,
       roleLabel(result.analysis.matchSummary.role),
       resultLabel(result.analysis.matchSummary.result),
-    ].filter(Boolean).join(" ")}`;
+    ].filter(Boolean).join(" ")} · 저장 샘플 목록에서 바로 열 수 있습니다.`;
     return result;
   } catch (error) {
     maybeHandleRiotKeyError(error);
@@ -4149,6 +4264,25 @@ async function init() {
   dom.loginForm.addEventListener("submit", handleLogin);
   dom.loginSampleButton?.addEventListener("click", handleLoginSampleOpen);
   dom.recentForm.addEventListener("submit", handleRecentMatchesSubmit);
+  dom.demoTokenForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const token = dom.demoTokenInput?.value?.trim() || "";
+    if (!token) {
+      state.demoToken = saveDemoToken("");
+      state.demoTokenStatus = "토큰을 입력하세요.";
+      renderDemoTokenPanel();
+      applyPendingUi();
+      return;
+    }
+    verifyDemoToken(token);
+  });
+  dom.demoTokenClear?.addEventListener("click", () => {
+    state.demoToken = saveDemoToken("");
+    state.demoTokenStatus = "저장 토큰을 지웠습니다.";
+    renderLoginDemoStatus();
+    renderDemoTokenPanel();
+    applyPendingUi();
+  });
 
   // Track B: Riot 키 배너 닫기 버튼
   document.querySelector("[data-riot-key-banner-dismiss]")
