@@ -8,7 +8,7 @@
 
 **Tech Stack:** Vanilla JavaScript frontend in `main.js`, static HTML/CSS in `index.html` / `styles.css`, Node HTTP server in `server.js`, existing manifest utilities in `lib/sample-manifest.js`, Node source-extraction tests in `test-artifacts/main` and server gate tests in `test-artifacts/server`.
 
-**Implementation status (2026-06-12 11:13 KST):** Implemented locally on `codex/external-protected-analysis-save`. Focused tests passed (`protected-demo-token-ui` 18/0, `demo-mode-ui` 23/0, `public-demo-mode-gate` 70/0), `npm test` passed 2968/0 across 135 files, `git diff --check` passed, local protected smoke passed on `http://127.0.0.1:8124`, read-only/protected smoke reports passed on `8125`/`8124`, browser QA confirmed token panel lock/unlock with no console warn/error, and sensitive artifact scan found no matches. Commit/push and GitHub Actions artifact verification remain open.
+**Implementation status (2026-06-12 11:25 KST):** Implemented on `codex/external-protected-analysis-save` and pushed. Focused tests passed (`protected-demo-token-ui` 18/0, `demo-mode-ui` 23/0, `public-demo-mode-gate` 70/0), `npm test` passed 2968/0 across 135 files, `git diff --check` passed, local protected smoke passed on `http://127.0.0.1:8124`, read-only/protected smoke reports passed on `8125`/`8124`, browser QA confirmed token panel lock/unlock with no console warn/error, and local sensitive artifact scan found no matches. Draft PR: https://github.com/crisious/Web_LOL_Banpick/pull/2. GitHub QA run `27390380803` passed for PR merge SHA `ba1c9d0`; artifact `qa-automation-27390380803` had QA verdict passed, 161 smoke checks passed / 0 failed, 13 required checks passed, artifact integrity passed, and sensitive artifact scan found no matches. GitHub protected smoke was skipped because repository secret `PUBLIC_DEMO_TOKEN` was not available; local protected smoke remains the protected-mode evidence.
 
 ---
 
@@ -650,7 +650,7 @@ rg -n --hidden -S "RGAPI|api_key|RIOT_API_KEY|Authorization|Bearer|PUBLIC_DEMO_T
 
 Expected: no matches. If matches are expected labels rather than secrets, narrow the scan to artifact files and document the exact harmless context before proceeding.
 
-- [ ] **Step 4: Commit implementation**
+- [x] **Step 4: Commit implementation**
 
 Run:
 
@@ -660,7 +660,7 @@ git commit -m "feat: enable protected external analysis save"
 git push origin codex/external-protected-analysis-save
 ```
 
-- [ ] **Step 5: Verify GitHub Actions artifact**
+- [x] **Step 5: Verify GitHub Actions artifact**
 
 Watch the `main` QA run, download `qa-automation-*`, inspect `qa-summary.json`, and run the same sensitive scan over the downloaded artifact.
 
