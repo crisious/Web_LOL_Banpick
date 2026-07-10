@@ -20,6 +20,11 @@ const dom = {
   weaknesses: document.querySelector("[data-weaknesses]"),
   checklist: document.querySelector("[data-checklist]"),
   keyMoments: document.querySelector("[data-key-moments]"),
+  teamplayV2: document.querySelector("[data-teamplay-v2]"),
+  teamplayStatus: document.querySelector("[data-teamplay-status]"),
+  teamplayReviews: document.querySelector("[data-teamplay-reviews]"),
+  teamplayMore: document.querySelector("[data-teamplay-more]"),
+  teamplayLegacy: document.querySelector("[data-teamplay-legacy]"),
   combatAnalysis: document.querySelector("[data-combat-analysis]"),
   teamfightPhases: document.querySelector("[data-teamfight-phases]"),
   evidence: document.querySelector("[data-evidence]"),
@@ -174,6 +179,31 @@ const HTML_ESCAPE = {
   "'": "&#39;",
   "`": "&#96;",
 };
+
+const TEAMPLAY_RENDER_LEVELS = new Set(["FULL", "PARTIAL", "EVENT_ONLY"]);
+const TEAMPLAY_COVERAGE_LEVELS = new Set([
+  "FULL",
+  "PARTIAL",
+  "EVENT_ONLY",
+  "PLAYER_ONLY",
+  "UNAVAILABLE",
+]);
+const TEAMPLAY_COVERAGE_SOURCES = new Set([
+  "RAW_TIMELINE",
+  "LEGACY_ADAPTER",
+  "NONE",
+]);
+const TEAMPLAY_LIMITATIONS = new Set([
+  "PARTIAL_POSITION_FRAMES",
+  "NO_POSITION_FRAMES",
+  "MISSING_SPATIAL_LINK",
+  "INCOMPLETE_ALLY_FRAME_COVERAGE",
+  "UNKNOWN_TEAM",
+  "INCOMPLETE_TEAM_SNAPSHOT",
+  "STALE_TEAM_SNAPSHOT",
+  "INVALID_V2_ITEM",
+  "INVALID_AI_SELECTION",
+]);
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"'`]/g, (char) => HTML_ESCAPE[char]);
@@ -2547,6 +2577,476 @@ function renderKeyMoments(sample) {
     .join("");
 }
 
+function sanitizeClientTeamplayV2(value) {
+  const rootValid = Boolean(
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    value.schemaVersion === "2.0" &&
+    value.coverage &&
+    TEAMPLAY_COVERAGE_LEVELS.has(value.coverage.level) &&
+    TEAMPLAY_COVERAGE_SOURCES.has(value.coverage.source) &&
+    Number.isFinite(value.coverage.usablePositionSceneRatio) &&
+    value.coverage.usablePositionSceneRatio >= 0 &&
+    value.coverage.usablePositionSceneRatio <= 1 &&
+    Array.isArray(value.coverage.limitationCodes) &&
+    value.coverage.limitationCodes.every((code) => TEAMPLAY_LIMITATIONS.has(code)) &&
+    Array.isArray(value.encounters) &&
+    Array.isArray(value.objectiveEngagements) &&
+    Array.isArray(value.scenes) &&
+    Array.isArray(value.personalReviews) &&
+    Array.isArray(value.teamAppendix)
+  );
+  if (!rootValid) return { rootValid: false, data: null };
+
+  let invalidItem = false;
+  function uniqueTimedRows(rows, idKey) {
+    const counts = new Map();
+    rows.forEach((row) => {
+      const id = row?.[idKey];
+      if (id) counts.set(id, (counts.get(id) || 0) + 1);
+    });
+    return rows.filter((row) => {
+      const id = row?.[idKey];
+      const validTime = Number.isFinite(row?.startTimestamp) &&
+        Number.isFinite(row?.endTimestamp) &&
+        row.endTimestamp >= row.startTimestamp;
+      const valid = Boolean(id) && counts.get(id) === 1 && validTime;
+      if (!valid) invalidItem = true;
+      return valid;
+    });
+  }
+
+  let encounters = uniqueTimedRows(value.encounters, "id");
+  let objectiveEngagements = uniqueTimedRows(
+    value.objectiveEngagements,
+    "id",
+  );
+  let graphChanged = true;
+  while (graphChanged) {
+    const encounterIdsNow = new Set(encounters.map((row) => row.id));
+    const objectiveIdsNow = new Set(
+      objectiveEngagements.map((row) => row.id),
+    );
+    const nextEncounters = encounters.filter((row) =>
+      Array.isArray(row.linkedObjectiveEngagementIds) &&
+      row.linkedObjectiveEngagementIds.every((id) => objectiveIdsNow.has(id)));
+    const nextObjectives = objectiveEngagements.filter((row) =>
+      Array.isArray(row.linkedEncounterIds) &&
+      row.linkedEncounterIds.every((id) => encounterIdsNow.has(id)));
+    graphChanged = nextEncounters.length !== encounters.length ||
+      nextObjectives.length !== objectiveEngagements.length;
+    if (graphChanged) invalidItem = true;
+    encounters = nextEncounters;
+    objectiveEngagements = nextObjectives;
+  }
+
+  const encounterIds = new Set(encounters.map((row) => row.id));
+  const objectiveIds = new Set(objectiveEngagements.map((row) => row.id));
+  const scenes = uniqueTimedRows(value.scenes, "sceneId").filter((scene) => {
+    const validObjective = scene.objectiveEngagementId === null ||
+      objectiveIds.has(scene.objectiveEngagementId);
+    const validEncounters = Array.isArray(scene.encounterIds) &&
+      scene.encounterIds.every((id) => encounterIds.has(id));
+    if (!validObjective || !validEncounters) invalidItem = true;
+    return validObjective && validEncounters;
+  });
+  const sceneIds = new Set(scenes.map((row) => row.sceneId));
+
+  const reviewCounts = new Map();
+  value.personalReviews.forEach((row) => {
+    if (row?.reviewId) {
+      reviewCounts.set(row.reviewId, (reviewCounts.get(row.reviewId) || 0) + 1);
+    }
+  });
+  const personalReviews = value.personalReviews.filter((review) => {
+    const valid = Boolean(
+      review &&
+      review.reviewId &&
+      reviewCounts.get(review.reviewId) === 1 &&
+      sceneIds.has(review.sceneId) &&
+      Array.isArray(review.encounterIds) &&
+      review.encounterIds.every((id) => encounterIds.has(id)) &&
+      (review.objectiveEngagementId === null ||
+        objectiveIds.has(review.objectiveEngagementId)) &&
+      Number.isFinite(review.startTimestamp) &&
+      Number.isFinite(review.endTimestamp) &&
+      review.endTimestamp >= review.startTimestamp &&
+      Array.isArray(review.situationFacts) &&
+      Array.isArray(review.decisionFacts) &&
+      Array.isArray(review.positioningFacts) &&
+      Array.isArray(review.outcomeFacts) &&
+      Array.isArray(review.evidenceIds),
+    );
+    if (!valid) invalidItem = true;
+    return valid;
+  });
+  const reviewIds = new Set(personalReviews.map((row) => row.reviewId));
+
+  const appendixCounts = new Map();
+  value.teamAppendix.forEach((row) => {
+    if (row?.teamAppendixId) {
+      appendixCounts.set(
+        row.teamAppendixId,
+        (appendixCounts.get(row.teamAppendixId) || 0) + 1,
+      );
+    }
+  });
+  const teamAppendix = value.teamAppendix.filter((row) => {
+    const valid = Boolean(
+      row?.teamAppendixId &&
+      appendixCounts.get(row.teamAppendixId) === 1 &&
+      reviewIds.has(row.reviewId),
+    );
+    if (!valid) invalidItem = true;
+    return valid;
+  });
+
+  const limitationCodes = [...new Set([
+    ...value.coverage.limitationCodes,
+    ...(invalidItem ? ["INVALID_V2_ITEM"] : []),
+  ])];
+  return {
+    rootValid: true,
+    data: {
+      ...value,
+      coverage: { ...value.coverage, limitationCodes },
+      encounters,
+      objectiveEngagements,
+      scenes,
+      personalReviews,
+      teamAppendix,
+    },
+  };
+}
+
+function hasLegacyTeamplayUi(sample) {
+  return Array.isArray(sample?.analysis?.combatAnalysis) ||
+    Array.isArray(sample?.analysis?.teamfightPhaseAnalysis);
+}
+
+function selectTeamplayRenderModel(sample) {
+  for (const candidate of [
+    sample?.analysis?.teamplayAnalysisV2,
+    sample?.normalized?.teamplayAnalysisV2,
+  ]) {
+    const sanitized = sanitizeClientTeamplayV2(candidate);
+    if (
+      sanitized.rootValid &&
+      sanitized.data.coverage.source === "RAW_TIMELINE" &&
+      TEAMPLAY_RENDER_LEVELS.has(sanitized.data.coverage.level)
+    ) {
+      return { mode: "V2", data: sanitized.data };
+    }
+  }
+  if (hasLegacyTeamplayUi(sample)) return { mode: "LEGACY", data: null };
+  return { mode: "EMPTY", data: null };
+}
+
+function teamplayDomToken(value) {
+  const bytes = new TextEncoder().encode(String(value || "empty"));
+  return `tp_${[...bytes]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function renderTeamplayReviewCard(review, appendix, index, mode = "visible") {
+  const narrative = review?.narrative && typeof review.narrative === "object"
+    ? review.narrative
+    : {};
+  const factGroups = [
+    Array.isArray(review?.situationFacts) ? review.situationFacts : [],
+    Array.isArray(review?.decisionFacts) ? review.decisionFacts : [],
+    Array.isArray(review?.positioningFacts) ? review.positioningFacts : [],
+    Array.isArray(review?.outcomeFacts) ? review.outcomeFacts : [],
+  ];
+  const facts = factGroups.flat();
+  const statementByFact = new Map(
+    (Array.isArray(narrative.factStatements) ? narrative.factStatements : [])
+      .filter((row) => row && typeof row.factId === "string")
+      .map((row) => [row.factId, row]),
+  );
+  const statementText = (rows, fallback) => {
+    const values = rows
+      .map((fact) => statementByFact.get(fact?.factId)?.text)
+      .filter((text) => typeof text === "string" && text.trim());
+    return values.length > 0 ? values.join(" ") : fallback;
+  };
+  const safeNarrativeText = (value, fallback) =>
+    typeof value === "string" && value.trim() ? value.trim() : fallback;
+  const situationText = statementText(factGroups[0], "상황 근거 부족");
+  const decisionText = safeNarrativeText(
+    narrative.decisionAssessment?.text,
+    statementText(factGroups[1], "확인된 행동 근거 부족"),
+  );
+  const positionText = factGroups[2].length > 0
+    ? safeNarrativeText(
+        narrative.positioningObservation?.text,
+        statementText(factGroups[2], "위치 근거 부족"),
+      )
+    : "위치 근거 부족";
+  const outcomeText = statementText(factGroups[3], "결과 근거 부족");
+
+  const involvementLabel = review?.effectiveInvolvementLevel === "CONFIRMED"
+    ? "직접 관여"
+    : review?.effectiveInvolvementLevel === "APPROXIMATE"
+      ? "근접 추정"
+      : "관여 미확인";
+  const confidenceLabel = (value) => {
+    if (value === "HIGH") return "높은 신뢰";
+    if (value === "MEDIUM") return "중간 신뢰";
+    if (value === "LOW") return "낮은 신뢰";
+    return "신뢰도 미상";
+  };
+  const positionConfidence = factGroups[2].length > 0
+    ? confidenceLabel(factGroups[2][0]?.confidence)
+    : "위치 근거 없음";
+  const sceneLabel = review?.objectiveEngagementId
+    ? "오브젝트 교전"
+    : "교전";
+  const start = msToClock(review?.startTimestamp);
+  const end = msToClock(review?.endTimestamp);
+  const importance = Number.isFinite(review?.importanceScore)
+    ? review.importanceScore
+    : 0;
+  const token = teamplayDomToken(review?.reviewId || `review_${index}`);
+  const evidenceId = `teamplay-evidence-${token}`;
+  const appendixId = appendix ? `teamplay-appendix-${token}` : null;
+  const visibilityAttribute = mode === "extra"
+    ? "data-teamplay-review-extra"
+    : "data-teamplay-review-visible";
+
+  const factTypeLabel = (type) => {
+    const labels = {
+      ENCOUNTER_CLASSIFICATION: "교전 분류",
+      ALLY_DEATH_COUNT: "아군 사망",
+      ENEMY_DEATH_COUNT: "상대 사망",
+      FIRST_TAKEDOWN_TEAM: "첫 처치 팀",
+      PLAYER_CONFIRMED_KILL: "확인된 킬",
+      PLAYER_CONFIRMED_ASSIST: "확인된 어시스트",
+      PLAYER_CONFIRMED_DEATH: "확인된 사망",
+      PLAYER_FIRST_RECORDED_INVOLVEMENT: "첫 기록 관여",
+      PLAYER_DISTANCE_LE_2500: "교전 거리 2,500 이하",
+      PLAYER_DISTANCE_2500_5000: "교전 거리 2,500~5,000",
+      PLAYER_DISTANCE_GT_5000: "교전 거리 5,000 초과",
+      NO_LIVING_ALLY_WITHIN_2500_AT_SNAPSHOT: "근처 생존 아군 없음",
+      OBJECTIVE_CAPTURE_TEAM: "오브젝트 획득 팀",
+      OBJECTIVE_CAPTURE_COUNTS: "오브젝트 획득 수",
+      PLAYER_OBJECTIVE_KILLER: "오브젝트 처치 기록",
+      PLAYER_OBJECTIVE_ASSIST: "오브젝트 어시스트 기록",
+      STRUCTURE_CONVERSION: "구조물 전환",
+      PRE_ENCOUNTER_GOLD_DIFFERENCE: "교전 전 골드 차이",
+      PLAYER_DEATH_WITHIN_120S_AFTER_CAPTURE: "획득 후 사망",
+    };
+    return labels[type] || "근거 사실";
+  };
+  const evidenceItems = facts.map((fact) => {
+    const value = fact?.value && typeof fact.value === "object" ? fact.value : {};
+    const details = [];
+    if (Number.isFinite(fact?.timestamp)) {
+      details.push(`기록 ${msToClock(fact.timestamp)}`);
+    }
+    if (Number.isFinite(value.frameAgeSeconds)) {
+      details.push(`프레임 시차 ${value.frameAgeSeconds}초`);
+    }
+    if (Number.isFinite(value.distance)) {
+      details.push(`거리 ${Math.round(value.distance).toLocaleString("ko-KR")}`);
+    }
+    if (Number.isFinite(value.deathOrder)) {
+      details.push(`사망 순서 ${value.deathOrder}`);
+    }
+    const refs = (Array.isArray(fact?.sourceRefs) ? fact.sourceRefs : [])
+      .map((ref) => {
+        const kind = ref?.kind === "PARTICIPANT_FRAME" ? "프레임" : "사건";
+        const time = Number.isFinite(ref?.timestamp)
+          ? ` ${msToClock(ref.timestamp)}`
+          : "";
+        return `${kind}${time} · ${String(ref?.id || "근거 ID 없음")}`;
+      });
+    return `
+      <li>
+        <strong>${escapeHtml(factTypeLabel(fact?.type))}</strong>
+        <span>${escapeHtml(confidenceLabel(fact?.confidence))}</span>
+        ${details.length > 0 ? `<span>${escapeHtml(details.join(" · "))}</span>` : ""}
+        ${refs.length > 0 ? `<small>${refs.map(escapeHtml).join("<br>")}</small>` : ""}
+      </li>`;
+  }).join("");
+
+  const coaching = narrative.coaching && typeof narrative.coaching === "object"
+    ? narrative.coaching
+    : null;
+  const coachingHtml = coaching
+    ? `
+      <div class="teamplay-coaching">
+        <p><strong>더 나은 선택</strong>${escapeHtml(coaching.betterChoice || "")}</p>
+        <p><strong>다음 경기 규칙</strong>${escapeHtml(coaching.nextGameRule || "")}</p>
+      </div>`
+    : '<p class="muted">코칭을 생성할 근거가 없습니다.</p>';
+
+  const participantText = (participant) => {
+    if (!participant || typeof participant !== "object") {
+      return String(participant || "기록 없음");
+    }
+    return [
+      participant.champion,
+      participant.role,
+      Number.isInteger(participant.participantId)
+        ? `#${participant.participantId}`
+        : null,
+    ].filter(Boolean).join(" · ") || "기록 없음";
+  };
+  const participantsText = (rows) => {
+    const list = Array.isArray(rows) ? rows.map(participantText) : [];
+    return list.length > 0 ? list.join(", ") : "기록 없음";
+  };
+  const teamLabel = (value) => {
+    if (value === "ALLY") return "아군";
+    if (value === "ENEMY") return "상대";
+    if (value === "SPLIT") return "분할 획득";
+    return "팀 미상";
+  };
+  let appendixButtonHtml = "";
+  let appendixPanelHtml = "";
+  if (appendix) {
+    const gold = appendix.preEncounterGoldDifference?.value?.value;
+    const conversions = Array.isArray(appendix.structureConversions)
+      ? appendix.structureConversions
+      : [];
+    const allyConversions = conversions.filter((row) =>
+      row?.takerRelation === "ALLY").length;
+    const enemyConversions = conversions.filter((row) =>
+      row?.takerRelation === "ENEMY").length;
+    appendixButtonHtml = `
+      <button type="button" class="secondary-button" data-teamplay-toggle
+        aria-expanded="false" aria-controls="${escapeAttr(appendixId)}">팀 상황 근거</button>`;
+    appendixPanelHtml = `
+      <div id="${escapeAttr(appendixId)}" class="teamplay-disclosure" hidden>
+        <table class="teamplay-team-table">
+          <caption>이 개인 리뷰의 팀 상황 근거</caption>
+          <thead><tr><th scope="col">항목</th><th scope="col">아군</th><th scope="col">상대</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">직접 기록</th><td>${escapeHtml(participantsText(appendix.allyDirectParticipants))}</td><td>${escapeHtml(participantsText(appendix.enemyDirectParticipants))}</td></tr>
+            <tr><th scope="row">사망</th><td>${escapeHtml(appendix.allyDeaths ?? 0)}</td><td>${escapeHtml(appendix.enemyDeaths ?? 0)}</td></tr>
+            <tr><th scope="row">구조물 전환</th><td>${escapeHtml(allyConversions)}</td><td>${escapeHtml(enemyConversions)}</td></tr>
+            <tr><th scope="row">첫 처치 팀</th><td colspan="2">${escapeHtml(teamLabel(appendix.firstTakedownTeam))}</td></tr>
+            <tr><th scope="row">오브젝트 획득</th><td colspan="2">${escapeHtml(teamLabel(appendix.captureTeam))}</td></tr>
+            <tr><th scope="row">교전 전 골드 차이</th><td colspan="2">${Number.isFinite(gold) ? escapeHtml(String(gold)) : "기록 없음"}</td></tr>
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  return `
+    <article class="teamplay-review" ${visibilityAttribute}
+      data-teamplay-review-id="${escapeAttr(review?.reviewId || "")}">
+      <div class="teamplay-review__header">
+        <div>
+          <span class="meta-label">리뷰 ${escapeHtml(index + 1)}</span>
+          <h3>${escapeHtml(start)}~${escapeHtml(end)} · ${escapeHtml(sceneLabel)}</h3>
+        </div>
+        <span class="teamplay-review__importance">중요도 ${escapeHtml(importance)}</span>
+      </div>
+      <div class="teamplay-review__meta">
+        <span>${escapeHtml(involvementLabel)}</span>
+        <span>${escapeHtml(positionConfidence)}</span>
+      </div>
+      <dl class="teamplay-facts">
+        <dt>상황</dt><dd>${escapeHtml(situationText)}</dd>
+        <dt>확인된 행동</dt><dd>${escapeHtml(decisionText)}</dd>
+        <dt>포지셔닝</dt><dd>${escapeHtml(positionText)}</dd>
+        <dt>결과</dt><dd>${escapeHtml(outcomeText)}</dd>
+      </dl>
+      ${coachingHtml}
+      <div class="teamplay-review__actions">
+        <button type="button" class="secondary-button" data-teamplay-toggle
+          aria-expanded="false" aria-controls="${escapeAttr(evidenceId)}">근거 보기</button>
+        ${appendixButtonHtml}
+        <button type="button" class="secondary-button"
+          data-teamplay-flow-target="${escapeAttr(review?.sceneId || "")}">전체 흐름 보기</button>
+      </div>
+      <div id="${escapeAttr(evidenceId)}" class="teamplay-disclosure" hidden>
+        <h4>원본 근거</h4>
+        ${evidenceItems
+          ? `<ul class="teamplay-evidence-list">${evidenceItems}</ul>`
+          : '<p class="muted">표시할 원본 근거가 없습니다.</p>'}
+      </div>
+      ${appendixPanelHtml}
+    </article>`;
+}
+
+function renderTeamplayReviewCollection(reviews, appendixByReview) {
+  const rows = Array.isArray(reviews) ? reviews : [];
+  const appendices = appendixByReview instanceof Map
+    ? appendixByReview
+    : new Map();
+  const visible = rows.slice(0, 3).map((review, index) =>
+    renderTeamplayReviewCard(
+      review,
+      appendices.get(review.reviewId),
+      index,
+      "visible",
+    ));
+  const extra = rows.slice(3).map((review, index) =>
+    renderTeamplayReviewCard(
+      review,
+      appendices.get(review.reviewId),
+      index + 3,
+      "extra",
+    ));
+  return `${visible.join("")}<div id="teamplay-extra-reviews" hidden>${extra.join("")}</div>`;
+}
+
+function setTeamplayBusy(isBusy) {
+  [
+    document.getElementById("teamplay-analysis"),
+    document.getElementById("teamplay-flow"),
+  ].filter(Boolean).forEach((node) =>
+    node.setAttribute("aria-busy", isBusy ? "true" : "false"));
+}
+
+function renderTeamplayAnalysis(sample) {
+  if (!dom.teamplayV2 || !dom.teamplayLegacy) return;
+  const selected = selectTeamplayRenderModel(sample);
+  const showV2 = selected.mode === "V2";
+  dom.teamplayV2.hidden = !showV2;
+  dom.teamplayLegacy.hidden = showV2 || selected.mode === "EMPTY";
+
+  if (selected.mode === "LEGACY") {
+    renderCombatAnalysis(sample);
+    renderTeamfightPhases(sample);
+    return;
+  }
+
+  dom.teamplayV2.hidden = false;
+  if (selected.mode === "EMPTY") {
+    dom.teamplayStatus.textContent = "검토할 수 있는 주요 교전 데이터가 없습니다.";
+    dom.teamplayReviews.innerHTML = '<div id="teamplay-extra-reviews" hidden></div>';
+    dom.teamplayMore.hidden = true;
+    dom.teamplayMore.setAttribute("aria-expanded", "false");
+    dom.teamplayMore.textContent = "전체 리뷰 보기";
+    return;
+  }
+
+  const reviews = selected.data.personalReviews.slice(0, 5);
+  const appendixByReview = new Map(
+    selected.data.teamAppendix.map((row) => [row.reviewId, row]),
+  );
+  dom.teamplayStatus.textContent = reviews.length === 0
+    ? "검토할 수 있는 주요 교전 데이터가 없습니다."
+    : selected.data.coverage.level === "FULL"
+      ? "전체 사건과 위치 근거를 사용했습니다."
+      : selected.data.coverage.level === "PARTIAL"
+        ? "일부 장면은 위치 근거가 제한됩니다."
+        : "사건 기록만 사용했으며 포지셔닝 조언은 생략합니다.";
+  dom.teamplayReviews.innerHTML = renderTeamplayReviewCollection(
+    reviews,
+    appendixByReview,
+  );
+  dom.teamplayMore.hidden = reviews.length <= 3;
+  dom.teamplayMore.setAttribute("aria-expanded", "false");
+  dom.teamplayMore.textContent = "전체 리뷰 보기";
+}
+
 // Phase 32: 전투 KDA 상황별 집중 분석 카드.
 // AI 응답 항목에는 시간 정보가 없으므로 relatedEventIds 첫 ID를 timelineEvents에
 // 매핑해 startLabel을 채운다 (evidenceMap 재사용).
@@ -3614,8 +4114,7 @@ function renderSample(sample) {
     dom.keyMoments.innerHTML = '<p class="muted">핵심 장면 데이터 생성 중...</p>';
   }
 
-  renderCombatAnalysis(sample);
-  renderTeamfightPhases(sample);
+  renderTeamplayAnalysis(sample);
   renderEvidence(sample);
   renderComparison(sample);
   renderPlaytimeScore(sample);
@@ -3650,6 +4149,7 @@ async function selectSample(sampleId) {
   state.currentSampleId = sampleId;
   // 연속 선택 시 늦게 도착한 이전 로드가 새 샘플 UI를 덮어쓰지 않도록 요청 토큰으로 폐기.
   const loadToken = (state.sampleLoadSeq = (state.sampleLoadSeq || 0) + 1);
+  setTeamplayBusy(true);
   dom.fetchStatus.textContent = `${sampleId} 데이터를 불러오는 중입니다.`;
 
   try {
@@ -3664,6 +4164,8 @@ async function selectSample(sampleId) {
   } catch (error) {
     if (loadToken !== state.sampleLoadSeq) return;
     dom.fetchStatus.innerHTML = `샘플 로드 실패: ${escapeHtml(formatRetryMessage(error))} <button class="retry-btn" data-retry-sample="${escapeAttr(sampleId)}">다시 시도</button>`;
+  } finally {
+    if (loadToken === state.sampleLoadSeq) setTeamplayBusy(false);
   }
 }
 
