@@ -1290,8 +1290,8 @@ test("known positions require 5000 proximity while missing positions lower confi
 });
 
 test("pre and end snapshots never use frames after their boundary", () => {
-  const objective = objectiveWithFramesAt([480000, 600000, 660000]);
-  assert.equal(objective.setupWindow.teamSnapshots.end.ally.snapshotTimestamp, 480000);
+  const objective = objectiveWithFramesAt([540000, 600000, 660000]);
+  assert.equal(objective.setupWindow.teamSnapshots.end.ally.snapshotTimestamp, 540000);
   assert.equal(objective.contestWindow.teamSnapshots.end.ally.snapshotTimestamp, 600000);
 });
 
