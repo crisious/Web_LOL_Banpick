@@ -50,8 +50,16 @@ const {
   focusTeamplayScene,
   setTeamplayBusy,
   toggleTeamplayDisclosure,
+  defaultTeamplayStatus,
+  defaultTeamplayNavigationStatus,
 } = new Function("HTML_ESCAPE", `
-  const dom = { teamplayFlowStatus: null };
+  const defaultTeamplayStatus = { textContent: "" };
+  const defaultTeamplayNavigationStatus = { textContent: "" };
+  const dom = {
+    teamplayStatus: defaultTeamplayStatus,
+    teamplayNavigationStatus: defaultTeamplayNavigationStatus,
+    teamplayFlowStatus: null,
+  };
   ${sources}
   return {
     renderTeamplayReviewCard,
@@ -59,6 +67,8 @@ const {
     focusTeamplayScene,
     setTeamplayBusy,
     toggleTeamplayDisclosure,
+    defaultTeamplayStatus,
+    defaultTeamplayNavigationStatus,
   };
 `)({
   "&": "&amp;",
@@ -278,14 +288,43 @@ test("flow navigation changes tab then focuses scene heading", () => {
 
 test("missing scene leaves position and announces status", () => {
   const status = { textContent: "" };
+  const calls = [];
   focusTeamplayScene("missing", {
-    switchTab: () => {},
+    switchTab: (id) => calls.push(id),
     requestFrame: (fn) => fn(),
     target: null,
     status,
     reducedMotion: false,
   });
+  assert.deepEqual(calls, []);
   assert.equal(status.textContent, "근거 장면을 찾지 못했습니다.");
+});
+
+test("missing scene uses the visible analysis status by default", () => {
+  defaultTeamplayNavigationStatus.textContent = "";
+  focusTeamplayScene("missing", {
+    switchTab: () => assert.fail("must not switch tabs"),
+    requestFrame: (fn) => fn(),
+    target: null,
+    reducedMotion: false,
+  });
+  assert.equal(
+    defaultTeamplayNavigationStatus.textContent,
+    "근거 장면을 찾지 못했습니다.",
+  );
+});
+
+test("successful scene navigation preserves the coverage status", () => {
+  defaultTeamplayStatus.textContent = "전체 근거 범위 안내";
+  defaultTeamplayNavigationStatus.textContent = "근거 장면을 찾지 못했습니다.";
+  focusTeamplayScene("scene_1", {
+    switchTab: () => {},
+    requestFrame: (fn) => fn(),
+    target: { scrollIntoView: () => {}, focus: () => {} },
+    reducedMotion: true,
+  });
+  assert.equal(defaultTeamplayNavigationStatus.textContent, "");
+  assert.equal(defaultTeamplayStatus.textContent, "전체 근거 범위 안내");
 });
 
 test("busy state is exposed on analysis and flow regions", () => {
@@ -349,6 +388,17 @@ test("DOM has one mutual-exclusion teamplay flow slot", () => {
   assert.ok(indexSource.includes("data-teamplay-flow-v2"));
   assert.ok(indexSource.includes("data-teamplay-flow-legacy"));
   assert.equal((indexSource.match(/data-dual-timeline/g) || []).length, 1);
+});
+
+test("legacy modes give both teamplay regions their visible heading", () => {
+  assert.ok(indexSource.includes('id="teamplay-analysis-legacy-title"'));
+  assert.ok(indexSource.includes('id="teamplay-flow-legacy-title"'));
+  assert.ok(mainSource.includes(
+    'setTeamplayRegionLabel("teamplay-analysis", showV2 || selected.mode === "EMPTY"\n    ? "teamplay-analysis-title"\n    : "teamplay-analysis-legacy-title")',
+  ));
+  assert.ok(mainSource.includes(
+    'setTeamplayRegionLabel("teamplay-flow", showV2 || selected.mode === "EMPTY"\n    ? "teamplay-flow-title"\n    : "teamplay-flow-legacy-title")',
+  ));
 });
 
 test("objective table exposes caption and column scopes", () => {

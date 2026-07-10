@@ -4908,6 +4908,10 @@ body::after {
   color: var(--muted);
 }
 
+.teamplay-navigation-status:empty {
+  display: none;
+}
+
 .teamplay-review-list {
   display: grid;
   gap: var(--space-4);

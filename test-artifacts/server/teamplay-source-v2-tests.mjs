@@ -78,6 +78,42 @@ test("source preserves observer kills and typed refs", () => {
   assert.equal(source.structureEvents[0].takerRelation, "ENEMY");
 });
 
+test("empty and malformed frame arrays are not usable raw timelines", () => {
+  const match = makeMatchFixture();
+  const missingTimestampFrame = makeFrame(1000);
+  delete missingTimestampFrame.timestamp;
+  for (const frames of [
+    [],
+    [null],
+    [{}],
+    [{ events: [] }],
+    [{ events: [null, {}, { type: "ITEM_PURCHASED" }] }],
+    [{ events: [{ type: "CHAMPION_KILL" }] }],
+    [{ participantFrames: {} }],
+    [{ participantFrames: { 1: null, 2: {} } }],
+    [{ participantFrames: { 1: { participantId: 1 } } }],
+    [missingTimestampFrame],
+  ]) {
+    const source = sourceModule.extractTeamplaySource(
+      match,
+      { info: { frames } },
+      1,
+    );
+    assert.equal(source.hasRawTimeline, false);
+    assert.equal(source.snapshots.length, 0);
+  }
+});
+
+test("a supported event is usable without participant frames", () => {
+  const source = sourceModule.extractTeamplaySource(
+    makeMatchFixture(),
+    { info: { frames: [{ timestamp: 1000, events: [championKill(1000, 1, 6)] }] } },
+    1,
+  );
+  assert.equal(source.hasRawTimeline, true);
+  assert.equal(source.killEvents.length, 1);
+});
+
 test("prior-frame lookup never returns a future frame", () => {
   const match = makeMatchFixture();
   const source = sourceModule.extractTeamplaySource(

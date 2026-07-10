@@ -636,6 +636,8 @@ AI 입력에는 사실 원문 대신 `teamplayRecommendationCandidates.reviews`�
 
 이 봉투는 정확한 key 집합과 허용 후보를 검증한 뒤 삭제된다. `teamplayRecommendationSelections`는 최종 API 응답이나 저장 분석에 남지 않는다. 자유 코칭 문장, 새 코드, 새 fact ID, 변경된 시각은 모두 거부하며 해당 리뷰는 `RULE_FALLBACK`을 사용하고 `INVALID_AI_SELECTION`을 기록한다.
 
+저장 분석을 다시 열 때도 같은 신뢰 경계를 적용한다. raw match/timeline이 있으면 도메인 사실을 원본에서 다시 만들고, 저장된 `AI_SELECTED` 코드는 새로 생성된 허용 후보와 다시 대조한다. raw 파일이 없으면 각 fact의 type별 `value` shape, sourceRef의 정확한 공개 필드, limitation, review 기반 stable `factId`를 검증하고 encounter/objective/scene 값과 다시 대조한다. 저장된 `factStatements`, 판단·포지셔닝 문장, 코칭 자유 문구는 그대로 신뢰하지 않고 서버 fact template과 검증된 recommendation template으로 재생성한다. 팀 부록의 사망·획득·전환 결과와 fact ID도 검증된 개인 리뷰 fact에서 다시 만들며, 팀 소속을 원본으로 확인할 수 없는 직접 참가자 목록은 비운다. 교전 전 골드와 획득 후 사망 정보는 각각 모든 frame의 교전 이전성 및 실제 획득 시각과의 millisecond 차이를 검증한다. 부적합한 fact는 해당 리뷰와 부록에서 격리하고 `INVALID_V2_ITEM`을, 부적합한 추천은 `INVALID_AI_SELECTION`을 기록한다.
+
 ## 5. 최소 유효 응답 조건
 
 아래 조건을 **모두** 만족해야 `validateAnalysisOutput`이 통과한다(하나라도 어기면 throw).

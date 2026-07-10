@@ -158,6 +158,17 @@ function modelWithFramesBeforeAndAfterScene() {
   ]);
 }
 
+function modelWithSplitTeamSnapshotTimes() {
+  const fullFrame = makeFrame(540000);
+  const allyOnlyFrame = makeFrame(545000, [
+    championKill(550000, 1, 6, [], { x: 1000, y: 1000 }),
+  ]);
+  for (let participantId = 6; participantId <= 10; participantId += 1) {
+    delete allyOnlyFrame.participantFrames[String(participantId)];
+  }
+  return modelFromFrames([fullFrame, allyOnlyFrame]);
+}
+
 function modelWithPostCaptureTargetDeath() {
   return modelFromFrames([
     makeFrame(590000, [
@@ -165,6 +176,26 @@ function modelWithPostCaptureTargetDeath() {
       championKill(650000, 6, 1, [], { x: 5100, y: 5000 }),
     ], { 1: { x: 5000, y: 5000 } }),
   ]);
+}
+
+function modelWithPostCaptureTargetDeathAtBoundary() {
+  return modelFromFrames([
+    makeFrame(590000, [
+      eliteKill(600000, 2, 100, "DRAGON", { x: 5000, y: 5000 }, [1]),
+      championKill(719999, 6, 1, [], { x: 5100, y: 5000 }),
+    ], { 1: { x: 5000, y: 5000 } }),
+  ]);
+}
+
+function positioningConfidenceAtAge(frameAgeMs) {
+  const anchorTimestamp = 600000;
+  const model = modelFromFrames([
+    makeFrame(anchorTimestamp - frameAgeMs, [
+      championKill(anchorTimestamp, 1, 6, [], { x: 1000, y: 1000 }),
+    ], { 1: { x: 1000, y: 1000 } }),
+  ]);
+  return model.personalReviews[0].positioningFacts.find((fact) =>
+    fact.type.startsWith("PLAYER_DISTANCE_"))?.confidence;
 }
 
 test("objective-linked encounter produces one scene and one review", () => {
@@ -249,10 +280,23 @@ test("coverage distinguishes full partial and event only", () => {
   assert.equal(buildCoverageModel("none").coverage.level, "EVENT_ONLY");
 });
 
+test("position confidence uses exact millisecond age boundaries", () => {
+  assert.equal(positioningConfidenceAtAge(5000), "HIGH");
+  assert.equal(positioningConfidenceAtAge(5001), "MEDIUM");
+  assert.equal(positioningConfidenceAtAge(15000), "MEDIUM");
+  assert.equal(positioningConfidenceAtAge(15001), "LOW");
+});
+
 test("pre-encounter gold never uses a later frame", () => {
   const appendix = modelWithFramesBeforeAndAfterScene().teamAppendix[0];
   assert.equal(appendix.preEncounterGoldDifference.value.snapshotTimestamp, 540000);
   assert.ok(appendix.preEncounterGoldDifference.value.snapshotTimestamp <= 550000);
+});
+
+test("pre-encounter gold requires one shared ten-player snapshot", () => {
+  const appendix = modelWithSplitTeamSnapshotTimes().teamAppendix[0];
+  assert.equal(appendix.preEncounterGoldDifference, null);
+  assert.ok(appendix.limitationCodes.includes("INCOMPLETE_TEAM_SNAPSHOT"));
 });
 
 test("confirmed objective participant receives factual post-capture death outcome", () => {
@@ -260,6 +304,13 @@ test("confirmed objective participant receives factual post-capture death outcom
   const fact = review.outcomeFacts.find((row) =>
     row.type === "PLAYER_DEATH_WITHIN_120S_AFTER_CAPTURE");
   assert.equal(fact.value.secondsAfterCapture, 50);
+});
+
+test("post-capture elapsed seconds stay inside the half-open 120s window", () => {
+  const review = modelWithPostCaptureTargetDeathAtBoundary().personalReviews[0];
+  const fact = review.outcomeFacts.find((row) =>
+    row.type === "PLAYER_DEATH_WITHIN_120S_AFTER_CAPTURE");
+  assert.equal(fact.value.secondsAfterCapture, 119);
 });
 
 test("team appendix direct participants use numeric participant order", () => {

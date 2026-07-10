@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
+const { makeFactId } = require("../../lib/teamplay-contract-v2.js");
 const {
   applyRecommendationSelections,
   buildRecommendationCandidatePayload,
@@ -47,8 +48,14 @@ function validTeamplayModel() {
     timestamp: 600000,
     participantId: null,
   };
+  const frameRef = {
+    kind: "PARTICIPANT_FRAME",
+    id: "frame_far_1",
+    timestamp: 590000,
+    participantId: 1,
+  };
+  const objectiveRef = { ...sourceRef, id: "event_obj_1" };
   const fact = {
-    factId: "fact_far",
     type: "PLAYER_DISTANCE_GT_5000",
     timestamp: 600000,
     value: {
@@ -58,9 +65,28 @@ function validTeamplayModel() {
       frameAgeSeconds: 10,
     },
     confidence: "MEDIUM",
-    sourceRefs: [sourceRef],
+    sourceRefs: [frameRef, sourceRef],
     limitationCodes: [],
   };
+  fact.factId = makeFactId("review_1", fact);
+  const captureFact = {
+    type: "OBJECTIVE_CAPTURE_TEAM",
+    timestamp: 600000,
+    value: { team: "ENEMY" },
+    confidence: "HIGH",
+    sourceRefs: [objectiveRef],
+    limitationCodes: [],
+  };
+  captureFact.factId = makeFactId("review_1", captureFact);
+  const captureCountsFact = {
+    type: "OBJECTIVE_CAPTURE_COUNTS",
+    timestamp: 600000,
+    value: { ally: 0, enemy: 1, unknown: 0 },
+    confidence: "HIGH",
+    sourceRefs: [objectiveRef],
+    limitationCodes: [],
+  };
+  captureCountsFact.factId = makeFactId("review_1", captureCountsFact);
   return {
     schemaVersion: "2.0",
     coverage: {
@@ -72,12 +98,17 @@ function validTeamplayModel() {
     encounters: [],
     objectiveEngagements: [{
       id: "obj_1",
+      objectiveType: "DRAGON",
+      captureEndTimestamp: 600000,
+      captureTeam: "ENEMY",
+      captureCounts: { ally: 0, enemy: 1, unknown: 0 },
       startTimestamp: 510000,
       endTimestamp: 720000,
-      sourceRefs: [{ ...sourceRef, id: "event_obj_1" }],
+      sourceRefs: [objectiveRef],
       confidence: "HIGH",
       limitationCodes: [],
       linkedEncounterIds: [],
+      structureConversions: [],
     }],
     scenes: [{
       sceneId: "scene_1",
@@ -85,9 +116,13 @@ function validTeamplayModel() {
       encounterIds: [],
       startTimestamp: 510000,
       endTimestamp: 720000,
+      sourceRefs: [objectiveRef],
       importanceScore: 40,
       involvements: [],
       effectiveInvolvementLevel: "APPROXIMATE",
+      allyDeaths: 0,
+      enemyDeaths: 0,
+      firstTakedownTeam: "UNKNOWN",
     }],
     personalReviews: [{
       reviewId: "review_1",
@@ -96,32 +131,32 @@ function validTeamplayModel() {
       encounterIds: [],
       startTimestamp: 510000,
       endTimestamp: 720000,
-      sourceRefs: [sourceRef],
+      sourceRefs: [frameRef, sourceRef, objectiveRef],
       confidence: "MEDIUM",
       limitationCodes: [],
       importanceScore: 40,
       involvements: [],
       effectiveInvolvementLevel: "APPROXIMATE",
-      situationFacts: [],
+      situationFacts: [captureFact, captureCountsFact],
       decisionFacts: [],
       positioningFacts: [fact],
       outcomeFacts: [],
-      evidenceIds: [fact.factId],
+      evidenceIds: [captureFact.factId, captureCountsFact.factId, fact.factId],
       narrative: null,
       teamAppendixId: "appendix_1",
     }],
     teamAppendix: [{
       teamAppendixId: "appendix_1",
       reviewId: "review_1",
-      allyDirectParticipants: [],
-      enemyDirectParticipants: [],
+      allyDirectParticipants: [{ participantId: 1, champion: "Champion1", role: "TOP" }],
+      enemyDirectParticipants: [{ participantId: 6, champion: "Champion6", role: "TOP" }],
       firstTakedownTeam: "UNKNOWN",
       allyDeaths: 0,
       enemyDeaths: 0,
       preEncounterGoldDifference: null,
       captureTeam: "ENEMY",
       structureConversions: [],
-      factIds: [],
+      factIds: [captureFact.factId, captureCountsFact.factId].sort(),
       limitationCodes: [],
     }],
   };
@@ -166,12 +201,16 @@ test("AI selection injection cannot alter deterministic facts", () => {
 
   const model = validTeamplayModel();
   const deterministicFacts = JSON.stringify(model.personalReviews[0].positioningFacts);
+  const deterministicParticipants = JSON.stringify({
+    ally: model.teamAppendix[0].allyDirectParticipants,
+    enemy: model.teamAppendix[0].enemyDirectParticipants,
+  });
   const primary = {
     teamplayRecommendationSelections: {
       reviews: [{
         reviewId: "review_1",
         recommendationCode: "DECIDE_JOIN_OR_TRADE_EARLY",
-        evidenceIds: ["fact_far"],
+        evidenceIds: [model.personalReviews[0].positioningFacts[0].factId],
         factText: "AI가 만든 근거 문장",
         timestamp: 1,
       }],
@@ -186,6 +225,10 @@ test("AI selection injection cannot alter deterministic facts", () => {
     JSON.stringify(primary.teamplayAnalysisV2.personalReviews[0].positioningFacts),
     deterministicFacts,
   );
+  assert.equal(JSON.stringify({
+    ally: primary.teamplayAnalysisV2.teamAppendix[0].allyDirectParticipants,
+    enemy: primary.teamplayAnalysisV2.teamAppendix[0].enemyDirectParticipants,
+  }), deterministicParticipants);
   assert.ok(primary.teamplayAnalysisV2.coverage.limitationCodes.includes(
     "INVALID_AI_SELECTION",
   ));

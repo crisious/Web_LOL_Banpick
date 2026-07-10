@@ -150,6 +150,18 @@ test("missing positions join only with shared participant", () => {
   ])).length, 2);
 });
 
+test("missing position cannot bridge a cluster beyond its medoid", () => {
+  const encounters = buildEncounters(sourceWithKills([
+    killAt(100000, 1, 6, [2], 1000, 1000),
+    killAt(105000, 2, 7, [3], 1100, 1000),
+    killAt(110000, 3, 8, [4], null, null),
+    killAt(115000, 4, 9, [], 12000, 12000),
+  ]));
+  assert.equal(encounters.length, 2);
+  assert.equal(encounters[0].sourceRefs.length, 3);
+  assert.equal(encounters[1].sourceRefs.length, 1);
+});
+
 test("classification decision tree is exclusive", () => {
   assert.equal(oneDeathEncounter().type, "PICK");
   assert.equal(twoDeathEncounter().type, "SKIRMISH");

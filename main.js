@@ -76,6 +76,7 @@ const dom = {
   teamplayFlowV2: document.querySelector("[data-teamplay-flow-v2]"),
   teamplayFlowList: document.querySelector("[data-teamplay-flow-list]"),
   teamplayFlowStatus: document.querySelector("[data-teamplay-flow-status]"),
+  teamplayNavigationStatus: document.querySelector("[data-teamplay-navigation-status]"),
   teamplayFlowLegacy: document.querySelector("[data-teamplay-flow-legacy]"),
   dualTimeline: document.querySelector("[data-dual-timeline]"),
   dualDetail: document.querySelector("[data-dual-detail]"),
@@ -2846,6 +2847,7 @@ function renderTeamplayReviewCard(review, appendix, index, mode = "visible") {
   };
   const evidenceItems = facts.map((fact) => {
     const value = fact?.value && typeof fact.value === "object" ? fact.value : {};
+    const resultText = statementByFact.get(fact?.factId)?.text;
     const details = [];
     if (Number.isFinite(fact?.timestamp)) {
       details.push(`기록 ${msToClock(fact.timestamp)}`);
@@ -2871,6 +2873,9 @@ function renderTeamplayReviewCard(review, appendix, index, mode = "visible") {
       <li>
         <strong>${escapeHtml(factTypeLabel(fact?.type))}</strong>
         <span>${escapeHtml(confidenceLabel(fact?.confidence))}</span>
+        ${typeof resultText === "string" && resultText.trim()
+          ? `<span>${escapeHtml(resultText.trim())}</span>`
+          : ""}
         ${details.length > 0 ? `<span>${escapeHtml(details.join(" · "))}</span>` : ""}
         ${refs.length > 0 ? `<small>${refs.map(escapeHtml).join("<br>")}</small>` : ""}
       </li>`;
@@ -2920,6 +2925,10 @@ function renderTeamplayReviewCard(review, appendix, index, mode = "visible") {
       row?.takerRelation === "ALLY").length;
     const enemyConversions = conversions.filter((row) =>
       row?.takerRelation === "ENEMY").length;
+    const captureLabel = appendix.captureTeam === null ||
+      appendix.captureTeam === undefined
+      ? "연결된 오브젝트 없음"
+      : teamLabel(appendix.captureTeam);
     appendixButtonHtml = `
       <button type="button" class="secondary-button" data-teamplay-toggle
         aria-expanded="false" aria-controls="${escapeAttr(appendixId)}">팀 상황 근거</button>`;
@@ -2933,7 +2942,7 @@ function renderTeamplayReviewCard(review, appendix, index, mode = "visible") {
             <tr><th scope="row">사망</th><td>${escapeHtml(appendix.allyDeaths ?? 0)}</td><td>${escapeHtml(appendix.enemyDeaths ?? 0)}</td></tr>
             <tr><th scope="row">구조물 전환</th><td>${escapeHtml(allyConversions)}</td><td>${escapeHtml(enemyConversions)}</td></tr>
             <tr><th scope="row">첫 처치 팀</th><td colspan="2">${escapeHtml(teamLabel(appendix.firstTakedownTeam))}</td></tr>
-            <tr><th scope="row">오브젝트 획득</th><td colspan="2">${escapeHtml(teamLabel(appendix.captureTeam))}</td></tr>
+            <tr><th scope="row">오브젝트 획득</th><td colspan="2">${escapeHtml(captureLabel)}</td></tr>
             <tr><th scope="row">교전 전 골드 차이</th><td colspan="2">${Number.isFinite(gold) ? escapeHtml(String(gold)) : "기록 없음"}</td></tr>
           </tbody>
         </table>
@@ -3000,6 +3009,11 @@ function renderTeamplayReviewCollection(reviews, appendixByReview) {
   return `${visible.join("")}<div id="teamplay-extra-reviews" hidden>${extra.join("")}</div>`;
 }
 
+function setTeamplayRegionLabel(regionId, titleId) {
+  const region = document.getElementById(regionId);
+  if (region) region.setAttribute("aria-labelledby", titleId);
+}
+
 function setTeamplayBusy(isBusy) {
   [
     document.getElementById("teamplay-analysis"),
@@ -3010,8 +3024,14 @@ function setTeamplayBusy(isBusy) {
 
 function renderTeamplayAnalysis(sample) {
   if (!dom.teamplayV2 || !dom.teamplayLegacy) return;
+  if (dom.teamplayNavigationStatus) {
+    dom.teamplayNavigationStatus.textContent = "";
+  }
   const selected = selectTeamplayRenderModel(sample);
   const showV2 = selected.mode === "V2";
+  setTeamplayRegionLabel("teamplay-analysis", showV2 || selected.mode === "EMPTY"
+    ? "teamplay-analysis-title"
+    : "teamplay-analysis-legacy-title");
   dom.teamplayV2.hidden = !showV2;
   dom.teamplayLegacy.hidden = showV2 || selected.mode === "EMPTY";
 
@@ -3164,6 +3184,9 @@ function renderTeamplayFlow(sample) {
   if (!dom.teamplayFlowV2 || !dom.teamplayFlowLegacy) return;
   const selected = selectTeamplayRenderModel(sample);
   const showV2 = selected.mode === "V2";
+  setTeamplayRegionLabel("teamplay-flow", showV2 || selected.mode === "EMPTY"
+    ? "teamplay-flow-title"
+    : "teamplay-flow-legacy-title");
   dom.teamplayFlowV2.hidden = !showV2;
   dom.teamplayFlowLegacy.hidden = showV2 || selected.mode === "EMPTY";
 
@@ -3926,18 +3949,19 @@ function toggleTeamplayDisclosure(button) {
 function focusTeamplayScene(sceneId, deps = {}) {
   const switchTabFn = deps.switchTab || switchTab;
   const requestFrame = deps.requestFrame || requestAnimationFrame;
-  const status = deps.status || dom.teamplayFlowStatus;
+  const status = deps.status || dom.teamplayNavigationStatus ||
+    dom.teamplayStatus || dom.teamplayFlowStatus;
   const reducedMotion = deps.reducedMotion ??
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const target = deps.target === undefined
+    ? document.getElementById(`teamplay-scene-${teamplayDomToken(sceneId)}`)
+    : deps.target;
+  if (!target) {
+    if (status) status.textContent = "근거 장면을 찾지 못했습니다.";
+    return;
+  }
   switchTabFn("tab-timeline");
   requestFrame(() => {
-    const target = deps.target === undefined
-      ? document.getElementById(`teamplay-scene-${teamplayDomToken(sceneId)}`)
-      : deps.target;
-    if (!target) {
-      if (status) status.textContent = "근거 장면을 찾지 못했습니다.";
-      return;
-    }
     if (status) status.textContent = "";
     target.scrollIntoView({
       behavior: reducedMotion ? "auto" : "smooth",

@@ -254,6 +254,29 @@ test("review card escapes content and starts disclosures closed", () => {
   assert.ok(html.includes("근접 추정"));
 });
 
+test("expanded evidence includes the matching server fact result", () => {
+  const review = reviewWithMarkup();
+  review.narrative.factStatements = [{
+    factId: "fact_0",
+    claimCode: "PLAYER_DISTANCE_2500_5000",
+    text: "교전 중심과의 실제 거리는 3,200입니다.",
+    evidenceIds: ["fact_0"],
+    source: "SERVER_FACT_TEMPLATE",
+  }];
+  const html = renderTeamplayReviewCard(review, appendixWithMarkup(), 0);
+  const start = html.indexOf('id="teamplay-evidence-');
+  const end = html.indexOf("</div>", start);
+  const evidenceHtml = html.slice(start, end);
+  assert.ok(evidenceHtml.includes("교전 중심과의 실제 거리는 3,200입니다."));
+});
+
+test("encounter-only appendix distinguishes no objective from unknown capture", () => {
+  const appendix = { ...appendixWithMarkup(), captureTeam: null };
+  const html = renderTeamplayReviewCard(reviewWithMarkup(), appendix, 0);
+  assert.ok(html.includes("연결된 오브젝트 없음"));
+  assert.ok(!html.includes("오브젝트 획득</th><td colspan=\"2\">팀 미상"));
+});
+
 test("missing position and coaching render explicit normal states", () => {
   const review = reviewWithMarkup();
   review.positioningFacts = [];

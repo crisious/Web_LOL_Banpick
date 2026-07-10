@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createRequire } from "node:module";
 import {
+  championKill,
   makeFrame,
   makeMatchFixture,
   makeTimelineFixture,
@@ -89,6 +90,23 @@ test("no raw and no legacy uses UNAVAILABLE", () => {
   assert.equal(bundle.analysis.teamplayAnalysisV2.coverage.level, "UNAVAILABLE");
 });
 
+test("empty raw timeline keeps valid legacy analysis visible", () => {
+  const bundle = loadFixture({
+    rawMatch: makeMatchFixture(),
+    rawTimeline: { info: { frames: [] } },
+    legacyAnalysis: {
+      ...validAnalysis,
+      combatAnalysis: [],
+      teamfightPhaseAnalysis: [],
+    },
+  });
+  assert.equal(bundle.analysis.teamplayAnalysisV2.coverage.level, "PLAYER_ONLY");
+  assert.equal(
+    bundle.analysis.teamplayAnalysisV2.coverage.source,
+    "LEGACY_ADAPTER",
+  );
+});
+
 test("one malformed stored v2 is rebuilt from raw", () => {
   const bundle = loadFixture({
     rawMatch: makeMatchFixture(),
@@ -153,6 +171,44 @@ test("malformed analysis v2 does not mask valid normalized raw v2", () => {
     bundle.analysis.teamplayAnalysisV2.coverage.source,
     "RAW_TIMELINE",
   );
+});
+
+test("raw files rebuild stale stored v2 before rendering", () => {
+  const rawMatch = makeMatchFixture();
+  const rawTimeline = makeTimelineFixture([makeFrame(590000, [
+    championKill(605000, 2, 6, [1], { x: 5000, y: 5000 }),
+  ], { 1: { x: 5000, y: 5000 } })]);
+  const freshFacts = buildTeamplayAnalysisV2(rawMatch, rawTimeline, 1);
+  const staleFacts = structuredClone(freshFacts);
+  staleFacts.encounters[0].allyDeaths = 999;
+  const staleAnalysis = structuredClone(freshFacts);
+  staleAnalysis.encounters[0].allyDeaths = 999;
+  staleAnalysis.personalReviews[0].narrative = {
+    factStatements: [],
+    decisionAssessment: {
+      claimCode: "INVENTED",
+      text: "저장된 임의 인과 설명",
+      evidenceIds: [],
+      source: "AI",
+    },
+    positioningObservation: null,
+    coaching: null,
+  };
+  const bundle = hydrateStoredTeamplayV2({
+    normalized: { ...validNormalized, teamplayAnalysisV2: staleFacts },
+    analysis: { ...validAnalysis, teamplayAnalysisV2: staleAnalysis },
+    matchDetail: rawMatch,
+    timeline: rawTimeline,
+  });
+  assert.equal(
+    bundle.normalized.teamplayAnalysisV2.encounters[0].allyDeaths,
+    freshFacts.encounters[0].allyDeaths,
+  );
+  assert.equal(
+    bundle.analysis.teamplayAnalysisV2.encounters[0].allyDeaths,
+    freshFacts.encounters[0].allyDeaths,
+  );
+  assert.ok(!JSON.stringify(bundle.analysis).includes("임의 인과 설명"));
 });
 
 test("stored hydration module has no persistence capability", () => {

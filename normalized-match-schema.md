@@ -444,6 +444,8 @@ Riot API Raw JSON
 
 `coverage.level`은 `FULL`, `PARTIAL`, `EVENT_ONLY`, `PLAYER_ONLY`, `UNAVAILABLE` 중 하나다. 정규화된 원본 분석은 앞의 세 값을 사용하며, 저장 샘플 호환 계층만 `PLAYER_ONLY` 또는 `UNAVAILABLE`을 만들 수 있다. `coverage.source`는 `RAW_TIMELINE`, `LEGACY_ADAPTER`, `NONE` 중 하나다.
 
+`RAW_TIMELINE`은 유효한 frame timestamp와 체력·골드·경험치·레벨을 가진 participant frame, 또는 type별 필수 값과 timestamp가 있는 지원 이벤트(`CHAMPION_KILL`, `ELITE_MONSTER_KILL`, `BUILDING_KILL`)가 적어도 하나 있을 때만 부여한다. 빈 `frames`, `{ events: [] }`, `{ participantFrames: {} }`, ID/type만 있는 stub, timestamp가 없는 frame처럼 분석 가능한 항목이 없으면 `UNAVAILABLE`/`NONE`으로 처리하며, 저장 샘플에 기존 전투·한타 분석이 있으면 `PLAYER_ONLY`/`LEGACY_ADAPTER`로 내려간다.
+
 `coverage.limitationCodes`는 다음 closed enum만 허용한다.
 
 - `PARTIAL_POSITION_FRAMES`
@@ -518,6 +520,8 @@ Riot API Raw JSON
 - `STRUCTURE_CONVERSION`, `PRE_ENCOUNTER_GOLD_DIFFERENCE`, `PLAYER_DEATH_WITHIN_120S_AFTER_CAPTURE`
 
 ID와 배열 순서는 같은 원본 입력에서 항상 동일하다. 사실, 시각, 위치, 획득 팀은 서버 코드가 원본에서 계산하며 AI가 생성하거나 수정하지 않는다.
+
+위치 fact의 `frameAgeSeconds`는 표시를 위해 반올림하지만 신뢰도는 반올림 전 millisecond 차이로 판정한다. 5,000ms 이하는 `HIGH`, 5,000ms 초과 15,000ms 이하는 `MEDIUM`, 그보다 크고 30,000ms 이하인 근거는 `LOW`다.
 
 ## 6. 최소 유효 조건
 
@@ -754,6 +758,10 @@ Riot API는 non-empty 값만 반환할 수 있으므로, 정규화 시 아래 �
 - 공개용 샘플은 익명화 값 사용
 - 샘플 교체 시 이전 버전은 보관 가능
 - 기존 저장 샘플의 v2 보강은 로드 시 메모리에서만 수행하며 원본 JSON이나 manifest를 수정하지 않는다
+- raw match/timeline이 있으면 저장된 v2 도메인 값보다 원본 재빌드를 우선한다
+- raw 파일이 없어서 저장 v2를 사용할 때는 fact의 closed value shape와 stable `factId`를 재검증하고, 서술과 코칭을 서버 템플릿 및 허용 추천 코드로 다시 만든다
+- 저장된 팀 부록의 사망 수·첫 처치·획득 팀·구조물 전환·fact ID는 encounter/objective/scene과 교차검증된 개인 리뷰 fact에서 재생성한다. raw가 없어 팀 소속을 재검증할 수 없으면 직접 참가자 목록은 비우고 `INVALID_V2_ITEM`을 기록한다. 교전 전 골드 fact는 10인 프레임·골드 합계·시각·신뢰도와 모든 frame이 교전 이전인지 다시 검증한다
+- 빈·손상 timeline은 raw 보강으로 간주하지 않으며 valid legacy 분석을 가리지 않는다
 
 ## 13. 현재 권장 실행안
 

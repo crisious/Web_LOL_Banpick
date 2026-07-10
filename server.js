@@ -2955,6 +2955,7 @@ async function buildAnalysis(normalized, sampleId) {
 
     const sanitizedTeamplay = sanitizeTeamplayAnalysisV2(
       primary.teamplayAnalysisV2,
+      { preserveAppendixParticipants: true },
     );
     if (!sanitizedTeamplay.rootValid) {
       primary.teamplayAnalysisV2 = createUnavailableTeamplayEnvelope();
