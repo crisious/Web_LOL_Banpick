@@ -282,13 +282,23 @@
           <!-- TAB: 타임라인 -->
           <div class="tab-page" id="tab-timeline" role="tabpanel" aria-labelledby="tab-timeline-btn" tabindex="0">
 
-          <section class="section-block" id="dual-timeline" aria-labelledby="dual-timeline-title">
-            <div class="section-heading">
-              <h2 id="dual-timeline-title">아군 / 적군 행동 타임라인</h2>
-              <p class="section-copy">양 팀의 핵심 행동을 시간순으로 비교합니다. 구간을 클릭하면 상세 분석을 볼 수 있습니다.</p>
+          <section class="section-block" id="teamplay-flow" aria-labelledby="teamplay-flow-title">
+            <div data-teamplay-flow-v2 hidden>
+              <div class="section-heading">
+                <h2 id="teamplay-flow-title">오브젝트·교전 흐름</h2>
+                <p class="section-copy">준비, 교전 사실, 획득 팀, 후속 전환을 시간순으로 확인합니다.</p>
+              </div>
+              <p data-teamplay-flow-status role="status"></p>
+              <div class="teamplay-flow-list" data-teamplay-flow-list></div>
             </div>
-            <div class="dual-tl" data-dual-timeline></div>
-            <div class="dual-tl-detail" data-dual-detail></div>
+            <div data-teamplay-flow-legacy>
+              <div class="section-heading">
+                <h2>이전 행동 타임라인</h2>
+                <p class="section-copy">이전 저장 분석이라 플레이어 이벤트 중심으로 표시합니다.</p>
+              </div>
+              <div class="dual-tl" data-dual-timeline></div>
+              <div class="dual-tl-detail" data-dual-detail></div>
+            </div>
           </section>
 
           <section class="section-block" id="kda-timeline" aria-labelledby="kda-timeline-title">

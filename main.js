@@ -73,6 +73,10 @@ const dom = {
   wardEvents: document.querySelector("[data-ward-events]"),
   buildTimeline: document.querySelector("[data-build-timeline]"),
   tabBar: document.querySelector("[data-tab-bar]"),
+  teamplayFlowV2: document.querySelector("[data-teamplay-flow-v2]"),
+  teamplayFlowList: document.querySelector("[data-teamplay-flow-list]"),
+  teamplayFlowStatus: document.querySelector("[data-teamplay-flow-status]"),
+  teamplayFlowLegacy: document.querySelector("[data-teamplay-flow-legacy]"),
   dualTimeline: document.querySelector("[data-dual-timeline]"),
   dualDetail: document.querySelector("[data-dual-detail]"),
   detailProgress: document.querySelector("[data-detail-progress]"),
@@ -3047,6 +3051,145 @@ function renderTeamplayAnalysis(sample) {
   dom.teamplayMore.textContent = "전체 리뷰 보기";
 }
 
+function teamplayTeamLabel(value) {
+  if (value === "ALLY") return "아군";
+  if (value === "ENEMY") return "상대";
+  if (value === "SPLIT") return "분할 획득";
+  return "팀 미상";
+}
+
+function renderTeamplayFlowScene(scene, model) {
+  const encounterById = new Map(
+    (Array.isArray(model?.encounters) ? model.encounters : [])
+      .map((row) => [row?.id, row]),
+  );
+  const objectiveById = new Map(
+    (Array.isArray(model?.objectiveEngagements)
+      ? model.objectiveEngagements
+      : []).map((row) => [row?.id, row]),
+  );
+  const linkedEncounters = (Array.isArray(scene?.encounterIds)
+    ? scene.encounterIds
+    : []).map((id) => encounterById.get(id)).filter(Boolean);
+  const objective = objectiveById.get(scene?.objectiveEngagementId) || null;
+  const count = (value) => Number.isFinite(value) && value >= 0
+    ? Math.round(value)
+    : 0;
+  const encounterTypeLabel = (value) => {
+    if (value === "PICK") return "픽 교전";
+    if (value === "SKIRMISH") return "소규모 교전";
+    if (value === "TEAMFIGHT_CANDIDATE") return "한타 후보";
+    return "교전 유형 미상";
+  };
+
+  let preparationText;
+  let combatText;
+  let captureText;
+  let conversionText;
+  let title;
+
+  if (objective) {
+    title = "오브젝트 교전";
+    const setupDeaths = objective.setupWindow?.deathCounts || {};
+    const setupLinked = Array.isArray(objective.setupWindow?.linkedEncounterIds)
+      ? objective.setupWindow.linkedEncounterIds.length
+      : 0;
+    const setupAllyDeaths = count(setupDeaths.ally);
+    const setupEnemyDeaths = count(setupDeaths.enemy);
+    preparationText = setupAllyDeaths + setupEnemyDeaths + setupLinked === 0
+      ? "준비 구간 기록 없음"
+      : `아군 사망 ${setupAllyDeaths} · 상대 사망 ${setupEnemyDeaths} · 연결 교전 ${setupLinked}`;
+
+    const contestDeaths = objective.contestWindow?.deathCounts || {};
+    const types = [...new Set(linkedEncounters.map((row) =>
+      encounterTypeLabel(row.type)))];
+    combatText = `아군 사망 ${count(contestDeaths.ally)} · 상대 사망 ${count(contestDeaths.enemy)}` +
+      (types.length > 0 ? ` · ${types.join(", ")}` : "");
+
+    const captureCounts = objective.captureCounts || {};
+    const captureTeam = objective.captureTeam;
+    const captureTeamText = captureTeam === "ALLY" || captureTeam === "ENEMY"
+      ? `${teamplayTeamLabel(captureTeam)} 획득`
+      : teamplayTeamLabel(captureTeam);
+    captureText = `${captureTeamText} · 획득 수 아군 ${count(captureCounts.ally)} · 상대 ${count(captureCounts.enemy)} · 미상 ${count(captureCounts.unknown)}`;
+
+    const conversions = Array.isArray(objective.structureConversions)
+      ? objective.structureConversions
+      : [];
+    const allyStructures = conversions.filter((row) =>
+      row?.takerRelation === "ALLY").length;
+    const enemyStructures = conversions.filter((row) =>
+      row?.takerRelation === "ENEMY").length;
+    const structureRefIds = new Set(conversions
+      .map((row) => row?.sourceRef?.id)
+      .filter(Boolean));
+    const captureRefIds = new Set((Array.isArray(objective.sourceRefs)
+      ? objective.sourceRefs
+      : []).map((ref) => ref?.id).filter(Boolean));
+    const laterNeutralCount = (Array.isArray(objective.conversionWindow?.sourceRefs)
+      ? objective.conversionWindow.sourceRefs
+      : []).filter((ref) =>
+      ref?.id &&
+      !structureRefIds.has(ref.id) &&
+      !captureRefIds.has(ref.id)).length;
+    conversionText = allyStructures + enemyStructures + laterNeutralCount === 0
+      ? "확인된 후속 전환 없음"
+      : `아군 구조물 ${allyStructures} · 상대 구조물 ${enemyStructures} · 후속 중립 오브젝트 ${laterNeutralCount}`;
+  } else {
+    const encounter = linkedEncounters[0] || null;
+    title = "독립 교전";
+    preparationText = "독립 교전";
+    combatText = encounter
+      ? `${encounterTypeLabel(encounter.type)} · 아군 사망 ${count(encounter.allyDeaths)} · 상대 사망 ${count(encounter.enemyDeaths)}`
+      : "교전 기록 없음";
+    captureText = "연결된 중립 오브젝트 없음";
+    conversionText = "확인된 후속 전환 없음";
+  }
+
+  const token = teamplayDomToken(scene?.sceneId || "scene");
+  const headingId = `teamplay-scene-${token}`;
+  return `
+    <article class="teamplay-flow-card" data-teamplay-scene="${escapeAttr(scene?.sceneId || "")}">
+      <h3 id="${escapeAttr(headingId)}" tabindex="-1">${escapeHtml(msToClock(scene?.startTimestamp))} · ${escapeHtml(title)}</h3>
+      <ol class="teamplay-flow-steps">
+        <li><strong>준비</strong><span>${escapeHtml(preparationText)}</span></li>
+        <li><strong>교전 사실</strong><span>${escapeHtml(combatText)}</span></li>
+        <li><strong>획득 팀</strong><span>${escapeHtml(captureText)}</span></li>
+        <li><strong>후속 전환</strong><span>${escapeHtml(conversionText)}</span></li>
+      </ol>
+    </article>`;
+}
+
+function renderTeamplayFlow(sample) {
+  if (!dom.teamplayFlowV2 || !dom.teamplayFlowLegacy) return;
+  const selected = selectTeamplayRenderModel(sample);
+  const showV2 = selected.mode === "V2";
+  dom.teamplayFlowV2.hidden = !showV2;
+  dom.teamplayFlowLegacy.hidden = showV2 || selected.mode === "EMPTY";
+
+  if (selected.mode === "LEGACY") {
+    renderDualTimeline(sample);
+    return;
+  }
+
+  dom.teamplayFlowV2.hidden = false;
+  if (selected.mode === "EMPTY") {
+    dom.teamplayFlowStatus.textContent = "검토할 수 있는 오브젝트·교전 흐름이 없습니다.";
+    dom.teamplayFlowList.innerHTML = "";
+    return;
+  }
+
+  const scenes = [...selected.data.scenes].sort((left, right) =>
+    left.startTimestamp - right.startTimestamp ||
+    left.sceneId.localeCompare(right.sceneId));
+  dom.teamplayFlowStatus.textContent = scenes.length === 0
+    ? "검토할 수 있는 오브젝트·교전 흐름이 없습니다."
+    : `${scenes.length}개 장면의 확인된 흐름입니다.`;
+  dom.teamplayFlowList.innerHTML = scenes
+    .map((scene) => renderTeamplayFlowScene(scene, selected.data))
+    .join("");
+}
+
 // Phase 32: 전투 KDA 상황별 집중 분석 카드.
 // AI 응답 항목에는 시간 정보가 없으므로 relatedEventIds 첫 ID를 timelineEvents에
 // 매핑해 startLabel을 채운다 (evidenceMap 재사용).
@@ -3767,6 +3910,58 @@ function bindDualTimelineEvents() {
   dom.dualTimeline.dataset.bound = "true";
 }
 
+function toggleTeamplayDisclosure(button) {
+  const targetId = button.getAttribute("aria-controls");
+  const target = targetId ? document.getElementById(targetId) : null;
+  if (!target) return;
+  const expanded = button.getAttribute("aria-expanded") === "true";
+  button.setAttribute("aria-expanded", expanded ? "false" : "true");
+  target.hidden = expanded;
+  if (button.hasAttribute?.("data-teamplay-more")) {
+    button.textContent = expanded ? "전체 리뷰 보기" : "리뷰 접기";
+  }
+  if (expanded) button.focus();
+}
+
+function focusTeamplayScene(sceneId, deps = {}) {
+  const switchTabFn = deps.switchTab || switchTab;
+  const requestFrame = deps.requestFrame || requestAnimationFrame;
+  const status = deps.status || dom.teamplayFlowStatus;
+  const reducedMotion = deps.reducedMotion ??
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  switchTabFn("tab-timeline");
+  requestFrame(() => {
+    const target = deps.target === undefined
+      ? document.getElementById(`teamplay-scene-${teamplayDomToken(sceneId)}`)
+      : deps.target;
+    if (!target) {
+      if (status) status.textContent = "근거 장면을 찾지 못했습니다.";
+      return;
+    }
+    if (status) status.textContent = "";
+    target.scrollIntoView({
+      behavior: reducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+    target.focus();
+  });
+}
+
+function bindTeamplayEvents() {
+  const root = document.getElementById("main-content");
+  if (!root || root.dataset.teamplayBound === "true") return;
+  root.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-teamplay-toggle]");
+    if (toggle) {
+      toggleTeamplayDisclosure(toggle);
+      return;
+    }
+    const flow = event.target.closest("[data-teamplay-flow-target]");
+    if (flow) focusTeamplayScene(flow.dataset.teamplayFlowTarget);
+  });
+  root.dataset.teamplayBound = "true";
+}
+
 function renderDualTimelineDetail(startMs, endMs, data, momentum, analysis) {
   if (!dom.dualDetail) return;
   if (!data) return;
@@ -3950,8 +4145,9 @@ function renderObjectiveTimeline(sample) {
 
   dom.objectiveTable.innerHTML = `
     <table class="obj-table">
+      <caption>타워 및 오브젝트 사건 시간순 목록</caption>
       <thead>
-        <tr><th>시간</th><th>구간</th><th>유형</th><th>상세</th><th>레인</th><th>팀</th></tr>
+        <tr><th scope="col">시간</th><th scope="col">구간</th><th scope="col">유형</th><th scope="col">상세</th><th scope="col">레인</th><th scope="col">팀</th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
@@ -4120,7 +4316,7 @@ function renderSample(sample) {
   renderPlaytimeScore(sample);
   renderParticipantScoreboard(sample);
   renderLaningStats(sample);
-  renderDualTimeline(sample);
+  renderTeamplayFlow(sample);
   renderObjectiveTimeline(sample);
   renderKdaTimeline(sample);
   renderWardTimeline(sample);
@@ -5010,6 +5206,7 @@ async function init() {
   initTabSystem();
   initChampionsTab();
   bindDualTimelineEvents();
+  bindTeamplayEvents();
 }
 
 // ─── Tab system ─────────────────────────────────────────────────────────
