@@ -41,7 +41,10 @@
   "weaknesses": [],
   "actionChecklist": [],
   "keyMoments": [],
-  "evidenceIndex": []
+  "evidenceIndex": [],
+  "combatAnalysis": [],
+  "teamfightPhaseAnalysis": [],
+  "teamplayAnalysisV2": {}
 }
 ```
 
@@ -492,6 +495,147 @@
   - `outcomeTag`: `INITIATED_KILL`/`CAUGHT_OUT`/`TRADE_WON`/`TRADE_LOST`/`TRADE_EVEN`/`CLOSED_OUT`/`OVERCHASE_DEATH`/`DIED_IN_FIGHT`
 - `takeaway`: `string`
 
+## 4.13 `teamplayAnalysisV2` (추가·서버 파생 필드)
+
+설명:
+
+- 원본 타임라인에서 서버가 만든 v2 사실 모델에 검증된 코칭 선택을 결합한 최종 응답
+- `normalized.teamplayAnalysisV2`와 같은 도메인 배열을 유지하되 `personalReviews[].narrative`가 채워진다
+- `combatAnalysis`와 `teamfightPhaseAnalysis`는 구버전 소비자를 위해 유지한다. renderable v2가 있으면 새 UI는 v2만 표시한다
+- 최종 응답의 사실, 시각, 위치, 획득 팀, fact ID는 AI가 생성하거나 수정할 수 없다
+
+`narrative` 필드:
+
+- `factStatements`: 표시 가능한 모든 review fact에 대한 서버 렌더 문장. 각 항목은 `factId`, `claimCode`, `text`, `evidenceIds`, `source: "SERVER_FACT_TEMPLATE"`을 가진다
+- `decisionAssessment`: 확인된 개인 킬·어시스트·사망 중 하나를 서버 템플릿으로 표시하거나 근거가 없으면 `null`
+- `positioningObservation`: 과거 위치 프레임 기반 관찰을 서버 템플릿으로 표시하거나 근거가 없으면 `null`
+- `coaching`: 검증된 추천이 있으면 아래 객체, 허용 근거가 없으면 `null`
+
+```json
+{
+  "recommendationCode": "DECIDE_JOIN_OR_TRADE_EARLY",
+  "betterChoice": "오브젝트 생성 전에 합류 또는 반대편 교환 계획을 먼저 확정하세요.",
+  "nextGameRule": "오브젝트 30초 전 5,000보다 멀면 합류와 교환 중 하나를 결정하세요.",
+  "evidenceIds": ["fact_far"],
+  "selectionSource": "AI_SELECTED"
+}
+```
+
+허용 `recommendationCode`는 `GROUP_BEFORE_OBJECTIVE`, `DECIDE_JOIN_OR_TRADE_EARLY`, `REVIEW_OPENING_DEATH`, `RESET_AFTER_CAPTURE`다. `selectionSource`는 `AI_SELECTED` 또는 `RULE_FALLBACK`이다. `betterChoice`와 `nextGameRule`은 recommendationCode에 고정된 서버 문구와 정확히 일치해야 한다.
+
+통합 테스트 합성 경기에서 생성된 실제 최종 응답 발췌:
+
+```json
+{
+  "schemaVersion": "2.0",
+  "coverage": {
+    "level": "FULL",
+    "source": "RAW_TIMELINE",
+    "usablePositionSceneRatio": 1,
+    "limitationCodes": [
+      "INCOMPLETE_TEAM_SNAPSHOT",
+      "STALE_TEAM_SNAPSHOT"
+    ]
+  },
+  "encounters": [
+    {
+      "id": "enc_e32e8df57424ca46bd1c",
+      "type": "TEAMFIGHT_CANDIDATE",
+      "allyDeaths": 1,
+      "enemyDeaths": 3,
+      "firstTakedownTeam": "ALLY",
+      "startTimestamp": 600000,
+      "endTimestamp": 618000,
+      "confidence": "HIGH"
+    }
+  ],
+  "objectiveEngagements": [
+    {
+      "id": "obj_002cadf98b3ac9e40f4c",
+      "objectiveType": "DRAGON",
+      "captureCounts": { "ally": 0, "enemy": 1, "unknown": 0 },
+      "captureTeam": "ENEMY",
+      "linkedEncounterIds": ["enc_e32e8df57424ca46bd1c"]
+    }
+  ],
+  "scenes": [
+    {
+      "sceneId": "scene_3d929d1e0bafdd6cafa9",
+      "primaryType": "OBJECTIVE",
+      "effectiveInvolvementLevel": "CONFIRMED",
+      "importanceScore": 110
+    }
+  ],
+  "personalReviews": [
+    {
+      "reviewId": "review_0325899addd9b093534f",
+      "sceneId": "scene_3d929d1e0bafdd6cafa9",
+      "effectiveInvolvementLevel": "CONFIRMED",
+      "evidenceIds": [
+        "fact_5545ee34f0170285ec28",
+        "fact_1e88a355823416cd5b14",
+        "fact_5bc2297db5edbe6934a2",
+        "fact_85e023cf6f30f9ab67a6",
+        "fact_73023c5e2f3a105bc3bd",
+        "fact_c27f0d8873cd0ac97d47",
+        "fact_fdfda55f7519b94adf81",
+        "fact_cf0913564de8bd76fe76",
+        "fact_8efaa5b4c6e6971f71c4",
+        "fact_af296a454908ba42deb1"
+      ],
+      "narrative": {
+        "decisionAssessment": {
+          "claimCode": "PLAYER_RECORDED_ASSIST",
+          "text": "대상 플레이어의 어시스트가 기록됐습니다.",
+          "evidenceIds": ["fact_fdfda55f7519b94adf81"],
+          "source": "SERVER_FACT_TEMPLATE"
+        },
+        "positioningObservation": {
+          "claimCode": "POSITION_DISTANCE_LE_2500",
+          "text": "사용 가능한 과거 프레임에서 교전 중심과의 거리는 2,500 이하였습니다.",
+          "evidenceIds": ["fact_8efaa5b4c6e6971f71c4"],
+          "source": "SERVER_FACT_TEMPLATE"
+        },
+        "coaching": null
+      },
+      "teamAppendixId": "appendix_80656060a13e87cc7411"
+    }
+  ],
+  "teamAppendix": [
+    {
+      "teamAppendixId": "appendix_80656060a13e87cc7411",
+      "reviewId": "review_0325899addd9b093534f",
+      "firstTakedownTeam": "ALLY",
+      "allyDeaths": 1,
+      "enemyDeaths": 3,
+      "captureTeam": "ENEMY"
+    }
+  ]
+}
+```
+
+위 예시는 도메인 객체의 대표 필드만 발췌했다. 전체 필드와 fact closed enum은 `normalized-match-schema.md`의 §5.10을 따른다.
+
+### AI 임시 선택 봉투
+
+AI 입력에는 사실 원문 대신 `teamplayRecommendationCandidates.reviews`의 허용 코드와 fact ID만 전달한다. AI는 다음 임시 필드만 반환한다.
+
+```json
+{
+  "teamplayRecommendationSelections": {
+    "reviews": [
+      {
+        "reviewId": "review_id_from_payload",
+        "recommendationCode": "eligible_code_from_payload",
+        "evidenceIds": ["permitted_fact_id_from_payload"]
+      }
+    ]
+  }
+}
+```
+
+이 봉투는 정확한 key 집합과 허용 후보를 검증한 뒤 삭제된다. `teamplayRecommendationSelections`는 최종 API 응답이나 저장 분석에 남지 않는다. 자유 코칭 문장, 새 코드, 새 fact ID, 변경된 시각은 모두 거부하며 해당 리뷰는 `RULE_FALLBACK`을 사용하고 `INVALID_AI_SELECTION`을 기록한다.
+
 ## 5. 최소 유효 응답 조건
 
 아래 조건을 **모두** 만족해야 `validateAnalysisOutput`이 통과한다(하나라도 어기면 throw).
@@ -508,6 +652,7 @@
 - `keyMoments` 최소 4개 (각 항목 shape는 §4.9 참조 — `relatedEventIds` 필수)
 - `evidenceIndex` 최소 1개 (각 항목 `eventId` + `summary`|`shortNote`)
 - `combatAnalysis` (있는 경우) 각 항목에 `situation`(enum)·`situationLabel`·`playerDecision`·`takeaway`·`relatedEventIds` 필수 (§4.11)
+- `teamplayAnalysisV2` (있는 경우) schemaVersion, coverage, 5개 도메인 배열을 포함하는 유효한 v2 root여야 한다 (§4.13)
 
 > 위 수치는 `server.js` 상수에서 파생된다: `PHASE_SUMMARIES_MIN = 3`, `INSIGHT_LIST_MIN = INSIGHT_LIST_MAX = 3`,
 > `ACTION_CHECKLIST_MIN = 3` / `ACTION_CHECKLIST_MAX = 5`, `KEY_MOMENTS_MIN = 4`, `EVIDENCE_INDEX_MIN = 1`.
@@ -538,6 +683,8 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
 - 필드 이름을 임의 변경하지 않는다
 - `strengths`, `weaknesses`, `actionChecklist`는 비어 있지 않아야 한다
 - 가능하면 모든 인사이트에 `relatedEventIds`를 연결한다
+- `teamplayRecommendationSelections`는 입력 후보의 reviewId, recommendationCode, evidenceIds만 그대로 선택한다. 후보 밖 사실이나 자유 문장을 만들지 않는다
+- AI가 반환한 `teamplayRecommendationSelections`는 서버 병합 후 삭제되며 `teamplayAnalysisV2` 자체는 AI 출력으로 받지 않는다
 
 ## 9. 예시 전체 응답
 
@@ -772,4 +919,3 @@ LLM 또는 분석 로직은 아래를 피해야 한다.
 2. 입력 데이터 스키마와 분석 출력 스키마를 1:1로 매핑한다
 3. Mock 응답 생성기를 만든다
 4. UI 컴포넌트 props와 연결한다
-

@@ -50,7 +50,8 @@ Riot API Raw JSON
   "teamContext": {},
   "phaseContext": {},
   "timelineEvents": [],
-  "derivedSignals": {}
+  "derivedSignals": {},
+  "teamplayAnalysisV2": {}
 }
 ```
 
@@ -424,6 +425,100 @@ Riot API Raw JSON
 - LLM 프롬프트 입력 간소화에 유리하다
 - 이후 규칙 기반 분석과 혼합하기 좋다
 
+## 5.10 `teamplayAnalysisV2` (추가 필드)
+
+설명:
+- 원본 Match/Timeline에서 결정적으로 만든 전체 10인 오브젝트·교전 사실 모델
+- 정규화 단계에서는 AI 문장이나 추천 선택을 포함하지 않는다
+- 기존 `timelineEvents`와 `derivedSignals`를 대체하지 않는 additive 필드다
+
+최상위 필드:
+
+- `schemaVersion`: 항상 `"2.0"`
+- `coverage`: 원본 가용 범위와 한계
+- `encounters`: 킬 로그 기반 교전 묶음
+- `objectiveEngagements`: 준비·쟁탈·획득·후속 전환 구간
+- `scenes`: 연결된 교전과 오브젝트를 중복 없이 묶은 화면 단위
+- `personalReviews`: 대상 플레이어가 직접 또는 위치 근거로 관여한 상위 5개 장면
+- `teamAppendix`: 개인 리뷰와 1:1로 연결된 팀 사실 부록
+
+`coverage.level`은 `FULL`, `PARTIAL`, `EVENT_ONLY`, `PLAYER_ONLY`, `UNAVAILABLE` 중 하나다. 정규화된 원본 분석은 앞의 세 값을 사용하며, 저장 샘플 호환 계층만 `PLAYER_ONLY` 또는 `UNAVAILABLE`을 만들 수 있다. `coverage.source`는 `RAW_TIMELINE`, `LEGACY_ADAPTER`, `NONE` 중 하나다.
+
+`coverage.limitationCodes`는 다음 closed enum만 허용한다.
+
+- `PARTIAL_POSITION_FRAMES`
+- `NO_POSITION_FRAMES`
+- `MISSING_SPATIAL_LINK`
+- `INCOMPLETE_ALLY_FRAME_COVERAGE`
+- `UNKNOWN_TEAM`
+- `INCOMPLETE_TEAM_SNAPSHOT`
+- `STALE_TEAM_SNAPSHOT`
+- `INVALID_V2_ITEM`
+- `INVALID_AI_SELECTION`
+
+공통 근거 참조:
+
+```json
+{
+  "kind": "TIMELINE_EVENT",
+  "id": "KR_123:18:4",
+  "timestamp": 1122000,
+  "participantId": null
+}
+```
+
+- `kind`: `TIMELINE_EVENT` 또는 `PARTICIPANT_FRAME`
+- `PARTICIPANT_FRAME`이면 `participantId`가 정수다
+- 공개 모델은 `puuid`와 Riot ID를 포함하지 않는다
+
+도메인 요약:
+
+| 배열 | 핵심 필드 |
+| --- | --- |
+| `encounters` | `id`, `type`, `classificationBasis`, `phaseEvents`, `participants`, `allyDeaths`, `enemyDeaths`, `firstTakedownTeam`, `playerInvolvement`, `linkedObjectiveEngagementIds`, `sourceRefs`, 시각·신뢰도·한계 |
+| `objectiveEngagements` | `id`, `objectiveType`, `captureStartTimestamp`, `captureEndTimestamp`, `captureCounts`, `captureTeam`, `setupWindow`, `contestWindow`, `conversionWindow`, `linkedEncounterIds`, `structureConversions`, `playerInvolvement`, 근거·신뢰도·한계 |
+| `scenes` | `sceneId`, `primaryType`, `objectiveEngagementId`, `encounterIds`, `involvements`, `effectiveInvolvementLevel`, `importanceScore`, 사망 수·첫 처치 팀·전환 수 |
+| `personalReviews` | `reviewId`, `sceneId`, 연결 ID, `effectiveInvolvementLevel`, 4개 fact 배열, `evidenceIds`, `importanceScore`, `teamAppendixId`; 정규화 단계의 `narrative`는 `null` |
+| `teamAppendix` | `teamAppendixId`, `reviewId`, 양 팀 직접 기록 참가자, 사망 수, 첫 처치 팀, 획득 팀, 교전 전 골드 차이, 구조물 전환, `factIds` |
+
+교전 `type`은 `PICK`, `SKIRMISH`, `TEAMFIGHT_CANDIDATE` 중 하나고, 교전 단계는 `OPENING`, `EXCHANGE`, `LATE_SEQUENCE` 순서만 사용한다. 관여 `level`은 `CONFIRMED`, `APPROXIMATE`, `NOT_INVOLVED` 중 하나다. `captureTeam`과 팀 관계는 `ALLY`, `ENEMY`, `SPLIT`, `UNKNOWN`을 사용하며, 신뢰도는 `HIGH`, `MEDIUM`, `LOW`다.
+
+개인 리뷰 fact atom의 공통 형태:
+
+```json
+{
+  "factId": "fact_8efaa5b4c6e6971f71c4",
+  "type": "PLAYER_DISTANCE_LE_2500",
+  "timestamp": 600000,
+  "value": {
+    "distance": 100,
+    "frameTimestamp": 590000,
+    "frameAgeSeconds": 10,
+    "stage": "ENCOUNTER"
+  },
+  "confidence": "MEDIUM",
+  "sourceRefs": [
+    {
+      "kind": "PARTICIPANT_FRAME",
+      "id": "KR_TEAMPLAY_FIXTURE:0:1",
+      "timestamp": 590000,
+      "participantId": 1
+    }
+  ],
+  "limitationCodes": []
+}
+```
+
+허용 fact `type`:
+
+- `ENCOUNTER_CLASSIFICATION`, `ALLY_DEATH_COUNT`, `ENEMY_DEATH_COUNT`, `FIRST_TAKEDOWN_TEAM`
+- `PLAYER_CONFIRMED_KILL`, `PLAYER_CONFIRMED_ASSIST`, `PLAYER_CONFIRMED_DEATH`, `PLAYER_FIRST_RECORDED_INVOLVEMENT`
+- `PLAYER_DISTANCE_LE_2500`, `PLAYER_DISTANCE_2500_5000`, `PLAYER_DISTANCE_GT_5000`, `NO_LIVING_ALLY_WITHIN_2500_AT_SNAPSHOT`
+- `OBJECTIVE_CAPTURE_TEAM`, `OBJECTIVE_CAPTURE_COUNTS`, `PLAYER_OBJECTIVE_KILLER`, `PLAYER_OBJECTIVE_ASSIST`
+- `STRUCTURE_CONVERSION`, `PRE_ENCOUNTER_GOLD_DIFFERENCE`, `PLAYER_DEATH_WITHIN_120S_AFTER_CAPTURE`
+
+ID와 배열 순서는 같은 원본 입력에서 항상 동일하다. 사실, 시각, 위치, 획득 팀은 서버 코드가 원본에서 계산하며 AI가 생성하거나 수정하지 않는다.
+
 ## 6. 최소 유효 조건
 
 정규화 데이터는 아래 조건을 만족해야 `분석 가능` 상태로 본다.
@@ -645,6 +740,7 @@ Riot API는 non-empty 값만 반환할 수 있으므로, 정규화 시 아래 �
 - `phaseContext` -> `phaseSummaries`
 - `timelineEvents` -> `keyMoments`, `evidenceIndex`
 - `derivedSignals` -> 장점/단점 초안 및 프롬프트 힌트
+- `teamplayAnalysisV2` -> 분석 결과의 동일 필드에 서버 fact template과 검증된 추천 template을 결합
 
 ## 12. 저장 파일 규칙
 
@@ -657,6 +753,7 @@ Riot API는 non-empty 값만 반환할 수 있으므로, 정규화 시 아래 �
 - 원본 JSON과 분리 저장
 - 공개용 샘플은 익명화 값 사용
 - 샘플 교체 시 이전 버전은 보관 가능
+- 기존 저장 샘플의 v2 보강은 로드 시 메모리에서만 수행하며 원본 JSON이나 manifest를 수정하지 않는다
 
 ## 13. 현재 권장 실행안
 
@@ -666,4 +763,3 @@ Riot API는 non-empty 값만 반환할 수 있으므로, 정규화 시 아래 �
 2. 샘플 경기 1건을 `normalized-match.json`으로 생성
 3. 이 정규화 데이터를 `analysis-json-schema.md` 출력으로 연결
 4. UI mock 데이터 소스로 사용
-
