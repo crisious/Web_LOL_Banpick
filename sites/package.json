@@ -9,7 +9,7 @@
   "scripts": {
     "stage": "node scripts/stage-assets.mjs .staging-public",
     "build": "npm run stage && vite build",
-    "test": "node --test tests/read-only-smoke.mjs"
+    "test": "node --test tests/read-only-smoke.mjs tests/standalone-ui.mjs"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",

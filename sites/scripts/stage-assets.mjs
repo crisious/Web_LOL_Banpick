@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const scriptsRoot = path.dirname(fileURLToPath(import.meta.url));
 const sitesRoot = path.resolve(scriptsRoot, "..");
+const appRoot = path.join(sitesRoot, "app");
 const repoRoot = path.resolve(sitesRoot, "..");
 const requestedOutput = process.argv[2] || path.join(sitesRoot, ".staging-public");
 const outputRoot = path.resolve(process.cwd(), requestedOutput);
@@ -19,12 +20,8 @@ const temporaryOutputRoot = `${outputRoot}.tmp-${process.pid}`;
 const uiAssets = [
   "index.html",
   "styles.css",
-  "main.js",
+  "app.js",
   "og.png",
-  "admin.html",
-  "admin.css",
-  "admin.js",
-  "draft-state.js",
 ];
 
 const sampleIdPattern = /^sample-[a-z0-9-]+$/;
@@ -145,7 +142,7 @@ async function stage() {
   await mkdir(temporaryOutputRoot, { recursive: true });
 
   for (const relativePath of uiAssets) {
-    await copyFile(path.join(repoRoot, relativePath), path.join(temporaryOutputRoot, relativePath));
+    await copyFile(path.join(appRoot, relativePath), path.join(temporaryOutputRoot, relativePath));
   }
 
   const manifest = JSON.parse(readCommittedFile("data/samples/manifest.json"));

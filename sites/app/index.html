@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="경기 데이터와 AI 해석을 분리해 읽는 LOLGG AI 코칭 분석실"
+    />
+    <meta name="theme-color" content="#080b0f" />
+    <meta property="og:title" content="LOLGG AI COACH — Evidence Lab" />
+    <meta
+      property="og:description"
+      content="관찰된 경기 사실에서 다음 게임의 실행 루틴까지 연결하는 읽기 전용 코칭 분석실"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://lolgg-ai-coach.crisious.chatgpt.site/og.png"
+    />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>LOLGG AI COACH — Evidence Lab</title>
+  </head>
+  <body data-app-state="loading">
+    <a class="skip-link" href="#main-content">분석 본문으로 건너뛰기</a>
+
+    <div class="ambient" aria-hidden="true">
+      <span class="ambient__grid"></span>
+      <span class="ambient__glow ambient__glow--lime"></span>
+      <span class="ambient__glow ambient__glow--blue"></span>
+    </div>
+
+    <header class="site-header shell" data-site-header>
+      <a class="brand" href="/" aria-label="LOLGG AI COACH 홈">
+        <span class="brand__signal" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="brand__copy">
+          <strong>LOLGG AI COACH</strong>
+          <small>EVIDENCE LAB</small>
+        </span>
+      </a>
+
+      <div class="sample-control">
+        <label for="sample-select">분석 경기</label>
+        <div class="select-shell">
+          <select id="sample-select" data-sample-select disabled>
+            <option>경기 목록 불러오는 중</option>
+          </select>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="shell">
+      <div class="status-line" data-app-status role="status" aria-live="polite">
+        <span class="status-line__pulse" aria-hidden="true"></span>
+        <span data-status-message>분석 데이터를 연결하고 있습니다.</span>
+      </div>
+
+      <section class="hero" aria-labelledby="analysis-title">
+        <div class="hero__index" aria-hidden="true">01 / READ</div>
+        <div class="hero__copy">
+          <div class="match-meta" data-match-meta>
+            <span>데이터 준비 중</span>
+          </div>
+          <p class="eyebrow">한 문장 진단</p>
+          <h1 id="analysis-title" data-analysis-headline>
+            경기의 결과보다, 다음 선택을 바꿀 근거를 읽습니다.
+          </h1>
+          <p class="coach-summary" data-coach-summary>
+            선택한 경기의 코칭 요약이 이곳에 표시됩니다.
+          </p>
+        </div>
+        <div class="hero__stamp" aria-hidden="true">
+          <span>READ ONLY</span>
+          <strong>LAB</strong>
+        </div>
+      </section>
+
+      <section class="metric-section" aria-labelledby="metric-title">
+        <div class="section-label">
+          <span>DATA STRIP</span>
+          <h2 id="metric-title">먼저 숫자로 확인</h2>
+        </div>
+        <div class="metrics" data-evidence-metrics>
+          <article class="metric metric--loading">
+            <span>KDA</span><strong>—</strong><small>경기 기록</small>
+          </article>
+          <article class="metric metric--loading">
+            <span>시야 점수</span><strong>—</strong><small>경기 기록</small>
+          </article>
+          <article class="metric metric--loading">
+            <span>킬 관여</span><strong>—</strong><small>경기 기록</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="evidence-section" aria-labelledby="evidence-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">02 / EVIDENCE</p>
+            <h2 id="evidence-title">장면을 고르면 판단의 근거가 열립니다.</h2>
+          </div>
+          <p>관찰된 사실과 AI의 해석을 섞지 않고 나란히 비교합니다.</p>
+        </div>
+
+        <div class="moment-grid" data-evidence-moments aria-label="핵심 장면 선택">
+          <p class="empty-copy">핵심 장면을 불러오는 중입니다.</p>
+        </div>
+
+        <div class="evidence-layout" data-evidence-detail aria-live="polite" aria-atomic="true">
+          <section class="reasoning-card reasoning-card--fact" data-observed-facts aria-labelledby="observed-title">
+            <div class="reasoning-card__head">
+              <span class="reasoning-card__number">A</span>
+              <div>
+                <p>RAW SIGNAL</p>
+                <h3 id="observed-title">관찰된 사실</h3>
+              </div>
+            </div>
+            <ul class="fact-list" data-observed-list>
+              <li>장면을 선택하면 타임라인 기록이 표시됩니다.</li>
+            </ul>
+          </section>
+
+          <div class="reasoning-bridge" aria-hidden="true">
+            <span></span>
+            <b>→</b>
+            <span></span>
+          </div>
+
+          <section class="reasoning-card reasoning-card--ai" data-ai-interpretation aria-labelledby="interpretation-title">
+            <div class="reasoning-card__head">
+              <span class="reasoning-card__number">B</span>
+              <div>
+                <p>COACHING LAYER</p>
+                <h3 id="interpretation-title">AI 해석</h3>
+              </div>
+            </div>
+            <p class="interpretation-copy" data-interpretation-copy>
+              선택한 장면을 코칭 관점에서 해석한 내용이 표시됩니다.
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <section class="protocol-section" aria-labelledby="protocol-title">
+        <div class="protocol-intro">
+          <p class="eyebrow">03 / ACT</p>
+          <h2 id="protocol-title">다음 게임에서 검증할 루틴</h2>
+          <p>
+            거창한 목표 대신, 게임 안에서 바로 체크할 수 있는 행동만 남깁니다.
+          </p>
+          <div class="protocol-progress" data-protocol-progress>0 / 0 READY</div>
+        </div>
+        <div class="protocol-list" data-action-checklist>
+          <p class="empty-copy">실행 루틴을 불러오는 중입니다.</p>
+        </div>
+      </section>
+
+      <section class="trace-section" aria-labelledby="trace-title">
+        <div class="trace-heading">
+          <div>
+            <p class="eyebrow">TRACE</p>
+            <h2 id="trace-title">분석 근거 인덱스</h2>
+          </div>
+          <p data-trace-count>—</p>
+        </div>
+        <ol class="trace-list" data-evidence-trace>
+          <li><span>—</span><p>근거 목록을 불러오는 중입니다.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer shell">
+      <p>LOLGG AI COACH · READ-ONLY RESEARCH PREVIEW</p>
+      <p>수치와 타임라인은 경기 데이터, 코칭 문장은 AI 분석을 기반으로 합니다.</p>
+    </footer>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -19,7 +19,19 @@ const repoRoot = path.resolve(sitesRoot, "..");
 const stagingScript = path.join(sitesRoot, "scripts", "stage-assets.mjs");
 const workerEntry = path.join(sitesRoot, "dist", "server", "index.js");
 
-const requiredUiAssets = ["index.html", "styles.css", "main.js", "og.png"];
+const requiredUiAssets = [
+  { source: "index.html", staged: "index.html" },
+  { source: "styles.css", staged: "styles.css" },
+  { source: "app.js", staged: "app.js" },
+  { source: "og.png", staged: "og.png" },
+];
+const forbiddenLegacyAssets = new Set([
+  "main.js",
+  "admin.html",
+  "admin.css",
+  "admin.js",
+  "draft-state.js",
+]);
 const allowedSampleBasenames = new Set([
   "normalized-match.json",
   "analysis-result.json",
@@ -104,14 +116,63 @@ test("the explicit staging script creates a sanitized read-only Sites bundle", a
       .join("\n"),
   );
 
-  await t.test("stages the root UI assets byte-for-byte", async () => {
-    for (const relativePath of requiredUiAssets) {
+  await t.test("stages only the standalone sites/app UI assets byte-for-byte", async () => {
+    for (const asset of requiredUiAssets) {
+      const sourcePath = path.join(sitesRoot, "app", asset.source);
+      assert.ok(
+        await isFile(sourcePath),
+        `Missing standalone Sites UI source: ${path.relative(repoRoot, sourcePath)}`,
+      );
       const [source, staged] = await Promise.all([
-        readFile(path.join(repoRoot, relativePath)),
-        readFile(path.join(stageRoot, relativePath)),
+        readFile(sourcePath),
+        readFile(path.join(stageRoot, asset.staged)),
       ]);
-      assert.deepEqual(staged, source, `${relativePath} must be staged from the root UI`);
+      assert.deepEqual(
+        staged,
+        source,
+        `${asset.staged} must be staged from sites/app/${asset.source}`,
+      );
     }
+  });
+
+  await t.test("does not stage legacy application or admin assets", async () => {
+    const stagedFiles = await listFiles(stageRoot);
+    const stagedLegacyAssets = stagedFiles.filter((relativePath) =>
+      forbiddenLegacyAssets.has(path.posix.basename(relativePath)),
+    );
+    assert.deepEqual(
+      stagedLegacyAssets,
+      [],
+      `legacy UI assets must not be staged: ${stagedLegacyAssets.join(", ")}`,
+    );
+
+    const [stagedHtml, stagedCss] = await Promise.all([
+      readFile(path.join(stageRoot, "index.html"), "utf8"),
+      readFile(path.join(stageRoot, "styles.css"), "utf8"),
+    ]);
+    const forbiddenHtml = [
+      "login-overlay",
+      "workspace-grid",
+      "sidebar-stack",
+      "tab-bar",
+      "data-login-overlay",
+      "data-tab-bar",
+      "admin.html",
+      "main.js",
+      "admin.js",
+      "draft-state.js",
+    ].filter((token) => stagedHtml.includes(token));
+    const forbiddenCss = [
+      ".login-overlay",
+      ".workspace-grid",
+      ".sidebar-stack",
+      ".tab-bar",
+      ".admin-shell",
+    ].filter((token) => stagedCss.includes(token));
+
+    assert.deepEqual(forbiddenHtml, [], `legacy HTML hooks staged: ${forbiddenHtml.join(", ")}`);
+    assert.deepEqual(forbiddenCss, [], `legacy CSS hooks staged: ${forbiddenCss.join(", ")}`);
+    assert.match(stagedHtml, /<script[^>]+src=["'][^"']*app\.js["']/i);
   });
 
   const manifestPath = path.join(stageRoot, "data", "samples", "manifest.json");
@@ -173,11 +234,15 @@ test("the explicit staging script creates a sanitized read-only Sites bundle", a
         /normalized-match\.json$/,
         "comparison-result.json",
       );
-      const sourceComparisonPath = path.join(repoRoot, comparisonPublicPath.slice(1));
       const stagedComparisonPath = path.join(stageRoot, comparisonPublicPath.slice(1));
+      const committedComparison = spawnSync(
+        "git",
+        ["cat-file", "-e", `HEAD:${comparisonPublicPath.slice(1)}`],
+        { cwd: repoRoot, encoding: "utf8" },
+      );
       assert.equal(
         await isFile(stagedComparisonPath),
-        await isFile(sourceComparisonPath),
+        committedComparison.status === 0,
         `${sample.id} comparison output must be copied only when present`,
       );
     }
