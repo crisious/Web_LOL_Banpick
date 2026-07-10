@@ -14,6 +14,12 @@
 //   6) phaseContext는 kills/deaths/assists/notableEventCount 만 추출
 
 import fs from "fs";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { buildRecommendationCandidatePayload } = require(
+  "../../lib/teamplay-coaching-v2.js",
+);
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
@@ -91,8 +97,9 @@ const tfConstants = [
 ].join("\n") + "\n";
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
+  "buildRecommendationCandidatePayload",
   `${tfConstants}${playerCombatPolicySources}${timestampPolicySources}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
-)();
+)(buildRecommendationCandidatePayload);
 
 let pass = 0, fail = 0;
 
@@ -137,6 +144,101 @@ function baseFixture() {
     teamContext: { teamTotalKills: 24 },
     derivedSignals: { hasEarlyLeadMoments: true },
   };
+}
+
+function validTeamplayModel() {
+  const fact = {
+    factId: "fact_far",
+    type: "PLAYER_DISTANCE_GT_5000",
+    timestamp: 600000,
+    value: {
+      distance: 6200,
+      stage: "SETUP",
+      frameTimestamp: 590000,
+      frameAgeSeconds: 10,
+    },
+    confidence: "MEDIUM",
+    sourceRefs: [{
+      kind: "TIMELINE_EVENT",
+      id: "event_far",
+      timestamp: 600000,
+      participantId: null,
+    }],
+    limitationCodes: [],
+  };
+  return {
+    schemaVersion: "2.0",
+    coverage: {
+      level: "PARTIAL",
+      source: "RAW_TIMELINE",
+      usablePositionSceneRatio: 1,
+      limitationCodes: [],
+    },
+    encounters: [],
+    objectiveEngagements: [{
+      id: "obj_1",
+      startTimestamp: 510000,
+      endTimestamp: 720000,
+      sourceRefs: [{
+        kind: "TIMELINE_EVENT",
+        id: "event_obj_1",
+        timestamp: 600000,
+        participantId: null,
+      }],
+      confidence: "HIGH",
+      limitationCodes: [],
+      linkedEncounterIds: [],
+    }],
+    scenes: [{
+      sceneId: "scene_1",
+      objectiveEngagementId: "obj_1",
+      encounterIds: [],
+      startTimestamp: 510000,
+      endTimestamp: 720000,
+      importanceScore: 40,
+      involvements: [],
+      effectiveInvolvementLevel: "APPROXIMATE",
+    }],
+    personalReviews: [{
+      reviewId: "review_1",
+      sceneId: "scene_1",
+      objectiveEngagementId: "obj_1",
+      encounterIds: [],
+      startTimestamp: 510000,
+      endTimestamp: 720000,
+      sourceRefs: [fact.sourceRefs[0]],
+      confidence: "MEDIUM",
+      limitationCodes: [],
+      importanceScore: 40,
+      involvements: [],
+      effectiveInvolvementLevel: "APPROXIMATE",
+      situationFacts: [],
+      decisionFacts: [],
+      positioningFacts: [fact],
+      outcomeFacts: [],
+      evidenceIds: [fact.factId],
+      narrative: null,
+      teamAppendixId: "appendix_1",
+    }],
+    teamAppendix: [{
+      teamAppendixId: "appendix_1",
+      reviewId: "review_1",
+      allyDirectParticipants: [],
+      enemyDirectParticipants: [],
+      firstTakedownTeam: "UNKNOWN",
+      allyDeaths: 0,
+      enemyDeaths: 0,
+      preEncounterGoldDifference: null,
+      captureTeam: "ENEMY",
+      structureConversions: [],
+      factIds: [],
+      limitationCodes: [],
+    }],
+  };
+}
+
+function modelWithOneEligibleReview() {
+  return validTeamplayModel();
 }
 
 function makeEvent(eventId, importance, timestampMs, extra = {}) {
@@ -227,7 +329,7 @@ function makeEvent(eventId, importance, timestampMs, extra = {}) {
   check("taskMeta.weaknessCount mirrors INSIGHT_LIST_MIN", out.taskMeta.weaknessCount, INSIGHT_LIST_MIN);
   check("requiredTopLevelFields list",
     out.outputContract.requiredTopLevelFields,
-    ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"]);
+    ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis", "teamplayRecommendationSelections"]);
   checkTrue("outputContract requires schemaVersion", out.outputContract.requiredTopLevelFields.includes("schemaVersion"));
   checkTrue("outputContract requires teamfightPhaseAnalysis", out.outputContract.requiredTopLevelFields.includes("teamfightPhaseAnalysis"));
   check("requiredArrayCounts.phaseSummariesMin", out.outputContract.requiredArrayCounts.phaseSummariesMin, 3);
@@ -452,6 +554,53 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
       checkTrue(`${label} teamfight instruction names ${field}`, snippet.includes(`\`${field}\``));
     }
   }
+}
+
+// ─── Teamplay v2: AI에는 폐쇄형 추천 후보만 노출 ───────────────────────────
+
+{
+  const normalizedFixture = baseFixture();
+  normalizedFixture.teamplayAnalysisV2 = modelWithOneEligibleReview();
+  const payload = buildLlmPayload(normalizedFixture);
+  const serializedCandidates = JSON.stringify(
+    payload.teamplayRecommendationCandidates,
+  ) || "";
+  check(
+    "payload exposes one coaching candidate",
+    payload.teamplayRecommendationCandidates?.reviews?.length,
+    1,
+  );
+  checkTrue(
+    "payload strips free coaching text",
+    !serializedCandidates.includes("betterChoice"),
+  );
+  checkTrue(
+    "output contract requests selections",
+    payload.outputContract.requiredTopLevelFields.includes(
+      "teamplayRecommendationSelections",
+    ),
+  );
+  checkTrue(
+    "candidate payload contains no raw refs or server coaching copy",
+    !serializedCandidates.includes("sourceRefs") &&
+      !serializedCandidates.includes("nextGameRule"),
+  );
+}
+
+{
+  const instruction = "teamplayRecommendationSelections: teamplayRecommendationCandidates.reviews에 있는 reviewId만 사용한다. 각 review에서 eligibleRecommendations 중 하나만 선택하고 recommendationCode와 그 항목의 evidenceIds만 그대로 반환한다. 자유 코칭 문장, 새로운 코드, 새로운 fact ID를 만들지 않는다. 후보가 없으면 reviews는 빈 배열이다.";
+  checkTrue(
+    "output schema includes closed teamplay selection envelope",
+    OUTPUT_SCHEMA_EXAMPLE.includes('"teamplayRecommendationSelections"'),
+  );
+  checkTrue(
+    "Claude prompt contains exact closed-selection instruction",
+    CLAUDE_COACHING_PROMPT.includes(instruction),
+  );
+  checkTrue(
+    "Codex prompt contains exact closed-selection instruction",
+    CODEX_REDTEAM_PROMPT.includes(instruction),
+  );
 }
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────

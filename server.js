@@ -10,6 +10,13 @@ const {
   sampleManifestPublicPathToStorageRelativePath,
   validateManifest,
 } = require("./lib/sample-manifest");
+const { buildTeamplayAnalysisV2 } = require("./lib/teamplay-analysis-v2");
+const {
+  applyRecommendationSelections,
+  buildRecommendationCandidatePayload,
+  createUnavailableTeamplayEnvelope,
+  sanitizeTeamplayAnalysisV2,
+} = require("./lib/teamplay-coaching-v2");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -1115,6 +1122,11 @@ function buildNormalized(account, matchDetail, timeline, options) {
   normalized.kdaTimeline = buildKdaTimeline(normalized);
   normalized.wardTimeline = buildWardTimeline(timeline, participant.participantId);
   normalized.itemTimeline = buildItemTimeline(timeline, participant.participantId);
+  normalized.teamplayAnalysisV2 = buildTeamplayAnalysisV2(
+    matchDetail,
+    timeline,
+    participant.participantId,
+  );
 
   return normalized;
 }
@@ -2141,6 +2153,10 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
       buildTeamfightPhases(detectCombatEncounters(normalized.timelineEvents), normalized.timelineEvents),
       [],
     ),
+    teamplayAnalysisV2: applyRecommendationSelections(
+      normalized.teamplayAnalysisV2,
+      null,
+    ),
     evidenceIndex,
   };
 }
@@ -2350,6 +2366,10 @@ function buildLlmPayload(normalized) {
 
   const combatEncounters = detectCombatEncounters(normalized.timelineEvents);
   const teamfightPhases = buildTeamfightPhases(combatEncounters, normalized.timelineEvents);
+  const teamplayRecommendationCandidates =
+    normalized.teamplayAnalysisV2 === undefined
+      ? { reviews: [] }
+      : buildRecommendationCandidatePayload(normalized.teamplayAnalysisV2);
 
   const { early, mid, late } = normalized.phaseContext;
   return {
@@ -2368,10 +2388,11 @@ function buildLlmPayload(normalized) {
     timelineEvents: filteredEvents,
     combatEncounters,
     teamfightPhases,
+    teamplayRecommendationCandidates,
     derivedSignals: normalized.derivedSignals,
     outputContract: {
       schemaVersion: "1.0",
-      requiredTopLevelFields: ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis"],
+      requiredTopLevelFields: ["schemaVersion", "analysisMeta", "matchSummary", "coachSummary", "phaseSummaries", "strengths", "weaknesses", "actionChecklist", "keyMoments", "evidenceIndex", "combatAnalysis", "teamfightPhaseAnalysis", "teamplayRecommendationSelections"],
       requiredArrayCounts: { phaseSummariesMin: PHASE_SUMMARIES_MIN, evidenceIndexMin: EVIDENCE_INDEX_MIN, strengths: INSIGHT_LIST_MIN, strengthsMax: INSIGHT_LIST_MAX, weaknesses: INSIGHT_LIST_MIN, weaknessesMax: INSIGHT_LIST_MAX, actionChecklistMin: ACTION_CHECKLIST_MIN, actionChecklistMax: ACTION_CHECKLIST_MAX, keyMomentsMin: KEY_MOMENTS_MIN },
       rules: ["JSON only", "No markdown", "Use Korean", "Prefer evidence-backed claims", "Do not invent unsupported facts"],
     },
@@ -2475,6 +2496,13 @@ teamfightPhaseAnalysis는 배열이다. 입력 payload의 teamfightPhases 각 �
     ],
     "takeaway": "이 한타 핵심 교훈"
   }],
+  "teamplayRecommendationSelections": {
+    "reviews": [{
+      "reviewId": "review_id_from_payload",
+      "recommendationCode": "eligible_code_from_payload",
+      "evidenceIds": ["permitted_fact_id_from_payload"]
+    }]
+  },
   "evidenceIndex": [{ "eventId": "evt_001", "shortNote": "..." }]
 }`;
 
@@ -2496,6 +2524,8 @@ playerDecision은 그 순간 플레이어의 판단/포지셔닝을 사실 기�
 combatAnalysis는 빈 배열.
 
 teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(\`teamfightId\`)마다 1개씩 작성. 각 \`phases\` row는 입력 phase row의 \`phase\`, \`outcomeTag\`, \`playerKills\`, \`playerDeaths\`, \`relatedEventIds\`를 그대로 반영하고, \`coaching\`은 그 국면 판단 코칭 한 줄로 작성. \`takeaway\`는 이 한타의 핵심 교훈 한 줄. 입력 teamfightPhases가 0개면 빈 배열.
+
+teamplayRecommendationSelections: teamplayRecommendationCandidates.reviews에 있는 reviewId만 사용한다. 각 review에서 eligibleRecommendations 중 하나만 선택하고 recommendationCode와 그 항목의 evidenceIds만 그대로 반환한다. 자유 코칭 문장, 새로운 코드, 새로운 fact ID를 만들지 않는다. 후보가 없으면 reviews는 빈 배열이다.
 
 분석할 경기 데이터:`;
 
@@ -2539,6 +2569,8 @@ encounter의 값을 그대로 반영하며 PLAYER_DOMINANT, PLAYER_DOWN, TRADED 
 판단 실수와 구조적 약점을 더 날카롭게 지적. 입력 encounter가 0개면 빈 배열.
 
 teamfightPhaseAnalysis: 입력 payload의 teamfightPhases 각 항목(\`teamfightId\`)마다 1개씩 작성. 각 \`phases\` row는 입력 phase row의 \`phase\`, \`outcomeTag\`, \`playerKills\`, \`playerDeaths\`, \`relatedEventIds\`를 그대로 반영하고, \`coaching\`은 레드팀 관점에서 국면별 판단 실수를 날카롭게 지적. \`takeaway\`는 이 한타의 핵심 교훈 한 줄. 입력 teamfightPhases가 0개면 빈 배열.
+
+teamplayRecommendationSelections: teamplayRecommendationCandidates.reviews에 있는 reviewId만 사용한다. 각 review에서 eligibleRecommendations 중 하나만 선택하고 recommendationCode와 그 항목의 evidenceIds만 그대로 반환한다. 자유 코칭 문장, 새로운 코드, 새로운 fact ID를 만들지 않는다. 후보가 없으면 reviews는 빈 배열이다.
 
 분석할 경기 데이터:`;
 
@@ -2831,6 +2863,10 @@ function validateAnalysisOutput(json) {
       }
     }
   }
+  if (json.teamplayAnalysisV2 !== undefined) {
+    const validation = sanitizeTeamplayAnalysisV2(json.teamplayAnalysisV2);
+    if (!validation.rootValid) throw new Error("teamplayAnalysisV2 invalid");
+  }
 }
 
 // ─── Red-team comparison builder ─────────────────────────────────────────────
@@ -2895,6 +2931,39 @@ function buildComparison(claudeResult, codexResult, sampleId) {
 // ─── Main analysis orchestrator ───────────────────────────────────────────────
 
 async function buildAnalysis(normalized, sampleId) {
+  function mergeTeamplayRecommendationSelections(
+    primary,
+    deterministicTeamplay,
+    violations,
+  ) {
+    const selectionEnvelope = primary.teamplayRecommendationSelections;
+    const selectionMissing = !selectionEnvelope ||
+      !Array.isArray(selectionEnvelope.reviews);
+    primary.teamplayAnalysisV2 = applyRecommendationSelections(
+      deterministicTeamplay,
+      selectionMissing ? null : selectionEnvelope,
+    );
+    delete primary.teamplayRecommendationSelections;
+
+    if (
+      selectionMissing &&
+      buildRecommendationCandidatePayload(deterministicTeamplay).reviews.length > 0
+    ) {
+      violations.push("missing.teamplayRecommendationSelections");
+    }
+
+    const sanitizedTeamplay = sanitizeTeamplayAnalysisV2(
+      primary.teamplayAnalysisV2,
+    );
+    if (!sanitizedTeamplay.rootValid) {
+      primary.teamplayAnalysisV2 = createUnavailableTeamplayEnvelope();
+      violations.push("shape.teamplayAnalysisV2.invalid");
+    } else {
+      primary.teamplayAnalysisV2 = sanitizedTeamplay.data;
+    }
+    return primary.teamplayAnalysisV2;
+  }
+
   const payload = buildLlmPayload(normalized);
 
   // Phase 30: AGENT_DISABLE_CODEX=1 환경변수로 Codex 비활성 (.env 또는 export).
@@ -3207,6 +3276,16 @@ async function buildAnalysis(normalized, sampleId) {
     payload.teamfightPhases,
     Array.isArray(primary.teamfightPhaseAnalysis) ? primary.teamfightPhaseAnalysis : [],
   );
+
+  if (normalized.teamplayAnalysisV2 !== undefined) {
+    mergeTeamplayRecommendationSelections(
+      primary,
+      normalized.teamplayAnalysisV2,
+      violations,
+    );
+  } else {
+    delete primary.teamplayRecommendationSelections;
+  }
 
   try {
     validateAnalysisOutput(primary);

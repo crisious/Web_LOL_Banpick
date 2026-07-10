@@ -11,6 +11,13 @@
 // 이 게이트가 깨지면 깨진 AI 응답이 그대로 사용자에게 노출된다.
 
 import fs from "fs";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const {
+  createUnavailableTeamplayEnvelope,
+  sanitizeTeamplayAnalysisV2,
+} = require("../../lib/teamplay-coaching-v2.js");
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
@@ -121,8 +128,9 @@ if (serverSrc.includes("function hasValidTeamfightPhaseAnalysis(")) {
 
 const validateSrc = extractFunctionSource(serverSrc, "validateAnalysisOutput");
 const validateAnalysisOutput = new Function(
+  "sanitizeTeamplayAnalysisV2",
   `${validatorSupportSources.join("\n")}\n${validateSrc}\nreturn validateAnalysisOutput;`,
-)();
+)(sanitizeTeamplayAnalysisV2);
 const evidenceIndexValidatorSrc = extractFunctionSource(serverSrc, "hasValidEvidenceIndex");
 
 let pass = 0, fail = 0;
@@ -926,6 +934,47 @@ expectThrows("teamfightPhaseAnalysis: phase row invalid relatedEventIds throws",
     validateAnalysisOutput(withTeamfightPhaseAnalysis([item]));
   },
   "relatedEventIds");
+
+// ─── Teamplay v2 검증 (기존 응답에는 additive optional field) ───────────────
+
+expectOk("teamplayAnalysisV2: valid server envelope passes", () => {
+  const f = validFixture();
+  f.teamplayAnalysisV2 = createUnavailableTeamplayEnvelope();
+  validateAnalysisOutput(f);
+});
+
+expectThrows("teamplayAnalysisV2: invalid root throws", () => {
+  const f = validFixture();
+  f.teamplayAnalysisV2 = {
+    schemaVersion: "AI_INVENTED",
+    coverage: {},
+  };
+  validateAnalysisOutput(f);
+}, "teamplayAnalysisV2 invalid");
+
+expectOk("legacy consumer ignores additive teamplayAnalysisV2", () => {
+  const extended = {
+    ...validFixture(),
+    teamplayAnalysisV2: createUnavailableTeamplayEnvelope(),
+  };
+  const {
+    schemaVersion,
+    analysisMeta,
+    matchSummary,
+    coachSummary,
+    phaseSummaries,
+    strengths,
+    weaknesses,
+    actionChecklist,
+    keyMoments,
+    evidenceIndex,
+  } = extended;
+  if (!schemaVersion || !analysisMeta || !matchSummary || !coachSummary ||
+      !phaseSummaries || !strengths || !weaknesses || !actionChecklist ||
+      !keyMoments || !evidenceIndex) {
+    throw new Error("legacy top-level field missing");
+  }
+});
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
 
