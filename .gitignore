@@ -6,5 +6,6 @@
 test-artifacts/qa-automation/
 test-artifacts/design-audit/
 .superpowers/
+.worktrees/
 test-artifacts/layout-redesign/
 test-artifacts/design-bundle/
