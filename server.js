@@ -17,6 +17,7 @@ const {
   createUnavailableTeamplayEnvelope,
   sanitizeTeamplayAnalysisV2,
 } = require("./lib/teamplay-coaching-v2");
+const { hydrateStoredTeamplayV2 } = require("./lib/teamplay-stored-v2");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -3488,6 +3489,23 @@ async function loadSampleBundle(sampleId) {
     };
     throw error;
   }
+
+  let storedRawMatch = null;
+  let storedRawTimeline = null;
+  try {
+    [storedRawMatch, storedRawTimeline] = await Promise.all([
+      readJson(sampleStoragePath(sampleId, "raw-match.json")),
+      readJson(sampleStoragePath(sampleId, "raw-timeline.json")),
+    ]);
+  } catch {}
+  const hydratedTeamplay = hydrateStoredTeamplayV2({
+    normalized,
+    analysis,
+    matchDetail: storedRawMatch,
+    timeline: storedRawTimeline,
+  });
+  normalized = hydratedTeamplay.normalized;
+  analysis = hydratedTeamplay.analysis;
 
   // 누락된 필드 서버측 보강 (기존 샘플 호환)
   if (!normalized.playtimeScore && normalized.playerStats && normalized.timelineEvents) {

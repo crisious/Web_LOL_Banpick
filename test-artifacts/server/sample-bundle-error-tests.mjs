@@ -89,6 +89,7 @@ function makeHarness(readJson) {
     "buildKdaTimeline",
     "buildWardTimeline",
     "buildItemTimeline",
+    "hydrateStoredTeamplayV2",
     [
       "const manifestPath = '/runtime/samples/manifest.json';",
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
@@ -105,6 +106,7 @@ function makeHarness(readJson) {
     () => [],
     () => [],
     () => [],
+    ({ normalized, analysis }) => ({ normalized, analysis }),
   );
 }
 
