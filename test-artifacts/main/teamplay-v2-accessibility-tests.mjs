@@ -3,6 +3,7 @@ import fs from "node:fs";
 
 const mainSource = fs.readFileSync(new URL("../../main.js", import.meta.url), "utf8");
 const indexSource = fs.readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+const stylesSource = fs.readFileSync(new URL("../../styles.css", import.meta.url), "utf8");
 
 function extractFunctionSource(source, name) {
   const start = source.indexOf(`function ${name}(`);
@@ -354,6 +355,15 @@ test("objective table exposes caption and column scopes", () => {
   const objectiveSource = extractFunctionSource(mainSource, "renderObjectiveTimeline");
   assert.ok(objectiveSource.includes("<caption>"));
   assert.equal((objectiveSource.match(/scope="col"/g) || []).length, 6);
+});
+
+test("dashboard can shrink below the tab bar intrinsic width", () => {
+  const dashboardRule = stylesSource.match(/\.dashboard\s*\{([^}]*)\}/s)?.[1] || "";
+  assert.match(dashboardRule, /min-width:\s*0\s*;/);
+  assert.match(dashboardRule, /width:\s*100%\s*;/);
+  assert.match(dashboardRule, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s*;/);
+  const activeTabRule = stylesSource.match(/\.tab-page--active\s*\{([^}]*)\}/s)?.[1] || "";
+  assert.match(activeTabRule, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s*;/);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

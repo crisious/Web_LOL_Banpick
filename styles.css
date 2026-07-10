@@ -329,6 +329,12 @@ body::after {
   gap: var(--space-6);
 }
 
+.dashboard {
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  width: 100%;
+}
+
 .control-grid,
 /* ─── Champion Hero Banner (detail view) ──────────────────────────────────── */
 
@@ -601,6 +607,7 @@ body::after {
 
 .tab-page--active {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
 }
 
