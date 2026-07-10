@@ -58,6 +58,7 @@ const dom = {
   matchListFooter: document.querySelector("[data-match-list-footer]"),
   backToListBtn: document.querySelector("[data-back-to-list]"),
   scorePanel: document.querySelector("[data-score-panel]"),
+  participantScoreboard: document.querySelector("[data-participant-scoreboard]"),
   objectiveSummary: document.querySelector("[data-objective-summary]"),
   objectiveTable: document.querySelector("[data-objective-table]"),
   kdaChart: document.querySelector("[data-kda-chart]"),
@@ -1994,6 +1995,16 @@ function firstManifestSample() {
   return Array.isArray(state.manifest) && state.manifest.length > 0 ? state.manifest[0] : null;
 }
 
+function hasMatchListContext() {
+  return Array.isArray(state.recentMatches) && state.recentMatches.length > 0;
+}
+
+function bootstrapEntryMode({ hasSavedAccount, hasStoredSample, serverMode }) {
+  if (hasSavedAccount) return "saved-account";
+  if (serverMode === "full" && hasStoredSample) return "internal-sample";
+  return "logged-out";
+}
+
 function serverModeUi(status, error) {
   if (error) {
     return {
@@ -2061,6 +2072,33 @@ function isLiveControlLocked() {
 
 function liveControlLockedMessage() {
   return currentServerModeUi().liveControlMessage || "현재 모드에서는 라이브 Riot 조회를 사용할 수 없습니다.";
+}
+
+async function openInternalLandingSample() {
+  const sample = firstManifestSample();
+  if (!sample) return false;
+
+  setDetailProgress("lookup", {
+    message: `${sample.id} 내부 개발 기본 리포트를 불러오고 있습니다.`,
+    progress: 32,
+    skippedSteps: ["riot", "ai"],
+  });
+  setView("LOADING_DETAIL");
+
+  try {
+    await selectSample(sample.id);
+    setView("DETAIL_VIEW");
+    completeDetailProgress("내부 개발용 기본 리포트를 열었습니다.");
+    if (dom.loginStatus) dom.loginStatus.textContent = "";
+    return true;
+  } catch (error) {
+    failDetailProgress(formatRetryMessage(error));
+    setView("LOGGED_OUT");
+    if (dom.loginStatus) {
+      dom.loginStatus.textContent = `기본 리포트 열기 실패: ${formatRetryMessage(error)}`;
+    }
+    return false;
+  }
 }
 
 function renderLoginDemoStatus() {
@@ -2816,6 +2854,83 @@ function renderPlaytimeScore(sample) {
   `;
 }
 
+function participantScoreTone(score) {
+  if (score >= 8) return "mvp";
+  if (score >= 6) return "good";
+  if (score >= 4) return "avg";
+  return "poor";
+}
+
+function participantRelationLabel(relation) {
+  if (relation === "PLAYER") return "나";
+  if (relation === "ALLY") return "아군";
+  if (relation === "ENEMY") return "상대";
+  return "참가자";
+}
+
+function renderParticipantScoreRow(participant) {
+  const stats = participant.stats || {};
+  const score = participant.score || {};
+  const tone = participantScoreTone(Number(score.overall) || 0);
+  const relation = participantRelationLabel(participant.relation);
+  const fallbackLabel = `${relation} ${participant.role || ""} ${participant.champion || ""}`.trim();
+  return `
+    <article class="participant-score-row participant-score-row--${escapeAttr(tone)}" data-relation="${escapeAttr(participant.relation || "UNKNOWN")}">
+      <div class="participant-score-row__top">
+        <div class="participant-score-row__main">
+          <span class="participant-score-row__rank">#${Number(participant.rankOverall) || "-"}</span>
+          <div>
+            <strong>${escapeHtml(participant.label || fallbackLabel)}</strong>
+            <p>${escapeHtml(relation)} · ${escapeHtml(participant.role || "UNKNOWN")} · 팀내 #${Number(participant.rankTeam) || "-"}</p>
+          </div>
+        </div>
+        <div class="participant-score-row__score">
+          <strong>${Number(score.overall || 0).toFixed(1)}</strong>
+          <span>${escapeHtml(score.label || "")}</span>
+        </div>
+      </div>
+      <dl class="participant-score-row__stats">
+        <div><dt>KDA</dt><dd>${Number(stats.kills) || 0} / ${Number(stats.deaths) || 0} / ${Number(stats.assists) || 0}</dd></div>
+        <div><dt>CS/분</dt><dd>${Number(stats.csPerMinute || 0).toFixed(2)}</dd></div>
+        <div><dt>딜</dt><dd>${Number(stats.damageToChampions || 0).toLocaleString("ko-KR")}</dd></div>
+        <div><dt>시야</dt><dd>${Number(stats.visionScore || 0)}</dd></div>
+      </dl>
+      <p class="participant-score-row__coach">${escapeHtml(participant.coaching || "")}</p>
+    </article>
+  `;
+}
+
+function renderParticipantScoreTeam(title, participants) {
+  if (!Array.isArray(participants) || participants.length === 0) return "";
+  return `
+    <section class="participant-score-team">
+      <h3>${escapeHtml(title)}</h3>
+      <div class="participant-score-list">
+        ${participants.map(renderParticipantScoreRow).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderParticipantScoreboard(sample) {
+  if (!dom.participantScoreboard) return;
+  const scoreboard = sample.normalized?.participantScoreboard;
+  if (!scoreboard || !Array.isArray(scoreboard.participants) || scoreboard.participants.length === 0) {
+    dom.participantScoreboard.innerHTML = '<p class="muted">참가자별 스코어 데이터가 없습니다.</p>';
+    return;
+  }
+  dom.participantScoreboard.innerHTML = `
+    <div class="section-heading section-heading--compact">
+      <h3>팀원·상대 플레이 스코어</h3>
+      <p class="section-copy">이번 한 경기에서 10명의 전투, 성장, 시야, 생존 지표를 비교합니다.</p>
+    </div>
+    <div class="participant-scoreboard__grid">
+      ${renderParticipantScoreTeam("우리 팀", scoreboard.teams?.ally || [])}
+      ${renderParticipantScoreTeam("상대 팀", scoreboard.teams?.enemy || [])}
+    </div>
+  `;
+}
+
 function renderLaningStats(sample) {
   const cs = sample.normalized?.challengeStats;
   if (!cs || !dom.laningStats) {
@@ -3504,6 +3619,7 @@ function renderSample(sample) {
   renderEvidence(sample);
   renderComparison(sample);
   renderPlaytimeScore(sample);
+  renderParticipantScoreboard(sample);
   renderLaningStats(sample);
   renderDualTimeline(sample);
   renderObjectiveTimeline(sample);
@@ -3653,6 +3769,7 @@ function applyPendingUi() {
   const sampleSwitcherDisabled = Boolean(state.isRecentMatchesPending || state.isGeneratePending || state.isDetailPending);
   const detailDisabled = Boolean(state.isDetailPending || state.isGeneratePending);
   const sampleLoginDisabled = Boolean(state.isLoginPending || state.isSampleLoginPending || !firstManifestSample());
+  const hasList = hasMatchListContext();
 
   toggleDisabled(Array.from(dom.loginForm.querySelectorAll("input, select, button")), loginDisabled);
   toggleDisabled([dom.loginSampleButton], sampleLoginDisabled);
@@ -3661,8 +3778,11 @@ function applyPendingUi() {
   toggleDisabled(Array.from(dom.sampleSwitcher.querySelectorAll("[data-sample-button]")), sampleSwitcherDisabled);
   toggleDisabled(Array.from(dom.matchListGrid.querySelectorAll("[data-match-detail]")), detailDisabled);
   toggleDisabled(Array.from(dom.matchListHeader.querySelectorAll("button")), detailDisabled);
-  toggleDisabled([dom.backToListBtn], detailDisabled);
+  toggleDisabled([dom.backToListBtn], detailDisabled || !hasList);
   toggleDisabled(Array.from(dom.demoTokenForm?.querySelectorAll("input, button") || []), demoTokenPending);
+  if (dom.backToListBtn) {
+    dom.backToListBtn.hidden = !hasList;
+  }
   if (dom.loginForm) dom.loginForm.dataset.liveLocked = liveLocked ? "true" : "false";
   if (dom.fetcherDetails) {
     dom.fetcherDetails.dataset.liveLocked = liveLocked ? "true" : "false";
@@ -4252,7 +4372,7 @@ async function startDetailAnalysis(matchId) {
 // ─── Init ─────────────────────────────────────────────────────────────────
 
 async function init() {
-  loadServerStatus();
+  await loadServerStatus();
 
   // manifest 로드 (실패해도 계속 진행)
   try {
@@ -4367,11 +4487,19 @@ async function init() {
   }
 
   const saved = loadSavedAccount();
-  if (saved) {
+  const entryMode = bootstrapEntryMode({
+    hasSavedAccount: Boolean(saved),
+    hasStoredSample: Boolean(firstManifestSample()),
+    serverMode: currentServerModeUi().mode,
+  });
+
+  if (entryMode === "saved-account" && saved) {
     dom.loginForm.querySelector("[name=gameName]").value = saved.gameName;
     dom.loginForm.querySelector("[name=tagLine]").value = saved.tagLine;
     if (saved.platformRegion) dom.loginForm.querySelector("[name=platformRegion]").value = saved.platformRegion;
     handleLogin();
+  } else if (entryMode === "internal-sample") {
+    await openInternalLandingSample();
   } else {
     setView("LOGGED_OUT");
   }

@@ -591,10 +591,33 @@ const blockedStaticPaths = [
   "/data%2Fsamples%2Fmanifest.json",
 ];
 
+// Cloudflare는 ".." 트래버설 경로를 origin에 전달하지 않고 엣지에서 400으로 거부한다.
+// 이 경우 파일은 노출되지 않지만 응답은 Cloudflare 자체 에러 페이지라 403/404·nosniff 계약을 따르지 않는다.
+const EDGE_TRAVERSAL_PATH_PATTERN = /\.\.%2F|%2e%2e%2F/i;
+
+function isEdgeTraversalReject(path, out) {
+  return (
+    out.response.status === 400 &&
+    (headerValue(out.response, "server") || "").toLowerCase() === "cloudflare" &&
+    EDGE_TRAVERSAL_PATH_PATTERN.test(path)
+  );
+}
+
 for (const path of blockedStaticPaths) {
   const out = await request(path);
-  expect(out.response.status === 403 || out.response.status === 404, `${path} is not publicly served`, `status=${out.response.status}`);
-  expect(headerValue(out.response, "x-content-type-options") === "nosniff", `${path} has X-Content-Type-Options nosniff`, `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`);
+  const edgeReject = isEdgeTraversalReject(path, out);
+  expect(
+    out.response.status === 403 || out.response.status === 404 || edgeReject,
+    `${path} is not publicly served`,
+    edgeReject ? "status=400 edge-level cloudflare reject" : `status=${out.response.status}`,
+  );
+  expect(
+    edgeReject || headerValue(out.response, "x-content-type-options") === "nosniff",
+    `${path} has X-Content-Type-Options nosniff`,
+    edgeReject
+      ? "skipped: edge-level cloudflare reject does not reach origin"
+      : `x-content-type-options=${headerValue(out.response, "x-content-type-options") || "(missing)"}`,
+  );
 }
 
 const liveApiProbes = [

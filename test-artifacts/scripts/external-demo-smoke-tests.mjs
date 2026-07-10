@@ -83,9 +83,16 @@ function completeSampleDetail() {
   };
 }
 
-function createRawModeHealthServer(rawMode, requests) {
+function createRawModeHealthServer(rawMode, requests, options = {}) {
+  const edgeTraversalReject = options.edgeTraversalReject || "";
   return http.createServer((req, res) => {
     requests.push({ method: req.method, url: req.url });
+    if (edgeTraversalReject && (req.url === "/..%2Fserver.js" || req.url === "/%2e%2e%2Fserver.js")) {
+      const headers = { "Content-Type": "text/html" };
+      if (edgeTraversalReject === "cloudflare") headers.Server = "cloudflare";
+      res.writeHead(400, headers);
+      return res.end("<html><head><title>400 Bad Request</title></head><body><center><h1>400 Bad Request</h1></center><hr><center>cloudflare</center></body></html>");
+    }
     const sendJson = (status, body) => {
       res.writeHead(status, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
       res.end(JSON.stringify(body));
@@ -99,6 +106,8 @@ function createRawModeHealthServer(rawMode, requests) {
         <title>LoL Replay Coach</title>
         <link rel="stylesheet" href="./styles.css?v=20260419">
         <script src="./main.js?v=20260419"></script>
+        <button data-login-sample-button>저장된 샘플</button>
+        <div data-sample-switcher></div>
       `);
     }
     if (req.url === "/styles.css?v=20260419") {
@@ -2521,6 +2530,47 @@ check("CLI exits non-zero when any checked sample detail misses report essential
 
 check("CLI reports missing report essentials for a later checked sample",
   incompleteSecondDetail.stderr.includes("FAIL sample detail sample-bad includes report essentials"),
+  true);
+
+const edgeRejectRequests = [];
+const edgeRejectServer = createRawModeHealthServer("readonly", edgeRejectRequests, { edgeTraversalReject: "cloudflare" });
+await new Promise((resolve) => edgeRejectServer.listen(0, "127.0.0.1", resolve));
+const edgeRejectUrl = `http://127.0.0.1:${edgeRejectServer.address().port}`;
+const edgeReject = await runNode([
+  smokePath,
+  edgeRejectUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => edgeRejectServer.close(resolve));
+
+check("CLI accepts Cloudflare edge 400 reject for encoded traversal blocked paths",
+  edgeReject.status,
+  0);
+
+check("CLI reports edge-rejected traversal paths as not publicly served",
+  edgeReject.stdout.includes("PASS /..%2Fserver.js is not publicly served") &&
+    edgeReject.stdout.includes("PASS /%2e%2e%2Fserver.js is not publicly served"),
+  true);
+
+const unmarkedRejectRequests = [];
+const unmarkedRejectServer = createRawModeHealthServer("readonly", unmarkedRejectRequests, { edgeTraversalReject: "unmarked" });
+await new Promise((resolve) => unmarkedRejectServer.listen(0, "127.0.0.1", resolve));
+const unmarkedRejectUrl = `http://127.0.0.1:${unmarkedRejectServer.address().port}`;
+const unmarkedReject = await runNode([
+  smokePath,
+  unmarkedRejectUrl,
+  "--expect-mode=readonly",
+  "--min-samples=1",
+]);
+await new Promise((resolve) => unmarkedRejectServer.close(resolve));
+
+check("CLI still fails a 400 traversal reject without the cloudflare server header",
+  unmarkedReject.status,
+  1);
+
+check("CLI reports unmarked 400 traversal rejects as smoke failures",
+  unmarkedReject.stderr.includes("FAIL /..%2Fserver.js is not publicly served"),
   true);
 
 console.log(`\n${pass} passed, ${fail} failed`);

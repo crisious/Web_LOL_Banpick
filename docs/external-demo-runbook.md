@@ -58,6 +58,7 @@ Expected:
 - `/api/samples` list entries omit explicit `matchId`; smoke fails on any list entry that reintroduces the field, while sample detail fetches continue to use public `sample-*` ids and must not require match IDs from the list payload. Smoke report summaries must include the required sample-list privacy, core sensitive static block, static block `nosniff`, and read-only live/write block check results so CI artifacts prove those gates were part of the run.
 - sensitive static paths and encoded variants 403/404
 - sensitive static path block responses return `X-Content-Type-Options: nosniff`
+- when the demo runs behind Cloudflare, encoded `..` traversal variants such as `/..%2Fserver.js` may be rejected at the edge with HTTP 400 and `server: cloudflare` before reaching the origin; smoke accepts that edge-level reject as blocked and skips the origin `nosniff` contract for those responses only. A 400 without the `server: cloudflare` header still fails.
 - read-only mode live/write APIs 403: `/api/recent-matches`, `/api/champion-history`, `/api/generate-sample`
 - protected mode without a token blocks live/write APIs with `PUBLIC_DEMO_UNAUTHORIZED` or `PUBLIC_DEMO_TOKEN_REQUIRED`
 - protected mode with a token passes the live/write API auth gate instead of returning 401/403

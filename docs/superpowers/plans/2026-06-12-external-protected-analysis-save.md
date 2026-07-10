@@ -677,10 +677,19 @@ Update Obsidian with:
 
 ## Rollout Checklist
 
-- [ ] Choose a strong `PUBLIC_DEMO_TOKEN` and share it out of band.
-- [ ] Start protected server with `SAMPLES_DIR` pointing at a writable persistent directory.
-- [ ] Start Cloudflare Tunnel or deploy behind HTTPS.
-- [ ] Run `npm run smoke:external:protected -- <https-url> --token=<token>`.
-- [ ] Verify the page shows "보호 모드" and the token panel.
-- [ ] Verify save flow creates a new sample entry and reloads the stored sample list.
+- [x] Choose a strong `PUBLIC_DEMO_TOKEN` and share it out of band.
+- [x] Start protected server with `SAMPLES_DIR` pointing at a writable persistent directory.
+- [x] Start Cloudflare Tunnel or deploy behind HTTPS.
+- [x] Run `npm run smoke:external:protected -- <https-url> --token=<token>`.
+- [x] Verify the page shows "보호 모드" and the token panel.
+- [x] Verify save flow creates a new sample entry and reloads the stored sample list.
 - [ ] After the session, stop the tunnel and rotate `PUBLIC_DEMO_TOKEN`.
+
+Operational evidence (2026-06-12 KST):
+
+- External URL: `https://interim-preceding-auto-preventing.trycloudflare.com`
+- `/healthz`: `publicDemoMode=protected`, `readonly=false`, `protected=true`, token configured and valid.
+- Persistent sample storage: `$HOME/.local/share/lol-ai-coach/external-protected-samples`
+- Protected external smoke passed against the tunnel URL.
+- Browser QA passed: token entry unlocks live controls, switches from `보호 모드` to `저장 가능`, and produced no console warn/error entries.
+- Save-flow QA passed: a protected `/api/generate-sample` run created `sample-kr-8254438502`; `/api/samples` increased from 35 to 36, listed the new sample, and `/api/samples/sample-kr-8254438502` returned 200.

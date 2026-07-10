@@ -1104,6 +1104,9 @@ function buildNormalized(account, matchDetail, timeline, options) {
 
   normalized.derivedSignals = buildDerivedSignals(normalized);
   normalized.playtimeScore = buildPlaytimeScore(normalized);
+  normalized.participantScoreboard = buildParticipantScoreboard(matchDetail, {
+    targetPuuid: account.puuid,
+  });
 
   // participantId → teamId 매핑 (오브젝트 타임라인용)
   const participantTeamMap = new Map();
@@ -1508,6 +1511,217 @@ function buildPlaytimeScore(normalized) {
     overall,
     categories: { combat, income, vision, survival, objective, structure },
     label: overall >= 8 ? "MVP급" : overall >= 6 ? "양호" : overall >= 4 ? "보통" : "개선 필요",
+  };
+}
+
+function participantPublicLabel(participant) {
+  const relationLabel =
+    participant?.relation === "PLAYER" ? "내" :
+      participant?.relation === "ALLY" ? "아군" : "상대";
+  return `${relationLabel} ${participant?.role || "UNKNOWN"} ${participant?.champion || "Unknown"}`.trim();
+}
+
+function participantStatsFromRaw(participant, teamTotalKills, durationSeconds) {
+  const kills = Number(participant?.kills || 0);
+  const deaths = Number(participant?.deaths || 0);
+  const assists = Number(participant?.assists || 0);
+  const cs = Number(participant?.totalMinionsKilled || 0) + Number(participant?.neutralMinionsKilled || 0);
+  const minutes = Math.max(1, Number(durationSeconds || 0) / 60);
+
+  return {
+    kills,
+    deaths,
+    assists,
+    kda: Number(((kills + assists) / Math.max(1, deaths)).toFixed(2)),
+    cs,
+    csPerMinute: Number((cs / minutes).toFixed(2)),
+    goldEarned: Number(participant?.goldEarned || 0),
+    damageToChampions: Number(participant?.totalDamageDealtToChampions || 0),
+    visionScore: Number(participant?.visionScore || 0),
+    killParticipation: Number(((kills + assists) / Math.max(1, Number(teamTotalKills || 0))).toFixed(2)),
+  };
+}
+
+function participantScoreLabel(overall) {
+  if (overall >= 8) return "캐리";
+  if (overall >= 6) return "양호";
+  if (overall >= 4) return "보통";
+  return "주의";
+}
+
+function participantCoachingText(input) {
+  const { relation, score, role } = input || {};
+  const relationLabel = relation === "PLAYER" ? "내 플레이" : relation === "ALLY" ? "아군" : "상대";
+  const roleLabel = role || "UNKNOWN";
+  const categoryLabels = {
+    combat: "교전",
+    income: "성장",
+    vision: "시야",
+    survival: "생존",
+  };
+  const entries = Object.entries(score?.categories || {}).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    return `${relationLabel} ${roleLabel} 지표를 더 모아 다음 경기 코칭 기준을 세워보세요.`;
+  }
+  const strongest = entries[0][0];
+  const weakest = entries[entries.length - 1][0];
+  const strongestLabel = categoryLabels[strongest] || strongest;
+  const weakestLabel = categoryLabels[weakest] || weakest;
+
+  if (relation === "ENEMY") {
+    return `${relationLabel} ${roleLabel}은 ${strongestLabel} 지표가 강합니다. ${weakestLabel} 구간을 압박하면 대응 여지가 있습니다.`;
+  }
+  if (relation === "ALLY") {
+    return `${relationLabel} ${roleLabel}은 ${strongestLabel} 강점을 살리고 ${weakestLabel} 보완을 콜로 맞추면 좋습니다.`;
+  }
+  return `${relationLabel}는 ${strongestLabel}이 가장 좋고 ${weakestLabel}을 보완하면 다음 경기 기대값이 올라갑니다.`;
+}
+
+function buildParticipantPlayScore(input) {
+  const { stats, challenges, role, durationSeconds } = input || {};
+  const minutes = Math.max(1, Number(durationSeconds || 0) / 60);
+  const safeStats = stats || {};
+  const safeChallenges = challenges || {};
+  const combat = calcCombatScore(safeStats, safeChallenges, minutes);
+  const income = calcIncomeScore(safeStats, safeChallenges, role, minutes);
+  const vision = calcVisionScore(safeStats, safeChallenges, minutes);
+  const survival = calcSurvivalScore(safeStats, minutes);
+  const overall = +(combat * 0.35 + income * 0.25 + vision * 0.15 + survival * 0.25).toFixed(1);
+
+  return {
+    overall,
+    categories: { combat, income, vision, survival },
+    label: participantScoreLabel(overall),
+  };
+}
+
+function buildParticipantScoreboard(matchDetail, options) {
+  options = options || {};
+  const rawParticipants = Array.isArray(matchDetail?.info?.participants)
+    ? matchDetail.info.participants
+    : [];
+  const target =
+    rawParticipants.find((participant) => participant.puuid === options.targetPuuid) ||
+    rawParticipants.find((participant) => participant.participantId === options.targetParticipantId) ||
+    rawParticipants[0] ||
+    null;
+
+  if (!target) {
+    return {
+      schemaVersion: 1,
+      targetParticipantId: null,
+      teams: { ally: [], enemy: [] },
+      participants: [],
+      laneMatchups: [],
+    };
+  }
+
+  const durationSeconds = Number(matchDetail?.info?.gameDuration || 0);
+  const roleOrder = ["TOP", "JUNGLE", "MID", "ADC", "SUPPORT", "UNKNOWN"];
+  const teamKillTotals = new Map();
+  rawParticipants.forEach((participant) => {
+    const teamId = participant.teamId;
+    teamKillTotals.set(teamId, (teamKillTotals.get(teamId) || 0) + Number(participant.kills || 0));
+  });
+
+  const rows = rawParticipants.map((participant) => {
+    const role = normalizeRole(participant.teamPosition || participant.individualPosition);
+    const relation =
+      participant.participantId === target.participantId || participant.puuid === target.puuid
+        ? "PLAYER"
+        : participant.teamId === target.teamId ? "ALLY" : "ENEMY";
+    const stats = participantStatsFromRaw(participant, teamKillTotals.get(participant.teamId) || 0, durationSeconds);
+    const score = buildParticipantPlayScore({
+      stats,
+      challenges: participant.challenges || {},
+      role,
+      durationSeconds,
+    });
+    const publicParticipant = {
+      participantId: Number(participant.participantId || 0),
+      relation,
+      side: relation === "ENEMY" ? "enemy" : "ally",
+      role,
+      champion: participant.championName || "Unknown",
+      stats,
+      score,
+      coaching: "",
+      rankOverall: 0,
+      rankTeam: 0,
+    };
+    publicParticipant.label = participantPublicLabel(publicParticipant);
+    publicParticipant.coaching = participantCoachingText({
+      relation,
+      score,
+      stats,
+      role,
+    });
+    return {
+      teamId: participant.teamId,
+      roleIndex: roleOrder.indexOf(role) >= 0 ? roleOrder.indexOf(role) : roleOrder.length,
+      publicParticipant,
+    };
+  });
+
+  rows
+    .slice()
+    .sort((a, b) =>
+      b.publicParticipant.score.overall - a.publicParticipant.score.overall ||
+      a.publicParticipant.participantId - b.publicParticipant.participantId)
+    .forEach((row, index) => {
+      row.publicParticipant.rankOverall = index + 1;
+    });
+
+  [target.teamId, ...new Set(rawParticipants.map((participant) => participant.teamId))].forEach((teamId) => {
+    rows
+      .filter((row) => row.teamId === teamId)
+      .sort((a, b) =>
+        b.publicParticipant.score.overall - a.publicParticipant.score.overall ||
+        a.publicParticipant.participantId - b.publicParticipant.participantId)
+      .forEach((row, index) => {
+        row.publicParticipant.rankTeam = index + 1;
+      });
+  });
+
+  const participants = rows
+    .map((row) => row.publicParticipant)
+    .sort((a, b) => a.rankOverall - b.rankOverall);
+  const allyRows = rows
+    .filter((row) => row.teamId === target.teamId)
+    .sort((a, b) => a.roleIndex - b.roleIndex || a.publicParticipant.participantId - b.publicParticipant.participantId);
+  const enemyRows = rows
+    .filter((row) => row.teamId !== target.teamId)
+    .sort((a, b) => a.roleIndex - b.roleIndex || a.publicParticipant.participantId - b.publicParticipant.participantId);
+  const laneMatchups = allyRows
+    .map((allyRow) => {
+      const enemyRow = enemyRows.find((row) => row.publicParticipant.role === allyRow.publicParticipant.role);
+      if (!enemyRow) return null;
+      const delta = +(
+        allyRow.publicParticipant.score.overall - enemyRow.publicParticipant.score.overall
+      ).toFixed(1);
+      return {
+        role: allyRow.publicParticipant.role,
+        playerParticipantId: allyRow.publicParticipant.participantId,
+        enemyParticipantId: enemyRow.publicParticipant.participantId,
+        playerLabel: allyRow.publicParticipant.label,
+        enemyLabel: enemyRow.publicParticipant.label,
+        playerScore: allyRow.publicParticipant.score.overall,
+        enemyScore: enemyRow.publicParticipant.score.overall,
+        delta,
+        favored: delta >= 0 ? "ALLY" : "ENEMY",
+      };
+    })
+    .filter(Boolean);
+
+  return {
+    schemaVersion: 1,
+    targetParticipantId: Number(target.participantId || 0),
+    teams: {
+      ally: allyRows.map((row) => row.publicParticipant),
+      enemy: enemyRows.map((row) => row.publicParticipant),
+    },
+    participants,
+    laneMatchups,
   };
 }
 
@@ -3199,6 +3413,16 @@ async function loadSampleBundle(sampleId) {
   // 누락된 필드 서버측 보강 (기존 샘플 호환)
   if (!normalized.playtimeScore && normalized.playerStats && normalized.timelineEvents) {
     normalized.playtimeScore = buildPlaytimeScore(normalized);
+  }
+  if (!normalized.participantScoreboard) {
+    const matchPath = sampleStoragePath(sampleId, "raw-match.json");
+    try {
+      const matchDetail = await readJson(matchPath);
+      normalized.participantScoreboard = buildParticipantScoreboard(matchDetail, {
+        targetPuuid: normalized.playerContext?.puuid,
+        targetParticipantId: normalized.playerContext?.participantId,
+      });
+    } catch {}
   }
   if (!normalized.objectiveTimeline) {
     // raw-timeline.json이 있으면 objectiveTimeline 생성

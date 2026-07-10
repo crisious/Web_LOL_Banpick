@@ -1980,6 +1980,135 @@ body::after {
   }
 }
 
+.participant-scoreboard {
+  margin-top: var(--space-5);
+}
+
+.participant-scoreboard__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.participant-score-team h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.participant-score-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.participant-score-row {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+}
+
+.participant-score-row--mvp { border-color: var(--accent); }
+.participant-score-row--good { border-color: var(--mint-border); }
+.participant-score-row--poor { border-color: var(--rose-border); }
+
+.participant-score-row__top,
+.participant-score-row__main,
+.participant-score-row__score,
+.participant-score-row__stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.participant-score-row__top {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.participant-score-row__main {
+  min-width: 0;
+}
+
+.participant-score-row__main strong,
+.participant-score-row__main p,
+.participant-score-row__coach {
+  overflow-wrap: anywhere;
+}
+
+.participant-score-row__main p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.participant-score-row__rank {
+  flex: 0 0 2.25rem;
+  font-weight: 800;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.participant-score-row__score {
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.participant-score-row__score strong {
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+.participant-score-row__score span {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.participant-score-row__stats {
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.participant-score-row__stats div {
+  min-width: 5rem;
+}
+
+.participant-score-row__stats dt {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.participant-score-row__stats dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.participant-score-row__coach {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .participant-scoreboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-score-row__top {
+    flex-direction: column;
+  }
+
+  .participant-score-row__score {
+    align-items: flex-start;
+  }
+}
+
 /* Phase 5: 점수를 conic-gradient 링으로 표현
    - 사용법: main.js에서 <div class="score-overall" style="--score: 78"> 식으로 점수(0-100) 주입
    - --score 미설정 시 0으로 fallback (링은 비어 보이지만 깨지지 않음) */
@@ -4766,12 +4895,10 @@ body::after {
 .tf-kd { margin-left: auto; font-size: 0.78rem; color: var(--text-muted, #a9b3c1); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
 
-/* 저장 샘플 GUI 숨김 (2026-06-10) — 상세 페이지에서 저장 샘플 표시/열람 GUI 비노출.
-   마크업·셀렉터·JS는 보존(설계 불변식). main.js는 숨겨진 요소에 그대로 렌더하지만
-   요소가 DOM에 존재하므로 오류 없음. /api/samples·추세 집계는 유지.
+/* 저장 샘플 탐색 GUI 숨김 (2026-06-10) — 상세 페이지 내부 샘플 탐색 UI는 비노출.
+   로그인 화면의 저장 샘플 진입 CTA는 공개 데모 진입점이므로 계속 노출한다.
    변형 클래스를 styles.css 끝에서 타깃해 소스 순서상 우선(!important 불필요). */
 .panel--samples,
-.panel--reports,
-.login-demo-actions {
+.panel--reports {
   display: none;
 }
