@@ -12,19 +12,25 @@ const PHASES = [
   { key: "late", phase: "LATE", label: "후반" },
 ];
 
-function finiteNumberOrNull(value) {
-  if (value == null || value === "") return null;
-  const number = Number(value);
-  return Number.isFinite(number) ? number : null;
+function nonNegativeFiniteNumberOrNull(value) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return null;
+  }
+  return value;
 }
 
 function formatClock(ms) {
-  const value = finiteNumberOrNull(ms);
-  if (value == null) return "";
-  const totalSeconds = Math.max(0, Math.floor(value / 1000));
+  const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function formatTimeRange(startMs, endMs) {
+  const start = nonNegativeFiniteNumberOrNull(startMs);
+  const end = nonNegativeFiniteNumberOrNull(endMs);
+  if (start == null || end == null || end < start) return "시간 정보 없음";
+  return `${formatClock(start)}–${formatClock(end)}`;
 }
 
 function normalizedPhaseName(value) {
@@ -108,8 +114,6 @@ export function buildPhaseModels(normalized, analysis) {
       && typeof context === "object"
       && Object.keys(context).length > 0,
     );
-    const start = formatClock(context?.startMs);
-    const end = formatClock(context?.endMs);
     const summary = summaries.find(
       (entry) => normalizedPhaseName(entry?.phase) === phase,
     );
@@ -117,14 +121,12 @@ export function buildPhaseModels(normalized, analysis) {
       key,
       phase,
       label,
-      timeRange: hasContext
-        ? (start && end ? `${start}–${end}` : start || end || "시간 정보 없음")
-        : "",
-      kills: hasContext ? finiteNumberOrNull(context?.kills) : null,
-      deaths: hasContext ? finiteNumberOrNull(context?.deaths) : null,
-      assists: hasContext ? finiteNumberOrNull(context?.assists) : null,
+      timeRange: hasContext ? formatTimeRange(context?.startMs, context?.endMs) : "",
+      kills: hasContext ? nonNegativeFiniteNumberOrNull(context?.kills) : null,
+      deaths: hasContext ? nonNegativeFiniteNumberOrNull(context?.deaths) : null,
+      assists: hasContext ? nonNegativeFiniteNumberOrNull(context?.assists) : null,
       notableEventCount: hasContext
-        ? finiteNumberOrNull(context?.notableEventCount)
+        ? nonNegativeFiniteNumberOrNull(context?.notableEventCount)
         : null,
       summary: hasContext
         ? nonEmptyString(summary?.summary) || "이 구간의 AI 요약이 없습니다."

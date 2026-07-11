@@ -133,6 +133,107 @@ test("buildPhaseModels preserves facts when AI summaries are absent", () => {
   assert.equal(models[1].summary, "");
 });
 
+test("buildPhaseModels rejects malformed and negative phase facts", () => {
+  const invalidValues = [
+    true,
+    false,
+    "   ",
+    "7",
+    [],
+    [7],
+    {},
+    NaN,
+    Infinity,
+    -1,
+  ];
+
+  for (const invalidValue of invalidValues) {
+    const [model] = buildPhaseModels({
+      phaseContext: {
+        early: {
+          startMs: 0,
+          endMs: 1000,
+          kills: invalidValue,
+          deaths: invalidValue,
+          assists: invalidValue,
+          notableEventCount: invalidValue,
+        },
+      },
+    }, {});
+
+    assert.equal(model.kills, null);
+    assert.equal(model.deaths, null);
+    assert.equal(model.assists, null);
+    assert.equal(model.notableEventCount, null);
+  }
+});
+
+test("buildPhaseModels hides invalid and reversed time intervals", () => {
+  const invalidEndpoints = [
+    undefined,
+    null,
+    true,
+    false,
+    "",
+    "   ",
+    "1000",
+    [],
+    [1000],
+    {},
+    NaN,
+    Infinity,
+    -1,
+  ];
+
+  for (const invalidEndpoint of invalidEndpoints) {
+    const invalidStart = buildPhaseModels({
+      phaseContext: { early: { startMs: invalidEndpoint, endMs: 1000 } },
+    }, {})[0];
+    const invalidEnd = buildPhaseModels({
+      phaseContext: { early: { startMs: 0, endMs: invalidEndpoint } },
+    }, {})[0];
+
+    assert.equal(invalidStart.timeRange, "시간 정보 없음");
+    assert.equal(invalidEnd.timeRange, "시간 정보 없음");
+  }
+
+  const reversed = buildPhaseModels(
+    {
+      phaseContext: {
+        early: {
+          startMs: 2000,
+          endMs: 1000,
+          kills: 1,
+          deaths: 2,
+          assists: 3,
+          notableEventCount: 4,
+        },
+      },
+    },
+    { phaseSummaries: [{ phase: "EARLY", summary: "초반 요약" }] },
+  )[0];
+
+  assert.equal(reversed.timeRange, "시간 정보 없음");
+  assert.deepEqual(
+    {
+      kills: reversed.kills,
+      deaths: reversed.deaths,
+      assists: reversed.assists,
+      notableEventCount: reversed.notableEventCount,
+      summary: reversed.summary,
+      hasContext: reversed.hasContext,
+    },
+    {
+      kills: 1,
+      deaths: 2,
+      assists: 3,
+      notableEventCount: 4,
+      summary: "초반 요약",
+      hasContext: true,
+    },
+  );
+});
+
 test("buildSkillProfile returns six ordered, clamped coaching scores", () => {
   const model = buildSkillProfile({
     playtimeScore: {
@@ -195,6 +296,7 @@ test("all committed samples produce focus, six skills, and three phases", async 
     "sample-kr-8186180726",
     "sample-kr-8186417086",
   ]);
+  const reversedPhaseModels = [];
 
   for (const sample of manifest.samples) {
     const [normalized, analysis] = await Promise.all([
@@ -209,10 +311,41 @@ test("all committed samples produce focus, six skills, and three phases", async 
     assert.equal(profile.categories.length, 6, `${sample.id}: skill count`);
     assert.equal(phases.length, 3, `${sample.id}: phase count`);
 
+    for (const phase of phases) {
+      const context = normalized.phaseContext?.[phase.key];
+      const startMs = context?.startMs;
+      const endMs = context?.endMs;
+      if (
+        typeof startMs === "number"
+        && Number.isFinite(startMs)
+        && typeof endMs === "number"
+        && Number.isFinite(endMs)
+        && endMs < startMs
+      ) {
+        reversedPhaseModels.push({
+          sampleId: sample.id,
+          phase: phase.key,
+          timeRange: phase.timeRange,
+        });
+      }
+    }
+
     if (noSummarySamples.has(sample.id)) {
       for (const phase of phases.filter((model) => model.hasContext)) {
         assert.equal(phase.summary, "이 구간의 AI 요약이 없습니다.");
       }
     }
   }
+
+  assert.ok(reversedPhaseModels.length > 0, "expected committed reversed intervals");
+  assert.deepEqual(
+    reversedPhaseModels.map((entry) => entry.timeRange),
+    reversedPhaseModels.map(() => "시간 정보 없음"),
+  );
+  assert.ok(
+    reversedPhaseModels.every(
+      (entry) => !/^\d{2,}:\d{2}–\d{2,}:\d{2}$/.test(entry.timeRange),
+    ),
+    "reversed contexts must not emit a descending clock range",
+  );
 });
