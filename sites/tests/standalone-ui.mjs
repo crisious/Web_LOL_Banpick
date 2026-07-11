@@ -158,6 +158,63 @@ test("skill profile exposes six accessible internal coaching meters", () => {
   );
 });
 
+test("phase coach keeps phase facts separate from AI summaries", () => {
+  assert.match(html, /<section\b[^>]*data-phase-coach[^>]*aria-labelledby="phase-title"/i);
+  assert.match(html, /data-phase-cards/);
+  assert.ok(
+    html.indexOf("data-phase-coach") < html.indexOf("data-evidence-moments"),
+    "phase coach must appear before evidence moments",
+  );
+  assert.match(appJs, /buildPhaseModels/);
+  assert.match(appJs, /PHASE FACTS/);
+  assert.match(appJs, /AI 구간 요약/);
+  assert.match(appJs, /이 구간의 AI 요약이 없습니다\./);
+
+  const at720 = mediaBlocks(css, 720);
+  assert.match(
+    at720,
+    /\.phase-grid\s*\{[^}]*grid-template-columns\s*:\s*1fr;/s,
+  );
+});
+
+test("coaching plan renderers preserve the HTML escaping boundary", () => {
+  assert.match(appJs, /escapeHtml\(model\.title/);
+  assert.match(appJs, /escapeHtml\(model\.description/);
+  assert.match(appJs, /escapeHtml\(model\.actionText/);
+  assert.match(appJs, /escapeHtml\(overallCopy\)/);
+  assert.match(appJs, /escapeHtml\(category\.label\)/);
+  assert.match(appJs, /escapeHtml\(model\.summary\)/);
+  assert.doesNotMatch(coachingPlanJs, /innerHTML|document\.|window\./);
+});
+
+test("non-ready states clear every coaching plan panel", () => {
+  const resetSource = appJs.slice(
+    appJs.indexOf("function resetDependentPanels"),
+    appJs.indexOf("function renderError"),
+  );
+  for (const property of ["focusContent", "skillProfile", "phaseCards"]) {
+    assert.match(
+      resetSource,
+      new RegExp(`elements\\.${property}`),
+      `reset must clear ${property}`,
+    );
+  }
+  for (const copy of [
+    "다음 게임 포커스를 불러오는 중입니다.",
+    "표시할 코칭 포커스가 없습니다.",
+    "역량 점수를 불러오는 중입니다.",
+    "표시할 역량 점수가 없습니다.",
+    "구간 코칭을 불러오는 중입니다.",
+    "표시할 구간 코칭이 없습니다.",
+  ]) {
+    assert.ok(resetSource.includes(copy), `missing reset copy: ${copy}`);
+  }
+  assert.match(
+    css,
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*scroll-behavior\s*:\s*auto\s*!important/,
+  );
+});
+
 test("sample and evidence-moment selection use native controls", () => {
   const sampleSelect = tagWithAttribute(html, "data-sample-select");
   assert.match(sampleSelect, /^<select\b/i);

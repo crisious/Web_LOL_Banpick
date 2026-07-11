@@ -6,6 +6,37 @@ function nonEmptyString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const PHASES = [
+  { key: "early", phase: "EARLY", label: "초반" },
+  { key: "mid", phase: "MID", label: "중반" },
+  { key: "late", phase: "LATE", label: "후반" },
+];
+
+function finiteNumberOrNull(value) {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function formatClock(ms) {
+  const value = finiteNumberOrNull(ms);
+  if (value == null) return "";
+  const totalSeconds = Math.max(0, Math.floor(value / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function normalizedPhaseName(value) {
+  const name = nonEmptyString(value);
+  const aliases = {
+    early: "EARLY", EARLY: "EARLY", 초반: "EARLY",
+    mid: "MID", MID: "MID", 중반: "MID",
+    late: "LATE", LATE: "LATE", 후반: "LATE",
+  };
+  return aliases[name] || aliases[name.toUpperCase()] || "";
+}
+
 const SKILL_CATEGORIES = [
   ["combat", "전투"],
   ["income", "수급"],
@@ -66,6 +97,41 @@ export function findFocusMomentId(focus, moments) {
   const match = asArray(moments).find((moment) =>
     uniqueEventIds(moment?.relatedEventIds).some((eventId) => targetIds.has(eventId)));
   return nonEmptyString(match?.id);
+}
+
+export function buildPhaseModels(normalized, analysis) {
+  const summaries = asArray(analysis?.phaseSummaries);
+  return PHASES.map(({ key, phase, label }) => {
+    const context = normalized?.phaseContext?.[key];
+    const hasContext = Boolean(
+      context
+      && typeof context === "object"
+      && Object.keys(context).length > 0,
+    );
+    const start = formatClock(context?.startMs);
+    const end = formatClock(context?.endMs);
+    const summary = summaries.find(
+      (entry) => normalizedPhaseName(entry?.phase) === phase,
+    );
+    return {
+      key,
+      phase,
+      label,
+      timeRange: hasContext
+        ? (start && end ? `${start}–${end}` : start || end || "시간 정보 없음")
+        : "",
+      kills: hasContext ? finiteNumberOrNull(context?.kills) : null,
+      deaths: hasContext ? finiteNumberOrNull(context?.deaths) : null,
+      assists: hasContext ? finiteNumberOrNull(context?.assists) : null,
+      notableEventCount: hasContext
+        ? finiteNumberOrNull(context?.notableEventCount)
+        : null,
+      summary: hasContext
+        ? nonEmptyString(summary?.summary) || "이 구간의 AI 요약이 없습니다."
+        : "",
+      hasContext,
+    };
+  });
 }
 
 export function buildSkillProfile(normalized) {

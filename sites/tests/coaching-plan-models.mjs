@@ -1,10 +1,27 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   buildFocusModel,
+  buildPhaseModels,
   buildSkillProfile,
   findFocusMomentId,
 } from "../app/coaching-plan.js";
+
+const testsRoot = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(testsRoot, "..", "..");
+
+function repoPath(publicPath) {
+  assert.equal(typeof publicPath, "string");
+  assert.ok(publicPath.startsWith("/data/samples/"));
+  const relativePath = publicPath.slice(1);
+  assert.equal(path.posix.normalize(relativePath), relativePath);
+  const resolved = path.resolve(repoRoot, relativePath);
+  assert.ok(resolved.startsWith(`${repoRoot}${path.sep}`));
+  return resolved;
+}
 
 test("buildFocusModel selects the first weakness and its linked action", () => {
   const model = buildFocusModel({
@@ -60,6 +77,62 @@ test("findFocusMomentId returns the first intersecting moment and safe fallback"
   assert.equal(findFocusMomentId(null, moments), "");
 });
 
+test("buildPhaseModels joins phase facts with EARLY MID LATE summaries", () => {
+  const models = buildPhaseModels(
+    {
+      phaseContext: {
+        early: {
+          startMs: 0, endMs: 900000, kills: 1, deaths: 2,
+          assists: 3, notableEventCount: 4,
+        },
+        mid: {
+          startMs: 900001, endMs: 1800000, kills: 2, deaths: 1,
+          assists: 5, notableEventCount: 6,
+        },
+        late: {
+          startMs: 1800001, endMs: 2100000, kills: 1, deaths: 0,
+          assists: 2, notableEventCount: 3,
+        },
+      },
+    },
+    {
+      phaseSummaries: [
+        { phase: "EARLY", summary: "초반 요약" },
+        { phase: "중반", summary: "중반 요약" },
+        { phase: "late", summary: "후반 요약" },
+      ],
+    },
+  );
+
+  assert.deepEqual(models.map((model) => model.key), ["early", "mid", "late"]);
+  assert.deepEqual(models.map((model) => model.label), ["초반", "중반", "후반"]);
+  assert.deepEqual(models[0], {
+    key: "early",
+    phase: "EARLY",
+    label: "초반",
+    timeRange: "00:00–15:00",
+    kills: 1,
+    deaths: 2,
+    assists: 3,
+    notableEventCount: 4,
+    summary: "초반 요약",
+    hasContext: true,
+  });
+  assert.equal(models[1].summary, "중반 요약");
+  assert.equal(models[2].summary, "후반 요약");
+});
+
+test("buildPhaseModels preserves facts when AI summaries are absent", () => {
+  const models = buildPhaseModels(
+    { phaseContext: { early: { startMs: 0, endMs: 600000, kills: 0 } } },
+    { phaseSummaries: [] },
+  );
+  assert.equal(models[0].hasContext, true);
+  assert.equal(models[0].summary, "이 구간의 AI 요약이 없습니다.");
+  assert.equal(models[1].hasContext, false);
+  assert.equal(models[1].summary, "");
+});
+
 test("buildSkillProfile returns six ordered, clamped coaching scores", () => {
   const model = buildSkillProfile({
     playtimeScore: {
@@ -111,5 +184,35 @@ test("buildSkillProfile rejects invalid coaching score types as missing", () => 
     assert.equal(model.overall, null);
     assert.equal(model.categories[0].value, null);
     assert.equal(model.categories[0].displayValue, "측정 없음");
+  }
+});
+
+test("all committed samples produce focus, six skills, and three phases", async () => {
+  const manifest = JSON.parse(
+    await readFile(path.join(repoRoot, "data", "samples", "manifest.json"), "utf8"),
+  );
+  const noSummarySamples = new Set([
+    "sample-kr-8186180726",
+    "sample-kr-8186417086",
+  ]);
+
+  for (const sample of manifest.samples) {
+    const [normalized, analysis] = await Promise.all([
+      readFile(repoPath(sample.normalizedPath), "utf8").then(JSON.parse),
+      readFile(repoPath(sample.analysisPath), "utf8").then(JSON.parse),
+    ]);
+    const focus = buildFocusModel(analysis);
+    const profile = buildSkillProfile(normalized);
+    const phases = buildPhaseModels(normalized, analysis);
+
+    assert.ok(focus, `${sample.id}: missing focus`);
+    assert.equal(profile.categories.length, 6, `${sample.id}: skill count`);
+    assert.equal(phases.length, 3, `${sample.id}: phase count`);
+
+    if (noSummarySamples.has(sample.id)) {
+      for (const phase of phases.filter((model) => model.hasContext)) {
+        assert.equal(phase.summary, "이 구간의 AI 요약이 없습니다.");
+      }
+    }
   }
 });

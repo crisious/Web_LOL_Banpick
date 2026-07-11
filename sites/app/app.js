@@ -1,5 +1,6 @@
 import {
   buildFocusModel,
+  buildPhaseModels,
   buildSkillProfile,
   findFocusMomentId,
 } from "./coaching-plan.js";
@@ -14,6 +15,7 @@ const elements = {
   coachSummary: document.querySelector("[data-coach-summary]"),
   metrics: document.querySelector("[data-evidence-metrics]"),
   skillProfile: document.querySelector("[data-skill-profile]"),
+  phaseCards: document.querySelector("[data-phase-cards]"),
   focusContent: document.querySelector("[data-focus-content]"),
   evidenceTitle: document.querySelector("#evidence-title"),
   moments: document.querySelector("[data-evidence-moments]"),
@@ -216,6 +218,46 @@ function renderSkillProfile(model) {
           </div>`;
       }).join("")}
     </div>`;
+}
+
+function displayFact(value) {
+  return Number.isFinite(value) ? String(value) : "—";
+}
+
+function renderPhaseCoach(models) {
+  elements.phaseCards.innerHTML = models.map((rawModel) => {
+    const model = rawModel.hasContext && !rawModel.summary
+      ? { ...rawModel, summary: "이 구간의 AI 요약이 없습니다." }
+      : rawModel;
+    if (!model.hasContext) {
+      return `
+        <article class="phase-card phase-card--empty">
+          <div class="phase-card__head">
+            <span>${escapeHtml(model.phase)}</span>
+            <h3>${escapeHtml(model.label)}</h3>
+          </div>
+          <p class="empty-copy">이 구간의 경기 기록이 없습니다.</p>
+        </article>`;
+    }
+    return `
+      <article class="phase-card">
+        <div class="phase-card__head">
+          <span>${escapeHtml(model.phase)} · ${escapeHtml(model.timeRange)}</span>
+          <h3>${escapeHtml(model.label)}</h3>
+        </div>
+        <div class="phase-card__facts" aria-label="${escapeHtml(model.label)} 구간 사실">
+          <span>PHASE FACTS</span>
+          <dl>
+            <div><dt>K / D / A</dt><dd>${displayFact(model.kills)} / ${displayFact(model.deaths)} / ${displayFact(model.assists)}</dd></div>
+            <div><dt>중요 사건</dt><dd>${displayFact(model.notableEventCount)}건</dd></div>
+          </dl>
+        </div>
+        <div class="phase-card__summary">
+          <span>AI 구간 요약</span>
+          <p>${escapeHtml(model.summary)}</p>
+        </div>
+      </article>`;
+  }).join("");
 }
 
 function getMoments(analysis) {
@@ -450,6 +492,7 @@ function renderDetail(detail) {
   renderMoments(detail);
   renderFocus(buildFocusModel(detail?.analysis));
   renderSkillProfile(buildSkillProfile(detail?.normalized));
+  renderPhaseCoach(buildPhaseModels(detail?.normalized, detail?.analysis));
   renderProtocols(detail?.analysis);
   renderTrace(detail?.analysis, detail?.normalized);
 }
@@ -476,6 +519,9 @@ function resetDependentPanels(mode = "empty") {
   elements.skillProfile.innerHTML = `<p class="empty-copy">${isLoading
     ? "역량 점수를 불러오는 중입니다."
     : "표시할 역량 점수가 없습니다."}</p>`;
+  elements.phaseCards.innerHTML = `<p class="empty-copy">${isLoading
+    ? "구간 코칭을 불러오는 중입니다."
+    : "표시할 구간 코칭이 없습니다."}</p>`;
   elements.moments.innerHTML = `<p class="empty-copy">${isLoading ? "핵심 장면을 불러오는 중입니다." : "표시할 핵심 장면이 없습니다."}</p>`;
   elements.observedList.innerHTML = `<li>${isLoading ? "타임라인 근거를 불러오는 중입니다." : "연결된 타임라인 근거가 없습니다."}</li>`;
   elements.interpretation.textContent = isLoading ? "AI 해석을 불러오는 중입니다." : "표시할 AI 해석이 없습니다.";

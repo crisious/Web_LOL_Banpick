@@ -590,6 +590,85 @@ body[data-app-state="error"] .status-line__pulse {
   color: var(--muted);
 }
 
+.phase-section {
+  padding: 88px 0;
+  border-top: 1px solid var(--line);
+}
+
+.phase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.phase-card {
+  min-width: 0;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow-wrap: anywhere;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.phase-card__head > span,
+.phase-card__facts > span,
+.phase-card__summary > span {
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.phase-card__head > span {
+  color: var(--muted);
+}
+
+.phase-card__head h3 {
+  margin: 8px 0 24px;
+  font-size: 1.4rem;
+}
+
+.phase-card__facts {
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--blue-soft);
+}
+
+.phase-card__facts > span {
+  color: var(--blue);
+}
+
+.phase-card__facts dl {
+  display: grid;
+  gap: 12px;
+  margin: 15px 0 0;
+}
+
+.phase-card__facts dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.phase-card__facts dt,
+.phase-card__facts dd {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+.phase-card__summary {
+  padding-top: 22px;
+}
+
+.phase-card__summary > span {
+  color: var(--lime);
+}
+
+.phase-card__summary p {
+  margin: 12px 0 0;
+  color: var(--muted-strong);
+  line-height: 1.7;
+}
+
 .evidence-section {
   padding: 88px 0;
   border-top: 1px solid var(--line);
@@ -1071,6 +1150,10 @@ body[data-app-state="error"] .status-line__pulse {
   }
 
   .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .phase-grid {
     grid-template-columns: 1fr;
   }
 
