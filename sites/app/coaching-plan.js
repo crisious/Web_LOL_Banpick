@@ -16,7 +16,9 @@ const SKILL_CATEGORIES = [
 ];
 
 function normalizedScore(value) {
-  if (value == null || value === "") return null;
+  const isNumber = typeof value === "number";
+  const isNumericString = typeof value === "string" && value.trim() !== "";
+  if (!isNumber && !isNumericString) return null;
   const number = Number(value);
   if (!Number.isFinite(number)) return null;
   return Math.round(Math.min(10, Math.max(0, number)) * 10) / 10;

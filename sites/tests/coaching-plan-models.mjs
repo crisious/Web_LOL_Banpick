@@ -98,3 +98,18 @@ test("buildSkillProfile keeps an explicit all-missing profile", () => {
   assert.equal(model.categories.length, 6);
   assert.ok(model.categories.every((category) => category.value === null));
 });
+
+test("buildSkillProfile rejects invalid coaching score types as missing", () => {
+  for (const invalidValue of [true, false, "   ", [], [7], {}, NaN, Infinity]) {
+    const model = buildSkillProfile({
+      playtimeScore: {
+        overall: invalidValue,
+        categories: { combat: invalidValue },
+      },
+    });
+
+    assert.equal(model.overall, null);
+    assert.equal(model.categories[0].value, null);
+    assert.equal(model.categories[0].displayValue, "측정 없음");
+  }
+});
