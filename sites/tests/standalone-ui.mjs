@@ -59,19 +59,30 @@ function mediaBlocks(source, width) {
   return blocks.join("\n");
 }
 
-const [html, css, appJs, ogImage] = await Promise.all([
+const [html, css, appJs, coachingPlanJs, ogImage] = await Promise.all([
   readOptional("index.html"),
   readOptional("styles.css"),
   readOptional("app.js"),
+  readOptional("coaching-plan.js"),
   readOptional("og.png", null),
 ]);
 
-test("standalone Sites UI provides its own four production assets", async (t) => {
-  for (const relativePath of ["index.html", "styles.css", "app.js", "og.png"]) {
+test("standalone Sites UI provides its own five production assets", async (t) => {
+  for (const relativePath of [
+    "index.html",
+    "styles.css",
+    "app.js",
+    "coaching-plan.js",
+    "og.png",
+  ]) {
     await t.test(relativePath, async () => {
-      assert.ok(await isFile(relativePath), `Missing standalone UI asset: sites/app/${relativePath}`);
+      assert.ok(
+        await isFile(relativePath),
+        `Missing standalone UI asset: sites/app/${relativePath}`,
+      );
     });
   }
+  assert.match(coachingPlanJs, /export function buildFocusModel/);
   assert.deepEqual(
     [...(ogImage?.subarray(0, 8) || [])],
     [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
@@ -98,6 +109,30 @@ test("summary and headline metrics are rendered only from staged sample data", (
     assert.ok(visibleContract.includes(label), `Missing metric label: ${label}`);
   }
   assert.doesNotMatch(appJs, /\b84\b|62%|근거\s*7건/);
+});
+
+test("next-game focus links one coaching action to its evidence", () => {
+  assert.match(html, /<section\b[^>]*data-coaching-focus[^>]*aria-labelledby="focus-title"/i);
+  assert.match(html, /data-focus-content/);
+  assert.ok(
+    html.indexOf("data-coaching-focus") < html.indexOf("data-evidence-metrics"),
+    "focus must appear before the metric strip",
+  );
+  assert.match(html, /id="evidence-title"[^>]*tabindex="-1"/i);
+  assert.match(appJs, /from ["']\.\/coaching-plan\.js["']/);
+  assert.match(appJs, /buildFocusModel/);
+  assert.match(appJs, /findFocusMomentId/);
+  assert.match(appJs, /data-focus-evidence/);
+  assert.match(appJs, /selectMoment\(momentId\)/);
+  assert.match(appJs, /momentId\s*!==\s*state\.activeMomentId/);
+  assert.match(appJs, /이미 선택된 근거 장면으로 이동했습니다\./);
+  assert.match(appJs, /evidenceTitle\.focus\(\{\s*preventScroll:\s*true\s*\}\)/);
+  assert.match(appJs, /evidenceTitle\.scrollIntoView/);
+  assert.match(appJs, /matchMedia\(["']\(prefers-reduced-motion: reduce\)["']\)/);
+
+  const at1024 = mediaBlocks(css, 1024);
+  assert.match(at1024, /\.focus-section\s*\{[^}]*grid-template-columns\s*:\s*1fr;/s);
+  assert.match(at1024, /\.focus-card\s*\{[^}]*grid-template-columns\s*:\s*1fr;/s);
 });
 
 test("sample and evidence-moment selection use native controls", () => {

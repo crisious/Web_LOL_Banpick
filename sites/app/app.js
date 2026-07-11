@@ -1,3 +1,8 @@
+import {
+  buildFocusModel,
+  findFocusMomentId,
+} from "./coaching-plan.js";
+
 const EVIDENCE_MOMENT_LIMIT = 4;
 
 const elements = {
@@ -7,6 +12,8 @@ const elements = {
   headline: document.querySelector("[data-analysis-headline]"),
   coachSummary: document.querySelector("[data-coach-summary]"),
   metrics: document.querySelector("[data-evidence-metrics]"),
+  focusContent: document.querySelector("[data-focus-content]"),
+  evidenceTitle: document.querySelector("#evidence-title"),
   moments: document.querySelector("[data-evidence-moments]"),
   observedList: document.querySelector("[data-observed-list]"),
   interpretation: document.querySelector("[data-interpretation-copy]"),
@@ -237,6 +244,50 @@ function renderMoments(detail) {
   renderMomentDetail(activeMoment, detail?.normalized);
 }
 
+function renderFocus(model) {
+  if (!model) {
+    elements.focusContent.innerHTML =
+      '<p class="empty-copy">이 경기에는 우선 적용할 코칭 포커스가 없습니다.</p>';
+    return;
+  }
+
+  elements.focusContent.innerHTML = `
+    <div class="focus-card__copy">
+      <span>핵심 약점 · 연결 근거 ${escapeHtml(model.evidenceCount)}건</span>
+      <h3>${escapeHtml(model.title || "핵심 약점")}</h3>
+      <p>${escapeHtml(model.description || "이 약점의 상세 설명이 없습니다.")}</p>
+    </div>
+    <div class="focus-card__action">
+      <span>다음 경기 대표 행동</span>
+      <strong>${escapeHtml(model.actionText || "연결된 실행 행동이 없습니다.")}</strong>
+      <button type="button" data-focus-evidence>근거 장면 보기</button>
+    </div>`;
+
+  elements.focusContent
+    .querySelector("[data-focus-evidence]")
+    .addEventListener("click", () => moveFocusToEvidence(model));
+}
+
+function moveFocusToEvidence(model) {
+  const moments = getMoments(state.detail?.analysis);
+  const momentId = findFocusMomentId(model, moments);
+  if (momentId && momentId !== state.activeMomentId) {
+    selectMoment(momentId);
+  } else if (momentId) {
+    setAppState("ready", "이미 선택된 근거 장면으로 이동했습니다.");
+  } else {
+    setAppState("ready", "관련 장면이 없어 근거 영역으로 이동했습니다.");
+  }
+  const reducedMotion = window
+    .matchMedia("(prefers-reduced-motion: reduce)")
+    .matches;
+  elements.evidenceTitle.focus({ preventScroll: true });
+  elements.evidenceTitle.scrollIntoView({
+    behavior: reducedMotion ? "auto" : "smooth",
+    block: "start",
+  });
+}
+
 function selectMoment(momentId) {
   const moments = getMoments(state.detail?.analysis);
   const selected = moments.find((moment) => moment.id === momentId);
@@ -362,6 +413,7 @@ function renderDetail(detail) {
   state.activeMomentId = "";
   renderMatchOverview(detail);
   renderMoments(detail);
+  renderFocus(buildFocusModel(detail?.analysis));
   renderProtocols(detail?.analysis);
   renderTrace(detail?.analysis, detail?.normalized);
 }
@@ -382,6 +434,9 @@ function resetDependentPanels(mode = "empty") {
   elements.metrics.innerHTML = ["KDA", "시야 점수", "킬 관여"]
     .map((label) => `<article class="metric"><span>${label}</span><strong>—</strong><small>${placeholder}</small></article>`)
     .join("");
+  elements.focusContent.innerHTML = `<p class="empty-copy">${isLoading
+    ? "다음 게임 포커스를 불러오는 중입니다."
+    : "표시할 코칭 포커스가 없습니다."}</p>`;
   elements.moments.innerHTML = `<p class="empty-copy">${isLoading ? "핵심 장면을 불러오는 중입니다." : "표시할 핵심 장면이 없습니다."}</p>`;
   elements.observedList.innerHTML = `<li>${isLoading ? "타임라인 근거를 불러오는 중입니다." : "연결된 타임라인 근거가 없습니다."}</li>`;
   elements.interpretation.textContent = isLoading ? "AI 해석을 불러오는 중입니다." : "표시할 AI 해석이 없습니다.";

@@ -23,6 +23,7 @@ const requiredUiAssets = [
   { source: "index.html", staged: "index.html" },
   { source: "styles.css", staged: "styles.css" },
   { source: "app.js", staged: "app.js" },
+  { source: "coaching-plan.js", staged: "coaching-plan.js" },
   { source: "og.png", staged: "og.png" },
 ];
 const forbiddenLegacyAssets = new Set([

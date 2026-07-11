@@ -21,6 +21,7 @@ const uiAssets = [
   "index.html",
   "styles.css",
   "app.js",
+  "coaching-plan.js",
   "og.png",
 ];
 
