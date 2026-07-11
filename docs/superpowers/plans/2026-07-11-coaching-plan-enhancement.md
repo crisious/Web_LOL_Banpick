@@ -74,12 +74,13 @@ Run from `/Users/a1234/Documents/Web_LOL_Banpick-coaching-plan`:
 
 ```bash
 git status --short
+npm --prefix sites run build
 npm --prefix sites test
 npm test
 node scripts/design-audit.js --file sites/app/styles.css --context index.html,app.js --scope all --format markdown
 ```
 
-Expected: `git status --short`가 비어 있고 Sites 테스트와 전체 회귀 테스트가 통과한다. 디자인 감사 결과는 구현 전 기준선으로 기록한다. 기존 실패가 있으면 구현을 시작하지 말고 실패 명령과 첫 오류를 보고한다.
+Expected: `git status --short`가 비어 있고 Sites build, Sites 테스트, 전체 회귀 테스트가 통과한다. 디자인 감사 결과는 구현 전 기준선으로 기록한다. 기존 실패가 있으면 구현을 시작하지 말고 실패 명령과 첫 오류를 보고한다.
 
 ---
 
