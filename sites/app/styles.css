@@ -263,8 +263,8 @@ body[data-app-state="error"] .status-line__pulse {
   grid-template-columns: 150px minmax(0, 1fr) 120px;
   gap: 30px;
   align-items: start;
-  min-height: 510px;
-  padding: 90px 0 82px;
+  min-height: 390px;
+  padding: 64px 0 60px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -317,18 +317,18 @@ body[data-app-state="error"] .status-line__pulse {
 }
 
 .hero h1 {
-  max-width: 850px;
+  max-width: 760px;
   margin: 0;
-  font-size: clamp(2.6rem, 5.7vw, 5.5rem);
-  font-weight: 820;
-  line-height: 1.06;
-  letter-spacing: -0.055em;
+  font-size: clamp(1.9rem, 3.8vw, 3.45rem);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
 .coach-summary {
   max-width: 760px;
-  margin: 33px 0 0;
+  margin: 24px 0 0;
   padding-left: 20px;
   border-left: 2px solid var(--lime);
   color: var(--muted-strong);
@@ -339,12 +339,12 @@ body[data-app-state="error"] .status-line__pulse {
 .hero__stamp {
   display: grid;
   place-items: center;
-  width: 112px;
+  width: 90px;
   aspect-ratio: 1;
   margin-top: 7px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--line);
   border-radius: 50%;
-  color: var(--muted);
+  color: rgba(154, 166, 177, 0.56);
   transform: rotate(8deg);
 }
 
@@ -899,7 +899,7 @@ body[data-app-state="error"] .status-line__pulse {
   }
 
   .hero h1 {
-    font-size: clamp(2.35rem, 11vw, 4.2rem);
+    font-size: clamp(1.8rem, 8.5vw, 2.8rem);
   }
 
   .metrics {

@@ -198,6 +198,25 @@ test("standalone typography is Pretendard-only with tabular numerals", () => {
   assert.match(css, /font-variant-numeric\s*:\s*tabular-nums/);
 });
 
+test("analysis headline uses the approved restrained hierarchy", () => {
+  assert.match(
+    css,
+    /\.hero\s*\{[^}]*min-height\s*:\s*390px;[^}]*padding\s*:\s*64px 0 60px;/s,
+  );
+  assert.match(
+    css,
+    /\.hero h1\s*\{[^}]*max-width\s*:\s*760px;[^}]*font-size\s*:\s*clamp\(1\.9rem,\s*3\.8vw,\s*3\.45rem\);[^}]*font-weight\s*:\s*700;[^}]*line-height\s*:\s*1\.16;[^}]*letter-spacing\s*:\s*-0\.035em;/s,
+  );
+  assert.match(css, /\.coach-summary\s*\{[^}]*margin\s*:\s*24px 0 0;/s);
+  assert.match(css, /\.hero__stamp\s*\{[^}]*width\s*:\s*90px;/s);
+
+  const at720 = mediaBlocks(css, 720);
+  assert.match(
+    at720,
+    /\.hero h1\s*\{[^}]*font-size\s*:\s*clamp\(1\.8rem,\s*8\.5vw,\s*2\.8rem\);/s,
+  );
+});
+
 test("standalone layout defines 1024, 720, and 480 responsive reflows", () => {
   const at1024 = mediaBlocks(css, 1024);
   const at720 = mediaBlocks(css, 720);
