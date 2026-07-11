@@ -1,6 +1,6 @@
 # LOLGG AI 코칭 플랜 기능 보강 설계
 
-- 상태: 사용자 방향 선택 완료, 명세 검토 대기
+- 상태: 사용자 명세 승인 완료
 - 작성일: 2026-07-11
 - 선택 방향: `1. 코칭 플랜`
 - 적용 대상: `sites/app` 독립형 읽기 전용 Evidence Lab
@@ -158,14 +158,17 @@
 
 기존 `/api/samples`와 `/api/samples/:id`만 사용한다. 새로운 네트워크 요청이나 Worker 엔드포인트는 만들지 않는다.
 
-`sites/app/app.js`에는 다음 경계를 둔다.
+테스트 가능한 순수 데이터 변환과 DOM 렌더링을 다음처럼 분리한다.
 
-- `buildFocusModel(analysis)`: 약점과 대표 행동 선택
-- `buildSkillProfile(normalized)`: 여섯 역량 정규화
-- `buildPhaseModels(normalized, analysis)`: 단계 사실과 AI 요약 결합
-- `renderFocus(model)`: 포커스 카드와 근거 이동 버튼
-- `renderSkillProfile(models)`: 접근 가능한 meter 목록
-- `renderPhaseCoach(models)`: 세 단계 카드
+- `sites/app/coaching-plan.js`
+  - `buildFocusModel(analysis)`: 약점과 대표 행동 선택
+  - `findFocusMomentId(focus, moments)`: 포커스와 겹치는 첫 근거 장면 선택
+  - `buildSkillProfile(normalized)`: 여섯 역량 정규화
+  - `buildPhaseModels(normalized, analysis)`: 단계 사실과 AI 요약 결합
+- `sites/app/app.js`
+  - `renderFocus(model)`: 포커스 카드와 근거 이동 버튼
+  - `renderSkillProfile(model)`: 접근 가능한 meter 목록
+  - `renderPhaseCoach(models)`: 세 단계 카드
 
 `renderDetail()`은 각 모델 생성과 렌더 함수를 호출한다. `resetDependentPanels()`는 새 세 영역도 loading, empty, error 상태에서 초기화해 이전 경기 내용이 남지 않게 한다.
 
@@ -223,7 +226,9 @@
 - `sites/app/index.html`
 - `sites/app/styles.css`
 - `sites/app/app.js`
+- `sites/app/coaching-plan.js`
 - `sites/tests/standalone-ui.mjs`
+- `sites/tests/coaching-plan-models.mjs`
 - 필요한 경우 Sites 읽기 전용 smoke 테스트
 
 유지:
