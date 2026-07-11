@@ -6,6 +6,22 @@ function nonEmptyString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const SKILL_CATEGORIES = [
+  ["combat", "전투"],
+  ["income", "수급"],
+  ["vision", "시야"],
+  ["survival", "생존"],
+  ["objective", "오브젝트"],
+  ["structure", "구조물"],
+];
+
+function normalizedScore(value) {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  if (!Number.isFinite(number)) return null;
+  return Math.round(Math.min(10, Math.max(0, number)) * 10) / 10;
+}
+
 function uniqueEventIds(value) {
   return [...new Set(asArray(value).map(nonEmptyString).filter(Boolean))];
 }
@@ -48,4 +64,22 @@ export function findFocusMomentId(focus, moments) {
   const match = asArray(moments).find((moment) =>
     uniqueEventIds(moment?.relatedEventIds).some((eventId) => targetIds.has(eventId)));
   return nonEmptyString(match?.id);
+}
+
+export function buildSkillProfile(normalized) {
+  const score = normalized?.playtimeScore;
+  const categories = score?.categories;
+  return {
+    overall: normalizedScore(score?.overall),
+    label: nonEmptyString(score?.label),
+    categories: SKILL_CATEGORIES.map(([key, label]) => {
+      const value = normalizedScore(categories?.[key]);
+      return {
+        key,
+        label,
+        value,
+        displayValue: value == null ? "측정 없음" : value.toFixed(1),
+      };
+    }),
+  };
 }

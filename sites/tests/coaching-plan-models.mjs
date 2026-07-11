@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildFocusModel,
+  buildSkillProfile,
   findFocusMomentId,
 } from "../app/coaching-plan.js";
 
@@ -57,4 +58,43 @@ test("findFocusMomentId returns the first intersecting moment and safe fallback"
   assert.equal(findFocusMomentId(focus, moments), "km_2");
   assert.equal(findFocusMomentId({ relatedEventIds: ["evt_x"] }, moments), "");
   assert.equal(findFocusMomentId(null, moments), "");
+});
+
+test("buildSkillProfile returns six ordered, clamped coaching scores", () => {
+  const model = buildSkillProfile({
+    playtimeScore: {
+      overall: 11.24,
+      label: "우수",
+      categories: {
+        combat: -2,
+        income: 4.94,
+        vision: 10,
+        survival: null,
+        objective: "7.2",
+      },
+    },
+  });
+
+  assert.equal(model.overall, 10);
+  assert.equal(model.label, "우수");
+  assert.deepEqual(
+    model.categories.map(({ key, label, value, displayValue }) => ({
+      key, label, value, displayValue,
+    })),
+    [
+      { key: "combat", label: "전투", value: 0, displayValue: "0.0" },
+      { key: "income", label: "수급", value: 4.9, displayValue: "4.9" },
+      { key: "vision", label: "시야", value: 10, displayValue: "10.0" },
+      { key: "survival", label: "생존", value: null, displayValue: "측정 없음" },
+      { key: "objective", label: "오브젝트", value: 7.2, displayValue: "7.2" },
+      { key: "structure", label: "구조물", value: null, displayValue: "측정 없음" },
+    ],
+  );
+});
+
+test("buildSkillProfile keeps an explicit all-missing profile", () => {
+  const model = buildSkillProfile({});
+  assert.equal(model.overall, null);
+  assert.equal(model.categories.length, 6);
+  assert.ok(model.categories.every((category) => category.value === null));
 });

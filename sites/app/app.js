@@ -1,5 +1,6 @@
 import {
   buildFocusModel,
+  buildSkillProfile,
   findFocusMomentId,
 } from "./coaching-plan.js";
 
@@ -12,6 +13,7 @@ const elements = {
   headline: document.querySelector("[data-analysis-headline]"),
   coachSummary: document.querySelector("[data-coach-summary]"),
   metrics: document.querySelector("[data-evidence-metrics]"),
+  skillProfile: document.querySelector("[data-skill-profile]"),
   focusContent: document.querySelector("[data-focus-content]"),
   evidenceTitle: document.querySelector("#evidence-title"),
   moments: document.querySelector("[data-evidence-moments]"),
@@ -181,6 +183,39 @@ function renderMatchOverview(detail) {
         </article>`,
     )
     .join("");
+}
+
+function renderSkillProfile(model) {
+  const overallCopy = model.overall == null
+    ? "종합 측정 없음"
+    : `종합 ${model.overall.toFixed(1)} / 10${model.label ? ` · ${model.label}` : ""}`;
+
+  elements.skillProfile.innerHTML = `
+    <p class="skill-profile__overall">${escapeHtml(overallCopy)}</p>
+    <div class="skill-profile__rows">
+      ${model.categories.map((category) => {
+        if (category.value == null) {
+          return `
+            <div class="skill-row skill-row--missing">
+              <span>${escapeHtml(category.label)}</span>
+              <strong>측정 없음</strong>
+            </div>`;
+        }
+        return `
+          <div class="skill-row">
+            <span>${escapeHtml(category.label)}</span>
+            <div class="skill-meter"
+              role="meter"
+              aria-label="${escapeHtml(category.label)}"
+              aria-valuemin="0"
+              aria-valuemax="10"
+              aria-valuenow="${category.value.toFixed(1)}">
+              <span style="--skill-value: ${category.value * 10}%"></span>
+            </div>
+            <strong>${escapeHtml(category.displayValue)}</strong>
+          </div>`;
+      }).join("")}
+    </div>`;
 }
 
 function getMoments(analysis) {
@@ -414,6 +449,7 @@ function renderDetail(detail) {
   renderMatchOverview(detail);
   renderMoments(detail);
   renderFocus(buildFocusModel(detail?.analysis));
+  renderSkillProfile(buildSkillProfile(detail?.normalized));
   renderProtocols(detail?.analysis);
   renderTrace(detail?.analysis, detail?.normalized);
 }
@@ -437,6 +473,9 @@ function resetDependentPanels(mode = "empty") {
   elements.focusContent.innerHTML = `<p class="empty-copy">${isLoading
     ? "다음 게임 포커스를 불러오는 중입니다."
     : "표시할 코칭 포커스가 없습니다."}</p>`;
+  elements.skillProfile.innerHTML = `<p class="empty-copy">${isLoading
+    ? "역량 점수를 불러오는 중입니다."
+    : "표시할 역량 점수가 없습니다."}</p>`;
   elements.moments.innerHTML = `<p class="empty-copy">${isLoading ? "핵심 장면을 불러오는 중입니다." : "표시할 핵심 장면이 없습니다."}</p>`;
   elements.observedList.innerHTML = `<li>${isLoading ? "타임라인 근거를 불러오는 중입니다." : "연결된 타임라인 근거가 없습니다."}</li>`;
   elements.interpretation.textContent = isLoading ? "AI 해석을 불러오는 중입니다." : "표시할 AI 해석이 없습니다.";

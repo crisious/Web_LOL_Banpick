@@ -135,6 +135,29 @@ test("next-game focus links one coaching action to its evidence", () => {
   assert.match(at1024, /\.focus-card\s*\{[^}]*grid-template-columns\s*:\s*1fr;/s);
 });
 
+test("skill profile exposes six accessible internal coaching meters", () => {
+  assert.match(html, /<section\b[^>]*class="skill-profile"[^>]*aria-labelledby="skill-profile-title"/i);
+  assert.match(html, /data-skill-profile/);
+  assert.match(appJs, /buildSkillProfile/);
+  assert.match(appJs, /role="meter"/);
+  assert.match(appJs, /aria-valuemin="0"/);
+  assert.match(appJs, /aria-valuemax="10"/);
+  assert.match(appJs, /aria-valuenow=/);
+  assert.match(appJs, /측정 없음/);
+  assert.ok(
+    `${html}\n${appJs}`.includes("티어 평균이나 백분위가 아닌"),
+    "profile must identify the numbers as internal coaching scores",
+  );
+
+  const at1024 = mediaBlocks(css, 1024);
+  assert.match(at1024, /\.skill-profile\s*\{[^}]*grid-template-columns\s*:\s*1fr;/s);
+  const at480 = mediaBlocks(css, 480);
+  assert.match(
+    at480,
+    /\.skill-row\s*\{[^}]*grid-template-columns\s*:\s*64px minmax\(0,\s*1fr\) 40px;/s,
+  );
+});
+
 test("sample and evidence-moment selection use native controls", () => {
   const sampleSelect = tagWithAttribute(html, "data-sample-select");
   assert.match(sampleSelect, /^<select\b/i);
