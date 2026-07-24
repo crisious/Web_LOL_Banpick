@@ -1,4 +1,5 @@
 .DS_Store
+.idea/
 .env
 *.log
 .claude/settings.local.json
@@ -9,3 +10,4 @@ test-artifacts/design-audit/
 .worktrees/
 test-artifacts/layout-redesign/
 test-artifacts/design-bundle/
+test-artifacts/tmp/
