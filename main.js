@@ -2005,10 +2005,11 @@ function hasMatchListContext() {
   return Array.isArray(state.recentMatches) && state.recentMatches.length > 0;
 }
 
-function bootstrapEntryMode({ hasSavedAccount, hasStoredSample, serverMode }) {
-  if (hasSavedAccount) return "saved-account";
-  if (serverMode === "full" && hasStoredSample) return "internal-sample";
-  return "logged-out";
+// 저장된 계정이 없으면 항상 로그인 화면으로 보낸다. 상세 화면에는 로그인
+// 오버레이도 "다른 계정" 버튼도 없어서, 거기로 직행시키면 Riot 계정을
+// 입력·변경할 방법이 사라진다. 샘플은 로그인 화면의 "저장 샘플 열기"로 연다.
+function bootstrapEntryMode({ hasSavedAccount }) {
+  return hasSavedAccount ? "saved-account" : "logged-out";
 }
 
 function serverModeUi(status, error) {
@@ -2078,33 +2079,6 @@ function isLiveControlLocked() {
 
 function liveControlLockedMessage() {
   return currentServerModeUi().liveControlMessage || "현재 모드에서는 라이브 Riot 조회를 사용할 수 없습니다.";
-}
-
-async function openInternalLandingSample() {
-  const sample = firstManifestSample();
-  if (!sample) return false;
-
-  setDetailProgress("lookup", {
-    message: `${sample.id} 내부 개발 기본 리포트를 불러오고 있습니다.`,
-    progress: 32,
-    skippedSteps: ["riot", "ai"],
-  });
-  setView("LOADING_DETAIL");
-
-  try {
-    await selectSample(sample.id);
-    setView("DETAIL_VIEW");
-    completeDetailProgress("내부 개발용 기본 리포트를 열었습니다.");
-    if (dom.loginStatus) dom.loginStatus.textContent = "";
-    return true;
-  } catch (error) {
-    failDetailProgress(formatRetryMessage(error));
-    setView("LOGGED_OUT");
-    if (dom.loginStatus) {
-      dom.loginStatus.textContent = `기본 리포트 열기 실패: ${formatRetryMessage(error)}`;
-    }
-    return false;
-  }
 }
 
 function renderLoginDemoStatus() {
@@ -4762,19 +4736,13 @@ async function init() {
   }
 
   const saved = loadSavedAccount();
-  const entryMode = bootstrapEntryMode({
-    hasSavedAccount: Boolean(saved),
-    hasStoredSample: Boolean(firstManifestSample()),
-    serverMode: currentServerModeUi().mode,
-  });
+  const entryMode = bootstrapEntryMode({ hasSavedAccount: Boolean(saved) });
 
   if (entryMode === "saved-account" && saved) {
     dom.loginForm.querySelector("[name=gameName]").value = saved.gameName;
     dom.loginForm.querySelector("[name=tagLine]").value = saved.tagLine;
     if (saved.platformRegion) dom.loginForm.querySelector("[name=platformRegion]").value = saved.platformRegion;
     handleLogin();
-  } else if (entryMode === "internal-sample") {
-    await openInternalLandingSample();
   } else {
     setView("LOGGED_OUT");
   }

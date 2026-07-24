@@ -1,7 +1,8 @@
-// Internal landing entry regression tests.
+// Boot entry-mode regression tests.
 //
-// Local/full mode should open an internal stored-sample view when no saved
-// account exists, while external demo modes should keep the login entry flow.
+// 저장된 계정이 없으면 어떤 서버 모드에서도 로그인 화면으로 진입해야 한다.
+// 과거 full 모드에서 저장 샘플이 있으면 상세 화면으로 직행했는데, 그 화면에는
+// 로그인 오버레이도 "다른 계정" 버튼도 없어 Riot 계정을 바꿀 수단이 사라졌다.
 
 import fs from "fs";
 
@@ -76,9 +77,9 @@ check(
   "saved-account",
 );
 check(
-  "full mode with stored sample uses internal sample entry",
+  "full mode with stored sample still starts logged out so the account can be entered",
   bootstrapEntryMode({ hasSavedAccount: false, hasStoredSample: true, serverMode: "full" }),
-  "internal-sample",
+  "logged-out",
 );
 check(
   "readonly mode keeps logged-out entry",
@@ -99,7 +100,14 @@ check(
 check("hasMatchListContext false for empty recent matches", hasMatchListContext(), false);
 
 checkTrue("init awaits health before deciding entry", mainSrc.includes("await loadServerStatus();"));
-checkTrue("init can open internal landing sample", mainSrc.includes("await openInternalLandingSample();"));
+checkTrue(
+  "internal landing sample entry is fully removed",
+  !mainSrc.includes("openInternalLandingSample") && !mainSrc.includes("internal-sample"),
+);
+checkTrue(
+  "logged-out entry renders the login overlay",
+  mainSrc.includes('setView("LOGGED_OUT")'),
+);
 checkTrue("back button hides without match list context", mainSrc.includes("dom.backToListBtn.hidden = !hasList;"));
 
 console.log(`\n${pass} passed, ${fail} failed`);
