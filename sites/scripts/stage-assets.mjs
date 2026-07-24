@@ -58,7 +58,13 @@ function validatedSampleAssetPath(sample, fieldName, expectedBasename) {
 }
 
 function sanitizeManifestSample(sample) {
-  const { matchId: _matchId, notesPath: _notesPath, ...publicSample } = sample;
+  // publicAlias 는 이름과 달리 실제 Riot ID(Name#TAG)를 담고 있어 공개 번들에서 제외한다.
+  const {
+    matchId: _matchId,
+    notesPath: _notesPath,
+    publicAlias: _publicAlias,
+    ...publicSample
+  } = sample;
   return publicSample;
 }
 
@@ -75,6 +81,34 @@ function sanitizeNormalized(normalized) {
     delete sanitized.matchInfo.matchId;
   }
   return sanitized;
+}
+
+const privateIdentifierKeys = new Set([
+  "puuid",
+  "riotId",
+  "playerRiotId",
+  "matchId",
+  "rawMatchId",
+  "summonerName",
+  "gameName",
+  "tagLine",
+  "summonerId",
+  "accountId",
+]);
+
+// analysis-result.json 은 analysisMeta.*, comparison-result.json 은
+// claudeAnalysis.analysisMeta.* 로 같은 필드가 서로 다른 깊이에 있다.
+// 경로를 지정하면 스키마가 한 겹 바뀔 때 조용히 새므로 키 기준으로 재귀 제거한다.
+function stripPrivateIdentifiers(value) {
+  if (Array.isArray(value)) return value.map(stripPrivateIdentifiers);
+  if (!value || typeof value !== "object") return value;
+
+  const cleaned = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (privateIdentifierKeys.has(key)) continue;
+    cleaned[key] = stripPrivateIdentifiers(entry);
+  }
+  return cleaned;
 }
 
 async function writeJson(filePath, value) {
@@ -114,12 +148,10 @@ async function stageSample(sample) {
     path.join(temporaryOutputRoot, normalizedAsset.relativePath),
     sanitizeNormalized(normalized),
   );
-  const analysisRaw = readCommittedFile(analysisAsset.relativePath);
-  JSON.parse(analysisRaw);
-  await writeFile(
+  const analysis = JSON.parse(readCommittedFile(analysisAsset.relativePath));
+  await writeJson(
     path.join(temporaryOutputRoot, analysisAsset.relativePath),
-    analysisRaw,
-    "utf8",
+    stripPrivateIdentifiers(analysis),
   );
 
   const comparisonRelativePath = normalizedAsset.relativePath.replace(
@@ -128,11 +160,9 @@ async function stageSample(sample) {
   );
   const comparisonRaw = readCommittedFile(comparisonRelativePath, { optional: true });
   if (comparisonRaw != null) {
-    JSON.parse(comparisonRaw);
-    await writeFile(
+    await writeJson(
       path.join(temporaryOutputRoot, comparisonRelativePath),
-      comparisonRaw,
-      "utf8",
+      stripPrivateIdentifiers(JSON.parse(comparisonRaw)),
     );
   }
 }

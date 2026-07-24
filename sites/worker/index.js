@@ -62,8 +62,14 @@ async function readOptionalJsonAsset(request, env, publicPath) {
 function publicManifest(manifest) {
   return {
     ...manifest,
-    samples: (manifest.samples || []).map(({ matchId: _matchId, notesPath: _notesPath, ...sample }) =>
-      sample
+    samples: (manifest.samples || []).map(
+      ({
+        matchId: _matchId,
+        notesPath: _notesPath,
+        // publicAlias 는 실제 Riot ID(Name#TAG)를 담고 있어 공개 응답에서 제외한다.
+        publicAlias: _publicAlias,
+        ...sample
+      }) => sample,
     ),
   };
 }
@@ -113,7 +119,6 @@ async function handleSampleDetail(request, env, pathname) {
 
   return json({
     sampleId: sample.id,
-    publicAlias: sample.publicAlias,
     collectedDate: sample.collectedDate,
     theme: sample.theme,
     normalized,
@@ -147,7 +152,7 @@ const worker = {
       }
 
       if (url.pathname.startsWith(SAMPLE_DETAIL_PREFIX) && request.method === "GET") {
-        return handleSampleDetail(request, env, url.pathname);
+        return await handleSampleDetail(request, env, url.pathname);
       }
 
       if (READ_ONLY_ENDPOINTS.has(url.pathname)) {
@@ -158,7 +163,7 @@ const worker = {
         return json({ ok: false, error: "Not found." }, 404);
       }
 
-      return env.ASSETS.fetch(request);
+      return await env.ASSETS.fetch(request);
     } catch (error) {
       console.error("Sites worker request failed", error);
       return json(

@@ -65,6 +65,39 @@ async function listFiles(root, relative = "") {
   return files.sort();
 }
 
+const privateIdentifierKeys = new Set([
+  "puuid",
+  "riotId",
+  "playerRiotId",
+  "matchId",
+  "rawMatchId",
+  "summonerName",
+  "gameName",
+  "tagLine",
+  "summonerId",
+  "accountId",
+]);
+
+// 스테이징 산출물은 공개 배포물이라 식별자가 어느 깊이에 있든 남으면 안 된다.
+// analysis-result.json 은 analysisMeta.*, comparison-result.json 은
+// claudeAnalysis.analysisMeta.* 로 깊이가 다르므로 경로 지정 대신 재귀로 훑는다.
+function collectPrivateIdentifierPaths(value, trail = "") {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry, index) =>
+      collectPrivateIdentifierPaths(entry, `${trail}[${index}]`),
+    );
+  }
+  if (!value || typeof value !== "object") return [];
+
+  const paths = [];
+  for (const [key, entry] of Object.entries(value)) {
+    const nextTrail = trail ? `${trail}.${key}` : key;
+    if (privateIdentifierKeys.has(key)) paths.push(nextTrail);
+    paths.push(...collectPrivateIdentifierPaths(entry, nextTrail));
+  }
+  return paths;
+}
+
 function stagedPathFromPublicPath(stageRoot, publicPath, sampleId, fieldName) {
   assert.equal(typeof publicPath, "string", `${sampleId}.${fieldName} must be a string`);
   assert.ok(
@@ -289,11 +322,56 @@ test("the explicit staging script creates a sanitized read-only Sites bundle", a
     }
   });
 
+  await t.test("removes private identifiers from analysis and comparison payloads", async () => {
+    for (const sample of manifest.samples) {
+      const analysisPath = stagedPathFromPublicPath(
+        stageRoot,
+        sample.analysisPath,
+        sample.id,
+        "analysisPath",
+      );
+      const analysis = JSON.parse(await readFile(analysisPath, "utf8"));
+      assert.deepEqual(
+        collectPrivateIdentifierPaths(analysis),
+        [],
+        `${sample.id} must remove private identifiers from analysis-result.json`,
+      );
+
+      const comparisonPath = path.join(path.dirname(analysisPath), "comparison-result.json");
+      if (!(await isFile(comparisonPath))) continue;
+      const comparison = JSON.parse(await readFile(comparisonPath, "utf8"));
+      assert.deepEqual(
+        collectPrivateIdentifierPaths(comparison),
+        [],
+        `${sample.id} must remove private identifiers from comparison-result.json`,
+      );
+    }
+  });
+
   await t.test("removes private fields from the staged manifest", () => {
     for (const sample of manifest.samples) {
       assert.ok(!Object.hasOwn(sample, "matchId"), `${sample.id} must remove manifest matchId`);
       assert.ok(!Object.hasOwn(sample, "notesPath"), `${sample.id} must remove manifest notesPath`);
+      assert.ok(
+        !Object.hasOwn(sample, "publicAlias"),
+        `${sample.id} must remove manifest publicAlias`,
+      );
     }
+  });
+
+  // publicAlias 를 지워도 같은 값이 다른 필드명으로 다시 들어올 수 있으므로
+  // 키가 아니라 값 모양(Name#TAG)으로도 한 번 더 막는다.
+  await t.test("staged manifest carries no Riot ID shaped values", async () => {
+    const staged = await readFile(
+      path.join(stageRoot, "data", "samples", "manifest.json"),
+      "utf8",
+    );
+    const riotIdLike = staged.match(/"[^"]*#[A-Za-z0-9]{2,5}"/gu) ?? [];
+    assert.deepEqual(
+      riotIdLike,
+      [],
+      `staged manifest must not expose Riot IDs: ${riotIdLike.join(", ")}`,
+    );
   });
 });
 
