@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8255072093_1781227730577",
+    "generatedAt": "2026-06-12T01:28:50.578Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "라이즈로 초중반 솔로킬 우위를 만들고 14/7/7과 분당 8.6 CS로 후반 캐리에 성공했지만, 중반 오브젝트 구도 전후의 연속 데스가 경기를 길게 끌었던 승리."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 두 차례 솔로 처치(5:25, 12:56)로 라인 주도권을 확실히 잡았고, 후반에는 8킬 3데스로 한타와 사이드 운영을 주도해 바론 2회·타워 10개의 승리 조건을 완성했다. 다만 중반 18~28분 구간에서 4데스가 집중되며 오브젝트 셋업 실패(17:28, 23:55)와 맞물려 흐름이 흔들렸다. 드래곤·바론 타이밍 합류 자체는 좋았으나, 교전 직후 포지셔닝과 시야 확보가 다음 게임의 핵심 개선 포인트다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2킬 0데스로 라인전을 완벽히 가져갔다. 5:25과 12:56 솔로 처치로 미드 주도권을 확보하며 라이즈의 스케일링 타이밍을 앞당겼다."
+    },
+    {
+      "phase": "MID",
+      "summary": "4킬 4데스로 가장 기복이 컸던 구간. 드래곤 합류(22:49, 28:24)와 솔로 처치(25:02, 26:01, 27:20)는 좋았지만, 18:45·20:11·23:20·28:24 데스가 오브젝트 셋업 실패와 연결되며 리드 굳히기가 늦어졌다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "8킬 3데스로 경기를 닫았다. 바론 2회(31:03, 37:14) 확보와 타워 압박(31:55)을 통해 승리 조건을 구조물로 전환했고, 후반 한타 영향력이 압도적이었다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "초반 라인전 솔로킬 능력",
+      "description": "5:25과 12:56 두 차례 솔로 처치로 0데스 라인전을 완성했다. 라이즈의 약한 초반 구간을 오히려 우위로 만든 점이 이번 경기 승리의 출발점이었다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_004"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "오브젝트 타이밍 합류",
+      "description": "드래곤 교전(22:49, 28:24, 33:39)마다 빠짐없이 합류해 팀이 드래곤 4 대 1 우위를 만드는 데 기여했다. 사이드에서 오브젝트로 전환하는 템포 감각이 좋았다.",
+      "relatedEventIds": [
+        "evt_014",
+        "evt_028",
+        "evt_040"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "후반 캐리력과 마무리",
+      "description": "후반에 8킬 3데스로 팀 화력을 책임졌고(총 딜량 44,880), 바론과 타워 압박 구간에서 승리 조건을 구조물로 전환하며 39분 게임을 닫았다.",
+      "relatedEventIds": [
+        "evt_034",
+        "evt_037",
+        "evt_045"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "중반 연속 데스로 인한 스노우볼 정체",
+      "description": "18:45부터 23:20까지 약 5분 사이 3데스를 기록했다. 초반 리드를 가진 상태에서 무리한 단독 교전이 반복되며 골드 우위를 굳히지 못했다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_011",
+        "evt_016"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 전후 생존 관리",
+      "description": "드래곤 교전 직후인 28:24에 데스가 발생했고, 오브젝트 셋업 실패(17:28, 23:55)와 데스 타이밍이 겹쳤다. 오브젝트 교전 후 점멸·룬 감옥 쿨다운 상태에서 물러나는 판단이 부족했다.",
+      "relatedEventIds": [
+        "evt_028",
+        "evt_029",
+        "evt_017"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "후반 핵심 구도 포지셔닝 리스크",
+      "description": "바론 직후 31:40과 35:32 데스는 경기를 내줄 수 있는 타이밍이었다. 킬 관여율 47%에 비해 데스 7회는 캐리 역할 대비 노출이 잦았다는 신호다.",
+      "relatedEventIds": [
+        "evt_036",
+        "evt_044"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "리드를 잡은 중반에는 솔로 교전 대신 시야 기반 푸시-합류 사이클을 유지한다(데스 없는 15~25분 목표).",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "오브젝트 교전 직후 10초간은 추격·사이드 복귀 전에 스킬/스펠 쿨다운을 확인하고 안전 지역으로 빠진다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "오브젝트 셋업 1분 전 강가·진입로에 와드 2개 이상 선설치를 루틴화한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_4",
+      "text": "후반 한타에서는 상대 진입기가 빠진 것을 확인한 뒤 사거리 끝에서 딜을 시작한다(바론 버프 상태 데스 0 목표).",
+      "linkedWeaknessId": "wk_3"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "5:25",
+      "phase": "EARLY",
+      "title": "첫 솔로킬로 라인 주도권 확보",
+      "description": "초반 솔로 처치로 미드 주도권을 잡으며 라이즈의 성장 곡선을 앞당겼다. 이 리드가 경기 전체의 토대가 됐다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "18:45",
+      "phase": "MID",
+      "title": "중반 첫 데스로 흐름 흔들림",
+      "description": "킬과 데스를 맞바꾼 교전 이후 20:11, 23:20 데스로 이어지는 중반 슬럼프의 시작점이었다. 리드 상태에서의 교전 선택 기준을 점검할 장면.",
+      "relatedEventIds": [
+        "evt_008",
+        "evt_009"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "28:24",
+      "phase": "MID",
+      "title": "드래곤 교전 승리 직후 데스",
+      "description": "드래곤 템포는 챙겼지만 직후 데스로 이득을 일부 반납했다. 오브젝트 확보 후 물러나는 타이밍 판단이 필요했던 순간.",
+      "relatedEventIds": [
+        "evt_028",
+        "evt_029"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "31:03",
+      "phase": "LATE",
+      "title": "첫 바론 확보로 승기 전환",
+      "description": "바론 확보와 타워 압박(31:55)으로 승리 조건이 구조물로 전환됐다. 이후 후반 8킬 캐리의 발판이 된 장면.",
+      "relatedEventIds": [
+        "evt_034",
+        "evt_037"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "37:14",
+      "phase": "LATE",
+      "title": "두 번째 바론으로 경기 마무리",
+      "description": "두 번째 바론 확보로 상대의 역전 가능성을 차단하고 39:45에 경기를 닫았다.",
+      "relatedEventIds": [
+        "evt_045"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "초반 라인전 솔로킬",
+      "playerDecision": "5:25 라인전에서 솔로 교전을 열어 데스 없이 킬을 가져왔다.",
+      "takeaway": "초반 솔로킬 각이 나오는 매치업에서는 이번처럼 적극적으로 주도권을 가져가도 좋다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "초반 종료 시점 추가 솔로킬",
+      "playerDecision": "12:56 다시 한 번 단독 교전에서 킬을 추가하며 라인 격차를 벌렸다.",
+      "takeaway": "두 번째 솔로킬 이후에는 로밍이나 시야 장악으로 리드를 팀 전체로 확산시키는 선택지를 고려하자.",
+      "relatedEventIds": [
+        "evt_004"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situation": "TRADED",
+      "situationLabel": "중반 1:1 맞교환 교전",
+      "playerDecision": "18:40 교전에서 킬을 가져왔지만 18:45 곧바로 데스를 내주며 이득을 상쇄했다.",
+      "takeaway": "리드 상태에서는 맞교환도 손해다. 킬 확정 후 추가 교전 없이 빠지는 디스인게이지를 우선하자.",
+      "relatedEventIds": [
+        "evt_008",
+        "evt_009"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "중반 단독 데스",
+      "playerDecision": "20:11 시야가 부족한 구도에서 단독으로 잡히며 일방적으로 데스를 내줬다.",
+      "takeaway": "직전 데스(18:45) 이후엔 상대가 미드를 노린다고 가정하고, 정글 위치 확인 전까지 라인을 깊게 밀지 말자.",
+      "relatedEventIds": [
+        "evt_011"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "오브젝트 셋업 구간 cut off",
+      "playerDecision": "23:20 오브젝트 셋업 직전 타이밍에 잘리면서 23:55 셋업 실패로 이어졌다.",
+      "takeaway": "오브젝트 1분 전에는 단독 이동을 피하고 팀과 동선을 맞춰 진입하자. 잘리면 오브젝트까지 같이 넘어간다.",
+      "relatedEventIds": [
+        "evt_016"
+      ]
+    },
+    {
+      "encounterId": "enc_006",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "중반 반격 솔로 처치",
+      "playerDecision": "25:02 교전에서 데스 없이 킬을 가져오며 중반 슬럼프를 끊어냈다.",
+      "takeaway": "이런 식의 안전한 킬 각 선별이 중반 운영의 정답이다. 이 기준을 18~23분 구간에도 적용하자.",
+      "relatedEventIds": [
+        "evt_018"
+      ]
+    },
+    {
+      "encounterId": "enc_007",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "연속 우위 교전",
+      "playerDecision": "26:01 다시 우위 교전을 만들어 킬을 추가했고, 직후 타워 압박(26:39)으로 연결됐다.",
+      "takeaway": "킬을 구조물 이득으로 전환한 좋은 사이클이다. 킬 이후 곧바로 푸시-구조물로 잇는 패턴을 유지하자.",
+      "relatedEventIds": [
+        "evt_020"
+      ]
+    },
+    {
+      "encounterId": "enc_008",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "드래곤 셋업 전 선제 킬",
+      "playerDecision": "27:20 드래곤(28:24) 전 선제 킬로 수적 우위를 만들었다.",
+      "takeaway": "오브젝트 전 선제 픽은 최상의 셋업이다. 다만 직후 교전(28:24 데스)까지 고려해 쿨다운 관리도 함께 챙기자.",
+      "relatedEventIds": [
+        "evt_025"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "5:25 초반 첫 솔로 처치"
+    },
+    {
+      "eventId": "evt_004",
+      "shortNote": "12:56 두 번째 솔로 처치로 라인 격차 확대"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "18:45 중반 첫 데스, 슬럼프 시작"
+    },
+    {
+      "eventId": "evt_011",
+      "shortNote": "20:11 단독 데스"
+    },
+    {
+      "eventId": "evt_016",
+      "shortNote": "23:20 오브젝트 셋업 전 cut off"
+    },
+    {
+      "eventId": "evt_017",
+      "shortNote": "23:55 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_028",
+      "shortNote": "28:24 드래곤 교전 합류"
+    },
+    {
+      "eventId": "evt_029",
+      "shortNote": "28:24 드래곤 직후 데스"
+    },
+    {
+      "eventId": "evt_034",
+      "shortNote": "31:03 첫 바론 확보"
+    },
+    {
+      "eventId": "evt_036",
+      "shortNote": "31:40 바론 직후 데스"
+    },
+    {
+      "eventId": "evt_044",
+      "shortNote": "35:32 후반 포지셔닝 데스"
+    },
+    {
+      "eventId": "evt_045",
+      "shortNote": "37:14 두 번째 바론으로 마무리"
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8253419762_1781134890420",
+    "generatedAt": "2026-06-10T23:41:30.420Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "초반 데스 누적에도 시야 점수 133과 어시스트 23으로 팀의 바론·구조물 템포를 견인하며 34분 승리를 만든 렐 서포터 경기였다."
+  },
+  "coachSummary": {
+    "overallSummary": "초반(1/2/4)은 오브젝트 셋업 실패와 솔로 데스로 흔들렸지만, 중반부터 드래곤·바론 합류와 어시스트 11개로 팀 교전을 안정적으로 받쳤다. 다만 20:50, 24:07, 30:14처럼 핵심 구도 직전·직후 데스가 반복되어 운영 템포가 끊길 뻔한 장면이 있었고, 후반에는 바론(31:54)과 연속 타워 철거(33:30~33:52)에 관여하며 승리 조건을 구조물로 전환해 경기를 마무리했다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "7:56과 10:20 솔로 데스 2회와 8:38, 14:05 오브젝트 셋업 실패로 초반 흐름이 불안정했다. 다만 11:58 교전에서 킬을 만들어내며 라인전 후반 반등의 발판은 마련했다."
+    },
+    {
+      "phase": "MID",
+      "summary": "19:18 드래곤 합류를 시작으로 어시스트 11개를 쌓으며 팀 교전의 중심이 됐다. 24:51 바론과 26:35, 29:51 타워 압박으로 흐름을 가져왔지만, 20:50과 24:07 데스처럼 오브젝트 전후 포지셔닝 리스크가 노출됐다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "30:14 데스와 30:48 오브젝트 손실로 잠시 흔들렸으나, 31:54 바론 확보 후 33:30~33:52 연속 타워 철거에 직접 관여하며 게임을 깔끔하게 닫았다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "압도적인 시야 장악력",
+      "description": "시야 점수 133은 34분 경기 기준 매우 높은 수치로, 중후반 드래곤(19:18)·바론(31:54) 타이밍마다 팀이 안전하게 오브젝트를 시도할 수 있는 기반을 만들었다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_039"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "오브젝트 템포 합류 판단",
+      "description": "19:18 드래곤, 31:54 바론 등 핵심 오브젝트 타이밍에 빠짐없이 합류했고, 어시스트 23개로 팀 교전 개시와 보호 역할을 동시에 수행했다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_024",
+        "evt_039"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "구조물 전환 마무리 능력",
+      "description": "바론 버프 이후 26:35, 29:51, 33:30, 33:52 타워 철거에 직접 관여하며 교전 우위를 승리 조건(구조물)으로 환산하는 운영 감각을 보여줬다.",
+      "relatedEventIds": [
+        "evt_031",
+        "evt_034",
+        "evt_042",
+        "evt_045"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "초반 라인전 단계 데스 누적",
+      "description": "7:56, 10:20 두 차례 솔로 데스로 초반 2데스를 기록했고, 같은 시간대 8:38, 14:05 오브젝트 셋업 실패와 맞물려 팀 초반 흐름이 흔들렸다. 갱킹·로밍 위험 시간대 진입 각 판단을 점검할 필요가 있다.",
+      "relatedEventIds": [
+        "evt_002",
+        "evt_008"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "중반 핵심 구도 전후 생존 실패",
+      "description": "20:50, 24:07 데스는 모두 바론·드래곤 구도 직전 시간대에 발생해 팀이 수적 열세로 오브젝트를 다툴 위험을 만들었다. 렐은 진입 후 탈출 수단이 제한적이므로 이니시 각과 백업 거리를 함께 계산해야 한다.",
+      "relatedEventIds": [
+        "evt_015",
+        "evt_020"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "후반 결정 구도 포지셔닝 리스크",
+      "description": "30:14 데스 직후 30:48 오브젝트를 내주며 다 이긴 흐름이 한 번 끊겼다. 후반에는 데스 한 번이 바론·장로로 직결되므로, 시야 작업 시에도 팀과의 거리를 유지하는 습관이 필요하다.",
+      "relatedEventIds": [
+        "evt_036",
+        "evt_037"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "2~10분 갱킹 위험 시간대에는 강 부쉬 핑크 와드를 먼저 박고, 정글 위치 확인 전에는 딥 와딩·로밍 진입을 자제한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "오브젝트 스폰 1분 전에는 단독 행동을 멈추고 팀과 함께 시야를 잡는다. 이니시는 백업이 2초 내 도달 가능한 거리에서만 시도한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "25분 이후 시야 작업은 미니언 라인과 팀원 위치를 먼저 확인하고, 혼자 깊은 시야를 잡지 않는다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "이니시 직전 'W 진입 → E 연결 → 탈출 경로' 순서를 머릿속으로 그린 뒤 들어간다. 탈출 경로가 없으면 진입하지 않는다.",
+      "linkedWeaknessId": "wk_2"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "11:58",
+      "phase": "EARLY",
+      "title": "초반 부진을 끊은 반격 킬",
+      "description": "두 차례 데스로 흔들리던 초반 흐름에서 11:58 교전 킬을 만들어내며 라인전 분위기를 회복했다.",
+      "relatedEventIds": [
+        "evt_006"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "19:18",
+      "phase": "MID",
+      "title": "드래곤 합류로 중반 템포 시작",
+      "description": "드래곤 타이밍에 정확히 합류하며 중반 어시스트 11개 행진의 시작점을 만들었다.",
+      "relatedEventIds": [
+        "evt_012"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "24:07",
+      "phase": "MID",
+      "title": "바론 직전 데스로 흔들린 구도",
+      "description": "24:07 데스 직후 24:51 바론 구도가 열렸다. 팀이 바론을 확보해 위기를 넘겼지만, 오브젝트 직전 데스는 게임을 던질 수 있는 리스크였다.",
+      "relatedEventIds": [
+        "evt_020",
+        "evt_024"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "31:54",
+      "phase": "LATE",
+      "title": "두 번째 바론으로 승부 결정",
+      "description": "30:14 데스와 30:48 오브젝트 손실로 흔들린 흐름을 31:54 바론 확보 관여로 되찾았고, 이후 연속 타워 철거의 발판이 됐다.",
+      "relatedEventIds": [
+        "evt_039"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "33:30~33:52",
+      "phase": "LATE",
+      "title": "연속 타워 철거로 경기 마무리",
+      "description": "바론 버프를 활용해 33:30, 33:48, 33:52 세 차례 타워 철거에 관여하며 승리를 확정지었다.",
+      "relatedEventIds": [
+        "evt_042",
+        "evt_044",
+        "evt_045"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "초반 라인전 단계 솔로 데스",
+      "playerDecision": "7:56 라인전 교전에서 킬 없이 데스를 내주며 초반 불안정의 시작점이 됐다.",
+      "takeaway": "라인전 단계에서는 상대 스킬 쿨다운과 정글 위치를 확인한 뒤에만 진입 각을 잡는다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "초반 연속 데스로 흐름 손실",
+      "playerDecision": "10:20 다시 단독으로 잘리며 초반 2데스가 누적됐고, 직후 오브젝트 셋업에도 부담을 줬다.",
+      "takeaway": "한 번 잘린 직후에는 무리한 복수 각 대신 와드 정비와 안전한 합류를 우선한다.",
+      "relatedEventIds": [
+        "evt_004"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "라인전 후반 반격 킬",
+      "playerDecision": "11:58 교전에서 킬을 만들어내며 데스 없이 우위를 가져와 초반 분위기를 회복했다.",
+      "takeaway": "이렇게 백업과 시야가 확보된 상황의 이니시가 렐의 이상적인 진입 각이다. 같은 조건을 기준으로 삼자.",
+      "relatedEventIds": [
+        "evt_006"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "중반 핵심 구도 직전 cut off",
+      "playerDecision": "20:50 중반 구도에서 단독으로 잘리며 팀 운영 템포가 일시적으로 끊겼다.",
+      "takeaway": "오브젝트 구도가 임박한 시간대에는 팀 본대보다 앞서 나가는 거리를 한 스킬 사거리 이내로 제한한다.",
+      "relatedEventIds": [
+        "evt_015"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "바론 셋업 직전 데스",
+      "playerDecision": "24:07 바론 구도 직전에 잘리며 팀이 수적 열세로 바론을 다툴 위험을 만들었다. 팀이 24:51 바론을 확보해 손실은 만회됐다.",
+      "takeaway": "바론 스폰 1분 전부터는 시야 작업도 팀 동행이 원칙이다. 단독 딥 와딩은 금지 시간대로 정하자.",
+      "relatedEventIds": [
+        "evt_020"
+      ]
+    },
+    {
+      "encounterId": "enc_006",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "후반 결정 구도에서 cut off",
+      "playerDecision": "30:14 후반 구도에서 생존하지 못했고, 직후 30:48 오브젝트를 상대에게 내주는 연쇄 손실로 이어졌다.",
+      "takeaway": "후반 데스는 곧 오브젝트 손실이다. 25분 이후에는 탈출기 없는 챔피언 특성상 항상 팀 시야 범위 안에서 움직인다.",
+      "relatedEventIds": [
+        "evt_036"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_002",
+      "shortNote": "8:38 초반 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_006",
+      "shortNote": "11:58 초반 반격 킬로 분위기 회복"
+    },
+    {
+      "eventId": "evt_012",
+      "shortNote": "19:18 드래곤 합류로 중반 템포 시작"
+    },
+    {
+      "eventId": "evt_015",
+      "shortNote": "20:50 중반 핵심 구도 데스"
+    },
+    {
+      "eventId": "evt_020",
+      "shortNote": "24:07 바론 직전 데스"
+    },
+    {
+      "eventId": "evt_024",
+      "shortNote": "24:51 바론 확보로 흐름 회복"
+    },
+    {
+      "eventId": "evt_036",
+      "shortNote": "30:14 후반 데스 후 30:48 오브젝트 손실"
+    },
+    {
+      "eventId": "evt_039",
+      "shortNote": "31:54 두 번째 바론 확보 관여"
+    },
+    {
+      "eventId": "evt_045",
+      "shortNote": "33:52 타워 철거로 승리 확정"
+    }
+  ]
+}

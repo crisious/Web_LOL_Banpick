@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8254466852_1781226731963",
+    "generatedAt": "2026-06-12T01:12:11.963Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "렐 서포터로 시야 점수 72점과 KDA 9.0을 기록하며 23분 44초 만에 팀의 압도적 승리를 견인한 경기"
+  },
+  "coachSummary": {
+    "overallSummary": "초반 라인전에서 직접 킬 2개를 만들고 드래곤 타이밍마다 합류하며 팀에 강한 템포를 제공했습니다. 중반에도 교전 합류와 구조물 압박 관여로 흐름을 유지했지만, 15:48과 22:40 두 차례 교전 직후 데스를 내주며 운영 안정감이 흔들리는 구간이 있었습니다. 다만 팀이 드래곤 3개와 타워 9개를 일방적으로 가져가는 동안 시야 장악으로 스노우볼을 뒷받침한 점이 승리의 핵심이었습니다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2킬 0데스 8어시스트로 초반을 완벽하게 가져갔습니다. 10:37과 12:05에 직접 킬을 만들고 12:33 드래곤 교전에도 합류하며 렐의 이니시에이팅 강점을 살렸습니다. 다만 8:34에 오브젝트 셋업이 한 차례 흔들린 장면은 복기할 가치가 있습니다."
+    },
+    {
+      "phase": "MID",
+      "summary": "15:40~15:48 연속 교전에서 킬 관여를 쌓았지만 같은 타이밍에 데스를 내줬고, 22:40 타워 철거 직후에도 데스가 나왔습니다. 교전 승리와 오브젝트 전환은 좋았으나 '이긴 교전 마무리 국면'에서의 생존 관리가 과제로 남았습니다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "경기가 23:44에 종료되어 후반 페이즈는 사실상 진행되지 않았습니다. 중반까지 쌓은 드래곤 3개, 타워 9개의 격차가 그대로 승리로 이어졌습니다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "서포터로서 직접 킬을 만드는 이니시에이팅 능력",
+      "description": "10:37과 12:05에 직접 킬을 기록하며 초반 흐름을 팀 쪽으로 당겨왔습니다. 렐의 진입기를 활용해 단순 보조가 아닌 교전 개시자 역할을 수행한 점이 돋보입니다.",
+      "relatedEventIds": [
+        "evt_005",
+        "evt_008"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "오브젝트 타이밍 합류와 템포 장악",
+      "description": "12:33과 17:53 드래곤 교전에 빠짐없이 합류하며 팀이 드래곤 3개를 무실점으로 가져가는 데 기여했습니다. 오브젝트 전 시야 작업과 합류 동선이 안정적이었습니다.",
+      "relatedEventIds": [
+        "evt_010",
+        "evt_024"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "23분 경기에서 시야 점수 72점의 압도적 시야 장악",
+      "description": "분당 3점에 가까운 시야 점수는 동일 시간대 서포터 기준 매우 높은 수치입니다. 이 시야 우위가 22:14 타워 압박 등 팀의 일방적인 맵 장악을 뒷받침했습니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_024"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "이긴 교전 직후 마무리 국면에서의 데스",
+      "description": "15:40~15:48 연속 교전 승리 직후 15:48에 데스를 내줬습니다. 교전을 이기고 있을 때 추격이나 잔류 판단이 깊어지면서 끊긴 패턴으로 보입니다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_017",
+        "evt_018"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "구조물 철거 후 정리 단계에서의 포지셔닝",
+      "description": "22:14~22:39 타워 압박 성공 직후 22:40에 데스가 나왔습니다. 목표를 달성한 뒤 빠지는 타이밍이 반 박자 늦어 상대 반격에 노출됐습니다.",
+      "relatedEventIds": [
+        "evt_033",
+        "evt_030",
+        "evt_032"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "초반 오브젝트 셋업 일관성",
+      "description": "7:03 드래곤 템포를 챙긴 흐름과 달리 8:34에는 셋업이 흔들리며 오브젝트/구조물을 내줬습니다. 첫 오브젝트 이후 다음 셋업으로 전환하는 동선 계획이 다소 끊겼습니다.",
+      "relatedEventIds": [
+        "evt_003",
+        "evt_002"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "교전에서 이기고 있어도 킬 확정 후 3초 안에 후퇴 여부를 스스로 콜하기 — 추격은 시야가 확보된 방향으로만.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "타워 철거가 끝나는 즉시 가장 가까운 아군 쪽으로 먼저 빠지고, 다음 목표는 재정비 후 결정하기.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "오브젝트 하나를 챙긴 직후 60초 안에 다음 오브젝트(드래곤↔전령) 주변 시야를 미리 깔아 셋업 공백 줄이기.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "마무리 국면에서는 렐의 진입기를 '탈출용'으로 아껴두는 습관 들이기 — 스킬이 빠진 상태로 잔류하지 않기.",
+      "linkedWeaknessId": "wk_1"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "10:37",
+      "phase": "EARLY",
+      "title": "라인전 첫 킬로 주도권 확보",
+      "description": "서포터가 직접 킬을 만들며 바텀 주도권을 가져왔고, 이후 드래곤 셋업으로 이어지는 발판이 됐습니다.",
+      "relatedEventIds": [
+        "evt_005"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "12:33",
+      "phase": "EARLY",
+      "title": "킬 우위를 드래곤 템포로 전환",
+      "description": "12:05 킬 직후 곧바로 드래곤 교전에 합류해 킬 이득을 오브젝트로 환산한 모범적인 운영 흐름이었습니다.",
+      "relatedEventIds": [
+        "evt_010",
+        "evt_008"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "15:48",
+      "phase": "MID",
+      "title": "연속 교전 승리 끝의 데스",
+      "description": "15:40부터 이어진 교전에서 킬 관여를 쌓았지만 마지막 순간 데스를 내줬습니다. 이긴 교전의 마무리 판단이 이 경기의 가장 큰 복기 포인트입니다.",
+      "relatedEventIds": [
+        "evt_017",
+        "evt_018",
+        "evt_019",
+        "evt_020"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "17:53",
+      "phase": "MID",
+      "title": "드래곤 교전 합류로 오브젝트 격차 굳히기",
+      "description": "중반 핵심 드래곤 타이밍에 합류하며 팀의 드래곤 3:0 구도를 완성하는 데 기여했습니다.",
+      "relatedEventIds": [
+        "evt_024"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "22:40",
+      "phase": "MID",
+      "title": "타워 압박 성공 직후의 데스",
+      "description": "22:14~22:39 연속 타워 철거로 승기를 굳힌 직후 데스가 나왔습니다. 결과에 영향은 없었지만 빠지는 타이밍 관리가 필요한 장면입니다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_032",
+        "evt_033"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "초반 라인전 교전에서 직접 킬 확보",
+      "playerDecision": "렐의 진입기를 활용해 교전을 열고 직접 킬을 가져가며 바텀 주도권을 잡았습니다.",
+      "takeaway": "이런 강한 이니시 타이밍을 다음 오브젝트 셋업과 연결하면 이득이 두 배가 됩니다.",
+      "relatedEventIds": [
+        "evt_005"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "킬 우위 굳히기 교전에서 추가 킬",
+      "playerDecision": "첫 킬 이후 식은 타이밍에 다시 교전을 열어 추가 킬을 만들었고, 실제로 직후 12:33 드래곤으로 전환했습니다.",
+      "takeaway": "킬 후 즉시 오브젝트로 전환하는 이 패턴을 표준 루틴으로 유지하세요.",
+      "relatedEventIds": [
+        "evt_008"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "연속 교전 승리 마무리 국면에서 cut off",
+      "playerDecision": "15:40~15:48 교전에서 후속 합류로 킬 관여를 쌓은 뒤에도 전장에 잔류하다 마지막에 끊겼습니다.",
+      "takeaway": "교전 승리가 확정되면 추격보다 생존을 우선하고, 진입기는 탈출용으로 남겨두세요.",
+      "relatedEventIds": [
+        "evt_019"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "타워 철거 직후 정리 단계에서 cut off",
+      "playerDecision": "22:14~22:39 연속 타워 압박에 관여한 뒤 빠지는 타이밍이 늦어 상대 반격에 데스를 내줬습니다.",
+      "takeaway": "구조물 목표 달성 즉시 후퇴 콜을 먼저 하고, 다음 목표는 재정비 후 결정하세요.",
+      "relatedEventIds": [
+        "evt_033"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_005",
+      "shortNote": "10:37 초반 교전 직접 킬 — 라인전 주도권의 근거"
+    },
+    {
+      "eventId": "evt_008",
+      "shortNote": "12:05 추가 킬 — 초반 2킬 0데스 흐름"
+    },
+    {
+      "eventId": "evt_010",
+      "shortNote": "12:33 드래곤 합류 — 킬 이득의 오브젝트 전환"
+    },
+    {
+      "eventId": "evt_019",
+      "shortNote": "15:48 교전 승리 직후 데스 — 마무리 국면 생존 과제"
+    },
+    {
+      "eventId": "evt_024",
+      "shortNote": "17:53 중반 드래곤 교전 합류 — 오브젝트 템포 유지"
+    },
+    {
+      "eventId": "evt_030",
+      "shortNote": "22:14 타워 압박 관여 — 승리 조건 전환 기여"
+    },
+    {
+      "eventId": "evt_033",
+      "shortNote": "22:40 타워 철거 직후 데스 — 후퇴 타이밍 과제"
+    },
+    {
+      "eventId": "evt_003",
+      "shortNote": "8:34 오브젝트 셋업 실패 — 초반 셋업 일관성 근거"
+    }
+  ]
+}

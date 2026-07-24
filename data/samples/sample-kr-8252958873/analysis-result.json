@@ -1,0 +1,298 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8252958873_1781086091474",
+    "generatedAt": "2026-06-10T10:08:11.474Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "쓰레쉬 서포터로 시야 점수 87점과 18어시스트로 팀의 오브젝트 압살(드래곤 4-0, 바론 1)을 이끌며 29분 승리를 만들어냈다."
+  },
+  "coachSummary": {
+    "overallSummary": "초반 두 차례 데스(2:33, 5:49)로 라인전 템포가 흔들렸지만, 4:13 킬과 9:58 오브젝트 셋업 승리로 빠르게 흐름을 복구했다. 중반에는 드래곤 타이밍마다 합류(17:08, 23:39)하며 팀의 오브젝트 독식 구도를 지탱했고, 26:03 바론과 연속 타워 철거(27:00~27:29)로 경기를 닫았다. 다만 중반 핵심 구도에서의 데스 2회(15:42, 26:00)는 오브젝트 직전 포지셔닝 리스크를 보여주므로, 다음 게임에서는 셋업 단계에서 끊기지 않는 동선 관리가 핵심 과제다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2:33과 5:49 두 차례 먼저 끊기며 초반 안정감이 흔들렸지만, 4:13 킬과 10어시스트로 라인 영향력 자체는 높게 유지했다. 9:58 오브젝트 셋업 승리와 6:18, 11:36 드래곤 확보로 팀 단위 템포는 확실히 가져왔다."
+    },
+    {
+      "phase": "MID",
+      "summary": "17:08과 23:39 드래곤 한타에 직접 관여하며 오브젝트 4스택 구도를 완성했다. 다만 15:42 데스 직후 15:59 오브젝트 셋업 실패로 이어진 장면과 26:00 바론 직전 데스는 중반 운영의 불안 요소였다. 그럼에도 26:03 바론과 27분대 연속 타워 철거로 승기를 굳혔다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "후반 구간은 별도 교전 없이 마무리됐다. 중반에 확보한 바론 버프와 타워 압박으로 29:14에 경기를 닫아, 후반 변수를 만들지 않은 깔끔한 클로징이었다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "오브젝트 타이밍 합류 능력",
+      "description": "6:18, 11:36, 17:08, 23:39 드래곤 타이밍마다 합류하며 팀의 드래곤 4-0 독식을 만들었다. 서포터로서 오브젝트 템포를 읽고 시야와 몸으로 셋업하는 능력이 이 경기 승리의 핵심 동력이었다.",
+      "relatedEventIds": [
+        "evt_009",
+        "evt_013",
+        "evt_023",
+        "evt_030"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "압도적인 시야 장악",
+      "description": "시야 점수 87점은 29분 게임 기준 매우 높은 수치다. 9:58 오브젝트 셋업 승리처럼 시야 우위가 실제 오브젝트 획득으로 연결됐고, 상대 드래곤·바론 0개라는 결과가 시야 통제의 효과를 증명한다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_009"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "데스 이후 빠른 흐름 복구",
+      "description": "2:33 데스 이후 4:13에 직접 킬을 만들어내며 라인전 흐름을 당겨왔고, 18어시스트로 팀 교전 기여를 꾸준히 유지했다. 실수 이후 위축되지 않고 다음 플레이로 만회하는 멘탈 관리가 좋았다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_004"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "초반 라인전 포지셔닝 불안정",
+      "description": "2:33과 5:49 두 차례 먼저 끊기며 초반 템포를 내줬다. 쓰레쉬는 진입형 챔피언이지만, 상대 스킬과 정글 동선 정보가 없는 상태에서의 선진입은 데스 리스크가 크다. 시야 확보 후 진입하는 순서가 필요하다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_006"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 셋업 단계에서 끊기는 패턴",
+      "description": "15:42 데스 직후 15:59 오브젝트 셋업 실패로 이어졌고, 26:00에도 바론 직전 타이밍에 끊겼다. 셋업 시야 작업 중 혼자 깊게 들어가는 동선이 반복되고 있어, 오브젝트 1분 전 시야 작업은 팀원 동행이 필요하다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_020",
+        "evt_035"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "킬 관여율 대비 낮은 한타 마무리 기여",
+      "description": "팀 45킬 중 킬 관여율 44%로, 시야·셋업 기여 대비 실제 한타 참여 빈도가 아쉽다. 26:03 바론과 27분대 타워 3개 철거 장면에 직접 관여하지 못한 점에서, 오브젝트 확정 이후 본대 합류 동선을 더 빠르게 가져갈 여지가 있다.",
+      "relatedEventIds": [
+        "evt_036",
+        "evt_039",
+        "evt_041"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "2~6분 라인전 구간에서는 부쉬 시야를 먼저 확보한 뒤에만 그랩/진입을 시도한다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "오브젝트 스폰 1분 전 시야 작업은 반드시 정글러나 미드와 함께 움직인다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "데스 직후 리스폰 타이밍에 팀에 오브젝트 포기/콜백 핑을 먼저 찍어 연쇄 손실을 막는다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_4",
+      "text": "바론·타워 푸시 국면에서는 시야 작업을 마친 즉시 본대에 합류해 한타 개시 각을 같이 본다.",
+      "linkedWeaknessId": "wk_3"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "4:13",
+      "phase": "EARLY",
+      "title": "초반 데스 만회 킬",
+      "description": "2:33 데스로 흔들린 직후 4:13 교전에서 직접 킬을 만들어 라인전 흐름을 되찾았다. 실수 후 복구 속도가 빠른 좋은 장면이었다.",
+      "relatedEventIds": [
+        "evt_004",
+        "evt_001"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "9:58",
+      "phase": "EARLY",
+      "title": "오브젝트 셋업 승리",
+      "description": "시야 우위를 바탕으로 정글 오브젝트를 챙기며 구조물 압박의 재료를 마련했다. 이후 11:36 드래곤까지 연결되는 초반 오브젝트 템포의 시작점이었다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_013"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "15:42",
+      "phase": "MID",
+      "title": "데스가 오브젝트 손실로 연결",
+      "description": "중반 핵심 구도에서 끊기며 17초 뒤 15:59 오브젝트 셋업 실패로 직결됐다. 서포터의 데스 하나가 팀 오브젝트 흐름 전체를 흔드는 대표적 장면으로, 셋업 단계 생존이 왜 중요한지 보여준다.",
+      "relatedEventIds": [
+        "evt_019",
+        "evt_020"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "23:39",
+      "phase": "MID",
+      "title": "드래곤 한타 합류로 승기 굳히기",
+      "description": "드래곤 타이밍에 직접 합류해 오브젝트 템포를 챙겼고, 이 구도가 26:03 바론과 27분대 연속 타워 철거로 이어지는 승리 시퀀스의 발판이 됐다.",
+      "relatedEventIds": [
+        "evt_030",
+        "evt_036"
+      ]
+    },
+    {
+      "id": "km_5",
+      "timestampLabel": "27:00",
+      "phase": "MID",
+      "title": "바론 버프 타워 러시",
+      "description": "26:03 바론 확보 후 27:00~27:29 사이 타워 3개를 연달아 철거하며 승리 조건을 구조물로 전환, 경기를 빠르게 닫았다.",
+      "relatedEventIds": [
+        "evt_039",
+        "evt_041",
+        "evt_043"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "초반 라인전 선끊김",
+      "playerDecision": "2:33 시야와 정글 동선 정보가 부족한 상태에서 교전 거리에 노출돼 먼저 끊겼다.",
+      "takeaway": "초반 2~5분 갱킹 위험 시간대에는 부쉬 와드 확보 전까지 미니언 라인 뒤에서 거리를 유지한다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "초반 교전 킬 메이킹",
+      "playerDecision": "4:13 직전 데스를 만회하는 교전 각을 잡아 직접 킬을 만들며 라인 주도권을 회복했다.",
+      "takeaway": "쓰레쉬의 그랩 진입이 통하는 각을 잡았을 때 과감하게 들어가는 판단은 유지할 것.",
+      "relatedEventIds": [
+        "evt_004"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "초반 재차 선끊김",
+      "playerDecision": "5:49 킬로 주도권을 잡은 직후 공격적 포지션을 유지하다 다시 먼저 끊겼다.",
+      "takeaway": "킬 직후 유리한 순간일수록 상대 정글 개입 가능성이 커지므로 한 템포 물러나 시야부터 정리한다.",
+      "relatedEventIds": [
+        "evt_006"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "오브젝트 셋업 중 cut off",
+      "playerDecision": "15:42 오브젝트 셋업 시야 작업 동선에서 혼자 끊겼고, 직후 셋업 실패로 연결됐다.",
+      "takeaway": "오브젝트 1분 전 시야 작업은 단독으로 깊게 들어가지 말고 팀원과 함께 진행한다.",
+      "relatedEventIds": [
+        "evt_019"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "중반 교전 킬 기여",
+      "playerDecision": "21:35 중반 교전에서 진입 각을 만들어 직접 킬을 가져가며 팀 교전 우위에 기여했다.",
+      "takeaway": "팀과 함께하는 교전에서의 진입 판단은 좋았다. 같은 기준을 단독 동선에도 적용할 것.",
+      "relatedEventIds": [
+        "evt_025"
+      ]
+    },
+    {
+      "encounterId": "enc_006",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "바론 직전 타이밍 cut off",
+      "playerDecision": "26:00 바론 셋업 직전 구도에서 먼저 끊겨, 팀이 26:03 바론을 4인으로 진행해야 하는 리스크를 만들었다.",
+      "takeaway": "바론·장로급 오브젝트 직전에는 생존이 최우선이므로, 시야 작업 후 즉시 본대 옆으로 붙는다.",
+      "relatedEventIds": [
+        "evt_035"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "2:33 초반 선끊김 데스"
+    },
+    {
+      "eventId": "evt_004",
+      "shortNote": "4:13 만회 킬"
+    },
+    {
+      "eventId": "evt_006",
+      "shortNote": "5:49 초반 2번째 데스"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "6:18 첫 드래곤 템포"
+    },
+    {
+      "eventId": "evt_012",
+      "shortNote": "9:58 오브젝트 셋업 승리"
+    },
+    {
+      "eventId": "evt_013",
+      "shortNote": "11:36 드래곤 확보"
+    },
+    {
+      "eventId": "evt_019",
+      "shortNote": "15:42 셋업 중 데스"
+    },
+    {
+      "eventId": "evt_020",
+      "shortNote": "15:59 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_023",
+      "shortNote": "17:08 드래곤 한타 관여"
+    },
+    {
+      "eventId": "evt_030",
+      "shortNote": "23:39 드래곤 한타 관여"
+    },
+    {
+      "eventId": "evt_035",
+      "shortNote": "26:00 바론 직전 데스"
+    },
+    {
+      "eventId": "evt_036",
+      "shortNote": "26:03 바론 확보"
+    },
+    {
+      "eventId": "evt_039",
+      "shortNote": "27:00 타워 철거"
+    },
+    {
+      "eventId": "evt_041",
+      "shortNote": "27:18 타워 철거"
+    },
+    {
+      "eventId": "evt_043",
+      "shortNote": "27:29 타워 철거"
+    }
+  ]
+}
