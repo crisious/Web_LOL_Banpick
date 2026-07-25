@@ -47,6 +47,14 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      # sites/는 별도 워크스페이스지만 Cloudflare로 나가는 공개 배포물이다.
+      # 공개 번들의 신원 노출 회귀 가드(read-only-smoke / worker-contract)가 여기 있으므로
+      # 루트 npm test만 돌리면 그 가드가 CI 밖에 남는다.
+      # 테스트는 node: 빌트인만 쓰므로 npm ci 없이 실행된다.
+      - name: Run sites workspace tests
+        working-directory: sites
+        run: npm test
+
       - name: Start read-only demo
         run: |
           HOST=127.0.0.1 npm run start:readonly > /tmp/lol-ai-coach-readonly.log 2>&1 &

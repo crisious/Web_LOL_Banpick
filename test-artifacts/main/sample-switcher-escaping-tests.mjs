@@ -1,7 +1,7 @@
 // Stored sample switcher escaping regression tests.
 //
 // Stored sample manifest values are assembled with innerHTML. Sample ids,
-// aliases, champion names, metadata, and summary strings must be escaped at
+// collected dates, champion names, metadata, and summary strings must be escaped at
 // attributes and visible text sinks.
 
 import fs from "fs";
@@ -109,7 +109,7 @@ function checkTrue(label, condition) {
 
 const unsafeId = 'sample-1"><img src=x onerror=alert(1)>';
 const unsafeChampion = 'Ahri"><img src=x onerror=alert(1)>';
-const unsafeAlias = "Tester<script>alert(1)</script>";
+const unsafeCollectedDate = "2026-06-08<script>alert(1)</script>";
 const unsafeTheme = "macro<script>alert(1)</script> plan";
 const unsafeResult = 'WIN"><svg onload=alert(1)>';
 
@@ -133,14 +133,14 @@ state.manifest = [
     id: unsafeId,
     label: `${unsafeId} · SUPPORT ${unsafeResult}`,
     champion: unsafeChampion,
-    publicAlias: unsafeAlias,
+    collectedDate: unsafeCollectedDate,
     theme: unsafeTheme,
   },
   {
     id: "sample-safe",
     label: "sample-safe · MID LOSS",
     champion: "Lux",
-    publicAlias: "Safe alias",
+    collectedDate: "2026-06-09",
     theme: "오브젝트 템포 좋음",
   },
 ];
@@ -170,12 +170,12 @@ checkTrue(
   dom.reportStrip.innerHTML.includes("Ahri&quot;&gt;&lt;img src=x onerror=alert(1)&gt;"),
 );
 checkTrue(
-  "sample chip alias is escaped",
-  dom.sampleSwitcher.innerHTML.includes("Tester&lt;script&gt;alert(1)&lt;/script&gt;"),
+  "sample chip collected date is escaped",
+  dom.sampleSwitcher.innerHTML.includes("2026-06-08&lt;script&gt;alert(1)&lt;/script&gt;"),
 );
 checkTrue(
-  "report card alias is escaped",
-  dom.reportStrip.innerHTML.includes("Tester&lt;script&gt;alert(1)&lt;/script&gt;"),
+  "report card collected date is escaped",
+  dom.reportStrip.innerHTML.includes("2026-06-08&lt;script&gt;alert(1)&lt;/script&gt;"),
 );
 checkTrue(
   "report card id label is escaped",
@@ -203,8 +203,8 @@ checkTrue(
   renderSampleSwitcherSrc.includes("escapeHtml(championDisplayName(sample.champion))"),
 );
 checkTrue(
-  "renderSampleSwitcher escapes sample public alias",
-  renderSampleSwitcherSrc.includes("escapeHtml(sample.publicAlias || \"\")"),
+  "renderSampleSwitcher escapes sample collected date",
+  renderSampleSwitcherSrc.includes("escapeHtml(sample.collectedDate || \"\")"),
 );
 checkTrue(
   "renderSampleSwitcher escapes report card id label",

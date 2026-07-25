@@ -1191,7 +1191,7 @@ function classifyTrendTag(tag) {
 function buildTrendSnapshot() {
   const samples = state.manifest;
   const current = samples.find((sample) => sample.id === state.currentSampleId) || samples[0];
-  const playerAlias = current?.publicAlias || "PlayerAlias#KR1";
+  const trendSubject = current ? sampleReportLabel(current) : "보관 리포트";
   const roleCounts = new Map();
   let wins = 0;
   let losses = 0;
@@ -1236,7 +1236,7 @@ function buildTrendSnapshot() {
     .slice(0, 3)
     .map(([tag, count]) => `${tag} ${count}회`);
 
-  const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${roleLabel(dominantRole)} 비중 ${dominantRoleCount}회`;
+  const headline = `${trendSubject} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${roleLabel(dominantRole)} 비중 ${dominantRoleCount}회`;
   const summary =
     recurringTags.length > 0
       ? `반복 신호: ${recurringTags.slice(0, 2).join(" / ")}. 현재 샘플 ${current?.id || "-"} 기준으로 복기 중입니다.`
@@ -1966,35 +1966,11 @@ async function loadManifest() {
   }
 }
 
-async function loadSampleBundle(sampleId) {
-  try {
-    return await fetchJson(`/api/samples/${sampleId}`);
-  } catch (error) {
-    const entry = state.manifest.find((sample) => sample.id === sampleId);
-    if (!entry) {
-      throw error;
-    }
-
-    const [normalized, analysis] = await Promise.all([
-      fetchJson(entry.normalizedPath),
-      fetchJson(entry.analysisPath),
-    ]);
-
-    // fallback에서도 comparison 로드 시도
-    let comparison = null;
-    const compPath = entry.normalizedPath.replace("normalized-match.json", "comparison-result.json");
-    try { comparison = await fetchJson(compPath); } catch {}
-
-    return {
-      sampleId: entry.id,
-      publicAlias: entry.publicAlias,
-      collectedDate: entry.collectedDate,
-      theme: entry.theme,
-      normalized,
-      analysis,
-      comparison,
-    };
-  }
+// 과거에는 /api/samples 실패 시 manifest의 /data/... 경로를 직접 받아오는 fallback이
+// 있었으나, 정적 서빙이 allowlist(기본 거부)라 /data/ 는 항상 403이었다. 즉 fallback은
+// 성공할 수 없었고, 원래 에러를 2차 에러로 덮어 진단만 어렵게 만들었다.
+function loadSampleBundle(sampleId) {
+  return fetchJson(`/api/samples/${sampleId}`);
 }
 
 function firstManifestSample() {
@@ -2102,7 +2078,7 @@ function renderLoginDemoStatus() {
   }
   if (dom.loginSampleMeta) {
     dom.loginSampleMeta.textContent = sample
-      ? `${sampleCount}개 보관 · ${sample.publicAlias || sampleReportLabel(sample)}`
+      ? `${sampleCount}개 보관 · ${sampleReportLabel(sample)}`
       : "샘플 대기 중";
   }
   if (dom.loginLiveLock) {
@@ -2460,7 +2436,7 @@ function renderSampleSwitcher() {
             <div class="sample-chip__copy">
               <em class="sample-chip__champion">${escapeHtml(championDisplayName(sample.champion))}</em>
               <span>${escapeHtml(sampleReportLabel(sample))}</span>
-              <strong>${escapeHtml(sample.publicAlias || "")}</strong>
+              <strong>${escapeHtml(sample.collectedDate || "")}</strong>
             </div>
           </div>
         </button>
@@ -2492,7 +2468,7 @@ function renderSampleSwitcher() {
               <span class="report-badge report-badge--result" data-result="${escapeAttr(meta.result)}">${escapeHtml(resultText)}</span>
             </div>
             <p>${escapeHtml(buildManifestCardSummary(sample))}</p>
-            <strong>${escapeHtml(sample.publicAlias || "")}</strong>
+            <strong>${escapeHtml(sample.collectedDate || "")}</strong>
           </button>
         `;
       })
@@ -2506,7 +2482,10 @@ function renderHero(sample) {
   const match = sampleMatchSummary(sample);
   const coachSummary = sample.analysis.coachSummary || {};
   const resultText = match.result ? resultLabel(match.result) : "결과 미상";
-  dom.heroPlayer.textContent = sample.publicAlias;
+  // 신원(publicAlias) 대신 경기 자체를 식별한다 — 서버가 Riot ID를 더 이상 내려보내지 않는다.
+  dom.heroPlayer.textContent = [championDisplayName(match.champion), roleLabel(match.role)]
+    .filter(Boolean)
+    .join(" · ");
   dom.heroDate.textContent = sample.collectedDate;
 
   dom.headline.textContent = buildCompactHeadline(sample);
