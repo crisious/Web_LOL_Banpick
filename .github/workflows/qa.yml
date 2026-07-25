@@ -50,7 +50,18 @@ jobs:
       # sites/는 별도 워크스페이스지만 Cloudflare로 나가는 공개 배포물이다.
       # 공개 번들의 신원 노출 회귀 가드(read-only-smoke / worker-contract)가 여기 있으므로
       # 루트 npm test만 돌리면 그 가드가 CI 밖에 남는다.
-      # 테스트는 node: 빌트인만 쓰므로 npm ci 없이 실행된다.
+      #
+      # 빌드가 먼저 필요하다: read-only-smoke가 dist/server/index.js 존재를 검증한다.
+      # dist/는 gitignore 대상이라 개발자 머신에는 예전 산출물이 남아 테스트가 통과하지만,
+      # 새 클론에는 없다. CI에서 매번 새로 빌드해야 그 계약이 실제로 검증된다.
+      - name: Install sites dependencies
+        working-directory: sites
+        run: npm ci
+
+      - name: Build sites bundle
+        working-directory: sites
+        run: npm run build
+
       - name: Run sites workspace tests
         working-directory: sites
         run: npm test
