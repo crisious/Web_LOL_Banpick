@@ -4,6 +4,9 @@
 *.log
 .claude/settings.local.json
 .claude/worktrees/
+# 로컬 IDE의 MCP 서버 설정. Rider가 세션마다 다른 포트에 뜨므로 값이 머신 전용이고,
+# 커밋해도 다른 환경에서는 연결되지 않는다.
+.mcp.json
 test-artifacts/qa-automation/
 test-artifacts/design-audit/
 .superpowers/
