@@ -24,6 +24,7 @@ function checkTrue(label, cond, detail = "") {
 // :root 토큰 + 컴포넌트 스코프 토큰 + 컴포넌트의 일반 선언(감사 대상)을 모두 담는다.
 const FIXTURE_CSS = `:root {
   --radius-md: 16px;
+  --space-2: 8px;
   --brand: #112233;
 }
 
@@ -61,6 +62,23 @@ const FIXTURE_CSS = `:root {
 /* 선언되지 않은 토큰을 폴백과 함께 참조. 실제 토큰이 아니므로 크레딧되면 안 된다. */
 .widget--fallback {
   gap: var(--not-declared, 6px);
+}
+
+/* color-mix() 로 파생한 색상 토큰. looksLikeColor 가 현대 색상 함수를 인식해야
+   이 토큰이 색상으로 분류되고, 그 참조가 색상 토큰 참조로 크레딧된다. */
+.widget--derived {
+  --widget-tint: color-mix(in srgb, var(--brand) 50%, transparent);
+  border-color: var(--widget-tint);
+}
+
+/* padding / margin 은 spacing(gap)과 별개 카테고리로 감사된다.
+   0 과 auto 는 키워드로 취급해 raw 로 세지 않는다. */
+.widget--box {
+  padding: 11px;
+  padding-left: var(--space-2);
+  margin: 0;
+  margin-top: 13px;
+  margin-right: auto;
 }
 `;
 
@@ -167,8 +185,91 @@ if (report) {
   //    --widget-accent: var(--brand) 는 "정의"이므로 제외되는 것이 맞다.
   checkTrue(
     "BEM modifier class is not mistaken for a custom property declaration",
-    report.colors.tokenReferences === 1,
-    `tokenReferences=${report.colors.tokenReferences} (expected 1: var(--brand) in .widget--active:hover)`,
+    report.colors.rawGroups.every((g) => !g.value.includes("hover")),
+    `rawGroups=${JSON.stringify(report.colors.rawGroups.map((g) => g.value))}`,
+  );
+
+  // 8. 색상 참조 크레딧이 :root 를 넘어 확장된다.
+  //    기대 3건:
+  //      .widget--active:hover  background: var(--brand)         :root 색상 토큰
+  //      .widget--themed        color: var(--widget-accent)      별칭(--brand) 1단 해석
+  //      .widget--derived       border-color: var(--widget-tint) color-mix() 파생
+  //    각 토큰의 "정의" 안에 있는 var(--brand) 는 blank 되므로 세어지지 않는다.
+  checkTrue(
+    "color references are credited beyond :root tokens",
+    report.colors.tokenReferences === 3,
+    `tokenReferences=${report.colors.tokenReferences} (expected 3: --brand, --widget-accent alias, --widget-tint color-mix)`,
+  );
+
+  // 9. 치수 토큰은 색상으로 잘못 분류되지 않는다.
+  //    --widget-radius: 9px / --widget-gap: 3px / --radius-md: 16px 는 색상이 아니다.
+  checkTrue(
+    "dimension tokens are not misclassified as colors",
+    report.colors.tokenReferences === 3,
+    `색상 참조가 3을 넘으면 치수 토큰 참조까지 세고 있다는 뜻 (실제 ${report.colors.tokenReferences})`,
+  );
+
+  // 10. padding / margin 이 spacing(gap)과 별개 카테고리로 감사된다.
+  //     spacing 은 gap 계열만 재는 지표라 과거 기록과 비교 가능해야 하므로
+  //     padding/margin 을 여기에 섞지 않는다.
+  checkTrue(
+    "padding is a separate category",
+    report.padding !== undefined && report.padding.tokenReferences === 1 && report.padding.rawTotal === 1,
+    `padding=${JSON.stringify(report.padding)}`,
+  );
+  checkTrue(
+    "padding raw value is 11px and it suggests no single token",
+    report.padding?.rawGroups.some((g) => g.value === "11px"),
+    `padding raw=${JSON.stringify(report.padding?.rawGroups)}`,
+  );
+  checkTrue(
+    "margin is a separate category",
+    report.margin !== undefined && report.margin.tokenReferences === 0 && report.margin.rawTotal === 1,
+    `margin=${JSON.stringify(report.margin)}`,
+  );
+  checkTrue(
+    "margin 0 and auto are treated as keywords, not raw values",
+    report.margin?.rawGroups.every((g) => g.value !== "0" && g.value !== "auto"),
+    `margin raw=${JSON.stringify(report.margin?.rawGroups)}`,
+  );
+  // spacing 은 gap 계열만 재야 한다. padding 의 11px 나 margin 의 13px 이 섞이면
+  // 과거 기록과 비교가 깨진다.
+  checkTrue(
+    "spacing stays gap-only (padding/margin not folded in)",
+    report.spacing.rawGroups.some((g) => g.value === "7px")
+      && report.spacing.rawGroups.every((g) => g.value !== "11px" && g.value !== "13px"),
+    `spacing raw=${JSON.stringify(report.spacing.rawGroups.map((g) => g.value))}`,
+  );
+}
+
+// ─── 잘림 표시 ────────────────────────────────────────────────────────────
+// --top 기본값이 8이고 잘림 표시가 없어서 한 번 실행한 결과를 전수로 오해하기 쉽다.
+// 잘렸으면 몇 건이 숨었는지 알려야 한다.
+{
+  fs.writeFileSync(fixture, FIXTURE_CSS);
+  const truncated = spawnSync(
+    process.execPath,
+    [path.join(repoRoot, "scripts/design-audit.js"), "--file", fixture, "--scope", "colors", "--top", "1"],
+    { encoding: "utf8" },
+  );
+  const out = truncated.stdout || "";
+  checkTrue("truncated run exits 0", truncated.status === 0, (truncated.stderr || "").trim());
+  checkTrue(
+    "truncated group list reports how many were hidden",
+    /\b1 more\b/.test(out),
+    `출력에 "1 more" 표기가 없다:\n${out}`,
+  );
+
+  // 잘리지 않았을 때는 표기가 없어야 한다 (노이즈 방지).
+  const full = spawnSync(
+    process.execPath,
+    [path.join(repoRoot, "scripts/design-audit.js"), "--file", fixture, "--scope", "colors", "--top", "999"],
+    { encoding: "utf8" },
+  );
+  checkTrue(
+    "untruncated run has no hidden-count note",
+    !/\bmore\b/.test(full.stdout || ""),
+    `잘리지 않았는데 표기가 있다:\n${full.stdout}`,
   );
 }
 

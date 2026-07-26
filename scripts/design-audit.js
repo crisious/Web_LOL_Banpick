@@ -18,6 +18,10 @@ const SCOPE_ALIASES = {
   gaps: "spacing",
   space: "spacing",
   spacing: "spacing",
+  padding: "padding",
+  paddings: "padding",
+  margin: "margin",
+  margins: "margin",
   fontsize: "fontSize",
   "font-size": "fontSize",
   typography: "fontSize",
@@ -112,7 +116,9 @@ function printHelp() {
       "",
       "Options:",
       "  --file, -f <path>       CSS file to audit (default: styles.css)",
-      "  --scope, -s <scope>     all | colors | radius | spacing | fontSize | breakpoints | customProps | tokens",
+      "  --scope, -s <scope>     all | colors | radius | spacing | padding | margin | fontSize |",
+      "                          breakpoints | customProps | tokens",
+      "                          (spacing 은 gap 계열만 잰다. padding/margin 은 별도 카테고리)",
       "  --format <type>         text | markdown | json (default: text)",
       "  --output, -o <path>     Write the rendered report to a file",
       "  --top <n>               Number of findings to render per section (default: 8)",
@@ -272,7 +278,45 @@ function escapeRegExp(value) {
 }
 
 function looksLikeColor(value) {
-  return /#(?:[0-9a-f]{3,8})\b|rgba?\(|hsla?\(/i.test(value);
+  // 레거시 표기 외에 현대 색상 함수도 인식한다. color-mix() 로 파생한 토큰
+  // (`--evidence-border-cyan`)이 색상으로 분류되지 않으면 그 참조가 색상 토큰
+  // 참조로 크레딧되지 않아 커버리지가 과소 집계된다.
+  return /#(?:[0-9a-f]{3,8})\b|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i.test(value);
+}
+
+// 색상으로 분류되는 커스텀 프로퍼티 이름을 스코프 무관하게 모은다.
+//
+// 값이 색상처럼 보이면 색상이고, `--tf-line: var(--surface-4)` 처럼 다른 색상
+// 토큰을 가리키는 별칭도 색상이다. 별칭 연쇄를 고정점까지 따라간다.
+//
+// 치수 토큰(`--evidence-radius: 18px`, `--tf-fill-alpha: 17%`)은 값이 색상이
+// 아니고 색상을 참조하지도 않으므로 자연히 빠진다.
+function collectColorTokenNames(declarations) {
+  const byName = new Map(declarations.map((entry) => [entry.name, entry.value]));
+  const colors = new Set();
+
+  for (const [name, value] of byName) {
+    if (looksLikeColor(value)) colors.add(name);
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [name, value] of byName) {
+      if (colors.has(name)) continue;
+      const regex = /var\(\s*(--[a-z0-9-]+)/gi;
+      let match;
+      while ((match = regex.exec(value)) !== null) {
+        if (colors.has(match[1])) {
+          colors.add(name);
+          changed = true;
+          break;
+        }
+      }
+    }
+  }
+
+  return colors;
 }
 
 function categorizeRootToken(token) {
@@ -579,6 +623,16 @@ function limitItems(items, top) {
   return items.slice(0, top);
 }
 
+// 목록이 --top 으로 잘렸으면 몇 건이 숨었는지 알린다.
+//
+// 표기가 없으면 한 번 실행한 결과를 전수로 오해하기 쉽다. 실제로 "정확 일치 전부
+// 처리"를 한 번의 실행 결과로 판단했다가 가려진 항목을 놓친 적이 있다.
+function pushHiddenCount(lines, format, total, top) {
+  const hidden = total - top;
+  if (hidden <= 0) return;
+  pushLine(lines, format, `... ${hidden} more (raise --top to see all)`);
+}
+
 function formatLines(lines) {
   if (!lines.length) return "";
   const preview = lines.slice(0, 4).map((line) => `L${line}`).join(", ");
@@ -625,6 +679,8 @@ function renderSelectedSections(report, lines, format) {
     colors: report.scope === "all" || report.scope === "colors" || report.scope === "tokens",
     radius: report.scope === "all" || report.scope === "radius" || report.scope === "tokens",
     spacing: report.scope === "all" || report.scope === "spacing" || report.scope === "tokens",
+    padding: report.scope === "all" || report.scope === "padding" || report.scope === "tokens",
+    margin: report.scope === "all" || report.scope === "margin" || report.scope === "tokens",
     fontSize: report.scope === "all" || report.scope === "fontSize" || report.scope === "tokens",
     breakpoints: report.scope === "all" || report.scope === "breakpoints",
     customProps: report.scope === "all" || report.scope === "customProps",
@@ -644,9 +700,21 @@ function renderSelectedSections(report, lines, format) {
   }
 
   if (include.spacing) {
-    pushSectionHeader(lines, format, "Spacing");
+    pushSectionHeader(lines, format, "Spacing (gap)");
     pushMetricSummary(lines, format, report.spacing);
     pushGroupList(lines, format, "Raw gap values", report.spacing.rawGroups, report.top);
+  }
+
+  if (include.padding) {
+    pushSectionHeader(lines, format, "Padding");
+    pushMetricSummary(lines, format, report.padding);
+    pushGroupList(lines, format, "Raw padding values", report.padding.rawGroups, report.top);
+  }
+
+  if (include.margin) {
+    pushSectionHeader(lines, format, "Margin");
+    pushMetricSummary(lines, format, report.margin);
+    pushGroupList(lines, format, "Raw margin values", report.margin.rawGroups, report.top);
   }
 
   if (include.fontSize) {
@@ -666,6 +734,7 @@ function renderSelectedSections(report, lines, format) {
       for (const item of limitItems(report.breakpoints, report.top)) {
         pushLine(lines, format, `\`${item.condition}\` x${item.count} (${formatLines(item.lines)})`);
       }
+      pushHiddenCount(lines, format, report.breakpoints.length, report.top);
     }
   }
 
@@ -680,6 +749,7 @@ function renderSelectedSections(report, lines, format) {
           : "";
         pushLine(lines, format, `\`${item.name}\` x${item.count} (${formatLines(item.lines)})${runtime}`);
       }
+      pushHiddenCount(lines, format, report.customProps.length, report.top);
     }
   }
 }
@@ -720,6 +790,8 @@ function pushGroupList(lines, format, label, items, top) {
     const tokenNote = item.matchingTokens?.length ? ` -> ${item.matchingTokens.join(", ")}` : "";
     pushLine(lines, format, `\`${item.value}\` x${item.count} (${formatLines(item.lines)})${tokenNote}`);
   }
+
+  pushHiddenCount(lines, format, items.length, top);
 }
 
 function pushEmpty(lines, format, text) {
@@ -766,11 +838,9 @@ function buildReport(cssPath, cssSource, options) {
   // 스코프 무관하게 "실제로 선언된" 모든 커스텀 프로퍼티 이름.
   // radius/spacing/fontSize 의 토큰 참조 판정에 쓴다 — 이름 접두 규칙을 대체한다.
   //
-  // 주의: analyzeColors 는 여전히 :root 색상 토큰 이름만 크레딧한다. 색상은 값 분류가
-  // 필요한데(`--evidence-border-cyan: color-mix(...)` 는 looksLikeColor 를 통과하지 못하고
-  // `--tf-line: var(--surface-4)` 는 별칭이라 한 단계 해석이 필요하다) 색상 쪽은 raw 를
-  // 리터럴로만 세므로 페널티 없이 과소 집계될 뿐이라 역전이 발생하지 않는다.
   const declaredNames = new Set(declaredInCss.map((entry) => entry.name));
+  // 색상 참조 크레딧용. 스코프 무관하게 색상으로 분류되는 토큰 이름을 모은다.
+  const declaredColorNames = collectColorTokenNames(declaredInCss);
   const tokenIndex = buildTokenIndex(rootTokens);
   // :root 블록 전체와, 그 밖의 블록에서 정의된 커스텀 프로퍼티 "선언 범위"를 감사 대상에서 제외한다.
   // 블록 전체가 아니라 선언 범위만 제외하는 것이 중요하다 — .evidence-lab 처럼 컴포넌트 스코프
@@ -785,14 +855,30 @@ function buildReport(cssPath, cssSource, options) {
 
   const radiusDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["border-radius"]);
   const spacingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["gap", "row-gap", "column-gap"]);
+  // padding / margin 은 spacing(gap)과 별개 카테고리다.
+  //
+  // spacing 지표는 gap 계열만 재는 값으로 계속 남겨야 과거 기록과 비교할 수 있다.
+  // 또 padding/margin 은 shorthand(`8px 12px`)가 흔해서 단일 토큰에 매핑되지 않는다 —
+  // 토큰화하면 `var(--space-2) var(--space-4)` 가 되므로 대체 토큰 제안 로직이
+  // 통째로 매칭하지 못한다. 취급이 다르므로 카테고리를 분리한다.
+  const paddingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+    "padding-block", "padding-inline", "padding-block-start", "padding-block-end",
+    "padding-inline-start", "padding-inline-end",
+  ]);
+  const marginDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "margin-block", "margin-inline", "margin-block-start", "margin-block-end",
+    "margin-inline-start", "margin-inline-end",
+  ]);
   const fontSizeDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["font-size"]);
   const breakpoints = analyzeBreakpoints(auditSource, lineStarts);
-  const colors = analyzeColors(
-    auditSource,
-    lineStarts,
-    tokenIndex.byValue.colors,
-    new Set(tokenIndex.byCategory.colors.map((token) => token.name)),
-  );
+  // 참조 크레딧은 스코프 무관한 색상 토큰 전체(declaredColorNames)를 쓴다.
+  //
+  // 반면 raw 값의 대체 토큰 제안(tokenValues)은 :root 토큰으로 한정한다.
+  // 컴포넌트 스코프 토큰을 제안하면 그 컴포넌트 밖에서는 해석되지 않는 값을
+  // 권하게 되므로, 제안은 전역 토큰만 하는 것이 안전하다.
+  const colors = analyzeColors(auditSource, lineStarts, tokenIndex.byValue.colors, declaredColorNames);
   const contextFiles = loadContextFiles(rootDir, options.context);
   const customProps = analyzeCustomProps(sanitizedSource, lineStarts, declaredInCss, contextFiles);
 
@@ -811,6 +897,16 @@ function buildReport(cssPath, cssSource, options) {
     spacing: analyzeValueDeclarations(spacingDeclarations, {
       tokenValues: tokenIndex.byValue.spacing,
       keywordOk: ["normal", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    padding: analyzeValueDeclarations(paddingDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    margin: analyzeValueDeclarations(marginDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
       declaredNames,
     }),
     fontSize: analyzeValueDeclarations(fontSizeDeclarations, {
