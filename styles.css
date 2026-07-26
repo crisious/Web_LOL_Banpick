@@ -54,6 +54,7 @@
   --radius-xl: 28px;
   --radius-pill: 999px;
   --radius-circle: 50%;
+  --space-0: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 10px;
@@ -3126,7 +3127,7 @@ body::after {
 .winrate-detail {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .winrate-record {
@@ -3137,7 +3138,7 @@ body::after {
 .profile-avg-kda {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .profile-avg-kda strong {
@@ -3282,7 +3283,7 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .msc-kda-ratio {
@@ -4613,7 +4614,7 @@ body::after {
 .sample-chip__copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .sample-chip__copy span,
@@ -4819,7 +4820,7 @@ body::after {
   /* Phase 9: pill-container 유지, 압축 패딩만 적용 */
   .tab-bar {
     padding: var(--space-1);
-    gap: 2px;
+    gap: var(--space-0);
   }
 
   .tab-btn {
@@ -4869,8 +4870,19 @@ body::after {
 
 /* 한타 단계별 분석 */
 .tf-phase-row {
+  /* .tf-*는 .evidence-lab의 형제라서 --evidence-*를 쓸 수 없다(index.html: evidence-lab은
+     237행에서 닫히고 #teamfight-phases는 296행에서 시작). .evidence-lab과 같은 패턴으로
+     자체 스코프 토큰을 둔다. --tf-line/--tf-muted는 정의 없이 참조되던
+     --border-subtle/--text-muted 폴백값을 그대로 승격한 것이다. */
+  --tf-line: var(--surface-4);
+  --tf-muted: #a9b3c1;
+  --tf-win: #6ee7b7;
+  --tf-loss: #f47272;
+  --tf-fill-alpha: 17%;
+  --tf-win-fill: color-mix(in srgb, var(--tf-win) var(--tf-fill-alpha), transparent);
+  --tf-loss-fill: color-mix(in srgb, var(--tf-loss) var(--tf-fill-alpha), transparent);
   padding: 0.5rem 0;
-  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--tf-line);
 }
 .tf-phase-row:first-child { border-top: none; }
 .tf-phase-head {
@@ -4885,22 +4897,22 @@ body::after {
   padding: 0.1rem 0.5rem;
   border-radius: var(--radius-pill);
   background: var(--surface-4);
-  color: var(--text-muted, #a9b3c1);
+  color: var(--tf-muted);
 }
 .tf-phase-row[data-outcome="CAUGHT_OUT"] .tf-tag,
 .tf-phase-row[data-outcome="OVERCHASE_DEATH"] .tf-tag,
 .tf-phase-row[data-outcome="DIED_IN_FIGHT"] .tf-tag,
 .tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag {
-  background: rgba(244, 114, 114, 0.18);
-  color: #f47272;
+  background: var(--tf-loss-fill);
+  color: var(--tf-loss);
 }
 .tf-phase-row[data-outcome="INITIATED_KILL"] .tf-tag,
 .tf-phase-row[data-outcome="CLOSED_OUT"] .tf-tag,
 .tf-phase-row[data-outcome="TRADE_WON"] .tf-tag {
-  background: rgba(110, 231, 183, 0.16);
-  color: #6ee7b7;
+  background: var(--tf-win-fill);
+  color: var(--tf-win);
 }
-.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--text-muted, #a9b3c1); }
+.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--tf-muted); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
 
 /* 저장 샘플 탐색 GUI 숨김 (2026-06-10) — 상세 페이지 내부 샘플 탐색 UI는 비노출.
@@ -4924,6 +4936,28 @@ body::after {
   --evidence-green: #55d69a;
   --evidence-amber: #f0bb59;
   --evidence-red: #ff7380;
+
+  /* 알파 파생 레이어 — 베이스 색에서 계산으로 유도하므로 베이스 변경이 자동 전파된다.
+     color-mix(in srgb, C p%, transparent)는 프리멀티플라이드 알파 규칙상 C를 알파 p로
+     적용한 것과 픽셀 동일하다 (Chrome 150에서 4가지 배경 합성 후 바이트 비교로 검증). */
+  --evidence-border-alpha: 38%;
+  --evidence-border-cyan: color-mix(in srgb, var(--evidence-cyan) var(--evidence-border-alpha), transparent);
+  --evidence-border-green: color-mix(in srgb, var(--evidence-green) var(--evidence-border-alpha), transparent);
+  --evidence-border-red: color-mix(in srgb, var(--evidence-red) var(--evidence-border-alpha), transparent);
+  --evidence-ring-cyan: color-mix(in srgb, var(--evidence-cyan) 24%, transparent);
+  --evidence-fill-alpha: 8%;
+  --evidence-fill-cyan: color-mix(in srgb, var(--evidence-cyan) var(--evidence-fill-alpha), transparent);
+  --evidence-fill-green: color-mix(in srgb, var(--evidence-green) var(--evidence-fill-alpha), transparent);
+  --evidence-fill-green-soft: color-mix(in srgb, var(--evidence-green) 14%, transparent);
+  --evidence-grid-blue: color-mix(in srgb, var(--evidence-blue) 3.5%, transparent);
+
+  /* 반복 사용되는 치수. radius 18px와 gap 18px가 같은 값인 것은 우연이므로
+     별개 토큰으로 둔다 — 하나로 묶으면 무관한 두 결정이 결합된다. */
+  --evidence-radius: 18px;
+  --evidence-radius-sm: 12px;
+  --evidence-surface-sunken: #091827;
+  --evidence-gap: 18px;
+
   position: relative;
   display: grid;
   gap: 20px;
@@ -4942,8 +4976,8 @@ body::after {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(79, 140, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(79, 140, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(var(--evidence-grid-blue) 1px, transparent 1px),
+    linear-gradient(90deg, var(--evidence-grid-blue) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
 }
@@ -5001,9 +5035,9 @@ body::after {
   flex: 0 0 auto;
   min-height: 34px;
   padding: 8px 12px;
-  border: 1px solid rgba(54, 214, 231, 0.42);
+  border: 1px solid var(--evidence-border-cyan);
   border-radius: var(--radius-pill);
-  background: rgba(54, 214, 231, 0.08);
+  background: var(--evidence-fill-cyan);
 }
 
 .evidence-hero {
@@ -5013,7 +5047,7 @@ body::after {
   align-items: stretch;
   padding: 24px;
   border: 1px solid var(--evidence-line);
-  border-radius: 18px;
+  border-radius: var(--evidence-radius);
   background: var(--evidence-surface);
 }
 
@@ -5040,12 +5074,12 @@ body::after {
 }
 
 .evidence-hero__context span[data-result="WIN"] {
-  border-color: rgba(85, 214, 154, 0.38);
+  border-color: var(--evidence-border-green);
   color: var(--evidence-green);
 }
 
 .evidence-hero__context span[data-result="LOSS"] {
-  border-color: rgba(255, 115, 128, 0.4);
+  border-color: var(--evidence-border-red);
   color: var(--evidence-red);
 }
 
@@ -5081,9 +5115,9 @@ body::after {
   min-height: 29px;
   align-items: center;
   padding: 5px 10px;
-  border: 1px solid rgba(85, 214, 154, 0.34);
+  border: 1px solid var(--evidence-border-green);
   border-radius: var(--radius-pill);
-  background: rgba(85, 214, 154, 0.08);
+  background: var(--evidence-fill-green);
   color: var(--evidence-green);
   font-size: var(--fs-xs);
   font-weight: 800;
@@ -5108,7 +5142,7 @@ body::after {
   background:
     radial-gradient(circle at center, var(--evidence-surface) 61%, transparent 62%),
     conic-gradient(var(--evidence-cyan) calc(var(--evidence-score) * 1%), #17324a 0);
-  box-shadow: inset 0 0 0 1px rgba(54, 214, 231, 0.24);
+  box-shadow: inset 0 0 0 1px var(--evidence-ring-cyan);
 }
 
 .evidence-score__value {
@@ -5163,14 +5197,14 @@ body::after {
 .evidence-lab-grid {
   display: grid;
   grid-template-columns: minmax(0, 2.15fr) minmax(290px, 0.9fr);
-  gap: 18px;
+  gap: var(--evidence-gap);
   align-items: start;
 }
 
 .evidence-lab__review,
 .evidence-protocol {
   display: grid;
-  gap: 18px;
+  gap: var(--evidence-gap);
 }
 
 [data-evidence-moments],
@@ -5178,14 +5212,14 @@ body::after {
 .evidence-protocol {
   padding: 22px;
   border: 1px solid var(--evidence-line);
-  border-radius: 18px;
+  border-radius: var(--evidence-radius);
   background: var(--evidence-surface);
 }
 
 .evidence-moment-section__heading,
 .evidence-protocol__heading {
   justify-content: space-between;
-  gap: 18px;
+  gap: var(--evidence-gap);
   margin-bottom: 18px;
 }
 
@@ -5234,7 +5268,7 @@ body::after {
 .evidence-moment[aria-pressed="true"] {
   border-color: var(--evidence-cyan);
   background: var(--evidence-surface-strong);
-  box-shadow: inset 0 0 0 1px rgba(54, 214, 231, 0.24);
+  box-shadow: inset 0 0 0 1px var(--evidence-ring-cyan);
 }
 
 .evidence-moment time {
@@ -5296,8 +5330,8 @@ body::after {
   padding: 18px;
   border: 1px solid var(--evidence-line);
   border-left-width: 3px;
-  border-radius: 12px;
-  background: #091827;
+  border-radius: var(--evidence-radius-sm);
+  background: var(--evidence-surface-sunken);
 }
 
 .evidence-reasoning__panel--observed {
@@ -5391,8 +5425,8 @@ body::after {
   min-height: 72px;
   padding: 14px;
   border: 1px solid var(--evidence-line);
-  border-radius: 12px;
-  background: #091827;
+  border-radius: var(--evidence-radius-sm);
+  background: var(--evidence-surface-sunken);
   color: var(--evidence-text);
   cursor: pointer;
 }
@@ -5416,7 +5450,7 @@ body::after {
 
 .evidence-protocol__item input:checked + span {
   border-color: var(--evidence-green);
-  background: rgba(85, 214, 154, 0.14);
+  background: var(--evidence-fill-green-soft);
 }
 
 .evidence-protocol__item input:checked + span::after {
@@ -5451,7 +5485,7 @@ body::after {
 @media (max-width: 760px) {
   .evidence-lab {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--evidence-radius);
   }
 
   .evidence-lab__intro,

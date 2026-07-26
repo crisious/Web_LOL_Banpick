@@ -14,6 +14,9 @@ test-artifacts/design-audit/
 test-artifacts/layout-redesign/
 test-artifacts/design-bundle/
 test-artifacts/tmp/
+
+# Playwright MCP 브라우저 검증 산출물 (스냅샷·콘솔 로그)
+.playwright-mcp/
 # 샘플 노트는 실제 Riot ID/매치 ID가 담긴 사람용 메모라 추적하지 않는다.
 # 코드가 디스크에서 읽지 않고(manifest의 notesPath는 경로 문자열일 뿐),
 # 스테이징 시 sanitizeManifestSample이 notesPath를 떼어낸다.
