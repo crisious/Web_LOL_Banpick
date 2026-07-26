@@ -48,6 +48,20 @@ const FIXTURE_CSS = `:root {
   --widget-accent: var(--brand);
   color: var(--widget-accent);
 }
+
+/* 컴포넌트 스코프 치수 토큰. 이름 접두가 --radius- / --space- 가 아니지만
+   실제로 선언된 토큰이므로 "토큰화됨"으로 크레딧되어야 한다. */
+.widget--scoped {
+  --widget-radius: 9px;
+  --widget-gap: 3px;
+  border-radius: var(--widget-radius);
+  gap: var(--widget-gap);
+}
+
+/* 선언되지 않은 토큰을 폴백과 함께 참조. 실제 토큰이 아니므로 크레딧되면 안 된다. */
+.widget--fallback {
+  gap: var(--not-declared, 6px);
+}
 `;
 
 fs.mkdirSync(tmpDir, { recursive: true });
@@ -98,14 +112,36 @@ if (report) {
   // 4. 컴포넌트의 border-radius / gap 은 계속 감사된다.
   checkTrue(
     "border-radius 16px is audited and matched to --radius-md",
-    report.radius.tokenReferences === 0
-      && report.radius.rawGroups.some((g) => g.value === "16px" && g.matchingTokens.includes("--radius-md")),
+    report.radius.rawGroups.some((g) => g.value === "16px" && g.matchingTokens.includes("--radius-md")),
     `radius=${JSON.stringify(report.radius.rawGroups)}`,
   );
   checkTrue(
     "gap 7px is audited as raw",
     report.spacing.rawGroups.some((g) => g.value === "7px"),
     `spacing=${JSON.stringify(report.spacing.rawGroups)}`,
+  );
+
+  // 4b. 컴포넌트 스코프 치수 토큰 참조는 이름 접두가 달라도 크레딧된다.
+  //     `--widget-radius` / `--widget-gap` 은 --radius- / --space- 접두가 아니지만
+  //     실제 선언된 토큰이므로 "토큰화됨"으로 세어야 한다.
+  checkTrue(
+    "scoped radius token reference is credited",
+    report.radius.tokenReferences === 1
+      && !report.radius.rawGroups.some((g) => g.value.includes("var(--widget-radius)")),
+    `refs=${report.radius.tokenReferences} raw=${JSON.stringify(report.radius.rawGroups.map((g) => g.value))}`,
+  );
+  checkTrue(
+    "scoped gap token reference is credited",
+    report.spacing.tokenReferences === 1
+      && !report.spacing.rawGroups.some((g) => g.value.includes("var(--widget-gap)")),
+    `refs=${report.spacing.tokenReferences} raw=${JSON.stringify(report.spacing.rawGroups.map((g) => g.value))}`,
+  );
+
+  // 4c. 선언되지 않은 토큰 참조는 크레딧되지 않는다 — 실제 토큰이 아니다.
+  checkTrue(
+    "undeclared token reference is not credited",
+    report.spacing.rawGroups.some((g) => g.value.includes("var(--not-declared")),
+    `spacing raw=${JSON.stringify(report.spacing.rawGroups.map((g) => g.value))}`,
   );
 
   // 5. :root 토큰 정의는 이전과 같이 제외된다 (회귀 방지).

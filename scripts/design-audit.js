@@ -315,12 +315,31 @@ function buildTokenIndex(tokens) {
   return { byName, byCategory, byValue };
 }
 
+// 값이 "실제로 선언된" 커스텀 프로퍼티를 참조하는지 판정한다.
+//
+// 이름 접두(`--radius-` 등)로 판정하면 .evidence-lab 처럼 컴포넌트 스코프
+// 네임스페이스를 쓰는 토큰(`--evidence-radius`)이 크레딧을 못 받고 raw 로
+// 집계된다. 그러면 매직 넘버를 토큰으로 바꾸는 리팩터링이 커버리지를
+// 떨어뜨리는 것으로 보고되어 지표가 개선을 역방향으로 표현한다.
+//
+// 선언 목록을 기준으로 삼으면 접두 규칙이 불필요하고, 선언되지 않은 토큰
+// 참조(폴백만으로 동작하는 것)는 자연히 크레딧에서 빠진다.
+function referencesDeclaredToken(value, declaredNames) {
+  if (!declaredNames) return false;
+  const regex = /var\(\s*(--[a-z0-9-]+)/gi;
+  let match;
+  while ((match = regex.exec(value)) !== null) {
+    if (declaredNames.has(match[1])) return true;
+  }
+  return false;
+}
+
 function analyzeValueDeclarations(declarations, options) {
   const {
-    tokenPrefix,
     tokenValues,
     keywordOk = [],
     responsiveMatcher = null,
+    declaredNames = null,
   } = options;
 
   let tokenReferences = 0;
@@ -331,7 +350,7 @@ function analyzeValueDeclarations(declarations, options) {
 
   for (const declaration of declarations) {
     const value = declaration.value;
-    if (value.includes(`var(${tokenPrefix}`)) {
+    if (referencesDeclaredToken(value, declaredNames)) {
       tokenReferences += 1;
       continue;
     }
@@ -744,6 +763,14 @@ function buildReport(cssPath, cssSource, options) {
 
   const rootTokens = parseCustomPropertyDeclarations(cssSource, lineStarts, rootBlock.bodyStart, rootBlock.bodyEnd);
   const declaredInCss = parseCustomPropertyDeclarations(cssSource, lineStarts);
+  // 스코프 무관하게 "실제로 선언된" 모든 커스텀 프로퍼티 이름.
+  // radius/spacing/fontSize 의 토큰 참조 판정에 쓴다 — 이름 접두 규칙을 대체한다.
+  //
+  // 주의: analyzeColors 는 여전히 :root 색상 토큰 이름만 크레딧한다. 색상은 값 분류가
+  // 필요한데(`--evidence-border-cyan: color-mix(...)` 는 looksLikeColor 를 통과하지 못하고
+  // `--tf-line: var(--surface-4)` 는 별칭이라 한 단계 해석이 필요하다) 색상 쪽은 raw 를
+  // 리터럴로만 세므로 페널티 없이 과소 집계될 뿐이라 역전이 발생하지 않는다.
+  const declaredNames = new Set(declaredInCss.map((entry) => entry.name));
   const tokenIndex = buildTokenIndex(rootTokens);
   // :root 블록 전체와, 그 밖의 블록에서 정의된 커스텀 프로퍼티 "선언 범위"를 감사 대상에서 제외한다.
   // 블록 전체가 아니라 선언 범위만 제외하는 것이 중요하다 — .evidence-lab 처럼 컴포넌트 스코프
@@ -777,20 +804,20 @@ function buildReport(cssPath, cssSource, options) {
     tokens: tokenIndex.byCategory,
     colors,
     radius: analyzeValueDeclarations(radiusDeclarations, {
-      tokenPrefix: "--radius-",
       tokenValues: tokenIndex.byValue.radius,
       keywordOk: ["inherit", "initial", "unset", "revert"],
+      declaredNames,
     }),
     spacing: analyzeValueDeclarations(spacingDeclarations, {
-      tokenPrefix: "--space-",
       tokenValues: tokenIndex.byValue.spacing,
       keywordOk: ["normal", "inherit", "initial", "unset", "revert"],
+      declaredNames,
     }),
     fontSize: analyzeValueDeclarations(fontSizeDeclarations, {
-      tokenPrefix: "--fs-",
       tokenValues: tokenIndex.byValue.fontSize,
       keywordOk: ["inherit", "initial", "unset", "revert"],
       responsiveMatcher: /^clamp\(/i,
+      declaredNames,
     }),
     breakpoints,
     customProps,
