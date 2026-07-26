@@ -6,7 +6,7 @@
 
 ## 배경
 
-`scripts/design-audit.js` 기준으로 `styles.css`에 raw 값 82건이 남아 있다. 전수 조사(`--top 999 --format json`) 결과 이는 균질한 부채가 아니라 성격이 다른 네 덩어리였다.
+`scripts/design-audit.js` 기준으로 `styles.css`에 raw 값 93건이 남아 있다(colors 57 + radius 10 + spacing 19 + fontSize 7). 전수 조사(`--top 999 --format json`) 결과 이는 균질한 부채가 아니라 성격이 다른 네 덩어리였다.
 
 | 분류 | colors | radius | spacing | fontSize | 계 |
 |---|---:|---:|---:|---:|---:|
@@ -164,14 +164,26 @@ const auditSource = blankRanges(sanitizedSource, [{ start: rootBlock.start, end:
 4. **문법.** 중괄호 균형 및 주석 종료 확인.
 5. **`color-mix` 지원 확인.** `CSS.supports('color', 'color-mix(in srgb, red 50%, transparent)')`가 대상 브라우저에서 true인지 확인. 이 프로젝트는 빌드 단계가 없어 폴리필·프리픽스 경로가 없으므로, 지원되지 않는 브라우저에서는 해당 선언이 무효화된다.
 
-### 기대 결과
+### 결과 (실측, 2026-07-26 구현 완료)
 
-| 항목 | 현재 | 예상 |
-|---|---:|---:|
-| colors | 91.9% | ~97% |
-| radius | 92.9% | ~96% |
-| spacing | 87.8% | ~93% |
-| fontSize | 96.6% | 변화 없음 |
+| 항목 | 시작 | 예상 | **실측** | raw |
+|---|---:|---:|---:|---:|
+| colors | 91.9% | ~97% | **96.1%** | 57 → 26 |
+| radius | 92.9% | ~96% | **96.4%** | 10 → 5 |
+| spacing | 87.8% | ~93% | **92.9%** | 19 → 11 |
+| fontSize | 96.6% | 변화 없음 | **96.6%** | 7 → 7 |
+
+raw 합계 93 → **49**. 정확 일치(`-> --token`) 제안은 소진됐다. `npm test` 3124 → **3197**건 통과.
+
+colors가 예상 ~97%에 못 미친 이유는 색상 참조 크레딧이 `:root` 색상 토큰 이름으로 한정되어 `var(--evidence-*)` 56회가 세어지지 않기 때문이다 (아래 "후속 관찰" 참조).
+
+### 구현 중 발견해 함께 처리한 사항
+
+1. **`parseCustomPropertyDeclarations`의 기존 버그.** 정규식이 `.btn--active:hover {` 같은 BEM 변형 클래스명을 선언으로 오인하고, 값 패턴 `[^;]+`가 중괄호를 넘어 뒤따르는 실제 선언까지 삼켰다. 원래는 오인된 "선언"이 쓰이지 않아 무해했지만, 선언 범위를 blank 처리하게 되면서 실제 선언을 감사에서 지우는 문제로 번졌다. 부정 룩비하인드 `(?<![\w-])`와 값 패턴 `[^;{}]+`로 고쳤다.
+
+   선행 문자 화이트리스트(`(?<=[{;]|^)`)로 먼저 시도했으나 주석 바로 뒤 선언(`*/` 다음)을 놓쳐 `--mint-bg-trace`와 `--focus-ring`이 토큰 인벤토리에서 빠졌다. HEAD 버전과 출력을 나란히 비교해 잡았다.
+
+2. **참조 크레딧이 이름 접두에 묶여 있던 문제.** `analyzeValueDeclarations`가 `var(--radius-` / `var(--space-` / `var(--fs-` 접두만 인정해, `--evidence-radius`·`--evidence-gap`이 크레딧을 못 받고 raw로 집계됐다. 매직 넘버를 토큰으로 바꾸는 리팩터링이 커버리지를 떨어뜨리는 것으로 보고되는 지표 역전이었다. `declaredInCss` 기준 판정으로 교체했다.
 
 신규 토큰 22개(알파 노브 3개 포함), 치환 33곳. `styles.css` 순변경은 약 +25행이다.
 
@@ -183,3 +195,4 @@ const auditSource = blankRanges(sanitizedSource, [{ start: rootBlock.start, end:
 - **감사 도구의 의도적 예외 표기.** 현재 도구는 "의도적 단발 리터럴"과 "방치된 하드코딩"을 구분하지 못한다. 주석 기반 예외 표기(`/* design-audit-ignore */` 등)를 도입하면 커버리지 지표의 신호가 개선된다.
 - **감사 도구의 spacing 범위가 좁다.** `collectPropertyDeclarations`에 넘기는 속성 목록이 `gap`·`row-gap`·`column-gap`뿐이다(design-audit.js:743). `padding`과 `margin`은 전혀 감사되지 않으므로 spacing 커버리지 87.8%는 간격 속성 전체가 아니라 gap 계열만 측정한 값이다. 예: `@media (max-width: 760px)`의 `.evidence-lab { padding: 18px }`(styles.css:5453)은 raw 값이지만 집계에 잡히지 않는다. 범위를 넓히면 실제 커버리지는 지금보다 낮게 나올 것이며, 그게 정확한 수치다.
 - **감사 도구의 `--top` 기본값이 8이다.** 잘림 표시가 없어 한 번 실행한 결과를 전수로 오해하기 쉽다. 기본값을 올리거나 "N건 더 있음" 표기를 추가하면 좋다.
+- **색상 참조 크레딧이 `:root` 색상 토큰으로 한정된다.** `analyzeColors`의 `tokenNames`는 `buildTokenIndex(rootTokens)`에서 오므로 `var(--evidence-*)` 56회가 크레딧되지 않는다. radius/spacing과 달리 색상은 raw를 리터럴 정규식으로만 세므로 페널티는 없고 과소 집계만 발생한다(지표 역전은 아니다). 정확히 고치려면 두 가지가 필요하다: (1) `looksLikeColor`가 `color-mix()`·`color()`·`oklch()` 같은 현대 색상 함수를 인식해야 한다 — 현재는 `#hex`/`rgba(`/`hsla(`만 본다. (2) `--tf-line: var(--surface-4)` 같은 별칭 토큰은 한 단계 해석이 필요하다. 이 설계가 필요해 이번 범위에서 제외했다.
