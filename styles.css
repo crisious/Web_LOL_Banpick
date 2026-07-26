@@ -4869,8 +4869,19 @@ body::after {
 
 /* 한타 단계별 분석 */
 .tf-phase-row {
+  /* .tf-*는 .evidence-lab의 형제라서 --evidence-*를 쓸 수 없다(index.html: evidence-lab은
+     237행에서 닫히고 #teamfight-phases는 296행에서 시작). .evidence-lab과 같은 패턴으로
+     자체 스코프 토큰을 둔다. --tf-line/--tf-muted는 정의 없이 참조되던
+     --border-subtle/--text-muted 폴백값을 그대로 승격한 것이다. */
+  --tf-line: var(--surface-4);
+  --tf-muted: #a9b3c1;
+  --tf-win: #6ee7b7;
+  --tf-loss: #f47272;
+  --tf-fill-alpha: 17%;
+  --tf-win-fill: color-mix(in srgb, var(--tf-win) var(--tf-fill-alpha), transparent);
+  --tf-loss-fill: color-mix(in srgb, var(--tf-loss) var(--tf-fill-alpha), transparent);
   padding: 0.5rem 0;
-  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--tf-line);
 }
 .tf-phase-row:first-child { border-top: none; }
 .tf-phase-head {
@@ -4885,22 +4896,22 @@ body::after {
   padding: 0.1rem 0.5rem;
   border-radius: var(--radius-pill);
   background: var(--surface-4);
-  color: var(--text-muted, #a9b3c1);
+  color: var(--tf-muted);
 }
 .tf-phase-row[data-outcome="CAUGHT_OUT"] .tf-tag,
 .tf-phase-row[data-outcome="OVERCHASE_DEATH"] .tf-tag,
 .tf-phase-row[data-outcome="DIED_IN_FIGHT"] .tf-tag,
 .tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag {
-  background: rgba(244, 114, 114, 0.18);
-  color: #f47272;
+  background: var(--tf-loss-fill);
+  color: var(--tf-loss);
 }
 .tf-phase-row[data-outcome="INITIATED_KILL"] .tf-tag,
 .tf-phase-row[data-outcome="CLOSED_OUT"] .tf-tag,
 .tf-phase-row[data-outcome="TRADE_WON"] .tf-tag {
-  background: rgba(110, 231, 183, 0.16);
-  color: #6ee7b7;
+  background: var(--tf-win-fill);
+  color: var(--tf-win);
 }
-.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--text-muted, #a9b3c1); }
+.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--tf-muted); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
 
 /* 저장 샘플 탐색 GUI 숨김 (2026-06-10) — 상세 페이지 내부 샘플 탐색 UI는 비노출.

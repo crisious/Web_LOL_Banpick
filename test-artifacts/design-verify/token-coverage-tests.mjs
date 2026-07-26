@@ -114,5 +114,51 @@ checkTrue(
   (ruleBody(".evidence-lab::before") || "").split("var(--evidence-grid-blue)").length - 1 === 2,
 );
 
+// ─── Task 3: .tf-phase-row 스코프 토큰 ───────────────────────────────────
+const tfRow = ruleBody(".tf-phase-row");
+checkTrue(".tf-phase-row rule block found", tfRow !== null);
+
+const TF_TOKENS = [
+  ["--tf-line", "var(--surface-4)"],
+  ["--tf-muted", "#a9b3c1"],
+  ["--tf-win", "#6ee7b7"],
+  ["--tf-loss", "#f47272"],
+  ["--tf-fill-alpha", "17%"],
+  ["--tf-win-fill", "color-mix(in srgb, var(--tf-win) var(--tf-fill-alpha), transparent)"],
+  ["--tf-loss-fill", "color-mix(in srgb, var(--tf-loss) var(--tf-fill-alpha), transparent)"],
+];
+for (const [name, value] of TF_TOKENS) {
+  checkTrue(`${name} defined in .tf-phase-row`, hasDeclaration(tfRow, name, value));
+}
+
+// 미정의 토큰 참조가 사라졌는지 — 이게 이 태스크가 고치는 버그다.
+checkTrue("--border-subtle reference removed", !stripped.includes("--border-subtle"),
+  "정의되지 않은 토큰을 폴백과 함께 참조하고 있다");
+checkTrue("--text-muted reference removed from styles.css", !stripped.includes("--text-muted"),
+  "정의되지 않은 토큰을 폴백과 함께 참조하고 있다");
+
+// 치환된 리터럴이 사라졌는지.
+for (const lit of ["rgba(244, 114, 114, 0.18)", "rgba(110, 231, 183, 0.16)"]) {
+  checkTrue(`literal retired: ${lit}`, !stripped.includes(lit));
+}
+
+// 사용처 참조 확인.
+checkTrue(".tf-phase-row border-top uses --tf-line",
+  hasDeclaration(tfRow, "border-top", "1px solid var(--tf-line)"));
+checkTrue(".tf-tag color uses --tf-muted",
+  hasDeclaration(ruleBody(".tf-tag"), "color", "var(--tf-muted)"));
+checkTrue(".tf-kd color uses --tf-muted",
+  hasDeclaration(ruleBody(".tf-kd"), "color", "var(--tf-muted)"));
+
+// 부정 결과 태그: 배경은 --tf-loss-fill, 글자색은 --tf-loss.
+const lossTagBody = ruleBody('.tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag');
+checkTrue("loss tag background uses --tf-loss-fill", hasDeclaration(lossTagBody, "background", "var(--tf-loss-fill)"));
+checkTrue("loss tag color uses --tf-loss", hasDeclaration(lossTagBody, "color", "var(--tf-loss)"));
+
+// 긍정 결과 태그.
+const winTagBody = ruleBody('.tf-phase-row[data-outcome="TRADE_WON"] .tf-tag');
+checkTrue("win tag background uses --tf-win-fill", hasDeclaration(winTagBody, "background", "var(--tf-win-fill)"));
+checkTrue("win tag color uses --tf-win", hasDeclaration(winTagBody, "color", "var(--tf-win)"));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
