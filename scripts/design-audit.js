@@ -18,6 +18,10 @@ const SCOPE_ALIASES = {
   gaps: "spacing",
   space: "spacing",
   spacing: "spacing",
+  padding: "padding",
+  paddings: "padding",
+  margin: "margin",
+  margins: "margin",
   fontsize: "fontSize",
   "font-size": "fontSize",
   typography: "fontSize",
@@ -112,7 +116,9 @@ function printHelp() {
       "",
       "Options:",
       "  --file, -f <path>       CSS file to audit (default: styles.css)",
-      "  --scope, -s <scope>     all | colors | radius | spacing | fontSize | breakpoints | customProps | tokens",
+      "  --scope, -s <scope>     all | colors | radius | spacing | padding | margin | fontSize |",
+      "                          breakpoints | customProps | tokens",
+      "                          (spacing 은 gap 계열만 잰다. padding/margin 은 별도 카테고리)",
       "  --format <type>         text | markdown | json (default: text)",
       "  --output, -o <path>     Write the rendered report to a file",
       "  --top <n>               Number of findings to render per section (default: 8)",
@@ -673,6 +679,8 @@ function renderSelectedSections(report, lines, format) {
     colors: report.scope === "all" || report.scope === "colors" || report.scope === "tokens",
     radius: report.scope === "all" || report.scope === "radius" || report.scope === "tokens",
     spacing: report.scope === "all" || report.scope === "spacing" || report.scope === "tokens",
+    padding: report.scope === "all" || report.scope === "padding" || report.scope === "tokens",
+    margin: report.scope === "all" || report.scope === "margin" || report.scope === "tokens",
     fontSize: report.scope === "all" || report.scope === "fontSize" || report.scope === "tokens",
     breakpoints: report.scope === "all" || report.scope === "breakpoints",
     customProps: report.scope === "all" || report.scope === "customProps",
@@ -692,9 +700,21 @@ function renderSelectedSections(report, lines, format) {
   }
 
   if (include.spacing) {
-    pushSectionHeader(lines, format, "Spacing");
+    pushSectionHeader(lines, format, "Spacing (gap)");
     pushMetricSummary(lines, format, report.spacing);
     pushGroupList(lines, format, "Raw gap values", report.spacing.rawGroups, report.top);
+  }
+
+  if (include.padding) {
+    pushSectionHeader(lines, format, "Padding");
+    pushMetricSummary(lines, format, report.padding);
+    pushGroupList(lines, format, "Raw padding values", report.padding.rawGroups, report.top);
+  }
+
+  if (include.margin) {
+    pushSectionHeader(lines, format, "Margin");
+    pushMetricSummary(lines, format, report.margin);
+    pushGroupList(lines, format, "Raw margin values", report.margin.rawGroups, report.top);
   }
 
   if (include.fontSize) {
@@ -835,6 +855,22 @@ function buildReport(cssPath, cssSource, options) {
 
   const radiusDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["border-radius"]);
   const spacingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["gap", "row-gap", "column-gap"]);
+  // padding / margin 은 spacing(gap)과 별개 카테고리다.
+  //
+  // spacing 지표는 gap 계열만 재는 값으로 계속 남겨야 과거 기록과 비교할 수 있다.
+  // 또 padding/margin 은 shorthand(`8px 12px`)가 흔해서 단일 토큰에 매핑되지 않는다 —
+  // 토큰화하면 `var(--space-2) var(--space-4)` 가 되므로 대체 토큰 제안 로직이
+  // 통째로 매칭하지 못한다. 취급이 다르므로 카테고리를 분리한다.
+  const paddingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+    "padding-block", "padding-inline", "padding-block-start", "padding-block-end",
+    "padding-inline-start", "padding-inline-end",
+  ]);
+  const marginDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "margin-block", "margin-inline", "margin-block-start", "margin-block-end",
+    "margin-inline-start", "margin-inline-end",
+  ]);
   const fontSizeDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["font-size"]);
   const breakpoints = analyzeBreakpoints(auditSource, lineStarts);
   // 참조 크레딧은 스코프 무관한 색상 토큰 전체(declaredColorNames)를 쓴다.
@@ -861,6 +897,16 @@ function buildReport(cssPath, cssSource, options) {
     spacing: analyzeValueDeclarations(spacingDeclarations, {
       tokenValues: tokenIndex.byValue.spacing,
       keywordOk: ["normal", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    padding: analyzeValueDeclarations(paddingDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    margin: analyzeValueDeclarations(marginDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
       declaredNames,
     }),
     fontSize: analyzeValueDeclarations(fontSizeDeclarations, {

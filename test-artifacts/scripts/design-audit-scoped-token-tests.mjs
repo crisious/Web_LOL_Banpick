@@ -24,6 +24,7 @@ function checkTrue(label, cond, detail = "") {
 // :root 토큰 + 컴포넌트 스코프 토큰 + 컴포넌트의 일반 선언(감사 대상)을 모두 담는다.
 const FIXTURE_CSS = `:root {
   --radius-md: 16px;
+  --space-2: 8px;
   --brand: #112233;
 }
 
@@ -68,6 +69,16 @@ const FIXTURE_CSS = `:root {
 .widget--derived {
   --widget-tint: color-mix(in srgb, var(--brand) 50%, transparent);
   border-color: var(--widget-tint);
+}
+
+/* padding / margin 은 spacing(gap)과 별개 카테고리로 감사된다.
+   0 과 auto 는 키워드로 취급해 raw 로 세지 않는다. */
+.widget--box {
+  padding: 11px;
+  padding-left: var(--space-2);
+  margin: 0;
+  margin-top: 13px;
+  margin-right: auto;
 }
 `;
 
@@ -196,6 +207,38 @@ if (report) {
     "dimension tokens are not misclassified as colors",
     report.colors.tokenReferences === 3,
     `색상 참조가 3을 넘으면 치수 토큰 참조까지 세고 있다는 뜻 (실제 ${report.colors.tokenReferences})`,
+  );
+
+  // 10. padding / margin 이 spacing(gap)과 별개 카테고리로 감사된다.
+  //     spacing 은 gap 계열만 재는 지표라 과거 기록과 비교 가능해야 하므로
+  //     padding/margin 을 여기에 섞지 않는다.
+  checkTrue(
+    "padding is a separate category",
+    report.padding !== undefined && report.padding.tokenReferences === 1 && report.padding.rawTotal === 1,
+    `padding=${JSON.stringify(report.padding)}`,
+  );
+  checkTrue(
+    "padding raw value is 11px and it suggests no single token",
+    report.padding?.rawGroups.some((g) => g.value === "11px"),
+    `padding raw=${JSON.stringify(report.padding?.rawGroups)}`,
+  );
+  checkTrue(
+    "margin is a separate category",
+    report.margin !== undefined && report.margin.tokenReferences === 0 && report.margin.rawTotal === 1,
+    `margin=${JSON.stringify(report.margin)}`,
+  );
+  checkTrue(
+    "margin 0 and auto are treated as keywords, not raw values",
+    report.margin?.rawGroups.every((g) => g.value !== "0" && g.value !== "auto"),
+    `margin raw=${JSON.stringify(report.margin?.rawGroups)}`,
+  );
+  // spacing 은 gap 계열만 재야 한다. padding 의 11px 나 margin 의 13px 이 섞이면
+  // 과거 기록과 비교가 깨진다.
+  checkTrue(
+    "spacing stays gap-only (padding/margin not folded in)",
+    report.spacing.rawGroups.some((g) => g.value === "7px")
+      && report.spacing.rawGroups.every((g) => g.value !== "11px" && g.value !== "13px"),
+    `spacing raw=${JSON.stringify(report.spacing.rawGroups.map((g) => g.value))}`,
   );
 }
 
