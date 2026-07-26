@@ -205,18 +205,26 @@ function normalizeValue(value) {
 function parseCustomPropertyDeclarations(source, lineStarts, start = 0, end = source.length) {
   const result = [];
   const segment = source.slice(start, end);
-  const regex = /--([a-z0-9-]+)\s*:\s*([^;]+);/gi;
+  // 커스텀 프로퍼티 "선언"만 매칭한다. 선언과 `.btn--active:hover {` 같은 BEM 변형
+  // 클래스명을 가르는 실제 규칙은 `--` 앞이 단어 문자인지 여부다. 부정 룩비하인드로
+  // 그것만 배제한다 — 선행 문자를 화이트리스트(`{`/`;`)로 두면 주석 바로 뒤에 오는
+  // 선언(`*/` 다음)을 놓친다.
+  //
+  // 값에서 `{`/`}` 를 제외하는 이유: 값이 블록 경계를 넘어가면 뒤따르는 실제 선언까지
+  // 하나의 "선언"으로 잘못 삼켜진다.
+  const regex = /(?<![\w-])(--[a-z0-9-]+)\s*:\s*([^;{}]+);/gi;
   let match;
 
   while ((match = regex.exec(segment)) !== null) {
     const index = start + match.index;
-    const name = `--${match[1]}`;
+    const name = match[1];
     const value = match[2].trim();
     result.push({
       name,
       value,
       normalizedValue: normalizeValue(value),
       index,
+      endIndex: index + match[0].length,
       line: lineNumberAt(lineStarts, index),
     });
   }
@@ -737,7 +745,16 @@ function buildReport(cssPath, cssSource, options) {
   const rootTokens = parseCustomPropertyDeclarations(cssSource, lineStarts, rootBlock.bodyStart, rootBlock.bodyEnd);
   const declaredInCss = parseCustomPropertyDeclarations(cssSource, lineStarts);
   const tokenIndex = buildTokenIndex(rootTokens);
-  const auditSource = blankRanges(sanitizedSource, [{ start: rootBlock.start, end: rootBlock.end }]);
+  // :root 블록 전체와, 그 밖의 블록에서 정의된 커스텀 프로퍼티 "선언 범위"를 감사 대상에서 제외한다.
+  // 블록 전체가 아니라 선언 범위만 제외하는 것이 중요하다 — .evidence-lab 처럼 컴포넌트 스코프
+  // 토큰을 두는 블록의 gap/padding/box-shadow 같은 일반 선언은 계속 감사되어야 한다.
+  //
+  // declaredInCss 는 cssSource 에서 파싱했지만 stripComments 가 주석의 비개행 문자를 공백으로
+  // 바꿔 길이를 보존하므로, sanitizedSource 와 인덱스 공간이 같아 그대로 blank 할 수 있다.
+  const auditSource = blankRanges(sanitizedSource, [
+    { start: rootBlock.start, end: rootBlock.end },
+    ...declaredInCss.map((entry) => ({ start: entry.index, end: entry.endIndex })),
+  ]);
 
   const radiusDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["border-radius"]);
   const spacingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["gap", "row-gap", "column-gap"]);
