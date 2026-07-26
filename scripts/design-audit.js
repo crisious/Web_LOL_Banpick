@@ -272,7 +272,45 @@ function escapeRegExp(value) {
 }
 
 function looksLikeColor(value) {
-  return /#(?:[0-9a-f]{3,8})\b|rgba?\(|hsla?\(/i.test(value);
+  // 레거시 표기 외에 현대 색상 함수도 인식한다. color-mix() 로 파생한 토큰
+  // (`--evidence-border-cyan`)이 색상으로 분류되지 않으면 그 참조가 색상 토큰
+  // 참조로 크레딧되지 않아 커버리지가 과소 집계된다.
+  return /#(?:[0-9a-f]{3,8})\b|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i.test(value);
+}
+
+// 색상으로 분류되는 커스텀 프로퍼티 이름을 스코프 무관하게 모은다.
+//
+// 값이 색상처럼 보이면 색상이고, `--tf-line: var(--surface-4)` 처럼 다른 색상
+// 토큰을 가리키는 별칭도 색상이다. 별칭 연쇄를 고정점까지 따라간다.
+//
+// 치수 토큰(`--evidence-radius: 18px`, `--tf-fill-alpha: 17%`)은 값이 색상이
+// 아니고 색상을 참조하지도 않으므로 자연히 빠진다.
+function collectColorTokenNames(declarations) {
+  const byName = new Map(declarations.map((entry) => [entry.name, entry.value]));
+  const colors = new Set();
+
+  for (const [name, value] of byName) {
+    if (looksLikeColor(value)) colors.add(name);
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [name, value] of byName) {
+      if (colors.has(name)) continue;
+      const regex = /var\(\s*(--[a-z0-9-]+)/gi;
+      let match;
+      while ((match = regex.exec(value)) !== null) {
+        if (colors.has(match[1])) {
+          colors.add(name);
+          changed = true;
+          break;
+        }
+      }
+    }
+  }
+
+  return colors;
 }
 
 function categorizeRootToken(token) {
@@ -579,6 +617,16 @@ function limitItems(items, top) {
   return items.slice(0, top);
 }
 
+// 목록이 --top 으로 잘렸으면 몇 건이 숨었는지 알린다.
+//
+// 표기가 없으면 한 번 실행한 결과를 전수로 오해하기 쉽다. 실제로 "정확 일치 전부
+// 처리"를 한 번의 실행 결과로 판단했다가 가려진 항목을 놓친 적이 있다.
+function pushHiddenCount(lines, format, total, top) {
+  const hidden = total - top;
+  if (hidden <= 0) return;
+  pushLine(lines, format, `... ${hidden} more (raise --top to see all)`);
+}
+
 function formatLines(lines) {
   if (!lines.length) return "";
   const preview = lines.slice(0, 4).map((line) => `L${line}`).join(", ");
@@ -666,6 +714,7 @@ function renderSelectedSections(report, lines, format) {
       for (const item of limitItems(report.breakpoints, report.top)) {
         pushLine(lines, format, `\`${item.condition}\` x${item.count} (${formatLines(item.lines)})`);
       }
+      pushHiddenCount(lines, format, report.breakpoints.length, report.top);
     }
   }
 
@@ -680,6 +729,7 @@ function renderSelectedSections(report, lines, format) {
           : "";
         pushLine(lines, format, `\`${item.name}\` x${item.count} (${formatLines(item.lines)})${runtime}`);
       }
+      pushHiddenCount(lines, format, report.customProps.length, report.top);
     }
   }
 }
@@ -720,6 +770,8 @@ function pushGroupList(lines, format, label, items, top) {
     const tokenNote = item.matchingTokens?.length ? ` -> ${item.matchingTokens.join(", ")}` : "";
     pushLine(lines, format, `\`${item.value}\` x${item.count} (${formatLines(item.lines)})${tokenNote}`);
   }
+
+  pushHiddenCount(lines, format, items.length, top);
 }
 
 function pushEmpty(lines, format, text) {
@@ -766,11 +818,9 @@ function buildReport(cssPath, cssSource, options) {
   // 스코프 무관하게 "실제로 선언된" 모든 커스텀 프로퍼티 이름.
   // radius/spacing/fontSize 의 토큰 참조 판정에 쓴다 — 이름 접두 규칙을 대체한다.
   //
-  // 주의: analyzeColors 는 여전히 :root 색상 토큰 이름만 크레딧한다. 색상은 값 분류가
-  // 필요한데(`--evidence-border-cyan: color-mix(...)` 는 looksLikeColor 를 통과하지 못하고
-  // `--tf-line: var(--surface-4)` 는 별칭이라 한 단계 해석이 필요하다) 색상 쪽은 raw 를
-  // 리터럴로만 세므로 페널티 없이 과소 집계될 뿐이라 역전이 발생하지 않는다.
   const declaredNames = new Set(declaredInCss.map((entry) => entry.name));
+  // 색상 참조 크레딧용. 스코프 무관하게 색상으로 분류되는 토큰 이름을 모은다.
+  const declaredColorNames = collectColorTokenNames(declaredInCss);
   const tokenIndex = buildTokenIndex(rootTokens);
   // :root 블록 전체와, 그 밖의 블록에서 정의된 커스텀 프로퍼티 "선언 범위"를 감사 대상에서 제외한다.
   // 블록 전체가 아니라 선언 범위만 제외하는 것이 중요하다 — .evidence-lab 처럼 컴포넌트 스코프
@@ -787,12 +837,12 @@ function buildReport(cssPath, cssSource, options) {
   const spacingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["gap", "row-gap", "column-gap"]);
   const fontSizeDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["font-size"]);
   const breakpoints = analyzeBreakpoints(auditSource, lineStarts);
-  const colors = analyzeColors(
-    auditSource,
-    lineStarts,
-    tokenIndex.byValue.colors,
-    new Set(tokenIndex.byCategory.colors.map((token) => token.name)),
-  );
+  // 참조 크레딧은 스코프 무관한 색상 토큰 전체(declaredColorNames)를 쓴다.
+  //
+  // 반면 raw 값의 대체 토큰 제안(tokenValues)은 :root 토큰으로 한정한다.
+  // 컴포넌트 스코프 토큰을 제안하면 그 컴포넌트 밖에서는 해석되지 않는 값을
+  // 권하게 되므로, 제안은 전역 토큰만 하는 것이 안전하다.
+  const colors = analyzeColors(auditSource, lineStarts, tokenIndex.byValue.colors, declaredColorNames);
   const contextFiles = loadContextFiles(rootDir, options.context);
   const customProps = analyzeCustomProps(sanitizedSource, lineStarts, declaredInCss, contextFiles);
 
