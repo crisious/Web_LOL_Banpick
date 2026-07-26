@@ -822,7 +822,7 @@ body::after {
 .dual-tl {
   position: relative;
   overflow-x: auto;
-  padding: 12px 0;
+  padding: var(--space-4) 0;
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
@@ -1077,7 +1077,7 @@ body::after {
 }
 
 .dual-tl-detail-col h5 {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-2);
   font-size: var(--fs-base);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1178,7 +1178,7 @@ body::after {
 }
 
 .trend-callout h4 {
-  margin: 10px 0 8px;
+  margin: var(--space-3) 0 var(--space-2);
   font-size: var(--fs-xl);
   line-height: 1.2;
 }
@@ -1860,7 +1860,7 @@ body::after {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
-  padding: 0 10px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--info-border);
   border-radius: var(--radius-pill);
   background: var(--info-soft);
@@ -2046,7 +2046,7 @@ body::after {
 }
 
 .participant-score-row__main p {
-  margin: 2px 0 0;
+  margin: var(--space-0) 0 0;
   color: var(--muted);
   font-size: var(--fs-xs);
 }
@@ -2413,7 +2413,7 @@ body::after {
   gap: var(--space-2);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 8px 0;
+  padding: var(--space-2) 0;
 }
 
 .build-item {
@@ -2622,7 +2622,7 @@ body::after {
   min-height: 30px;
   display: inline-flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--info-border);
   border-radius: var(--radius-pill);
   background: var(--info-soft);
@@ -2706,7 +2706,7 @@ body::after {
 .demo-token-submit,
 .demo-token-clear {
   min-height: 38px;
-  padding: 0 12px;
+  padding: 0 var(--space-4);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--surface-3);
@@ -2761,7 +2761,7 @@ body::after {
 
 .login-demo-button {
   min-height: var(--touch-min);
-  padding: 0 16px;
+  padding: 0 var(--space-5);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--surface-3);
@@ -3579,7 +3579,7 @@ body::after {
   font-size: var(--fs-base);
   color: var(--muted);
   line-height: 1.5;
-  margin: 4px 0;
+  margin: var(--space-1) 0;
 }
 
 .comparison-notes p strong {
@@ -5096,7 +5096,7 @@ body::after {
 }
 
 .evidence-hero__eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-2);
 }
 
 .evidence-hero h3 {
@@ -5110,7 +5110,7 @@ body::after {
 
 .evidence-hero h3 + p {
   max-width: 830px;
-  margin: 16px 0 0;
+  margin: var(--space-5) 0 0;
   color: var(--evidence-text-3);
   font-size: var(--fs-md);
   line-height: 1.75;
@@ -5237,7 +5237,7 @@ body::after {
 
 .evidence-moment-section__heading h3,
 .evidence-protocol__heading h3 {
-  margin: 4px 0 0;
+  margin: var(--space-1) 0 0;
   color: var(--evidence-text);
   font-size: var(--fs-xl);
 }
