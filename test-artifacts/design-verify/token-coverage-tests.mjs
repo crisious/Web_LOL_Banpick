@@ -166,7 +166,7 @@ const REPEATED_TOKENS = [
   [".evidence-lab", "--evidence-radius-sm", "12px"],
   [".evidence-lab", "--evidence-surface-sunken", "#091827"],
   [".evidence-lab", "--evidence-gap", "18px"],
-  [":root", "--space-0", "2px"],
+  [":root", "--space-2", "2px"],
 ];
 for (const [selector, name, value] of REPEATED_TOKENS) {
   checkTrue(`${name}: ${value} defined in ${selector}`, hasDeclaration(ruleBody(selector), name, value));
@@ -184,10 +184,11 @@ for (const [ref, expected] of USAGE_COUNTS) {
   checkTrue(`${ref} used ${expected} times`, actual === expected, `실제 ${actual}회`);
 }
 
-// --space-0 은 전역 토큰이라 총 횟수를 고정하면 다른 속성을 토큰화할 때마다 깨진다.
+// 전역 토큰은 총 횟수를 고정하면 다른 속성을 토큰화할 때마다 깨진다.
 // 원래 의도는 "gap: 2px 5곳이 치환됐다" 이므로 gap 선언으로 한정해 센다.
-const gapSpace0 = (stripped.match(/(?<![-\w])(?:row-|column-)?gap:\s*var\(--space-0\)/g) || []).length;
-checkTrue("gap: var(--space-0) used 5 times", gapSpace0 === 5, `실제 ${gapSpace0}회`);
+// (2px 토큰의 이름은 값 기반 재편으로 --space-0 -> --space-2 로 바뀌었다.)
+const gapSpace2 = (stripped.match(/(?<![-\w])(?:row-|column-)?gap:\s*var\(--space-2\)/g) || []).length;
+checkTrue("gap: var(--space-2) used 5 times", gapSpace2 === 5, `실제 ${gapSpace2}회`);
 
 // #091827 리터럴이 토큰 정의 1곳에만 남아야 한다.
 checkTrue("#091827 appears only in its token definition",
@@ -240,7 +241,7 @@ checkTrue("moment hover border uses --evidence-line-hover",
 //
 // 검사는 속성명을 포함해서 한다. `18px` 처럼 토큰이 없어 의도적으로 리터럴로
 // 남긴 값이나, 다른 속성(border-radius 등)의 같은 값을 잡지 않기 위해서다.
-const SPACE_TOKEN_VALUES = ["2px", "4px", "8px", "10px", "12px", "16px", "22px"];
+const SPACE_TOKEN_VALUES = ["2px", "4px", "6px", "8px", "10px", "12px", "14px", "16px", "18px", "20px", "22px", "24px"];
 const BOX_PROPS = "(?:padding|margin)(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?";
 for (const value of SPACE_TOKEN_VALUES) {
   const re = new RegExp(`\\b${BOX_PROPS}\\s*:\\s*${value.replace(".", "\\.")}\\s*;`);
@@ -249,10 +250,25 @@ for (const value of SPACE_TOKEN_VALUES) {
 }
 
 // shorthand 는 축 순서가 의미를 가진다. 역순 케이스가 보존됐는지 고정한다.
-checkTrue("shorthand axis order is preserved (12px 10px stays 4 then 3)",
-  stripped.includes("var(--space-4) var(--space-3)")
-    && stripped.includes("var(--space-3) var(--space-4)"),
+// 12px 10px 와 10px 12px 가 각각 남아 있어야 한다.
+checkTrue("shorthand axis order is preserved (12px 10px stays 12 then 10)",
+  stripped.includes("var(--space-12) var(--space-10)")
+    && stripped.includes("var(--space-10) var(--space-12)"),
   "축 순서가 뒤바뀌었거나 한쪽이 사라졌다");
+
+// ─── 값 기반 래더 ─────────────────────────────────────────────────────────
+// 이름의 숫자가 px 값과 일치해야 한다. 어긋나면 이름이 거짓말을 하게 되고,
+// 값 사이에 새 값을 넣을 수 있다는 재편의 이점이 사라진다.
+const LADDER = ["2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
+const rootBody = ruleBody(":root");
+for (const n of LADDER) {
+  checkTrue(`--space-${n} is ${n}px`, hasDeclaration(rootBody, `--space-${n}`, `${n}px`));
+}
+// 서수 시절 이름이 남아 있으면 미정의 참조가 된다.
+checkTrue("no ordinal --space-0 remains", !/(?<![\w-])--space-0\b/.test(stripped));
+checkTrue("no ordinal --space-1 remains", !/(?<![\w-])--space-1\b/.test(stripped));
+checkTrue("no ordinal --space-3 remains", !/(?<![\w-])--space-3\b/.test(stripped));
+checkTrue("no ordinal --space-5 remains", !/(?<![\w-])--space-5\b/.test(stripped));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
