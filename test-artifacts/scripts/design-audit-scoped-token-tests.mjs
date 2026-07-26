@@ -80,6 +80,22 @@ const FIXTURE_CSS = `:root {
   margin-top: 13px;
   margin-right: auto;
 }
+
+/* 모든 축이 키워드인 shorthand 와 !important 는 raw 로 세면 안 된다.
+   margin: 0 auto 는 가로 중앙 정렬의 표준 관용구이고 토큰화 대상이 아니다. */
+.widget--centered {
+  margin: 0 auto;
+  padding: 0 0;
+}
+
+.widget--forced {
+  margin-bottom: 0 !important;
+}
+
+/* 축 하나라도 실제 값이면 raw 로 잡아야 한다. */
+.widget--mixed {
+  margin: 0 0 17px;
+}
 `;
 
 fs.mkdirSync(tmpDir, { recursive: true });
@@ -212,6 +228,7 @@ if (report) {
   // 10. padding / margin 이 spacing(gap)과 별개 카테고리로 감사된다.
   //     spacing 은 gap 계열만 재는 지표라 과거 기록과 비교 가능해야 하므로
   //     padding/margin 을 여기에 섞지 않는다.
+  // padding raw 는 11px 하나뿐이어야 한다 — `padding: 0 0` 은 모든 축이 키워드다.
   checkTrue(
     "padding is a separate category",
     report.padding !== undefined && report.padding.tokenReferences === 1 && report.padding.rawTotal === 1,
@@ -222,15 +239,39 @@ if (report) {
     report.padding?.rawGroups.some((g) => g.value === "11px"),
     `padding raw=${JSON.stringify(report.padding?.rawGroups)}`,
   );
+  // margin raw 는 13px 과 `0 0 17px` 둘이어야 한다 — `0 auto` 와 `0 !important` 는 제외.
   checkTrue(
     "margin is a separate category",
-    report.margin !== undefined && report.margin.tokenReferences === 0 && report.margin.rawTotal === 1,
+    report.margin !== undefined && report.margin.tokenReferences === 0 && report.margin.rawTotal === 2,
     `margin=${JSON.stringify(report.margin)}`,
   );
   checkTrue(
     "margin 0 and auto are treated as keywords, not raw values",
     report.margin?.rawGroups.every((g) => g.value !== "0" && g.value !== "auto"),
     `margin raw=${JSON.stringify(report.margin?.rawGroups)}`,
+  );
+
+  // 11. 모든 축이 키워드인 shorthand 는 raw 가 아니다.
+  //     `margin: 0 auto` 는 가로 중앙 정렬 관용구이고 토큰화 대상이 아니다.
+  checkTrue(
+    "all-keyword shorthand is not counted as raw",
+    report.margin?.rawGroups.every((g) => g.value !== "0 auto")
+      && report.padding?.rawGroups.every((g) => g.value !== "0 0"),
+    `margin raw=${JSON.stringify(report.margin?.rawGroups.map((g) => g.value))} padding raw=${JSON.stringify(report.padding?.rawGroups.map((g) => g.value))}`,
+  );
+
+  // 12. !important 는 값에서 떼고 판정한다.
+  checkTrue(
+    "!important is stripped before keyword matching",
+    report.margin?.rawGroups.every((g) => !g.value.includes("!important")),
+    `margin raw=${JSON.stringify(report.margin?.rawGroups.map((g) => g.value))}`,
+  );
+
+  // 13. 축 하나라도 실제 값이면 raw 로 잡는다 (과잉 제외 방지).
+  checkTrue(
+    "shorthand with a real axis value is still counted as raw",
+    report.margin?.rawGroups.some((g) => g.value === "0 0 17px"),
+    `margin raw=${JSON.stringify(report.margin?.rawGroups.map((g) => g.value))}`,
   );
   // spacing 은 gap 계열만 재야 한다. padding 의 11px 나 margin 의 13px 이 섞이면
   // 과거 기록과 비교가 깨진다.
