@@ -160,5 +160,46 @@ const winTagBody = ruleBody('.tf-phase-row[data-outcome="TRADE_WON"] .tf-tag');
 checkTrue("win tag background uses --tf-win-fill", hasDeclaration(winTagBody, "background", "var(--tf-win-fill)"));
 checkTrue("win tag color uses --tf-win", hasDeclaration(winTagBody, "color", "var(--tf-win)"));
 
+// ─── Task 4: 반복값 토큰 ─────────────────────────────────────────────────
+const REPEATED_TOKENS = [
+  [".evidence-lab", "--evidence-radius", "18px"],
+  [".evidence-lab", "--evidence-radius-sm", "12px"],
+  [".evidence-lab", "--evidence-surface-sunken", "#091827"],
+  [".evidence-lab", "--evidence-gap", "18px"],
+  [":root", "--space-0", "2px"],
+];
+for (const [selector, name, value] of REPEATED_TOKENS) {
+  checkTrue(`${name}: ${value} defined in ${selector}`, hasDeclaration(ruleBody(selector), name, value));
+}
+
+// 사용 횟수 확인.
+const USAGE_COUNTS = [
+  ["var(--evidence-radius)", 3],
+  ["var(--evidence-radius-sm)", 2],
+  ["var(--evidence-surface-sunken)", 2],
+  ["var(--evidence-gap)", 3],
+  ["var(--space-0)", 5],
+];
+for (const [ref, expected] of USAGE_COUNTS) {
+  const actual = stripped.split(ref).length - 1;
+  checkTrue(`${ref} used ${expected} times`, actual === expected, `실제 ${actual}회`);
+}
+
+// #091827 리터럴이 토큰 정의 1곳에만 남아야 한다.
+checkTrue("#091827 appears only in its token definition",
+  stripped.split("#091827").length - 1 === 1,
+  `${stripped.split("#091827").length - 1}회 등장`);
+
+// 리터럴 잔존 검사. 18px/12px/2px 는 padding 등 감사 대상 밖 속성에도 쓰이므로
+// border-radius / gap 형태로만 한정한다.
+//
+// `gap:` 앞에 `(?<![-\w])` 경계를 두는 이유: 토큰 정의 `--evidence-gap: 18px;` 가
+// 부분문자열로 `gap: 18px;` 를 포함하므로, 경계가 없으면 정의를 잔존 리터럴로 오판한다.
+// 정의는 남아야 하고 사용처만 사라져야 한다.
+checkTrue("no raw `gap: 2px` remains", !/(?<![-\w])gap:\s*2px\s*;/.test(stripped));
+checkTrue("no raw `border-radius: 18px` remains", !/(?<![-\w])border-radius:\s*18px\s*;/.test(stripped));
+checkTrue("no raw `border-radius: 12px` remains", !/(?<![-\w])border-radius:\s*12px\s*;/.test(stripped));
+checkTrue("no raw `gap: 18px` remains", !/(?<![-\w])gap:\s*18px\s*;/.test(stripped));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

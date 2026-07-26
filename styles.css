@@ -54,6 +54,7 @@
   --radius-xl: 28px;
   --radius-pill: 999px;
   --radius-circle: 50%;
+  --space-0: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 10px;
@@ -3126,7 +3127,7 @@ body::after {
 .winrate-detail {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .winrate-record {
@@ -3137,7 +3138,7 @@ body::after {
 .profile-avg-kda {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .profile-avg-kda strong {
@@ -3282,7 +3283,7 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .msc-kda-ratio {
@@ -4613,7 +4614,7 @@ body::after {
 .sample-chip__copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0);
 }
 
 .sample-chip__copy span,
@@ -4819,7 +4820,7 @@ body::after {
   /* Phase 9: pill-container 유지, 압축 패딩만 적용 */
   .tab-bar {
     padding: var(--space-1);
-    gap: 2px;
+    gap: var(--space-0);
   }
 
   .tab-btn {
@@ -4950,6 +4951,13 @@ body::after {
   --evidence-fill-green-soft: color-mix(in srgb, var(--evidence-green) 14%, transparent);
   --evidence-grid-blue: color-mix(in srgb, var(--evidence-blue) 3.5%, transparent);
 
+  /* 반복 사용되는 치수. radius 18px와 gap 18px가 같은 값인 것은 우연이므로
+     별개 토큰으로 둔다 — 하나로 묶으면 무관한 두 결정이 결합된다. */
+  --evidence-radius: 18px;
+  --evidence-radius-sm: 12px;
+  --evidence-surface-sunken: #091827;
+  --evidence-gap: 18px;
+
   position: relative;
   display: grid;
   gap: 20px;
@@ -5039,7 +5047,7 @@ body::after {
   align-items: stretch;
   padding: 24px;
   border: 1px solid var(--evidence-line);
-  border-radius: 18px;
+  border-radius: var(--evidence-radius);
   background: var(--evidence-surface);
 }
 
@@ -5189,14 +5197,14 @@ body::after {
 .evidence-lab-grid {
   display: grid;
   grid-template-columns: minmax(0, 2.15fr) minmax(290px, 0.9fr);
-  gap: 18px;
+  gap: var(--evidence-gap);
   align-items: start;
 }
 
 .evidence-lab__review,
 .evidence-protocol {
   display: grid;
-  gap: 18px;
+  gap: var(--evidence-gap);
 }
 
 [data-evidence-moments],
@@ -5204,14 +5212,14 @@ body::after {
 .evidence-protocol {
   padding: 22px;
   border: 1px solid var(--evidence-line);
-  border-radius: 18px;
+  border-radius: var(--evidence-radius);
   background: var(--evidence-surface);
 }
 
 .evidence-moment-section__heading,
 .evidence-protocol__heading {
   justify-content: space-between;
-  gap: 18px;
+  gap: var(--evidence-gap);
   margin-bottom: 18px;
 }
 
@@ -5322,8 +5330,8 @@ body::after {
   padding: 18px;
   border: 1px solid var(--evidence-line);
   border-left-width: 3px;
-  border-radius: 12px;
-  background: #091827;
+  border-radius: var(--evidence-radius-sm);
+  background: var(--evidence-surface-sunken);
 }
 
 .evidence-reasoning__panel--observed {
@@ -5417,8 +5425,8 @@ body::after {
   min-height: 72px;
   padding: 14px;
   border: 1px solid var(--evidence-line);
-  border-radius: 12px;
-  background: #091827;
+  border-radius: var(--evidence-radius-sm);
+  background: var(--evidence-surface-sunken);
   color: var(--evidence-text);
   cursor: pointer;
 }
@@ -5477,7 +5485,7 @@ body::after {
 @media (max-width: 760px) {
   .evidence-lab {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--evidence-radius);
   }
 
   .evidence-lab__intro,
