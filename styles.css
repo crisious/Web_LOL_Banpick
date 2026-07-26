@@ -1608,11 +1608,11 @@ body::after {
 }
 
 .phase-card[data-rating='GOOD'] {
-  background: linear-gradient(180deg, rgba(89, 209, 178, 0.14), var(--surface-1));
+  background: linear-gradient(180deg, var(--mint-soft), var(--surface-1));
 }
 
 .phase-card[data-rating='BAD'] {
-  background: linear-gradient(180deg, rgba(255, 134, 120, 0.14), var(--surface-1));
+  background: linear-gradient(180deg, var(--rose-soft), var(--surface-1));
 }
 
 .phase-tag {
@@ -1792,7 +1792,7 @@ body::after {
   padding: 16px 18px;
   border-left: 3px solid var(--line-strong);
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 42%),
+    linear-gradient(90deg, var(--surface-2), transparent 42%),
     var(--surface-2);
 }
 
@@ -2658,7 +2658,7 @@ body::after {
 
 .demo-token-form {
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -2699,7 +2699,7 @@ body::after {
 .demo-token-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .demo-token-submit,
@@ -4883,8 +4883,8 @@ body::after {
 .tf-tag {
   font-size: 0.75rem;
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  background: var(--surface-4);
   color: var(--text-muted, #a9b3c1);
 }
 .tf-phase-row[data-outcome="CAUGHT_OUT"] .tf-tag,
@@ -4900,7 +4900,7 @@ body::after {
   background: rgba(110, 231, 183, 0.16);
   color: #6ee7b7;
 }
-.tf-kd { margin-left: auto; font-size: 0.78rem; color: var(--text-muted, #a9b3c1); }
+.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--text-muted, #a9b3c1); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
 
 /* 저장 샘플 탐색 GUI 숨김 (2026-06-10) — 상세 페이지 내부 샘플 탐색 UI는 비노출.
@@ -4931,7 +4931,7 @@ body::after {
   padding: 26px;
   overflow: hidden;
   border: 1px solid var(--evidence-line);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--evidence-bg);
   color: var(--evidence-text);
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.26);
@@ -5072,7 +5072,7 @@ body::after {
 
 .evidence-hero__quality {
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
   margin-top: 20px;
 }
 
@@ -5104,7 +5104,7 @@ body::after {
   display: grid;
   place-content: center;
   text-align: center;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background:
     radial-gradient(circle at center, var(--evidence-surface) 61%, transparent 62%),
     conic-gradient(var(--evidence-cyan) calc(var(--evidence-score) * 1%), #17324a 0);
@@ -5132,7 +5132,7 @@ body::after {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   overflow: hidden;
   border: 1px solid var(--evidence-line);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: var(--evidence-surface);
 }
 
@@ -5205,7 +5205,7 @@ body::after {
 .evidence-moment-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .evidence-moment {
@@ -5309,14 +5309,14 @@ body::after {
 }
 
 .evidence-reasoning__label {
-  gap: 8px;
+  gap: var(--space-2);
   margin-bottom: 13px;
 }
 
 .evidence-reasoning__label > span {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--evidence-blue);
 }
 
@@ -5379,14 +5379,14 @@ body::after {
 
 .evidence-protocol__list {
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .evidence-protocol__item {
   position: relative;
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--space-4);
   align-items: start;
   min-height: 72px;
   padding: 14px;
