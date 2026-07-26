@@ -172,18 +172,22 @@ for (const [selector, name, value] of REPEATED_TOKENS) {
   checkTrue(`${name}: ${value} defined in ${selector}`, hasDeclaration(ruleBody(selector), name, value));
 }
 
-// 사용 횟수 확인.
+// 사용 횟수 확인. --evidence-* 는 그 컴포넌트 전용이라 총 횟수를 고정할 수 있다.
 const USAGE_COUNTS = [
   ["var(--evidence-radius)", 3],
   ["var(--evidence-radius-sm)", 2],
   ["var(--evidence-surface-sunken)", 2],
   ["var(--evidence-gap)", 3],
-  ["var(--space-0)", 5],
 ];
 for (const [ref, expected] of USAGE_COUNTS) {
   const actual = stripped.split(ref).length - 1;
   checkTrue(`${ref} used ${expected} times`, actual === expected, `실제 ${actual}회`);
 }
+
+// --space-0 은 전역 토큰이라 총 횟수를 고정하면 다른 속성을 토큰화할 때마다 깨진다.
+// 원래 의도는 "gap: 2px 5곳이 치환됐다" 이므로 gap 선언으로 한정해 센다.
+const gapSpace0 = (stripped.match(/(?<![-\w])(?:row-|column-)?gap:\s*var\(--space-0\)/g) || []).length;
+checkTrue("gap: var(--space-0) used 5 times", gapSpace0 === 5, `실제 ${gapSpace0}회`);
 
 // #091827 리터럴이 토큰 정의 1곳에만 남아야 한다.
 checkTrue("#091827 appears only in its token definition",
@@ -229,6 +233,26 @@ checkTrue("protocol item border uses --evidence-line-strong",
   hasDeclaration(ruleBody(".evidence-protocol__item > span"), "border", "1px solid var(--evidence-line-strong)"));
 checkTrue("moment hover border uses --evidence-line-hover",
   hasDeclaration(ruleBody(".evidence-moment:hover"), "border-color", "var(--evidence-line-hover)"));
+
+// ─── padding / margin 기계적 치환 ─────────────────────────────────────────
+// 기존 --space-* 토큰 값과 정확히 일치하는 padding/margin 값 67건을 치환했다.
+// 치환 대상 값이 해당 속성에 다시 등장하면 회귀다.
+//
+// 검사는 속성명을 포함해서 한다. `18px` 처럼 토큰이 없어 의도적으로 리터럴로
+// 남긴 값이나, 다른 속성(border-radius 등)의 같은 값을 잡지 않기 위해서다.
+const SPACE_TOKEN_VALUES = ["2px", "4px", "8px", "10px", "12px", "16px", "22px"];
+const BOX_PROPS = "(?:padding|margin)(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?";
+for (const value of SPACE_TOKEN_VALUES) {
+  const re = new RegExp(`\\b${BOX_PROPS}\\s*:\\s*${value.replace(".", "\\.")}\\s*;`);
+  checkTrue(`no raw padding/margin of ${value} remains`, !re.test(stripped),
+    "--space-* 토큰과 값이 같은데 리터럴로 남아 있다");
+}
+
+// shorthand 는 축 순서가 의미를 가진다. 역순 케이스가 보존됐는지 고정한다.
+checkTrue("shorthand axis order is preserved (12px 10px stays 4 then 3)",
+  stripped.includes("var(--space-4) var(--space-3)")
+    && stripped.includes("var(--space-3) var(--space-4)"),
+  "축 순서가 뒤바뀌었거나 한쪽이 사라졌다");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
