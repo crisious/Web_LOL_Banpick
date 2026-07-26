@@ -4958,6 +4958,18 @@ body::after {
   --evidence-surface-sunken: #091827;
   --evidence-gap: 18px;
 
+  /* 계조 래더. hex 근접성으로는 드리프트처럼 보이지만 명암비로 보면 단조 증가하는
+     분리된 단계다 — 텍스트 7.03 / 11.15 / 12.63 / 17.68:1 (배경 --evidence-bg),
+     테두리 1.40 / 1.99 / 2.62:1 (배경 --evidence-surface).
+
+     텍스트 2단은 번호로 둔다. -2(본문)가 -3(히어로 리드)보다 밝은데, 보통
+     히어로 리드가 더 강조되므로 의도된 순서인지 불확실하다. 값을 보존하되
+     의미를 단정하지 않는다. */
+  --evidence-text-2: #c6d4df;
+  --evidence-text-3: #b8c8d5;
+  --evidence-line-strong: #2a506a;
+  --evidence-line-hover: #2a6385;
+
   position: relative;
   display: grid;
   gap: 20px;
@@ -5099,7 +5111,7 @@ body::after {
 .evidence-hero h3 + p {
   max-width: 830px;
   margin: 16px 0 0;
-  color: #b8c8d5;
+  color: var(--evidence-text-3);
   font-size: var(--fs-md);
   line-height: 1.75;
 }
@@ -5256,7 +5268,7 @@ body::after {
 }
 
 .evidence-moment:hover {
-  border-color: #2a6385;
+  border-color: var(--evidence-line-hover);
   transform: translateY(-2px);
 }
 
@@ -5369,7 +5381,7 @@ body::after {
 .evidence-fact-list p,
 .evidence-empty-fact {
   margin: 0;
-  color: #c6d4df;
+  color: var(--evidence-text-2);
   line-height: 1.7;
 }
 
@@ -5443,7 +5455,7 @@ body::after {
   height: 30px;
   display: grid;
   place-items: center;
-  border: 1px solid #2a506a;
+  border: 1px solid var(--evidence-line-strong);
   border-radius: 7px;
   background: var(--evidence-surface);
 }

@@ -201,5 +201,34 @@ checkTrue("no raw `border-radius: 18px` remains", !/(?<![-\w])border-radius:\s*1
 checkTrue("no raw `border-radius: 12px` remains", !/(?<![-\w])border-radius:\s*12px\s*;/.test(stripped));
 checkTrue("no raw `gap: 18px` remains", !/(?<![-\w])gap:\s*18px\s*;/.test(stripped));
 
+// ─── 후속 B: evidence 계조 래더 ───────────────────────────────────────────
+// hex 근접성으로는 드리프트처럼 보였지만 명암비로 보면 단조 증가하는 분리된
+// 단계였다(텍스트 7.03 / 11.15 / 12.63 / 17.68, 테두리 1.40 / 1.99 / 2.62).
+const GRADATION_TOKENS = [
+  ["--evidence-text-2", "#c6d4df"],
+  ["--evidence-text-3", "#b8c8d5"],
+  ["--evidence-line-strong", "#2a506a"],
+  ["--evidence-line-hover", "#2a6385"],
+];
+for (const [name, value] of GRADATION_TOKENS) {
+  checkTrue(`${name}: ${value} defined in .evidence-lab`, hasDeclaration(evidenceLab, name, value));
+}
+
+// 리터럴은 토큰 정의 1곳에만 남아야 한다.
+for (const [, value] of GRADATION_TOKENS) {
+  const count = stripped.split(value).length - 1;
+  checkTrue(`${value} appears only in its token definition`, count === 1, `${count}회 등장`);
+}
+
+// 사용처가 올바른 토큰을 참조하는지.
+checkTrue("hero lede uses --evidence-text-3",
+  hasDeclaration(ruleBody(".evidence-hero h3 + p"), "color", "var(--evidence-text-3)"));
+checkTrue("reasoning panel body uses --evidence-text-2",
+  hasDeclaration(ruleBody(".evidence-empty-fact"), "color", "var(--evidence-text-2)"));
+checkTrue("protocol item border uses --evidence-line-strong",
+  hasDeclaration(ruleBody(".evidence-protocol__item > span"), "border", "1px solid var(--evidence-line-strong)"));
+checkTrue("moment hover border uses --evidence-line-hover",
+  hasDeclaration(ruleBody(".evidence-moment:hover"), "border-color", "var(--evidence-line-hover)"));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
