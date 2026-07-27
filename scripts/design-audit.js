@@ -378,6 +378,20 @@ function referencesDeclaredToken(value, declaredNames) {
   return false;
 }
 
+// shorthand 의 모든 축이 키워드인지 판정한다.
+//
+// padding/margin 은 `margin: 0 auto` 처럼 축마다 키워드가 오는 관용구가 흔하다.
+// 값 전체를 통짜로 keywordOk 와 비교하면 `0 auto` 가 목록에 없어 raw 로 잡힌다.
+// 가로 중앙 정렬은 토큰화 대상이 아니므로 축 단위로 검사한다.
+//
+// `!important` 는 값이 아니라 우선순위 지시자이므로 떼고 본다.
+function isAllKeywords(value, keywordOk) {
+  if (!keywordOk.length) return false;
+  const cleaned = value.replace(/!\s*important/gi, "").trim();
+  if (!cleaned) return false;
+  return cleaned.split(/\s+/).every((axis) => keywordOk.includes(axis));
+}
+
 function analyzeValueDeclarations(declarations, options) {
   const {
     tokenValues,
@@ -405,7 +419,7 @@ function analyzeValueDeclarations(declarations, options) {
       continue;
     }
 
-    if (keywordOk.includes(value)) {
+    if (isAllKeywords(value, keywordOk)) {
       continue;
     }
 
