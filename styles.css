@@ -4877,10 +4877,14 @@ body::after {
 .tf-phase-row {
   /* .tf-*는 .evidence-lab의 형제라서 --evidence-*를 쓸 수 없다(index.html: evidence-lab은
      237행에서 닫히고 #teamfight-phases는 296행에서 시작). .evidence-lab과 같은 패턴으로
-     자체 스코프 토큰을 둔다. --tf-line/--tf-muted는 정의 없이 참조되던
-     --border-subtle/--text-muted 폴백값을 그대로 승격한 것이다. */
+     자체 스코프 토큰을 둔다. --tf-line은 정의 없이 참조되던 --border-subtle 폴백값을
+     그대로 승격한 것이다.
+
+     .tf-tag/.tf-kd 의 글자색 토큰은 두지 않는다. 두 요소 모두 .moment-copy 안의 span 이라
+     `.eyebrow, …, .moment-copy span, …` 규칙(구체성 0,2,0)이 `.tf-tag`(0,1,0)를 이겨
+     --muted 가 적용된다. 색 토큰을 정의해도 화면에 나타나지 않는다.
+     WIN/LOSS 변형은 [data-outcome] 이 붙어 0,3,0 이므로 정상 적용된다. */
   --tf-line: var(--surface-4);
-  --tf-muted: #a9b3c1;
   --tf-win: #6ee7b7;
   --tf-loss: #f47272;
   --tf-fill-alpha: 17%;
@@ -4902,7 +4906,6 @@ body::after {
   padding: 0.1rem 0.5rem;
   border-radius: var(--radius-pill);
   background: var(--surface-4);
-  color: var(--tf-muted);
 }
 .tf-phase-row[data-outcome="CAUGHT_OUT"] .tf-tag,
 .tf-phase-row[data-outcome="OVERCHASE_DEATH"] .tf-tag,
@@ -4917,7 +4920,7 @@ body::after {
   background: var(--tf-win-fill);
   color: var(--tf-win);
 }
-.tf-kd { margin-left: auto; font-size: var(--fs-sm); color: var(--tf-muted); }
+.tf-kd { margin-left: auto; font-size: var(--fs-sm); }
 .tf-takeaway { display: block; margin-top: 0.5rem; font-weight: 600; }
 
 /* 저장 샘플 탐색 GUI 숨김 (2026-06-10) — 상세 페이지 내부 샘플 탐색 UI는 비노출.
