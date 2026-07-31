@@ -120,7 +120,6 @@ checkTrue(".tf-phase-row rule block found", tfRow !== null);
 
 const TF_TOKENS = [
   ["--tf-line", "var(--surface-4)"],
-  ["--tf-muted", "#a9b3c1"],
   ["--tf-win", "#6ee7b7"],
   ["--tf-loss", "#f47272"],
   ["--tf-fill-alpha", "17%"],
@@ -145,10 +144,23 @@ for (const lit of ["rgba(244, 114, 114, 0.18)", "rgba(110, 231, 183, 0.16)"]) {
 // 사용처 참조 확인.
 checkTrue(".tf-phase-row border-top uses --tf-line",
   hasDeclaration(tfRow, "border-top", "1px solid var(--tf-line)"));
-checkTrue(".tf-tag color uses --tf-muted",
-  hasDeclaration(ruleBody(".tf-tag"), "color", "var(--tf-muted)"));
-checkTrue(".tf-kd color uses --tf-muted",
-  hasDeclaration(ruleBody(".tf-kd"), "color", "var(--tf-muted)"));
+// .tf-tag / .tf-kd 는 글자색을 선언하지 않는다. 두 요소 모두 .moment-copy 안의 span 이라
+// `… .moment-copy span …` 규칙(구체성 0,2,0)이 `.tf-tag`(0,1,0)를 이겨 --muted 가 적용된다.
+// 색 선언을 되살리면 화면에 나타나지도 않으면서 있는 것처럼 보이는 죽은 코드가 된다.
+// `background-color` 같은 속성에 걸리지 않도록 앞 경계를 둔다.
+const declaresColor = (sel) => /(?<![-\w])color\s*:/.test(ruleBody(sel) || "");
+checkTrue(".tf-tag declares no color", !declaresColor(".tf-tag"),
+  "구체성에 져서 적용되지 않는 색 선언이 되살아났다");
+checkTrue(".tf-kd declares no color", !declaresColor(".tf-kd"),
+  "구체성에 져서 적용되지 않는 색 선언이 되살아났다");
+checkTrue("--tf-muted token is gone", !stripped.includes("--tf-muted"),
+  "효과 없는 토큰이 되살아났다");
+
+// WIN/LOSS 변형은 [data-outcome] 이 붙어 0,3,0 이므로 계속 적용되어야 한다.
+checkTrue("loss tag still declares its color",
+  hasDeclaration(ruleBody('.tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag'), "color", "var(--tf-loss)"));
+checkTrue("win tag still declares its color",
+  hasDeclaration(ruleBody('.tf-phase-row[data-outcome="TRADE_WON"] .tf-tag'), "color", "var(--tf-win)"));
 
 // 부정 결과 태그: 배경은 --tf-loss-fill, 글자색은 --tf-loss.
 const lossTagBody = ruleBody('.tf-phase-row[data-outcome="TRADE_LOST"] .tf-tag');
