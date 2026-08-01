@@ -110,7 +110,8 @@ playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake �
   - 노력: 큼 (~반나절) — 현재 tab-trends는 단일 매치 비교만
 - **Codex 대체 에이전트 검토** (GPT-4o-mini, Gemini, 등)
   - 트리거: 사용자가 Codex CLI 업그레이드가 어렵거나 비용 측면에서 다른 모델 선호
-  - 노력: 중간 (~3h) — `callCodexAgent` 추상화 + 새 어댑터
+  - 노력: 중간 (~3h) — 어댑터 추출은 2026-08-01에 끝났으므로(`lib/agent-adapter.js`) 남은 일은 새 구현체 하나 추가뿐
+  - 상태: **미구현 유지.** `AGENT_BACKEND=api`는 Claude만 담당하고 Codex 레그는 비활성이므로, api 모드는 이중 교차검증 없이 단일 에이전트로 돈다
 - **Riot RSO OAuth**
   - 트리거: Riot Games 프로덕션 승인 (외부 의존)
   - 노력: 큼 — 별도 페이즈
@@ -136,14 +137,33 @@ playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake �
 
 ## 4. 다음 액션
 
+**분석 엔진 어댑터화 + API 백엔드 완료 (2026-08-01~02, 브랜치 `crisious/agent-adapter-api`).** `docs/superpowers/plans/2026-08-01-agent-adapter-external-deploy.md` Task 1~5 실행. `npm test` **3401 → 3440 passed / 0 failed / 158 → 162 files**.
+
+가능해진 것:
+
+- **`AGENT_BACKEND=api`로 CLI 없는 호스트에서 라이브 분석 가능.** Node ≥ 20이면 되고 루트 의존성은 여전히 0 (`lib/anthropic-client.js`가 내장 `fetch`로 Messages API 직접 호출). 미설정/오타는 `cli`로 폴백해 기존 동작이 그대로 보존된다 — 실측: `AGENT_BACKEND` 미설정 시 `claude` CLI를 실제로 spawn, `api`면 Messages API 경로, `sdk` 같은 오타면 CLI 복귀.
+- 구조화 출력(`output_config.format` + `lib/analysis-json-schema.js`)으로 스키마 강제. 배열 최소 길이는 구조화 출력이 지원하지 않으므로 `validateAnalysisOutput`이 계속 담당한다.
+
+남은 것 / 한계:
+
+- **Codex 대체 어댑터는 미구현** (Tier B 유지). `AGENT_BACKEND=api`에서 Codex 레그는 비활성이라 api 모드는 단일 에이전트다.
+- **`schemaViolations` 실측 미완.** 구조화 출력 전/후 비교는 실제 API 키로 동일 샘플을 돌려야 하는데 이번 사이클에서 수행하지 못했다. 근거 없이 효과를 주장하지 않는다 — 기준선부터 다시 잡아야 한다.
+- Riot RSO OAuth는 여전히 Tier C DEFER (외부 의존).
+
+이번 사이클에서 드러난 함정 2건:
+
+- **`additionalProperties: false`는 나열하지 않은 필드를 금지한다.** 스키마를 명세(`analysis-json-schema.md` §3)만 보고 짰으면 프롬프트가 요구하는 `teamplayRecommendationSelections`가 막혀 teamplay v2 코칭 선택 경로가 통째로 죽었다. 스키마 `properties`는 명세가 아니라 **프롬프트가 실제로 요구하는 것 + 실데이터에 나타나는 것**의 상위집합이어야 한다. 저장된 분석 36건을 스키마에 대고 훑는 테스트로 고정했다.
+- **명세와 실데이터가 여러 곳에서 다르다.** `actionChecklist`는 `action`/`reason`이 아니라 `text`/`linkedWeaknessId`를 쓰고 `priority`가 number가 아니라 string이다. `evidenceIndex`는 `timestamp`/`summary`가 아니라 `timestampLabel`/`shortNote`다. `phaseSummaries`의 `rating`/`focus`는 36건 중 0회다. 전부 실데이터를 따랐다.
+
 **Tier A 3종 전부 완료 (2026-08-01, Orca orchestration 병렬 3워커).** Phase 33 / Phase 34 / Phase 32-후속을 각각 독립 워크트리에서 진행한 뒤 순차 머지했다. `npm test` **3388 → 3401 passed / 0 failed / 156 → 158 files**, `server.js` 4,539 → 4,285줄(−254, 로직 3개 모듈로 이동).
 
 이 사이클에서 걷어낸 공통 취약점: **소스 문자열을 `new Function`/`includes()`로 재구성·검사하는 테스트**는 코드가 이동하면 깨지고 배선 버그는 못 잡는다. 신규·전환 테스트는 모두 실제 모듈 import 방식이다.
 
 현 시점 자동 진행 가능한 후보:
 
-- **A**: Tier B — N개 매치 누적 추세 뷰 (~반나절). 현재 tab-trends는 단일 매치 비교만 가능
-- **B**: Tier B — Codex 대체 에이전트 어댑터 (`callCodexAgent` 추상화, ~3h)
-- **C**: 현재 stable — 외부 트리거 대기
+- **A**: `AGENT_BACKEND=api` 라이브 검증 + `schemaViolations` 전후 실측 (~1h, 실제 API 키 필요)
+- **B**: Tier B — N개 매치 누적 추세 뷰 (~반나절). 현재 tab-trends는 단일 매치 비교만 가능
+- **C**: Tier B — Codex 대체 에이전트 어댑터 (새 구현체 추가, ~1h로 축소)
+- **D**: 현재 stable — 외부 트리거 대기
 
-권장: **C** — Tier A로 회귀 차단이 한 단계 올라갔고, Tier B 두 항목은 모두 "사용자 시나리오가 실제로 생겼을 때" 트리거가 걸리는 성격이다. 새 feature 요청 / 회귀 발견 시 재개.
+권장: **A** — api 백엔드는 코드·테스트상 완결이지만 실제 API를 한 번도 치지 않았다. 구조화 출력의 효과 주장은 실측 전까지 근거가 없고, 라이브 1회가 그 둘을 동시에 해소한다.
