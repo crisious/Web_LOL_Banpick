@@ -1,62 +1,9 @@
-// server.js key moment timestamp policy regression tests
+// Rule-based fallback key moment timestamp policy regression tests.
 
-import fs from "fs";
+import { createRequire } from "node:module";
 
-const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
-
-function extractFunctionSource(source, name) {
-  const startIdx = source.indexOf(`function ${name}(`);
-  if (startIdx < 0) throw new Error(`function ${name} not found`);
-  let depth = 0;
-  let bodyStarted = false;
-  for (let i = startIdx; i < source.length; i += 1) {
-    const ch = source[i];
-    if (ch === "{") { depth += 1; bodyStarted = true; }
-    else if (ch === "}") {
-      depth -= 1;
-      if (bodyStarted && depth === 0) return source.slice(startIdx, i + 1);
-    }
-  }
-  throw new Error(`function ${name} not closed`);
-}
-
-function extractConstSource(source, name) {
-  const m = source.match(new RegExp(`const ${name} = [^;]*;`));
-  if (!m) throw new Error(`const ${name} not found`);
-  return m[0];
-}
-
-function functionSourceOrFallback(source, name, fallback) {
-  return source.includes(`function ${name}(`)
-    ? extractFunctionSource(source, name)
-    : fallback;
-}
-
-const rawTimestampSource = functionSourceOrFallback(
-  serverSrc,
-  "rawEventTimestampMs",
-  "function rawEventTimestampMs(event) { return Number.isFinite(event.timestamp) && event.timestamp >= 0 ? event.timestamp : 0; }",
-);
-const buildKeyMomentsSrc = extractFunctionSource(serverSrc, "buildKeyMoments");
-
-const { buildKeyMoments } = new Function(
-  [
-    extractFunctionSource(serverSrc, "timestampLabel"),
-    extractFunctionSource(serverSrc, "phaseFor"),
-    rawTimestampSource,
-    extractConstSource(serverSrc, "PLAYER_DEATH_EVENT_TYPES"),
-    extractConstSource(serverSrc, "ELITE_OBJECTIVE_FIGHT_EVENT_TYPES"),
-    extractConstSource(serverSrc, "STRUCTURE_TAKE_EVENT_TYPES"),
-    extractFunctionSource(serverSrc, "isPlayerDeathEvent"),
-    extractFunctionSource(serverSrc, "isEliteObjectiveFightEvent"),
-    extractFunctionSource(serverSrc, "isStructureTakeEvent"),
-    extractFunctionSource(serverSrc, "labelForMoment"),
-    extractFunctionSource(serverSrc, "impactForMoment"),
-    extractConstSource(serverSrc, "KEY_MOMENTS_MIN"),
-    buildKeyMomentsSrc,
-    "return { buildKeyMoments };",
-  ].join("\n"),
-)();
+const require = createRequire(import.meta.url);
+const { buildKeyMoments } = require("../../lib/rule-based-fallback.js");
 
 let pass = 0;
 let fail = 0;
@@ -138,26 +85,6 @@ check("key moment labels and related ids stay intact", {
   reason: "valid timestamp kill",
   relatedEventIds: ["evt_valid"],
 });
-checkTrue(
-  "buildKeyMoments normalizes sort timestamps",
-  buildKeyMomentsSrc.includes("rawEventTimestampMs({ timestamp: a.timestampMs })"),
-);
-checkTrue(
-  "buildKeyMoments derives timestamp label from normalized time",
-  buildKeyMomentsSrc.includes("timestamp: timestampLabel(time),"),
-);
-checkTrue(
-  "buildKeyMoments derives phase from normalized time",
-  buildKeyMomentsSrc.includes("phase: phaseFor(time),"),
-);
-checkTrue(
-  "buildKeyMoments no longer copies event.timestampLabel",
-  !buildKeyMomentsSrc.includes("timestamp: event.timestampLabel"),
-);
-checkTrue(
-  "buildKeyMoments no longer copies event.phase",
-  !buildKeyMomentsSrc.includes("phase: event.phase"),
-);
 
 const emptyTimelineMoments = buildKeyMoments({
   matchInfo: { result: "LOSS", position: "SUPPORT" },
@@ -200,10 +127,5 @@ check("short timeline fallback tail ids", shortTimelineMoments.slice(1).map((mom
   "fallback_key_moment_03",
   "fallback_key_moment_04",
 ]);
-checkTrue(
-  "buildKeyMoments pads with shared minimum constant",
-  buildKeyMomentsSrc.includes("while (moments.length < KEY_MOMENTS_MIN)"),
-);
-
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

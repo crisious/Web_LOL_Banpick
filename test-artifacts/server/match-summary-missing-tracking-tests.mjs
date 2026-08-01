@@ -1,8 +1,11 @@
 // server.js buildAnalysis matchSummary missing tracking regression tests
 
 import fs from "fs";
+import { createRequire } from "node:module";
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
+const require = createRequire(import.meta.url);
+const { buildActionChecklist, buildKeyMoments } = require("../../lib/rule-based-fallback.js");
 
 function extractFunctionSource(source, name) {
   let startIdx = source.indexOf(`async function ${name}(`);
@@ -66,7 +69,7 @@ const state = {
   console: { log() {}, error() {} },
 };
 
-const buildAnalysis = new Function("state", `
+const buildAnalysis = new Function("state", "buildKeyMoments", "buildActionChecklist", `
   const console = state.console;
   ${supportSources}
 
@@ -132,9 +135,6 @@ const buildAnalysis = new Function("state", `
   function buildPhaseSummaries() {
     return buildRuleBasedAnalysis().phaseSummaries;
   }
-  function buildKeyMoments() {
-    return buildRuleBasedAnalysis().keyMoments;
-  }
   function buildEvidenceIndex() {
     return [{ eventId: "evt_001", summary: "fallback evidence" }];
   }
@@ -143,9 +143,6 @@ const buildAnalysis = new Function("state", `
   }
   function buildWeaknesses() {
     return buildRuleBasedAnalysis().weaknesses;
-  }
-  function buildActionChecklist() {
-    return buildRuleBasedAnalysis().actionChecklist;
   }
   function mergeTeamfightCoaching() {
     return [];
@@ -156,7 +153,7 @@ const buildAnalysis = new Function("state", `
 
   ${buildAnalysisSrc}
   return buildAnalysis;
-`)(state);
+`)(state, buildKeyMoments, buildActionChecklist);
 
 let pass = 0;
 let fail = 0;
