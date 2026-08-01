@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { analyzeWithApi, buildRequestBody } = require("../../lib/agent-api.js");
+const {
+  analyzeWithApi,
+  buildRequestBody,
+  parseDisableApiFallbackConfig,
+} = require("../../lib/agent-api.js");
 
 let pass = 0;
 let fail = 0;
@@ -88,6 +92,68 @@ test("the attached schema permits every key the prompt asks for", () => {
   ]) {
     assert.ok(field in schema.properties, `prompt asks for ${field} but the schema forbids it`);
   }
+});
+
+// AGENT_DISABLE_CODEX와 같은 정확 일치 규칙 — "1"만 끈다.
+test("parseDisableApiFallbackConfig only accepts an exact 1", () => {
+  assert.equal(parseDisableApiFallbackConfig("1"), true);
+  assert.equal(parseDisableApiFallbackConfig(undefined), false);
+  assert.equal(parseDisableApiFallbackConfig(""), false);
+  assert.equal(parseDisableApiFallbackConfig("0"), false);
+  assert.equal(parseDisableApiFallbackConfig("true"), false);
+  assert.equal(parseDisableApiFallbackConfig(" 1"), false);
+});
+
+asyncTest("analyzeWithApi opts into fallbacks by default", async () => {
+  let seen;
+  const saved = process.env.AGENT_DISABLE_API_FALLBACK;
+  delete process.env.AGENT_DISABLE_API_FALLBACK;
+  try {
+    await analyzeWithApi({
+      agent: "claude", prompt: "p",
+      createMessageImpl: async (args) => { seen = args; return { text: "{}", stopReason: "end_turn" }; },
+    });
+  } finally {
+    if (saved === undefined) delete process.env.AGENT_DISABLE_API_FALLBACK;
+    else process.env.AGENT_DISABLE_API_FALLBACK = saved;
+  }
+  assert.equal(seen.fallbacks, "default");
+});
+
+asyncTest("analyzeWithApi disables fallbacks when AGENT_DISABLE_API_FALLBACK=1", async () => {
+  let seen;
+  const saved = process.env.AGENT_DISABLE_API_FALLBACK;
+  process.env.AGENT_DISABLE_API_FALLBACK = "1";
+  try {
+    await analyzeWithApi({
+      agent: "claude", prompt: "p",
+      createMessageImpl: async (args) => { seen = args; return { text: "{}", stopReason: "end_turn" }; },
+    });
+  } finally {
+    if (saved === undefined) delete process.env.AGENT_DISABLE_API_FALLBACK;
+    else process.env.AGENT_DISABLE_API_FALLBACK = saved;
+  }
+  assert.equal(seen.fallbacks, null);
+});
+
+// 다른 모델이 대신 응답했다는 사실은 호출자에게 올라가야 한다.
+asyncTest("analyzeWithApi surfaces fallback switch points", async () => {
+  const out = await analyzeWithApi({
+    agent: "claude", prompt: "p",
+    createMessageImpl: async () => ({
+      text: "{}", stopReason: "end_turn",
+      fallbackSwitches: [{ from: "claude-opus-5", to: "claude-opus-4-8" }],
+    }),
+  });
+  assert.deepEqual(out.fallbackSwitches, [{ from: "claude-opus-5", to: "claude-opus-4-8" }]);
+});
+
+asyncTest("analyzeWithApi reports an empty switch list when none occurred", async () => {
+  const out = await analyzeWithApi({
+    agent: "claude", prompt: "p",
+    createMessageImpl: async () => ({ text: "{}", stopReason: "end_turn" }),
+  });
+  assert.deepEqual(out.fallbackSwitches, []);
 });
 
 for (const [name, fn] of asyncTests) {

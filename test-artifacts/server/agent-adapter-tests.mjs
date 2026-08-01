@@ -136,5 +136,61 @@ test("server.js still computes codexDisabled from AGENT_BACKEND", () => {
   );
 });
 
+// api 백엔드에서 다른 모델이 대신 응답했다면 meta로 올라와야 한다. 그러지 않으면
+// 운영자가 Opus 5 출력이라고 믿은 채 품질 차이를 해석하게 된다.
+const asyncTests = [];
+function asyncTest(name, fn) { asyncTests.push([name, fn]); }
+
+asyncTest("analyzeWithAgent carries fallback switches into meta on the api backend", async () => {
+  const saved = process.env.AGENT_BACKEND;
+  process.env.AGENT_BACKEND = "api";
+  const { analyzeWithApi } = require("../../lib/agent-api.js");
+  const original = analyzeWithApi;
+  try {
+    const api = require("../../lib/agent-api.js");
+    api.analyzeWithApi = async () => ({
+      text: "{}",
+      fallbackSwitches: [{ from: "claude-opus-5", to: "claude-opus-4-8" }],
+    });
+    const { analyzeWithAgent } = require("../../lib/agent-adapter.js");
+    const out = await analyzeWithAgent({ agent: "claude", prompt: "p" });
+    assert.equal(out.meta.backend, "api");
+    assert.deepEqual(out.meta.fallbackSwitches, [{ from: "claude-opus-5", to: "claude-opus-4-8" }]);
+  } finally {
+    require("../../lib/agent-api.js").analyzeWithApi = original;
+    if (saved === undefined) delete process.env.AGENT_BACKEND;
+    else process.env.AGENT_BACKEND = saved;
+  }
+});
+
+asyncTest("analyzeWithAgent reports an empty switch list on the cli backend", async () => {
+  const saved = process.env.AGENT_BACKEND;
+  delete process.env.AGENT_BACKEND;
+  const cli = require("../../lib/agent-cli.js");
+  const original = cli.analyzeWithCli;
+  try {
+    cli.analyzeWithCli = async () => ({ text: "{}" });
+    const { analyzeWithAgent } = require("../../lib/agent-adapter.js");
+    const out = await analyzeWithAgent({ agent: "claude", prompt: "p" });
+    assert.equal(out.meta.backend, "cli");
+    assert.deepEqual(out.meta.fallbackSwitches, []);
+  } finally {
+    cli.analyzeWithCli = original;
+    if (saved === undefined) delete process.env.AGENT_BACKEND;
+    else process.env.AGENT_BACKEND = saved;
+  }
+});
+
+for (const [name, fn] of asyncTests) {
+  try {
+    await fn();
+    pass += 1;
+    console.log(`PASS  ${name}`);
+  } catch (err) {
+    fail += 1;
+    console.log(`FAIL  ${name}: ${err.message}`);
+  }
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exitCode = 1;
