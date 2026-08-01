@@ -2315,7 +2315,12 @@ teamplayRecommendationSelections: teamplayRecommendationCandidates.reviews에 �
 
 async function callClaudeAgent(payload, timeoutMs = 300000) {
   const prompt = `${CLAUDE_COACHING_PROMPT}\n\n${JSON.stringify(payload, null, 2)}`;
-  const { text } = await analyzeWithAgent({ agent: "claude", prompt, timeoutMs });
+  const { text, meta } = await analyzeWithAgent({ agent: "claude", prompt, timeoutMs });
+  // 안전 분류기가 거절해 다른 모델이 대신 응답했으면 조용히 넘어가지 않는다.
+  // 이걸 안 찍으면 운영자가 Opus 5 출력이라고 믿은 채 품질 차이를 해석하게 된다.
+  for (const hop of meta?.fallbackSwitches ?? []) {
+    console.log(`[AI] Claude request fell back: ${hop.from} declined, ${hop.to} served`);
+  }
   return parseAgentJson(text);
 }
 

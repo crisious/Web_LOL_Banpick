@@ -185,6 +185,150 @@ test("parseSseChunk skips unparsable data lines", () => {
   assert.equal(events.length, 0);
 });
 
+// ─── 서버사이드 refusal fallback ────────────────────────────────────────────
+//
+// Opus 5의 안전 분류기는 요청을 거절할 수 있고(HTTP 200 + stop_reason:"refusal"),
+// 양성 요청도 오탐될 수 있다. fallbacks 옵트인은 거절된 요청을 서버측에서 다른
+// 모델로 다시 돌린다. 베타 헤더와 body 필드는 짝이라 한쪽만 보내면 400이다.
+
+// init을 붙잡아 요청 모양을 검증하는 fetch.
+function capturingFetch({ sseLines = SSE_OK, onCall } = {}) {
+  const calls = [];
+  const impl = async (url, init) => {
+    calls.push({ url, init, body: JSON.parse(init.body) });
+    const canned = onCall?.(calls.length);
+    if (canned) return canned;
+    return fakeFetch({ sseLines })();
+  };
+  impl.calls = calls;
+  return impl;
+}
+
+function rejects400(message) {
+  return {
+    ok: false, status: 400,
+    headers: { get: () => null },
+    json: async () => ({ error: { message } }),
+  };
+}
+
+asyncTest("createMessage opts into server-side fallbacks by default", async () => {
+  const impl = capturingFetch();
+  await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fetchImpl: impl,
+  });
+  assert.equal(impl.calls.length, 1);
+  assert.equal(impl.calls[0].init.headers["anthropic-beta"], "server-side-fallback-2026-07-01");
+  assert.equal(impl.calls[0].body.fallbacks, "default");
+});
+
+asyncTest("createMessage omits the fallback opt-in when disabled", async () => {
+  const impl = capturingFetch();
+  await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fallbacks: null,
+    fetchImpl: impl,
+  });
+  assert.equal(impl.calls[0].init.headers["anthropic-beta"], undefined);
+  assert.equal("fallbacks" in impl.calls[0].body, false);
+});
+
+asyncTest("createMessage reports fallback switch points from the stream", async () => {
+  const out = await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fetchImpl: fakeFetch({
+      sseLines: [
+        'data: {"type":"content_block_start","index":0,"content_block":{"type":"fallback","from":{"model":"claude-opus-5"},"to":{"model":"claude-opus-4-8"}}}\n\n',
+        ...SSE_OK,
+      ],
+    }),
+  });
+  assert.deepEqual(out.fallbackSwitches, [{ from: "claude-opus-5", to: "claude-opus-4-8" }]);
+  assert.equal(out.text, "Hello");
+});
+
+asyncTest("createMessage reports no switch when the primary model served", async () => {
+  const out = await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fetchImpl: fakeFetch({ sseLines: SSE_OK }),
+  });
+  assert.deepEqual(out.fallbackSwitches, []);
+});
+
+// 이 레포는 실제 API를 테스트에서 부르지 않으므로 베타 가용 여부를 알 수 없다.
+// 계정에 베타가 없으면 400이 나고 api 백엔드가 통째로 죽으므로, 옵트인을 떼고
+// 한 번 다시 시도해 스스로 낫는다.
+asyncTest("createMessage drops the opt-in and retries when the beta is rejected", async () => {
+  const impl = capturingFetch({
+    onCall: (n) => (n === 1 ? rejects400("fallbacks: unsupported beta parameter") : null),
+  });
+  const out = await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fetchImpl: impl,
+  });
+  assert.equal(impl.calls.length, 2);
+  assert.equal(impl.calls[1].init.headers["anthropic-beta"], undefined);
+  assert.equal("fallbacks" in impl.calls[1].body, false);
+  assert.equal(out.text, "Hello");
+});
+
+asyncTest("createMessage downgrades at most once", async () => {
+  const impl = capturingFetch({ onCall: () => rejects400("fallbacks are not enabled") });
+  await assert.rejects(
+    () => createMessage({
+      apiKey: "k",
+      body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+      fetchImpl: impl,
+    }),
+    /400/,
+  );
+  assert.equal(impl.calls.length, 2);
+});
+
+asyncTest("createMessage does not downgrade on an unrelated 400", async () => {
+  const impl = capturingFetch({ onCall: () => rejects400("messages: must not be empty") });
+  await assert.rejects(
+    () => createMessage({
+      apiKey: "k",
+      body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+      fetchImpl: impl,
+    }),
+    /400/,
+  );
+  assert.equal(impl.calls.length, 1);
+});
+
+// 강등은 재시도 예산을 쓰지 않아야 한다 — 베타 미가용은 서버 장애가 아니다.
+asyncTest("the fallback downgrade does not consume a 5xx retry", async () => {
+  let n = 0;
+  const impl = async () => {
+    n += 1;
+    if (n === 1) return rejects400("fallbacks: unknown field");
+    if (n <= 3) {
+      return {
+        ok: false, status: 503,
+        headers: { get: (k) => (k.toLowerCase() === "retry-after" ? "0" : null) },
+        json: async () => ({}),
+      };
+    }
+    return fakeFetch({ sseLines: SSE_OK })();
+  };
+  const out = await createMessage({
+    apiKey: "k",
+    body: { model: "claude-opus-5", max_tokens: 100, messages: [] },
+    fetchImpl: impl,
+  });
+  // 1 강등 + 503 두 번 + 성공 = 4회. 강등이 예산을 먹었다면 3회째에 throw했을 것.
+  assert.equal(n, 4);
+  assert.equal(out.text, "Hello");
+});
+
 for (const [name, fn] of asyncTests) {
   try {
     await fn();
