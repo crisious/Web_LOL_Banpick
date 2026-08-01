@@ -8,6 +8,10 @@
 // recent-matches must tolerate partial match-detail failures.
 
 import fs from "fs";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const { summarizeMatch } = require("../../lib/match-summary.js");
 
 const mainSrc = fs.readFileSync(new URL("../../main.js", import.meta.url), "utf8");
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
@@ -96,11 +100,6 @@ checkTrue("safeJsonParse returns fallback on corrupt JSON", safeJsonParse("{not 
 checkTrue("safeJsonParse returns fallback on null", safeJsonParse(null, "FB") === "FB");
 
 // ── summarizeMatch null/malformed guard ───────────────────────────────────
-const summarizeMatch = new Function(
-  `function normalizeRole() { return "SUPPORT"; }
-${extractFunctionSource(serverSrc, "summarizeMatch")}
-return summarizeMatch;`,
-)();
 checkTrue("summarizeMatch returns null for null detail", summarizeMatch(null, "p") === null);
 checkTrue("summarizeMatch returns null for missing info", summarizeMatch({}, "p") === null);
 checkTrue("summarizeMatch returns null for non-array participants", summarizeMatch({ info: { participants: null } }, "p") === null);

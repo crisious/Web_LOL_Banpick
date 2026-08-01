@@ -1,7 +1,10 @@
 // server.js participant scoreboard coaching regression tests.
 
 import fs from "fs";
+import { createRequire } from "module";
 
+const require = createRequire(import.meta.url);
+const { normalizeRole } = require("../../lib/match-summary.js");
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
 function extractFunctionSource(source, name) {
@@ -31,7 +34,6 @@ function extractConstSource(source, name) {
 const harnessSrc = [
   extractConstSource(serverSrc, "CS_FULL_SCORE_TARGETS"),
   extractFunctionSource(serverSrc, "clamp10"),
-  extractFunctionSource(serverSrc, "normalizeRole"),
   extractFunctionSource(serverSrc, "calcCombatScore"),
   extractFunctionSource(serverSrc, "calcIncomeScore"),
   extractFunctionSource(serverSrc, "calcVisionScore"),
@@ -52,7 +54,7 @@ const {
   participantCoachingText,
   buildParticipantPlayScore,
   buildParticipantScoreboard,
-} = new Function(harnessSrc)();
+} = new Function("normalizeRole", harnessSrc)(normalizeRole);
 
 let pass = 0;
 let fail = 0;
