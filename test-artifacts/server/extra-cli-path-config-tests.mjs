@@ -5,39 +5,14 @@
 // so accidental leading/trailing/double delimiters must fail before spawning AI
 // CLI subprocesses.
 
-import fs from "fs";
+// 2026-08: parseExtraCliPathConfig가 server.js에서 lib/agent-cli.js로 이동했다.
+// 이전에는 server.js 소스를 문자열로 읽어 new Function으로 재구성했는데, 함수가
+// 사라지면 관대한 스텁으로 조용히 폴백해 아래 throw 검증 9건이 전부 무의미해졌다.
+// 실제 모듈을 require해 그 배선 함정을 없앤다.
+import { createRequire } from "node:module";
 
-const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
-
-function extractFunctionSource(source, name) {
-  const startIdx = source.indexOf(`function ${name}(`);
-  if (startIdx < 0) throw new Error(`function ${name} not found`);
-  let depth = 0;
-  let bodyStarted = false;
-  for (let i = startIdx; i < source.length; i += 1) {
-    const ch = source[i];
-    if (ch === "{") {
-      depth += 1;
-      bodyStarted = true;
-    } else if (ch === "}") {
-      depth -= 1;
-      if (bodyStarted && depth === 0) return source.slice(startIdx, i + 1);
-    }
-  }
-  throw new Error(`function ${name} not closed`);
-}
-
-const parseExtraCliPathConfigSource = serverSrc.includes("function parseExtraCliPathConfig(")
-  ? extractFunctionSource(serverSrc, "parseExtraCliPathConfig")
-  : [
-      "function parseExtraCliPathConfig(rawPath, delimiter = ':') {",
-      "  return rawPath ? String(rawPath).split(delimiter) : [];",
-      "}",
-    ].join("\n");
-
-const { parseExtraCliPathConfig } = new Function(
-  `${parseExtraCliPathConfigSource}\nreturn { parseExtraCliPathConfig };`,
-)();
+const require = createRequire(import.meta.url);
+const { parseExtraCliPathConfig } = require("../../lib/agent-cli.js");
 
 let pass = 0, fail = 0;
 

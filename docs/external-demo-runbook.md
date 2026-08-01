@@ -251,6 +251,29 @@ SAMPLES_DIR=/var/lib/lol-ai-coach/samples
 
 The first cloud deploy should stay read-only. `PUBLIC_DEMO_MODE` defaults to `full` only when missing or empty; any non-empty value must exactly match lowercase `full`, `readonly`, or `protected`. The local `.env` loader does not trim or lowercase mode values after `=`, so values that could be normalized, such as ` readonly` or `READONLY`, remain invalid and block live/write APIs with 403 `PUBLIC_DEMO_MODE_INVALID` while preserving the raw mode and `publicDemoModeValid: false` in `/healthz` for diagnosis. Shell or platform environment keys take precedence over `.env` entries even when the existing value is an empty string. `PORT` defaults to `8123` only when missing or empty; any non-empty value must be an exact decimal integer from `0` to `65535` without whitespace, leading-zero, hex, exponent, or float normalization. `TRUST_PROXY` is also an exact opt-in: only `TRUST_PROXY=1` enables forwarded IP headers, while values such as `TRUST_PROXY= 1` keep proxy trust disabled and rate limiting keyed to the socket IP. Even with `TRUST_PROXY=1`, duplicate or array-shaped `cf-connecting-ip`, `x-forwarded-for`, or `x-real-ip` values are not trusted; rate limiting falls back to the socket IP instead of the first forwarded value. Non-empty `x-forwarded-for` values with leading, trailing, or middle empty comma segments are also treated as malformed and fall back to the socket IP. `SAMPLES_DIR` should point at a persistent volume; when unset, the server uses `./data/samples`. Writable sample generation now has a same-process `platformRegion + matchId` lock that returns 409 `SAMPLE_GENERATION_IN_PROGRESS` for duplicate work without exposing match IDs or lock keys in the response; `/healthz.sampleGeneration` exposes only aggregate lock status with `activeCount` and integer `oldestAgeMs`, not lock keys, match IDs, Riot IDs, tokens, or raw payloads. Local JSON writes use a temp file plus rename to reduce partial-write corruption, manifest read-modify-write operations are queued inside a single process, and processes sharing the same `SAMPLES_DIR` coordinate through a `.manifest.lock` directory. A lock directory older than 5 minutes is treated as stale and removed before retrying acquisition. `manifest.json` declares `schemaVersion: 1`; legacy manifests without the field are normalized as v1, and unsupported versions, invalid runtime shape, missing required sample entry metadata, missing exact `/data/samples/` public prefixes, escaped per-sample public paths, traversal segments, raw/internal path exposure, malformed sample entry ids, or duplicate sample entry ids use the `SAMPLE_MANIFEST_INVALID` diagnostic code. Sample entry `id` values must also match the lowercase generated `sample-...` contract used by `/api/samples/:id`; uppercase, slash, encoded slash, whitespace, trailing-hyphen, or duplicate ids fail with `SAMPLE_MANIFEST_INVALID`. If a validated manifest points `normalizedPath` or `analysisPath` at a missing or malformed required JSON file, sample detail returns `SAMPLE_BUNDLE_UNAVAILABLE` without local path or parser detail leakage. Runtime validation and stored fixture integrity tests share `lib/sample-manifest.js` so path and metadata criteria stay aligned. Multi-instance protected demos still need provider-level persistent storage validation before wider use.
 
+## Always-On Deploy (AGENT_BACKEND=api)
+
+Runs live analysis without the `claude` CLI on the host, so any box with Node >= 20 can serve it. `AGENT_BACKEND` selects the analysis engine behind `lib/agent-adapter.js`: unset or unrecognized falls back to `cli` (the original subprocess path, unchanged), `api` routes to the Anthropic Messages API over the built-in `fetch`. No npm packages are involved either way.
+
+```bash
+export ANTHROPIC_API_KEY=...        # Anthropic API key
+export RIOT_API_KEY=...             # Riot development key (expires every 24h)
+export AGENT_BACKEND=api            # use the Messages API instead of the CLI
+export PUBLIC_DEMO_MODE=protected   # require an invite token
+export PUBLIC_DEMO_TOKEN=...        # share only with invited testers
+export PORT=8123
+node server.js
+```
+
+Notes:
+
+- **The Codex leg is disabled under `AGENT_BACKEND=api`.** Codex is an OpenAI CLI with no Messages API counterpart, so the run is single-agent and the dual cross-check is gone. The server logs `[AI] Codex disabled (AGENT_DISABLE_CODEX or AGENT_BACKEND=api)` once per analysis; this reuses the existing `AGENT_DISABLE_CODEX` code path rather than adding a second one.
+- **`ANTHROPIC_API_KEY` must be an actual environment variable.** `lib/anthropic-client.js` is raw HTTP with zero dependencies, so it reads that one variable and nothing else — an `ant auth login` profile, `ANTHROPIC_AUTH_TOKEN`, or Workload Identity Federation will not be picked up the way the official SDKs would. Without it the request fails fast with `ANTHROPIC_API_KEY is not set`.
+- **Analysis output is constrained by a JSON schema** (`lib/analysis-json-schema.js`) via `output_config.format`. `validateAnalysisOutput` still runs afterwards and still owns the array-length rules (3 phase summaries, 4 key moments, and so on), because JSON schema `minItems` is not supported by structured outputs.
+- **The Riot development key expires every 24 hours.** The UI surfaces the failure but nothing renews it automatically.
+- Requests stream (`stream: true`) and retry 429/5xx twice, honoring `retry-after`. A refusal or a `max_tokens` truncation raises, which drops the run onto the existing rule-based fallback chain.
+- The `sites/` Cloudflare deploy is a separate read-only demo. Do not confuse it with this configuration.
+
 ## Pre-Share Checklist
 
 - [ ] `npm test` passes
