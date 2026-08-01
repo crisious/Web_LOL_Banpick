@@ -64,6 +64,32 @@ asyncTest("analyzeWithApi throws on max_tokens truncation", async () => {
   );
 });
 
+test("buildRequestBody attaches the json_schema format by default", () => {
+  const body = buildRequestBody({ prompt: "hi" });
+  assert.equal(body.output_config.format.type, "json_schema");
+  assert.equal(body.output_config.format.schema.type, "object");
+});
+
+test("buildRequestBody omits the format when structured is false", () => {
+  const body = buildRequestBody({ prompt: "hi", structured: false });
+  assert.equal(body.output_config.format, undefined);
+});
+
+// 구조화 출력을 켜도 프롬프트가 요구하는 필드가 스키마에서 막히면 안 된다.
+// additionalProperties:false가 teamplayRecommendationSelections를 금지하면
+// teamplay v2 코칭 선택 경로가 통째로 죽는다.
+test("the attached schema permits every key the prompt asks for", () => {
+  const { schema } = buildRequestBody({ prompt: "hi" }).output_config.format;
+  for (const field of [
+    "schemaVersion", "analysisMeta", "matchSummary", "coachSummary",
+    "phaseSummaries", "strengths", "weaknesses", "actionChecklist",
+    "keyMoments", "evidenceIndex", "combatAnalysis",
+    "teamfightPhaseAnalysis", "teamplayRecommendationSelections",
+  ]) {
+    assert.ok(field in schema.properties, `prompt asks for ${field} but the schema forbids it`);
+  }
+});
+
 for (const [name, fn] of asyncTests) {
   try {
     await fn();
