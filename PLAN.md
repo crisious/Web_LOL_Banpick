@@ -90,12 +90,13 @@ playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake �
 
 (노트: 후보 Phase 라벨은 31/32에서 33/34로 재배정 — 31은 데이터 코호트 확장, 32는 combatAnalysis 기능이 차지)
 
-- **Phase 33: `summarizeMatch` 회귀 테스트** (~1h)
-  - 트리거: Riot Match-V5 응답 스키마 변경 / 새 challenge 필드 추가 / participant 구조 변경
-  - 가치: 서버 단의 raw → summary 추출 깨지면 모든 후속 분석이 손상
-- **Phase 34: `buildKeyMoments` / `buildActionChecklist` fixture** (~1h)
-  - 트리거: AI 양쪽 실패 케이스가 실제 발생 (서버 콘솔 `rule-based fallback` 로그)
-  - 가치: fallback 안전망의 출력 품질을 회귀 차단 — 현재는 fallback 발화 시 결과 불확실
+- **Phase 33: `summarizeMatch` 회귀 테스트 — DONE (2026-08-01)**
+  - `summarizeMatch` + 직접 의존 helper(`durationLabel`/`normalizeRole`/`queueLabel`)를 `lib/match-summary.js`로 동작 불변 추출하고, 실제 Match-V5 fixture(`test-artifacts/fixtures/match-v5-summary-fixture.mjs`) 기반 직접-import 회귀 테스트를 추가했다.
+  - 기존 `fetch-resilience-tests.mjs`는 `new Function`으로 소스를 재구성하면서 **`normalizeRole`을 항상 `"SUPPORT"`로 반환하는 가짜와 함께** 검증하고 있었다 — role 정규화가 어떻게 깨져도 통과하는 상태였다. 실제 모듈 import로 전환해 이 사각지대를 닫았다.
+  - `challenges`는 현 계약에서 미사용이므로, 블록 누락/부분 누락이 동일 summary를 유지하도록 고정했다.
+- **Phase 34: `buildKeyMoments` / `buildActionChecklist` fixture — DONE (2026-08-01)**
+  - 두 fallback 빌더를 `lib/rule-based-fallback.js`로 동작 불변 추출하고, 정상/단시간/빈 timeline 및 다중/빈/비배열 weaknesses fixture로 상한·필수 필드·정렬 계약을 고정했다 (계약 테스트 9건).
+  - 착시 제거가 핵심이었다: `match-summary-missing-tracking` / `strengths-count-tracking` / `phase-summaries-missing-tracking` 세 파일이 **같은 이름의 로컬 stub 함수**를 정의하고 있어, 테스트가 있는 것처럼 보였지만 실제 빌더는 한 줄도 검증되지 않았다. 세 파일 모두 실제 모듈 주입으로 교체했다.
 - **Phase 32 후속: `detectCombatEncounters` 임계값 실측 — DONE (2026-08-01, 27경기)**
   - 재실행: `node scripts/measure-combat-encounters.mjs --window-ms=25000 --max-encounters=8`. 매치당 uncapped encounter 분포는 `1:1, 2:1, 4:2, 5:1, 6:4, 7:1, 8:4, 10:3, 11:2, 12:1, 14:1, 15:1, 16:1, 17:2, 18:1, 21:1`(encounter 수:매치 수), 중앙값 8 / p90 17 / 최대 21.
   - **윈도우 25초 유지**: encounter 간 234개 간격 중 25~30초 경계 쌍은 2개(0.85%, 각 26.138s/26.148s)뿐이다. 30초로 넓혀도 두 쌍만 합쳐지고 cap에 잘린 매치는 13개로 동일해, 장기 한타 분할의 코호트 근거가 부족하다.
@@ -135,11 +136,14 @@ playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake �
 
 ## 4. 다음 액션
 
-Phase 25~30 + 라이브 Track D/E + Codex 진단 모두 처리됨. 현 시점 자동 진행 가능한 후보:
+**Tier A 3종 전부 완료 (2026-08-01, Orca orchestration 병렬 3워커).** Phase 33 / Phase 34 / Phase 32-후속을 각각 독립 워크트리에서 진행한 뒤 순차 머지했다. `npm test` **3388 → 3401 passed / 0 failed / 156 → 158 files**, `server.js` 4,539 → 4,285줄(−254, 로직 3개 모듈로 이동).
 
-- **A**: Phase 31 (summarizeMatch 테스트) — 함수 추출 + fixture, 1h
-- **B**: Phase 32 (buildKeyMoments / buildActionChecklist fixture) — fallback 품질 고정, 1h
-- **C**: 두 트랙 묶음 — 2h
-- **D**: 현재 stable — 외부 트리거 대기
+이 사이클에서 걷어낸 공통 취약점: **소스 문자열을 `new Function`/`includes()`로 재구성·검사하는 테스트**는 코드가 이동하면 깨지고 배선 버그는 못 잡는다. 신규·전환 테스트는 모두 실제 모듈 import 방식이다.
 
-권장: **D** — 핵심 검증 다 끝났고 ROI 곡선이 평평해졌음. 새 feature 요청 / 회귀 발견 시 재개.
+현 시점 자동 진행 가능한 후보:
+
+- **A**: Tier B — N개 매치 누적 추세 뷰 (~반나절). 현재 tab-trends는 단일 매치 비교만 가능
+- **B**: Tier B — Codex 대체 에이전트 어댑터 (`callCodexAgent` 추상화, ~3h)
+- **C**: 현재 stable — 외부 트리거 대기
+
+권장: **C** — Tier A로 회귀 차단이 한 단계 올라갔고, Tier B 두 항목은 모두 "사용자 시나리오가 실제로 생겼을 때" 트리거가 걸리는 성격이다. 새 feature 요청 / 회귀 발견 시 재개.
