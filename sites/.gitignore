@@ -1,0 +1,5 @@
+/node_modules/
+/dist/
+/.staging-public/
+/.wrangler/
+*.log

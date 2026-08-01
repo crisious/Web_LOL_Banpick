@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LoL 리플레이 코치 리포트</title>
+    <meta name="description" content="관찰된 경기 사실과 AI 해석을 분리해 다음 행동으로 연결하는 LoL 코칭 리포트" />
+    <meta property="og:title" content="LOLGG AI COACH · 경기 근거 타임라인" />
+    <meta property="og:description" content="관찰된 사실과 AI 해석을 분리한 코칭" />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LOLGG AI COACH · 경기 근거 타임라인" />
+    <meta name="twitter:description" content="관찰된 사실과 AI 해석을 분리한 코칭" />
+    <meta name="twitter:image" content="/og.png" />
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <link rel="stylesheet" href="./styles.css?v=20260616" />
   </head>
@@ -207,6 +215,26 @@
 
           <!-- TAB: 분석 -->
           <div class="tab-page" id="tab-analysis" role="tabpanel" aria-labelledby="tab-analysis-btn" tabindex="0">
+
+          <section class="evidence-lab" data-evidence-dashboard aria-labelledby="evidence-lab-title">
+            <header class="evidence-lab__intro">
+              <div>
+                <span class="evidence-lab__brand">LOLGG AI COACH</span>
+                <h2 id="evidence-lab-title">경기 근거 타임라인</h2>
+                <p>원본에서 관찰된 사실과 AI 코치의 해석을 분리해, 다음 경기의 한 가지 행동으로 연결합니다.</p>
+              </div>
+              <span class="evidence-lab__mode">EVIDENCE MODE</span>
+            </header>
+            <div data-evidence-dashboard-header></div>
+            <div data-evidence-dashboard-metrics></div>
+            <div class="evidence-lab-grid">
+              <div class="evidence-lab__review">
+                <div data-evidence-moments></div>
+                <div data-evidence-detail aria-live="polite" aria-atomic="true"></div>
+              </div>
+              <aside data-evidence-protocol aria-label="다음 게임 행동 프로토콜"></aside>
+            </div>
+          </section>
 
           <section class="panel panel--phases" id="phases" aria-labelledby="phases-title">
             <div class="section-heading">

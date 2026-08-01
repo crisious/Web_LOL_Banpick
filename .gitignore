@@ -1,11 +1,23 @@
 .DS_Store
+.idea/
 .env
 *.log
 .claude/settings.local.json
 .claude/worktrees/
+# 로컬 IDE의 MCP 서버 설정. Rider가 세션마다 다른 포트에 뜨므로 값이 머신 전용이고,
+# 커밋해도 다른 환경에서는 연결되지 않는다.
+.mcp.json
 test-artifacts/qa-automation/
 test-artifacts/design-audit/
 .superpowers/
 .worktrees/
 test-artifacts/layout-redesign/
 test-artifacts/design-bundle/
+test-artifacts/tmp/
+
+# Playwright MCP 브라우저 검증 산출물 (스냅샷·콘솔 로그)
+.playwright-mcp/
+# 샘플 노트는 실제 Riot ID/매치 ID가 담긴 사람용 메모라 추적하지 않는다.
+# 코드가 디스크에서 읽지 않고(manifest의 notesPath는 경로 문자열일 뿐),
+# 스테이징 시 sanitizeManifestSample이 notesPath를 떼어낸다.
+data/samples/*/*-notes.md

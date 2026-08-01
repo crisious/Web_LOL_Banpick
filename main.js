@@ -29,6 +29,12 @@ const dom = {
   teamfightPhases: document.querySelector("[data-teamfight-phases]"),
   evidence: document.querySelector("[data-evidence]"),
   evidenceQuality: document.querySelector("[data-evidence-quality]"),
+  evidenceDashboard: document.querySelector("[data-evidence-dashboard]"),
+  evidenceDashboardHeader: document.querySelector("[data-evidence-dashboard-header]"),
+  evidenceDashboardMetrics: document.querySelector("[data-evidence-dashboard-metrics]"),
+  evidenceMoments: document.querySelector("[data-evidence-moments]"),
+  evidenceDetail: document.querySelector("[data-evidence-detail]"),
+  evidenceProtocol: document.querySelector("[data-evidence-protocol]"),
   sampleSwitcher: document.querySelector("[data-sample-switcher]"),
   reportStrip: document.querySelector("[data-report-strip]"),
   trendHeadline: document.querySelector("[data-trend-headline]"),
@@ -1220,7 +1226,7 @@ function classifyTrendTag(tag) {
 function buildTrendSnapshot() {
   const samples = state.manifest;
   const current = samples.find((sample) => sample.id === state.currentSampleId) || samples[0];
-  const playerAlias = current?.publicAlias || "PlayerAlias#KR1";
+  const trendSubject = current ? sampleReportLabel(current) : "보관 리포트";
   const roleCounts = new Map();
   let wins = 0;
   let losses = 0;
@@ -1265,7 +1271,7 @@ function buildTrendSnapshot() {
     .slice(0, 3)
     .map(([tag, count]) => `${tag} ${count}회`);
 
-  const headline = `${playerAlias} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${roleLabel(dominantRole)} 비중 ${dominantRoleCount}회`;
+  const headline = `${trendSubject} · 리포트 ${samples.length}개 / ${wins}승 ${losses}패 / ${roleLabel(dominantRole)} 비중 ${dominantRoleCount}회`;
   const summary =
     recurringTags.length > 0
       ? `반복 신호: ${recurringTags.slice(0, 2).join(" / ")}. 현재 샘플 ${current?.id || "-"} 기준으로 복기 중입니다.`
@@ -1995,35 +2001,11 @@ async function loadManifest() {
   }
 }
 
-async function loadSampleBundle(sampleId) {
-  try {
-    return await fetchJson(`/api/samples/${sampleId}`);
-  } catch (error) {
-    const entry = state.manifest.find((sample) => sample.id === sampleId);
-    if (!entry) {
-      throw error;
-    }
-
-    const [normalized, analysis] = await Promise.all([
-      fetchJson(entry.normalizedPath),
-      fetchJson(entry.analysisPath),
-    ]);
-
-    // fallback에서도 comparison 로드 시도
-    let comparison = null;
-    const compPath = entry.normalizedPath.replace("normalized-match.json", "comparison-result.json");
-    try { comparison = await fetchJson(compPath); } catch {}
-
-    return {
-      sampleId: entry.id,
-      publicAlias: entry.publicAlias,
-      collectedDate: entry.collectedDate,
-      theme: entry.theme,
-      normalized,
-      analysis,
-      comparison,
-    };
-  }
+// 과거에는 /api/samples 실패 시 manifest의 /data/... 경로를 직접 받아오는 fallback이
+// 있었으나, 정적 서빙이 allowlist(기본 거부)라 /data/ 는 항상 403이었다. 즉 fallback은
+// 성공할 수 없었고, 원래 에러를 2차 에러로 덮어 진단만 어렵게 만들었다.
+function loadSampleBundle(sampleId) {
+  return fetchJson(`/api/samples/${sampleId}`);
 }
 
 function firstManifestSample() {
@@ -2034,10 +2016,11 @@ function hasMatchListContext() {
   return Array.isArray(state.recentMatches) && state.recentMatches.length > 0;
 }
 
-function bootstrapEntryMode({ hasSavedAccount, hasStoredSample, serverMode }) {
-  if (hasSavedAccount) return "saved-account";
-  if (serverMode === "full" && hasStoredSample) return "internal-sample";
-  return "logged-out";
+// 저장된 계정이 없으면 항상 로그인 화면으로 보낸다. 상세 화면에는 로그인
+// 오버레이도 "다른 계정" 버튼도 없어서, 거기로 직행시키면 Riot 계정을
+// 입력·변경할 방법이 사라진다. 샘플은 로그인 화면의 "저장 샘플 열기"로 연다.
+function bootstrapEntryMode({ hasSavedAccount }) {
+  return hasSavedAccount ? "saved-account" : "logged-out";
 }
 
 function serverModeUi(status, error) {
@@ -2109,33 +2092,6 @@ function liveControlLockedMessage() {
   return currentServerModeUi().liveControlMessage || "현재 모드에서는 라이브 Riot 조회를 사용할 수 없습니다.";
 }
 
-async function openInternalLandingSample() {
-  const sample = firstManifestSample();
-  if (!sample) return false;
-
-  setDetailProgress("lookup", {
-    message: `${sample.id} 내부 개발 기본 리포트를 불러오고 있습니다.`,
-    progress: 32,
-    skippedSteps: ["riot", "ai"],
-  });
-  setView("LOADING_DETAIL");
-
-  try {
-    await selectSample(sample.id);
-    setView("DETAIL_VIEW");
-    completeDetailProgress("내부 개발용 기본 리포트를 열었습니다.");
-    if (dom.loginStatus) dom.loginStatus.textContent = "";
-    return true;
-  } catch (error) {
-    failDetailProgress(formatRetryMessage(error));
-    setView("LOGGED_OUT");
-    if (dom.loginStatus) {
-      dom.loginStatus.textContent = `기본 리포트 열기 실패: ${formatRetryMessage(error)}`;
-    }
-    return false;
-  }
-}
-
 function renderLoginDemoStatus() {
   const sample = firstManifestSample();
   const sampleCount = Array.isArray(state.manifest) ? state.manifest.length : 0;
@@ -2157,7 +2113,7 @@ function renderLoginDemoStatus() {
   }
   if (dom.loginSampleMeta) {
     dom.loginSampleMeta.textContent = sample
-      ? `${sampleCount}개 보관 · ${sample.publicAlias || sampleReportLabel(sample)}`
+      ? `${sampleCount}개 보관 · ${sampleReportLabel(sample)}`
       : "샘플 대기 중";
   }
   if (dom.loginLiveLock) {
@@ -2237,6 +2193,274 @@ function evidenceMap(sample) {
   );
 }
 
+function buildEvidenceDashboardMetrics(sample) {
+  const stats = sample?.normalized?.playerStats || {};
+  const score = Number(sample?.normalized?.playtimeScore?.overall);
+  const vision = Number(stats.visionScore);
+  return {
+    score: Number.isFinite(score) ? Math.round(score * 10) : null,
+    kda: `${stats.kills ?? 0} / ${stats.deaths ?? 0} / ${stats.assists ?? 0}`,
+    vision: Number.isFinite(vision) ? vision : null,
+    killParticipation: formatPercent(Number(stats.killParticipation) || 0),
+  };
+}
+
+function evidenceMomentTone(moment, observedFacts) {
+  const eventTypes = observedFacts.map((fact) => fact.eventType).join(" ");
+  const copy = `${moment?.title || moment?.label || ""} ${moment?.description || moment?.reason || ""}`;
+  if (/DEATH|FAIL|LOSS|BAD/.test(eventTypes) || /데스|사망|실패|손실|늦은|늦게/.test(copy)) {
+    return "danger";
+  }
+  return "good";
+}
+
+function buildEvidenceMomentModels(sample) {
+  const timelineById = new Map(
+    (sample?.normalized?.timelineEvents || []).map((event) => [event.eventId, event]),
+  );
+  const sourceMoments = Array.isArray(sample?.analysis?.keyMoments)
+    ? sample.analysis.keyMoments
+    : [];
+
+  const allMoments = sourceMoments.map((moment, index) => {
+    const relatedEventIds = Array.isArray(moment.relatedEventIds) ? moment.relatedEventIds : [];
+    const observedFacts = relatedEventIds
+      .map((eventId) => timelineById.get(eventId))
+      .filter(Boolean)
+      .map((event) => ({
+        eventId: event.eventId,
+        timestampLabel: event.timestampLabel || event.timestamp || "—",
+        eventType: event.eventType || "—",
+        summary: event.summary || "",
+      }));
+    const model = {
+      id: moment.id || `moment-${index + 1}`,
+      timestampLabel: moment.timestampLabel || moment.timestamp || "—",
+      phase: moment.phase || keyMomentPhase(moment),
+      title: moment.title || moment.label || "주요 장면",
+      interpretation: moment.description || moment.reason || "AI 해석이 없습니다.",
+      observedFacts,
+    };
+    model.tone = evidenceMomentTone(moment, observedFacts);
+    return model;
+  });
+
+  const positive = allMoments.filter((moment) => moment.tone !== "danger").slice(0, 2);
+  const danger = allMoments.filter((moment) => moment.tone === "danger");
+  const selectedDanger = danger.length > 1 ? [danger[0], danger[danger.length - 1]] : danger;
+  const selectedIds = new Set([...positive, ...selectedDanger].map((moment) => moment.id));
+  const moments = allMoments
+    .filter((moment) => selectedIds.has(moment.id))
+    .slice(0, 4);
+
+  if (moments.length < Math.min(4, allMoments.length)) {
+    for (const moment of allMoments) {
+      if (moments.length >= 4) break;
+      if (!moments.some((item) => item.id === moment.id)) moments.push(moment);
+    }
+  }
+  const sourceOrder = new Map(allMoments.map((moment, index) => [moment.id, index]));
+  moments.sort((a, b) => (sourceOrder.get(a.id) ?? 0) - (sourceOrder.get(b.id) ?? 0));
+
+  const defaultMoment = moments.find(
+    (moment) => moment.tone === "danger" && moment.observedFacts.length > 0,
+  ) || moments[0] || null;
+
+  return {
+    moments,
+    selectedId: defaultMoment?.id || null,
+  };
+}
+
+function renderEvidenceMomentDetail(moment) {
+  if (!moment) {
+    return '<p class="muted">선택할 수 있는 경기 장면이 없습니다.</p>';
+  }
+  const observedFacts = Array.isArray(moment.observedFacts) ? moment.observedFacts : [];
+  const observedHtml = observedFacts.length > 0
+    ? `<ul class="evidence-fact-list">
+        ${observedFacts.map((fact) => `
+          <li>
+            <div class="evidence-fact-list__meta">
+              <time>${escapeHtml(fact.timestampLabel || "—")}</time>
+              <span>${escapeHtml(compactEventTypeLabel(fact.eventType))}</span>
+            </div>
+            <p>${escapeHtml(fact.summary || "기록된 설명 없음")}</p>
+          </li>
+        `).join("")}
+      </ul>`
+    : '<p class="evidence-empty-fact">원본 이벤트 기록 없음</p>';
+
+  return `
+    <div class="evidence-detail__heading">
+      <span>${escapeHtml(moment.timestampLabel || "—")} · ${escapeHtml(gamePhaseLabel(moment.phase))}</span>
+      <h3>${escapeHtml(moment.title || "주요 장면")}</h3>
+    </div>
+    <div class="evidence-reasoning">
+      <section class="evidence-reasoning__panel evidence-reasoning__panel--observed" data-evidence-observed aria-labelledby="evidence-observed-title">
+        <div class="evidence-reasoning__label">
+          <span aria-hidden="true"></span>
+          <h4 id="evidence-observed-title">관찰된 사실</h4>
+        </div>
+        ${observedHtml}
+      </section>
+      <section class="evidence-reasoning__panel evidence-reasoning__panel--interpretation" data-evidence-interpretation aria-labelledby="evidence-interpretation-title">
+        <div class="evidence-reasoning__label">
+          <span aria-hidden="true"></span>
+          <h4 id="evidence-interpretation-title">AI 해석</h4>
+        </div>
+        <p>${escapeHtml(moment.interpretation || "AI 해석이 없습니다.")}</p>
+      </section>
+    </div>
+  `;
+}
+
+function evidenceCount(sample) {
+  const index = sample?.analysis?.evidenceIndex;
+  if (Array.isArray(index)) return index.length;
+  if (index && typeof index === "object") return Object.keys(index).length;
+  return 0;
+}
+
+function renderEvidenceDashboard(sample) {
+  if (!dom.evidenceDashboard) return;
+  const match = sampleMatchSummary(sample);
+  const metrics = buildEvidenceDashboardMetrics(sample);
+  const momentBundle = buildEvidenceMomentModels(sample);
+  const selectedMoment = momentBundle.moments.find((moment) => moment.id === momentBundle.selectedId)
+    || momentBundle.moments[0]
+    || null;
+  const coachSummary = sample?.analysis?.coachSummary?.overallSummary || "코칭 요약이 없습니다.";
+  const primaryWeakness = sample?.analysis?.weaknesses?.[0];
+  const headline = primaryWeakness?.title || sample?.analysis?.matchSummary?.headline || "이번 경기의 핵심 판단을 복기하세요";
+  const duration = sample?.normalized?.matchInfo?.durationLabel || "—";
+  const scoreLabel = sample?.normalized?.playtimeScore?.label || "분석 점수";
+  const violations = Array.isArray(sample?.analysis?.analysisMeta?.schemaViolations)
+    ? sample.analysis.analysisMeta.schemaViolations.length
+    : null;
+
+  dom.evidenceDashboardHeader.innerHTML = `
+    <div class="evidence-hero">
+      <div class="evidence-hero__copy">
+        <div class="evidence-hero__context">
+          <span>${escapeHtml(championDisplayName(match.champion))} · ${escapeHtml(roleLabel(match.role))}</span>
+          <span data-result="${escapeAttr(match.result || "UNKNOWN")}">${escapeHtml(resultLabel(match.result))} · ${escapeHtml(duration)}</span>
+        </div>
+        <p class="evidence-hero__eyebrow">이번 경기의 핵심 코칭</p>
+        <h3>${escapeHtml(headline)}</h3>
+        <p>${escapeHtml(coachSummary)}</p>
+        <div class="evidence-hero__quality">
+          <span>근거 ${evidenceCount(sample)}건</span>
+          ${violations == null ? "" : `<span>스키마 위반 ${violations}건</span>`}
+        </div>
+      </div>
+      <div class="evidence-score" role="img" aria-label="플레이 점수 ${metrics.score ?? "미상"}점">
+        <div class="evidence-score__ring" style="--evidence-score: ${metrics.score ?? 0}">
+          <strong class="evidence-score__value">${metrics.score ?? "—"}</strong>
+          <span>${escapeHtml(scoreLabel)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const metricItems = [
+    { label: "KDA", value: metrics.kda, note: `KDA 배수 ${(Number(sample?.normalized?.playerStats?.kda) || 0).toFixed(2)}` },
+    { label: "시야 점수", value: metrics.vision ?? "—", note: `분당 ${(Number(sample?.normalized?.challengeStats?.visionScorePerMinute) || 0).toFixed(1)}` },
+    { label: "킬 관여", value: metrics.killParticipation, note: `팀 킬 ${sample?.normalized?.teamContext?.teamTotalKills ?? "—"}` },
+  ];
+  dom.evidenceDashboardMetrics.innerHTML = `
+    <div class="evidence-metrics" aria-label="경기 핵심 지표">
+      ${metricItems.map((metric) => `
+        <article class="evidence-metric">
+          <span>${escapeHtml(metric.label)}</span>
+          <strong class="evidence-metric__value">${escapeHtml(metric.value)}</strong>
+          <small>${escapeHtml(metric.note)}</small>
+        </article>
+      `).join("")}
+    </div>
+  `;
+
+  dom.evidenceMoments.innerHTML = `
+    <div class="evidence-moment-section__heading">
+      <div>
+        <span>04 MOMENTS</span>
+        <h3>판단을 바꾼 장면</h3>
+      </div>
+      <p>장면을 선택하면 기록과 코칭을 함께 확인할 수 있습니다.</p>
+    </div>
+    <div class="evidence-moment-grid">
+      ${momentBundle.moments.map((moment) => `
+        <button type="button" class="evidence-moment" data-evidence-moment-id="${escapeAttr(moment.id)}" data-tone="${escapeAttr(moment.tone)}" aria-pressed="${moment.id === selectedMoment?.id}">
+          <time>${escapeHtml(moment.timestampLabel)}</time>
+          <strong>${escapeHtml(moment.title)}</strong>
+          <span>${escapeHtml(gamePhaseLabel(moment.phase))}</span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+
+  dom.evidenceDashboard._momentModels = momentBundle.moments;
+  dom.evidenceDetail.innerHTML = renderEvidenceMomentDetail(selectedMoment);
+
+  const actions = Array.isArray(sample?.analysis?.actionChecklist)
+    ? sample.analysis.actionChecklist.slice(0, 3)
+    : [];
+  dom.evidenceProtocol.innerHTML = `
+    <div class="evidence-protocol">
+      <div class="evidence-protocol__heading">
+        <div>
+          <span>NEXT GAME PROTOCOL</span>
+          <h3>다음 게임 체크리스트</h3>
+        </div>
+        <strong data-evidence-protocol-progress>0 / ${actions.length}</strong>
+      </div>
+      <div class="evidence-protocol__list">
+        ${actions.map((action, index) => {
+          const text = action.action || action.text || action.label || action.title || "행동 루틴";
+          return `
+            <label class="evidence-protocol__item">
+              <input type="checkbox" data-evidence-protocol-check="${index}">
+              <span aria-hidden="true"></span>
+              <strong>${escapeHtml(text)}</strong>
+            </label>
+          `;
+        }).join("") || '<p class="muted">표시할 행동 루틴이 없습니다.</p>'}
+      </div>
+    </div>
+  `;
+}
+
+function activateEvidenceMoment(button) {
+  if (!button || !dom.evidenceDashboard || !dom.evidenceMoments || !dom.evidenceDetail) return;
+  const momentId = button.dataset.evidenceMomentId;
+  const moment = (dom.evidenceDashboard._momentModels || []).find((item) => item.id === momentId);
+  if (!moment) return;
+  dom.evidenceMoments.querySelectorAll("[data-evidence-moment-id]").forEach((candidate) => {
+    candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
+  });
+  dom.evidenceDetail.innerHTML = renderEvidenceMomentDetail(moment);
+}
+
+function updateEvidenceProtocolProgress() {
+  if (!dom.evidenceProtocol) return;
+  const checks = [...dom.evidenceProtocol.querySelectorAll("[data-evidence-protocol-check]")];
+  const completed = checks.filter((check) => check.checked).length;
+  const progress = dom.evidenceProtocol.querySelector("[data-evidence-protocol-progress]");
+  if (progress) progress.textContent = `${completed} / ${checks.length}`;
+}
+
+function bindEvidenceDashboardEvents() {
+  if (!dom.evidenceDashboard || dom.evidenceDashboard.dataset.bound === "true") return;
+  dom.evidenceDashboard.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-evidence-moment-id]");
+    if (button && dom.evidenceDashboard.contains(button)) activateEvidenceMoment(button);
+  });
+  dom.evidenceDashboard.addEventListener("change", (event) => {
+    if (event.target.matches("[data-evidence-protocol-check]")) updateEvidenceProtocolProgress();
+  });
+  dom.evidenceDashboard.dataset.bound = "true";
+}
+
 function renderSampleSwitcher() {
   dom.sampleSwitcher.innerHTML = state.manifest
     .map(
@@ -2247,7 +2471,7 @@ function renderSampleSwitcher() {
             <div class="sample-chip__copy">
               <em class="sample-chip__champion">${escapeHtml(championDisplayName(sample.champion))}</em>
               <span>${escapeHtml(sampleReportLabel(sample))}</span>
-              <strong>${escapeHtml(sample.publicAlias || "")}</strong>
+              <strong>${escapeHtml(sample.collectedDate || "")}</strong>
             </div>
           </div>
         </button>
@@ -2279,7 +2503,7 @@ function renderSampleSwitcher() {
               <span class="report-badge report-badge--result" data-result="${escapeAttr(meta.result)}">${escapeHtml(resultText)}</span>
             </div>
             <p>${escapeHtml(buildManifestCardSummary(sample))}</p>
-            <strong>${escapeHtml(sample.publicAlias || "")}</strong>
+            <strong>${escapeHtml(sample.collectedDate || "")}</strong>
           </button>
         `;
       })
@@ -2293,7 +2517,10 @@ function renderHero(sample) {
   const match = sampleMatchSummary(sample);
   const coachSummary = sample.analysis.coachSummary || {};
   const resultText = match.result ? resultLabel(match.result) : "결과 미상";
-  dom.heroPlayer.textContent = sample.publicAlias;
+  // 신원(publicAlias) 대신 경기 자체를 식별한다 — 서버가 Riot ID를 더 이상 내려보내지 않는다.
+  dom.heroPlayer.textContent = [championDisplayName(match.champion), roleLabel(match.role)]
+    .filter(Boolean)
+    .join(" · ");
   dom.heroDate.textContent = sample.collectedDate;
 
   dom.headline.textContent = buildCompactHeadline(sample);
@@ -4314,6 +4541,7 @@ function renderSample(sample) {
 
   renderHero(sample);
   renderStats(sample);
+  renderEvidenceDashboard(sample);
   renderPhases(sample);
 
   // 배열 필드 가드
@@ -5209,19 +5437,13 @@ async function init() {
   }
 
   const saved = loadSavedAccount();
-  const entryMode = bootstrapEntryMode({
-    hasSavedAccount: Boolean(saved),
-    hasStoredSample: Boolean(firstManifestSample()),
-    serverMode: currentServerModeUi().mode,
-  });
+  const entryMode = bootstrapEntryMode({ hasSavedAccount: Boolean(saved) });
 
   if (entryMode === "saved-account" && saved) {
     dom.loginForm.querySelector("[name=gameName]").value = saved.gameName;
     dom.loginForm.querySelector("[name=tagLine]").value = saved.tagLine;
     if (saved.platformRegion) dom.loginForm.querySelector("[name=platformRegion]").value = saved.platformRegion;
     handleLogin();
-  } else if (entryMode === "internal-sample") {
-    await openInternalLandingSample();
   } else {
     setView("LOGGED_OUT");
   }
@@ -5229,6 +5451,7 @@ async function init() {
   applyPendingUi();
   initTabSystem();
   initChampionsTab();
+  bindEvidenceDashboardEvents();
   bindDualTimelineEvents();
   bindTeamplayEvents();
 }

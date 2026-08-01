@@ -4,6 +4,7 @@
 // A misspelled PUBLIC_DEMO_MODE must not silently behave like full mode.
 
 import fs from "fs";
+import { timingSafeEqual } from "crypto";
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
@@ -41,11 +42,34 @@ const parsePublicDemoModeConfigSource = serverSrc.includes("function parsePublic
       "}",
     ].join("\n");
 
+function extractConstStatement(source, name) {
+  const pattern = new RegExp(`^const ${name} = .*?;$`, "m");
+  const match = source.match(pattern);
+  if (!match) throw new Error(`const ${name} not found`);
+  return match[0];
+}
+
 function makeGate({ publicDemoMode, publicDemoToken }) {
   return new Function(
     "rawPublicDemoMode",
     "rawPublicDemoToken",
+    "timingSafeEqual",
     [
+      // getClientIp는 프록시 헤더 해석이 관심사라 이 게이트 테스트 범위 밖이다.
+      // 이 파일이 검증하는 건 "각 요청이 어떤 사유로 거부되는가"이지 실패 누적이 아니므로,
+      // 호출마다 다른 출처를 돌려줘 케이스끼리 스로틀 버킷을 공유하지 않게 한다.
+      // (실패 누적 차단은 demo-auth-bruteforce-http-tests.mjs가 실제 서버로 검증한다.)
+      "let stubIpSeq = 0;",
+      "function getClientIp(req) { return (req && req.clientIp) || `test-ip-${stubIpSeq += 1}`; }",
+      // 토큰 비교와 실패 스로틀은 게이트 동작 자체이므로 실제 구현을 평가한다.
+      extractFunctionSource(serverSrc, "tokensMatch"),
+      extractConstStatement(serverSrc, "AUTH_FAILURE_LIMIT"),
+      extractConstStatement(serverSrc, "AUTH_FAILURE_WINDOW_MS"),
+      extractConstStatement(serverSrc, "authFailureBuckets"),
+      extractFunctionSource(serverSrc, "authFailureBucket"),
+      extractFunctionSource(serverSrc, "isAuthThrottled"),
+      extractFunctionSource(serverSrc, "registerAuthFailure"),
+      extractFunctionSource(serverSrc, "clearAuthFailures"),
       "function sendJson(res, status, body) { res.status = status; res.body = body; }",
       "const validPublicDemoModes = new Set(['full', 'readonly', 'protected']);",
       parsePublicDemoModeConfigSource,
@@ -68,7 +92,7 @@ function makeGate({ publicDemoMode, publicDemoToken }) {
       extractFunctionSource(serverSrc, "requireLiveApiAccess"),
       "return { requireLiveApiAccess, tokenFromRequest, isInvalidDemoMode, publicDemoModeHealth };",
     ].join("\n"),
-  )(publicDemoMode, publicDemoToken);
+  )(publicDemoMode, publicDemoToken, timingSafeEqual);
 }
 
 function makeResponseRecorder() {

@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "1.0",
+  "analysisMeta": {
+    "sourceType": "claude_ai",
+    "language": "ko",
+    "analysisId": "ai_sample-kr-8253489777_1781134282979",
+    "generatedAt": "2026-06-10T23:31:22.979Z",
+    "schemaViolations": [],
+    "schemaViolationCount": 0
+  },
+  "matchSummary": {
+    "headline": "초반 5데스의 흔들림을 71 시야 점수와 중반 오브젝트·타워 합류로 만회하며 승리를 견인한 노틸러스 서포터 경기였다."
+  },
+  "coachSummary": {
+    "overallSummary": "초반(2:02~10:59)에 다섯 번 끊기며 라인전 안정감이 크게 흔들렸지만, 5:40과 9:38 교전에서 직접 킬을 만들어 흐름을 일부 회복했다. 중반부터는 데스를 1회로 줄이고 17:38·23:29 드래곤 타이밍 합류와 24:47~25:15 연속 타워 압박 관여로 팀의 승리 조건 전환에 기여했다. 시야 점수 71은 25분 경기 기준 매우 높은 수치로, 후반 운영 안정화의 핵심 동력이었다. 다음 과제는 초반 2~9분 구간의 생존 안정성 확보다."
+  },
+  "phaseSummaries": [
+    {
+      "phase": "EARLY",
+      "summary": "2:02, 3:29, 6:25, 8:55 등 다섯 차례 먼저 끊기며 초반 템포가 흔들렸다. 다만 5:40 킬 관여와 6:25 드래곤, 8:12 오브젝트 셋업으로 팀 단위 이득은 유지했다."
+    },
+    {
+      "phase": "MID",
+      "summary": "데스를 1회(19:01)로 줄이고 어시스트 12개를 쌓으며 안정화에 성공했다. 17:38·23:29 드래곤 합류와 24:47~25:15 타워 4개 연속 철거 관여로 경기를 닫는 데 기여했다."
+    },
+    {
+      "phase": "LATE",
+      "summary": "경기가 25:28에 종료되어 별도의 후반 국면 없이 중반 타워 러시로 마무리됐다. 중반에 만든 시야·오브젝트 우위가 그대로 승리로 이어졌다."
+    }
+  ],
+  "strengths": [
+    {
+      "id": "str_1",
+      "title": "오브젝트 타이밍 합류",
+      "description": "17:38 드래곤 한타에 직접 합류해 오브젝트 템포를 챙겼고, 팀이 드래곤 3개를 확보하는 흐름에 기여했다. 서포터로서 오브젝트 타이밍 감각이 좋다.",
+      "relatedEventIds": [
+        "evt_023",
+        "evt_006",
+        "evt_035"
+      ]
+    },
+    {
+      "id": "str_2",
+      "title": "구조물 압박 전환 능력",
+      "description": "24:56, 25:04, 25:15 연속 타워 철거에 직접 관여하며 교전 우위를 구조물 이득으로 전환했다. 팀 타워 10:0의 격차를 만드는 데 핵심 역할을 했다.",
+      "relatedEventIds": [
+        "evt_040",
+        "evt_041",
+        "evt_043"
+      ]
+    },
+    {
+      "id": "str_3",
+      "title": "높은 시야 장악력",
+      "description": "25분 경기에서 시야 점수 71을 기록했다. 분당 2.8에 가까운 수치로, 중반 이후 팀이 안정적으로 오브젝트와 타워를 압박할 수 있었던 기반이었다.",
+      "relatedEventIds": [
+        "evt_023",
+        "evt_039"
+      ]
+    }
+  ],
+  "weaknesses": [
+    {
+      "id": "wk_1",
+      "title": "초반 반복 데스로 인한 템포 손실",
+      "description": "2:02, 3:29, 6:25, 8:55에 연이어 먼저 끊기며 초반 5데스를 기록했다. 라인전 단계에서 상대 스킬 사거리와 정글 동선에 대한 위험 관리가 부족했다.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_003",
+        "evt_007",
+        "evt_009"
+      ]
+    },
+    {
+      "id": "wk_2",
+      "title": "오브젝트 직후 포지셔닝 위험",
+      "description": "6:25 드래곤 타이밍 직후 데스가 발생했고, 19:01 중반 핵심 구도에서도 끊겼다. 오브젝트 전후 정리 국면에서 앞포지션을 잡다 잘리는 패턴이 보인다.",
+      "relatedEventIds": [
+        "evt_007",
+        "evt_027"
+      ]
+    },
+    {
+      "id": "wk_3",
+      "title": "오브젝트 셋업 실패 구간의 시야 공백",
+      "description": "11:39에 중요 오브젝트/구조물을 내주며 흐름이 흔들렸다. 초반 데스 누적으로 핵심 타이밍에 시야 셋업과 합류가 늦어진 영향으로 보인다.",
+      "relatedEventIds": [
+        "evt_012",
+        "evt_009"
+      ]
+    }
+  ],
+  "actionChecklist": [
+    {
+      "id": "act_1",
+      "text": "0~10분 라인전에서는 후킹 시도 전 상대 정글 위치를 핑크 와드로 먼저 확인하고, 시야 없으면 진입하지 않는다.",
+      "linkedWeaknessId": "wk_1"
+    },
+    {
+      "id": "act_2",
+      "text": "드래곤·한타 종료 직후 3초간 뒤포지션을 유지하고, 추격은 팀원과 함께만 한다.",
+      "linkedWeaknessId": "wk_2"
+    },
+    {
+      "id": "act_3",
+      "text": "오브젝트 스폰 1분 전에 시야 셋업을 완료하고, 셋업이 늦었다면 오브젝트를 과감히 포기한다.",
+      "linkedWeaknessId": "wk_3"
+    },
+    {
+      "id": "act_4",
+      "text": "초반 데스 2회가 누적되면 그 이후 5분간은 후킹보다 시야·보호 위주로 플레이 모드를 전환한다.",
+      "linkedWeaknessId": "wk_1"
+    }
+  ],
+  "keyMoments": [
+    {
+      "id": "km_1",
+      "timestampLabel": "2:02",
+      "phase": "EARLY",
+      "title": "첫 데스로 흔들린 시작",
+      "description": "2분대에 먼저 끊기며 초반 템포가 흔들렸고, 이후 3:29까지 연속 데스로 이어졌다. 초반 위험 관리가 필요했던 구간.",
+      "relatedEventIds": [
+        "evt_001",
+        "evt_003"
+      ]
+    },
+    {
+      "id": "km_2",
+      "timestampLabel": "5:40",
+      "phase": "EARLY",
+      "title": "킬로 되찾은 흐름",
+      "description": "교전에서 직접 킬을 만들며 연속 데스의 흐름을 끊고 라인 주도권 회복의 발판을 만들었다.",
+      "relatedEventIds": [
+        "evt_005"
+      ]
+    },
+    {
+      "id": "km_3",
+      "timestampLabel": "17:38",
+      "phase": "MID",
+      "title": "드래곤 한타 합류",
+      "description": "드래곤 타이밍에 직접 합류해 오브젝트 템포를 챙겼다. 중반 안정화의 전환점이 된 장면.",
+      "relatedEventIds": [
+        "evt_023"
+      ]
+    },
+    {
+      "id": "km_4",
+      "timestampLabel": "24:56",
+      "phase": "MID",
+      "title": "타워 연속 철거로 경기 마무리",
+      "description": "24:56부터 25:15까지 타워 철거에 연속 관여하며 교전 우위를 구조물 이득으로 전환, 경기를 닫았다.",
+      "relatedEventIds": [
+        "evt_040",
+        "evt_041",
+        "evt_043"
+      ]
+    }
+  ],
+  "combatAnalysis": [
+    {
+      "encounterId": "enc_001",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "2분대 첫 교전에서 선취 데스",
+      "playerDecision": "라인전 초입 교전에서 먼저 끊기며 상대에게 초반 주도권을 내줬다.",
+      "takeaway": "레벨 1~2 구간에는 상대 스킬 사거리 밖에서 견제 위주로 운영한다.",
+      "relatedEventIds": [
+        "evt_001"
+      ]
+    },
+    {
+      "encounterId": "enc_002",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "3분대 연속 데스로 템포 손실",
+      "playerDecision": "첫 데스 직후 복귀 타이밍에 다시 교전을 받아주다 연속으로 끊겼다.",
+      "takeaway": "데스 직후 복귀 시에는 경험치 손실을 감수하더라도 안전 거리부터 확보한다.",
+      "relatedEventIds": [
+        "evt_003"
+      ]
+    },
+    {
+      "encounterId": "enc_003",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "5:40 교전 솔로 주도 킬",
+      "playerDecision": "교전 각을 정확히 잡아 직접 킬을 만들며 흐름을 되찾았다.",
+      "takeaway": "이렇게 시야와 각이 확보된 상황에서의 진입이 본인의 승리 패턴임을 기억한다.",
+      "relatedEventIds": [
+        "evt_005"
+      ]
+    },
+    {
+      "encounterId": "enc_004",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "드래곤 타이밍 직후 cut off",
+      "playerDecision": "6:25 드래곤 구도에서 앞포지션을 잡다 끊기며 오브젝트 이득을 상쇄했다.",
+      "takeaway": "오브젝트 전후에는 진입 역할이라도 팀원 합류 거리를 먼저 확인한다.",
+      "relatedEventIds": [
+        "evt_007"
+      ]
+    },
+    {
+      "encounterId": "enc_005",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "8분대 교전 선취 데스",
+      "playerDecision": "오브젝트 셋업 흐름 속에서 다시 먼저 끊기며 초반 데스가 4회로 누적됐다.",
+      "takeaway": "데스가 누적된 시점에는 후킹 빈도를 줄이고 시야·보호 모드로 전환한다.",
+      "relatedEventIds": [
+        "evt_009"
+      ]
+    },
+    {
+      "encounterId": "enc_006",
+      "situation": "PLAYER_DOMINANT",
+      "situationLabel": "9:38 교전 킬 주도",
+      "playerDecision": "교전 각을 다시 만들어 킬을 따내며 초반 손실을 일부 회복했다.",
+      "takeaway": "회복 국면에서의 침착한 각 보기가 좋았다. 이 패턴을 초반부터 적용한다.",
+      "relatedEventIds": [
+        "evt_010"
+      ]
+    },
+    {
+      "encounterId": "enc_007",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "11분 직전 교전 cut off",
+      "playerDecision": "10:59 교전에서 끊기며 직후 11:39 오브젝트 셋업 실패로 연결됐다.",
+      "takeaway": "오브젝트 스폰 1분 전 데스는 팀 전체 손실로 이어진다. 그 시간대 교전은 보수적으로 받는다.",
+      "relatedEventIds": [
+        "evt_011"
+      ]
+    },
+    {
+      "encounterId": "enc_008",
+      "situation": "PLAYER_DOWN",
+      "situationLabel": "중반 핵심 구도에서 단독 cut off",
+      "playerDecision": "19:01 중반 운영 구도에서 끊기며 안정감이 잠시 흔들렸으나 이후 데스 없이 마무리했다.",
+      "takeaway": "중반 시야 작업 시에는 항상 탈출 경로와 아군 위치를 확인한 뒤 이동한다.",
+      "relatedEventIds": [
+        "evt_027"
+      ]
+    }
+  ],
+  "teamfightPhaseAnalysis": [],
+  "evidenceIndex": [
+    {
+      "eventId": "evt_001",
+      "shortNote": "2:02 초반 첫 데스"
+    },
+    {
+      "eventId": "evt_003",
+      "shortNote": "3:29 연속 데스"
+    },
+    {
+      "eventId": "evt_005",
+      "shortNote": "5:40 직접 킬로 흐름 회복"
+    },
+    {
+      "eventId": "evt_007",
+      "shortNote": "6:25 드래곤 타이밍 데스"
+    },
+    {
+      "eventId": "evt_009",
+      "shortNote": "8:55 초반 4번째 데스"
+    },
+    {
+      "eventId": "evt_012",
+      "shortNote": "11:39 오브젝트 셋업 실패"
+    },
+    {
+      "eventId": "evt_023",
+      "shortNote": "17:38 드래곤 한타 합류"
+    },
+    {
+      "eventId": "evt_027",
+      "shortNote": "19:01 중반 유일한 데스"
+    },
+    {
+      "eventId": "evt_040",
+      "shortNote": "24:56 타워 철거 관여"
+    },
+    {
+      "eventId": "evt_043",
+      "shortNote": "25:15 마지막 타워 철거 관여"
+    }
+  ]
+}

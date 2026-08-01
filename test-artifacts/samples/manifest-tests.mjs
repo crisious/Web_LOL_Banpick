@@ -69,9 +69,15 @@ for (const sample of samples) {
     if (MANIFEST_ENTRY_RAW_PATH_PATTERN.test(relativePath)) {
       rawExposures.push(`${sample.id}:${key}:${publicPath}`);
     }
-    const fileUrl = localPathFromPublicPath(publicPath);
-    if (!fs.existsSync(fileUrl)) {
-      missingFiles.push(`${sample.id}:${key}:${publicPath}`);
+    // notesPath는 디스크 존재를 요구하지 않는다. 샘플 노트는 실제 Riot ID/매치 ID가 담긴
+    // 사람용 메모라 .gitignore로 추적하지 않으므로, 새 클론(=CI)에는 파일이 없다.
+    // 코드도 이 파일을 읽지 않는다 — notesPath는 matchId 추론용 문자열일 뿐이고
+    // sites/ 공개 번들에서는 필드 자체가 제거된다. 경로 형식 검증은 위에서 계속 수행한다.
+    if (key !== "notesPath") {
+      const fileUrl = localPathFromPublicPath(publicPath);
+      if (!fs.existsSync(fileUrl)) {
+        missingFiles.push(`${sample.id}:${key}:${publicPath}`);
+      }
     }
   }
 

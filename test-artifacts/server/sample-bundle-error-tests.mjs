@@ -17,6 +17,19 @@ function extractAsyncFunctionSource(source, name) {
   return extractSourceFromStart(source, startIdx, `async function ${name}`);
 }
 
+function extractFunctionSource(source, name) {
+  const startIdx = source.indexOf(`function ${name}(`);
+  if (startIdx < 0) throw new Error(`function ${name} not found`);
+  return extractSourceFromStart(source, startIdx, `function ${name}`);
+}
+
+function extractConstSetSource(source, name) {
+  const pattern = new RegExp(`const ${name} = new Set\\(\\[[\\s\\S]*?\\]\\);`);
+  const match = source.match(pattern);
+  if (!match) throw new Error(`const ${name} not found`);
+  return match[0];
+}
+
 function extractSourceFromStart(source, startIdx, label) {
   let bodyStartIdx = -1;
   let parenDepth = 0;
@@ -92,6 +105,10 @@ function makeHarness(readJson) {
     "hydrateStoredTeamplayV2",
     [
       "const manifestPath = '/runtime/samples/manifest.json';",
+      // loadSampleBundle은 응답 경계에서 신원 키를 재귀 제거한다 — 스텁이 아니라
+      // server.js의 실제 구현을 함께 평가해야 정제 동작까지 검증된다.
+      extractConstSetSource(serverSrc, "privateIdentifierKeys"),
+      extractFunctionSource(serverSrc, "stripPrivateIdentifiers"),
       extractAsyncFunctionSource(serverSrc, "loadManifest"),
       extractAsyncFunctionSource(serverSrc, "loadSampleBundle"),
       "return { loadSampleBundle };",

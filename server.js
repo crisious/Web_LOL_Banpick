@@ -5,6 +5,7 @@ const fsp = require("fs/promises");
 const path = require("path");
 const { URL } = require("url");
 const { spawn } = require("child_process");
+const { timingSafeEqual } = require("crypto");
 const {
   isValidSampleId,
   sampleManifestPublicPathToStorageRelativePath,
@@ -122,25 +123,9 @@ const publicStaticPaths = new Set([
   "/admin.js",
   "/draft-state.js",
   "/favicon.ico",
+  // index.html이 og:image / twitter:image로 선언하는 자산 — 빠지면 링크 미리보기가 깨진다.
+  "/og.png",
 ]);
-
-const blockedStaticPrefixes = [
-  "/.",
-  "/data/",
-  "/docs/",
-  "/scripts/",
-  "/test-artifacts/",
-  "/node_modules/",
-  "/_design-mockups/",
-];
-
-const blockedStaticSuffixes = [
-  ".md",
-  ".ps1",
-  ".mjs",
-  ".log",
-  ".env",
-];
 
 // ─── Simple in-memory rate limiter ───────────────────────────────────────────
 const rateBuckets = new Map();
@@ -318,6 +303,52 @@ function tokenFromRequest(req) {
   return tokenHeaderValue(req.headers["x-demo-token"]);
 }
 
+// 토큰 비교는 상수 시간으로 한다. 길이는 어차피 드러나므로 길이 불일치는 즉시 false.
+function tokensMatch(candidate, expected) {
+  const candidateBuf = Buffer.from(String(candidate ?? ""), "utf8");
+  const expectedBuf = Buffer.from(String(expected ?? ""), "utf8");
+  if (candidateBuf.length !== expectedBuf.length) return false;
+  return timingSafeEqual(candidateBuf, expectedBuf);
+}
+
+// ─── 인증 실패 스로틀 ─────────────────────────────────────────────────────────
+// rateLimit()은 "윈도우당 1회"라 토큰을 한 번 오타낸 사용자까지 막는다.
+// 인증은 실패만 세고 성공은 세지 않는 카운팅 방식이 맞다.
+const AUTH_FAILURE_LIMIT = 5;
+const AUTH_FAILURE_WINDOW_MS = 60000;
+const authFailureBuckets = new Map();
+
+function authFailureBucket(key) {
+  const now = Date.now();
+  const bucket = authFailureBuckets.get(key);
+  if (!bucket || now - bucket.start >= AUTH_FAILURE_WINDOW_MS) {
+    const fresh = { start: now, count: 0 };
+    authFailureBuckets.set(key, fresh);
+    return fresh;
+  }
+  return bucket;
+}
+
+function isAuthThrottled(key) {
+  return authFailureBucket(key).count >= AUTH_FAILURE_LIMIT;
+}
+
+function registerAuthFailure(key) {
+  const bucket = authFailureBucket(key);
+  bucket.count += 1;
+  // 버킷이 무한히 쌓이지 않도록 만료된 항목을 청소한다.
+  if (authFailureBuckets.size > 1000) {
+    const now = Date.now();
+    for (const [entryKey, entry] of authFailureBuckets) {
+      if (now - entry.start >= AUTH_FAILURE_WINDOW_MS) authFailureBuckets.delete(entryKey);
+    }
+  }
+}
+
+function clearAuthFailures(key) {
+  authFailureBuckets.delete(key);
+}
+
 function sendDemoModeBlocked(res) {
   sendJson(res, 403, {
     ok: false,
@@ -364,7 +395,19 @@ function requireLiveApiAccess(req, res) {
       return false;
     }
 
-    if (tokenFromRequest(req) !== publicDemoToken) {
+    // 토큰 판별 자체가 오라클이다 — 실패가 누적된 출처는 정답 여부를 알려주기 전에 막는다.
+    const authKey = `demoToken:${getClientIp(req)}`;
+    if (isAuthThrottled(authKey)) {
+      sendJson(res, 429, {
+        ok: false,
+        code: "PUBLIC_DEMO_AUTH_THROTTLED",
+        error: "토큰 인증 실패가 반복되었습니다. 잠시 후 다시 시도하세요.",
+      });
+      return false;
+    }
+
+    if (!tokensMatch(tokenFromRequest(req), publicDemoToken)) {
+      registerAuthFailure(authKey);
       sendJson(res, 401, {
         ok: false,
         code: "PUBLIC_DEMO_UNAUTHORIZED",
@@ -372,6 +415,8 @@ function requireLiveApiAccess(req, res) {
       });
       return false;
     }
+
+    clearAuthFailures(authKey);
   }
 
   return true;
@@ -3580,14 +3625,16 @@ async function loadSampleBundle(sampleId) {
   const compPath = sampleStoragePath(sampleId, "comparison-result.json");
   try { comparison = await readJson(compPath); } catch {}
 
+  // publicAlias는 실제 Riot ID를 담고 있어 상세 응답에서도 제외한다 — publicSampleListEntry 참고.
+  // normalized/analysis 본문에도 riotId·puuid가 박혀 있으므로 응답 경계에서 재귀 정제한다.
+  // (위 보강 로직이 playerContext.puuid를 쓰므로 정제는 반드시 반환 시점에 한다.)
   return {
     sampleId: entry.id,
-    publicAlias: entry.publicAlias,
     collectedDate: entry.collectedDate,
     theme: entry.theme,
-    normalized,
-    analysis,
-    comparison,
+    normalized: stripPrivateIdentifiers(normalized),
+    analysis: stripPrivateIdentifiers(analysis),
+    comparison: stripPrivateIdentifiers(comparison),
   };
 }
 
@@ -4057,8 +4104,40 @@ function inferMatchIdFromSampleEntry(entry) {
 }
 
 function publicSampleListEntry(sample) {
-  const { matchId, ...publicSample } = sample || {};
+  // publicAlias는 이름과 달리 실제 Riot ID(Name#TAG)를 담고 있어 공개 응답에서 제외한다.
+  // (sites/worker/index.js · sites/scripts/stage-assets.mjs와 동일한 정책)
+  const { matchId, publicAlias, ...publicSample } = sample || {};
   return publicSample;
+}
+
+// 공개 샘플 응답에서 제거하는 신원 키 — sites/scripts/stage-assets.mjs의 목록과 같아야 한다.
+// 샘플 노출 경로가 둘(sites/ 정적 번들, server.js 데모 모드)이라 정책도 둘 다 걸어야 한다.
+const privateIdentifierKeys = new Set([
+  "puuid",
+  "riotId",
+  "playerRiotId",
+  "matchId",
+  "rawMatchId",
+  "summonerName",
+  "gameName",
+  "tagLine",
+  "summonerId",
+  "accountId",
+]);
+
+// 경로 지정이 아니라 키 기준 재귀 제거인 이유: 같은 필드가 파일마다 다른 깊이에 있다
+// (analysis-result.json은 analysisMeta.matchId, comparison-result.json은
+//  claudeAnalysis.analysisMeta.matchId).
+function stripPrivateIdentifiers(value) {
+  if (Array.isArray(value)) return value.map(stripPrivateIdentifiers);
+  if (!value || typeof value !== "object") return value;
+
+  const cleaned = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (privateIdentifierKeys.has(key)) continue;
+    cleaned[key] = stripPrivateIdentifiers(entry);
+  }
+  return cleaned;
 }
 
 const sampleGenerationLocks = new Map();
@@ -4356,19 +4435,10 @@ function isAllowedStaticPath(urlPath) {
   if (!decoded.startsWith("/")) return false;
   if (decoded.includes("..")) return false;
 
-  if (publicStaticPaths.has(decoded)) {
-    return true;
-  }
-
-  if (blockedStaticPrefixes.some((prefix) => decoded === prefix.slice(0, -1) || decoded.startsWith(prefix))) {
-    return false;
-  }
-
-  if (blockedStaticSuffixes.some((suffix) => decoded.toLowerCase().endsWith(suffix))) {
-    return false;
-  }
-
-  return false;
+  // allowlist 전용 — 기본 거부. 새 자산을 서빙하려면 publicStaticPaths에 추가한다.
+  // (블록리스트를 덧대지 말 것: 기본이 거부라 결과를 바꾸지 못하면서
+  //  "블록리스트가 막아준다"는 착각만 만든다.)
+  return publicStaticPaths.has(decoded);
 }
 
 function staticFilePath(urlPath) {

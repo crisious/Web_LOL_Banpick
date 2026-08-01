@@ -74,6 +74,12 @@ if (exists) {
     /run:\s*npm test/.test(workflow),
     workflow);
 
+  // sites/는 별도 워크스페이스라 루트 npm test에 포함되지 않는다. 공개 번들의
+  // 신원 노출 회귀 가드가 거기 있으므로 CI가 반드시 따로 실행해야 한다.
+  check("QA workflow runs sites workspace tests",
+    /working-directory:\s*sites/.test(workflow),
+    workflow);
+
   check("QA workflow runs read-only smoke report",
     /run:\s*npm run smoke:report:readonly/.test(workflow),
     workflow);

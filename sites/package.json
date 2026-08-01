@@ -1,0 +1,19 @@
+{
+  "name": "lol-replay-coach-sites-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "stage": "node scripts/stage-assets.mjs .staging-public",
+    "build": "npm run stage && vite build",
+    "test": "node --test tests/coaching-plan-models.mjs tests/read-only-smoke.mjs tests/standalone-ui.mjs tests/worker-contract.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  }
+}

@@ -18,6 +18,10 @@ const SCOPE_ALIASES = {
   gaps: "spacing",
   space: "spacing",
   spacing: "spacing",
+  padding: "padding",
+  paddings: "padding",
+  margin: "margin",
+  margins: "margin",
   fontsize: "fontSize",
   "font-size": "fontSize",
   typography: "fontSize",
@@ -112,7 +116,9 @@ function printHelp() {
       "",
       "Options:",
       "  --file, -f <path>       CSS file to audit (default: styles.css)",
-      "  --scope, -s <scope>     all | colors | radius | spacing | fontSize | breakpoints | customProps | tokens",
+      "  --scope, -s <scope>     all | colors | radius | spacing | padding | margin | fontSize |",
+      "                          breakpoints | customProps | tokens",
+      "                          (spacing 은 gap 계열만 잰다. padding/margin 은 별도 카테고리)",
       "  --format <type>         text | markdown | json (default: text)",
       "  --output, -o <path>     Write the rendered report to a file",
       "  --top <n>               Number of findings to render per section (default: 8)",
@@ -205,18 +211,26 @@ function normalizeValue(value) {
 function parseCustomPropertyDeclarations(source, lineStarts, start = 0, end = source.length) {
   const result = [];
   const segment = source.slice(start, end);
-  const regex = /--([a-z0-9-]+)\s*:\s*([^;]+);/gi;
+  // 커스텀 프로퍼티 "선언"만 매칭한다. 선언과 `.btn--active:hover {` 같은 BEM 변형
+  // 클래스명을 가르는 실제 규칙은 `--` 앞이 단어 문자인지 여부다. 부정 룩비하인드로
+  // 그것만 배제한다 — 선행 문자를 화이트리스트(`{`/`;`)로 두면 주석 바로 뒤에 오는
+  // 선언(`*/` 다음)을 놓친다.
+  //
+  // 값에서 `{`/`}` 를 제외하는 이유: 값이 블록 경계를 넘어가면 뒤따르는 실제 선언까지
+  // 하나의 "선언"으로 잘못 삼켜진다.
+  const regex = /(?<![\w-])(--[a-z0-9-]+)\s*:\s*([^;{}]+);/gi;
   let match;
 
   while ((match = regex.exec(segment)) !== null) {
     const index = start + match.index;
-    const name = `--${match[1]}`;
+    const name = match[1];
     const value = match[2].trim();
     result.push({
       name,
       value,
       normalizedValue: normalizeValue(value),
       index,
+      endIndex: index + match[0].length,
       line: lineNumberAt(lineStarts, index),
     });
   }
@@ -264,7 +278,45 @@ function escapeRegExp(value) {
 }
 
 function looksLikeColor(value) {
-  return /#(?:[0-9a-f]{3,8})\b|rgba?\(|hsla?\(/i.test(value);
+  // 레거시 표기 외에 현대 색상 함수도 인식한다. color-mix() 로 파생한 토큰
+  // (`--evidence-border-cyan`)이 색상으로 분류되지 않으면 그 참조가 색상 토큰
+  // 참조로 크레딧되지 않아 커버리지가 과소 집계된다.
+  return /#(?:[0-9a-f]{3,8})\b|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i.test(value);
+}
+
+// 색상으로 분류되는 커스텀 프로퍼티 이름을 스코프 무관하게 모은다.
+//
+// 값이 색상처럼 보이면 색상이고, `--tf-line: var(--surface-4)` 처럼 다른 색상
+// 토큰을 가리키는 별칭도 색상이다. 별칭 연쇄를 고정점까지 따라간다.
+//
+// 치수 토큰(`--evidence-radius: 18px`, `--tf-fill-alpha: 17%`)은 값이 색상이
+// 아니고 색상을 참조하지도 않으므로 자연히 빠진다.
+function collectColorTokenNames(declarations) {
+  const byName = new Map(declarations.map((entry) => [entry.name, entry.value]));
+  const colors = new Set();
+
+  for (const [name, value] of byName) {
+    if (looksLikeColor(value)) colors.add(name);
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [name, value] of byName) {
+      if (colors.has(name)) continue;
+      const regex = /var\(\s*(--[a-z0-9-]+)/gi;
+      let match;
+      while ((match = regex.exec(value)) !== null) {
+        if (colors.has(match[1])) {
+          colors.add(name);
+          changed = true;
+          break;
+        }
+      }
+    }
+  }
+
+  return colors;
 }
 
 function categorizeRootToken(token) {
@@ -307,12 +359,45 @@ function buildTokenIndex(tokens) {
   return { byName, byCategory, byValue };
 }
 
+// 값이 "실제로 선언된" 커스텀 프로퍼티를 참조하는지 판정한다.
+//
+// 이름 접두(`--radius-` 등)로 판정하면 .evidence-lab 처럼 컴포넌트 스코프
+// 네임스페이스를 쓰는 토큰(`--evidence-radius`)이 크레딧을 못 받고 raw 로
+// 집계된다. 그러면 매직 넘버를 토큰으로 바꾸는 리팩터링이 커버리지를
+// 떨어뜨리는 것으로 보고되어 지표가 개선을 역방향으로 표현한다.
+//
+// 선언 목록을 기준으로 삼으면 접두 규칙이 불필요하고, 선언되지 않은 토큰
+// 참조(폴백만으로 동작하는 것)는 자연히 크레딧에서 빠진다.
+function referencesDeclaredToken(value, declaredNames) {
+  if (!declaredNames) return false;
+  const regex = /var\(\s*(--[a-z0-9-]+)/gi;
+  let match;
+  while ((match = regex.exec(value)) !== null) {
+    if (declaredNames.has(match[1])) return true;
+  }
+  return false;
+}
+
+// shorthand 의 모든 축이 키워드인지 판정한다.
+//
+// padding/margin 은 `margin: 0 auto` 처럼 축마다 키워드가 오는 관용구가 흔하다.
+// 값 전체를 통짜로 keywordOk 와 비교하면 `0 auto` 가 목록에 없어 raw 로 잡힌다.
+// 가로 중앙 정렬은 토큰화 대상이 아니므로 축 단위로 검사한다.
+//
+// `!important` 는 값이 아니라 우선순위 지시자이므로 떼고 본다.
+function isAllKeywords(value, keywordOk) {
+  if (!keywordOk.length) return false;
+  const cleaned = value.replace(/!\s*important/gi, "").trim();
+  if (!cleaned) return false;
+  return cleaned.split(/\s+/).every((axis) => keywordOk.includes(axis));
+}
+
 function analyzeValueDeclarations(declarations, options) {
   const {
-    tokenPrefix,
     tokenValues,
     keywordOk = [],
     responsiveMatcher = null,
+    declaredNames = null,
   } = options;
 
   let tokenReferences = 0;
@@ -323,7 +408,7 @@ function analyzeValueDeclarations(declarations, options) {
 
   for (const declaration of declarations) {
     const value = declaration.value;
-    if (value.includes(`var(${tokenPrefix}`)) {
+    if (referencesDeclaredToken(value, declaredNames)) {
       tokenReferences += 1;
       continue;
     }
@@ -334,7 +419,7 @@ function analyzeValueDeclarations(declarations, options) {
       continue;
     }
 
-    if (keywordOk.includes(value)) {
+    if (isAllKeywords(value, keywordOk)) {
       continue;
     }
 
@@ -552,6 +637,16 @@ function limitItems(items, top) {
   return items.slice(0, top);
 }
 
+// 목록이 --top 으로 잘렸으면 몇 건이 숨었는지 알린다.
+//
+// 표기가 없으면 한 번 실행한 결과를 전수로 오해하기 쉽다. 실제로 "정확 일치 전부
+// 처리"를 한 번의 실행 결과로 판단했다가 가려진 항목을 놓친 적이 있다.
+function pushHiddenCount(lines, format, total, top) {
+  const hidden = total - top;
+  if (hidden <= 0) return;
+  pushLine(lines, format, `... ${hidden} more (raise --top to see all)`);
+}
+
 function formatLines(lines) {
   if (!lines.length) return "";
   const preview = lines.slice(0, 4).map((line) => `L${line}`).join(", ");
@@ -598,6 +693,8 @@ function renderSelectedSections(report, lines, format) {
     colors: report.scope === "all" || report.scope === "colors" || report.scope === "tokens",
     radius: report.scope === "all" || report.scope === "radius" || report.scope === "tokens",
     spacing: report.scope === "all" || report.scope === "spacing" || report.scope === "tokens",
+    padding: report.scope === "all" || report.scope === "padding" || report.scope === "tokens",
+    margin: report.scope === "all" || report.scope === "margin" || report.scope === "tokens",
     fontSize: report.scope === "all" || report.scope === "fontSize" || report.scope === "tokens",
     breakpoints: report.scope === "all" || report.scope === "breakpoints",
     customProps: report.scope === "all" || report.scope === "customProps",
@@ -617,9 +714,21 @@ function renderSelectedSections(report, lines, format) {
   }
 
   if (include.spacing) {
-    pushSectionHeader(lines, format, "Spacing");
+    pushSectionHeader(lines, format, "Spacing (gap)");
     pushMetricSummary(lines, format, report.spacing);
     pushGroupList(lines, format, "Raw gap values", report.spacing.rawGroups, report.top);
+  }
+
+  if (include.padding) {
+    pushSectionHeader(lines, format, "Padding");
+    pushMetricSummary(lines, format, report.padding);
+    pushGroupList(lines, format, "Raw padding values", report.padding.rawGroups, report.top);
+  }
+
+  if (include.margin) {
+    pushSectionHeader(lines, format, "Margin");
+    pushMetricSummary(lines, format, report.margin);
+    pushGroupList(lines, format, "Raw margin values", report.margin.rawGroups, report.top);
   }
 
   if (include.fontSize) {
@@ -639,6 +748,7 @@ function renderSelectedSections(report, lines, format) {
       for (const item of limitItems(report.breakpoints, report.top)) {
         pushLine(lines, format, `\`${item.condition}\` x${item.count} (${formatLines(item.lines)})`);
       }
+      pushHiddenCount(lines, format, report.breakpoints.length, report.top);
     }
   }
 
@@ -653,6 +763,7 @@ function renderSelectedSections(report, lines, format) {
           : "";
         pushLine(lines, format, `\`${item.name}\` x${item.count} (${formatLines(item.lines)})${runtime}`);
       }
+      pushHiddenCount(lines, format, report.customProps.length, report.top);
     }
   }
 }
@@ -693,6 +804,8 @@ function pushGroupList(lines, format, label, items, top) {
     const tokenNote = item.matchingTokens?.length ? ` -> ${item.matchingTokens.join(", ")}` : "";
     pushLine(lines, format, `\`${item.value}\` x${item.count} (${formatLines(item.lines)})${tokenNote}`);
   }
+
+  pushHiddenCount(lines, format, items.length, top);
 }
 
 function pushEmpty(lines, format, text) {
@@ -736,19 +849,50 @@ function buildReport(cssPath, cssSource, options) {
 
   const rootTokens = parseCustomPropertyDeclarations(cssSource, lineStarts, rootBlock.bodyStart, rootBlock.bodyEnd);
   const declaredInCss = parseCustomPropertyDeclarations(cssSource, lineStarts);
+  // 스코프 무관하게 "실제로 선언된" 모든 커스텀 프로퍼티 이름.
+  // radius/spacing/fontSize 의 토큰 참조 판정에 쓴다 — 이름 접두 규칙을 대체한다.
+  //
+  const declaredNames = new Set(declaredInCss.map((entry) => entry.name));
+  // 색상 참조 크레딧용. 스코프 무관하게 색상으로 분류되는 토큰 이름을 모은다.
+  const declaredColorNames = collectColorTokenNames(declaredInCss);
   const tokenIndex = buildTokenIndex(rootTokens);
-  const auditSource = blankRanges(sanitizedSource, [{ start: rootBlock.start, end: rootBlock.end }]);
+  // :root 블록 전체와, 그 밖의 블록에서 정의된 커스텀 프로퍼티 "선언 범위"를 감사 대상에서 제외한다.
+  // 블록 전체가 아니라 선언 범위만 제외하는 것이 중요하다 — .evidence-lab 처럼 컴포넌트 스코프
+  // 토큰을 두는 블록의 gap/padding/box-shadow 같은 일반 선언은 계속 감사되어야 한다.
+  //
+  // declaredInCss 는 cssSource 에서 파싱했지만 stripComments 가 주석의 비개행 문자를 공백으로
+  // 바꿔 길이를 보존하므로, sanitizedSource 와 인덱스 공간이 같아 그대로 blank 할 수 있다.
+  const auditSource = blankRanges(sanitizedSource, [
+    { start: rootBlock.start, end: rootBlock.end },
+    ...declaredInCss.map((entry) => ({ start: entry.index, end: entry.endIndex })),
+  ]);
 
   const radiusDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["border-radius"]);
   const spacingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["gap", "row-gap", "column-gap"]);
+  // padding / margin 은 spacing(gap)과 별개 카테고리다.
+  //
+  // spacing 지표는 gap 계열만 재는 값으로 계속 남겨야 과거 기록과 비교할 수 있다.
+  // 또 padding/margin 은 shorthand(`8px 12px`)가 흔해서 단일 토큰에 매핑되지 않는다 —
+  // 토큰화하면 `var(--space-2) var(--space-4)` 가 되므로 대체 토큰 제안 로직이
+  // 통째로 매칭하지 못한다. 취급이 다르므로 카테고리를 분리한다.
+  const paddingDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+    "padding-block", "padding-inline", "padding-block-start", "padding-block-end",
+    "padding-inline-start", "padding-inline-end",
+  ]);
+  const marginDeclarations = collectPropertyDeclarations(auditSource, lineStarts, [
+    "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "margin-block", "margin-inline", "margin-block-start", "margin-block-end",
+    "margin-inline-start", "margin-inline-end",
+  ]);
   const fontSizeDeclarations = collectPropertyDeclarations(auditSource, lineStarts, ["font-size"]);
   const breakpoints = analyzeBreakpoints(auditSource, lineStarts);
-  const colors = analyzeColors(
-    auditSource,
-    lineStarts,
-    tokenIndex.byValue.colors,
-    new Set(tokenIndex.byCategory.colors.map((token) => token.name)),
-  );
+  // 참조 크레딧은 스코프 무관한 색상 토큰 전체(declaredColorNames)를 쓴다.
+  //
+  // 반면 raw 값의 대체 토큰 제안(tokenValues)은 :root 토큰으로 한정한다.
+  // 컴포넌트 스코프 토큰을 제안하면 그 컴포넌트 밖에서는 해석되지 않는 값을
+  // 권하게 되므로, 제안은 전역 토큰만 하는 것이 안전하다.
+  const colors = analyzeColors(auditSource, lineStarts, tokenIndex.byValue.colors, declaredColorNames);
   const contextFiles = loadContextFiles(rootDir, options.context);
   const customProps = analyzeCustomProps(sanitizedSource, lineStarts, declaredInCss, contextFiles);
 
@@ -760,20 +904,30 @@ function buildReport(cssPath, cssSource, options) {
     tokens: tokenIndex.byCategory,
     colors,
     radius: analyzeValueDeclarations(radiusDeclarations, {
-      tokenPrefix: "--radius-",
       tokenValues: tokenIndex.byValue.radius,
       keywordOk: ["inherit", "initial", "unset", "revert"],
+      declaredNames,
     }),
     spacing: analyzeValueDeclarations(spacingDeclarations, {
-      tokenPrefix: "--space-",
       tokenValues: tokenIndex.byValue.spacing,
       keywordOk: ["normal", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    padding: analyzeValueDeclarations(paddingDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
+      declaredNames,
+    }),
+    margin: analyzeValueDeclarations(marginDeclarations, {
+      tokenValues: tokenIndex.byValue.spacing,
+      keywordOk: ["0", "auto", "inherit", "initial", "unset", "revert"],
+      declaredNames,
     }),
     fontSize: analyzeValueDeclarations(fontSizeDeclarations, {
-      tokenPrefix: "--fs-",
       tokenValues: tokenIndex.byValue.fontSize,
       keywordOk: ["inherit", "initial", "unset", "revert"],
       responsiveMatcher: /^clamp\(/i,
+      declaredNames,
     }),
     breakpoints,
     customProps,
