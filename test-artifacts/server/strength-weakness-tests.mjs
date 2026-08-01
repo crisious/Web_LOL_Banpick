@@ -10,8 +10,11 @@
 //   - filterPostObjectiveDeaths (+ POST_OBJECTIVE_DEATH_WINDOW_MS): 120s 윈도 경계
 
 import fs from "fs";
+import { createRequire } from "node:module";
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
+const require = createRequire(import.meta.url);
+const { buildActionChecklist } = require("../../lib/rule-based-fallback.js");
 
 function extractFunctionSource(source, name) {
   const startIdx = source.indexOf(`function ${name}(`);
@@ -86,21 +89,18 @@ const env = new Function(
     extractFunctionSource(serverSrc, "bestObjectiveSummary"),
     extractFunctionSource(serverSrc, "bestFightSummary"),
     extractFunctionSource(serverSrc, "lowFarmThreshold"),
-    extractConstSource(serverSrc, "ACTION_CHECKLIST_MIN"),
-    extractConstSource(serverSrc, "ACTION_CHECKLIST_MAX"),
     extractConstSource(serverSrc, "INSIGHT_LIST_MIN"),
     extractConstSource(serverSrc, "INSIGHT_LIST_MAX"),
     extractConstSource(serverSrc, "VISION_STRENGTH_THRESHOLDS"),
     extractFunctionSource(serverSrc, "visionStrengthThreshold"),
     extractFunctionSource(serverSrc, "buildStrengths"),
     extractFunctionSource(serverSrc, "buildWeaknesses"),
-    extractFunctionSource(serverSrc, "buildActionChecklist"),
-    "return { filterPostObjectiveDeaths, bestObjectiveSummary, bestFightSummary, lowFarmThreshold, buildStrengths, buildWeaknesses, buildActionChecklist };",
+    "return { filterPostObjectiveDeaths, bestObjectiveSummary, bestFightSummary, lowFarmThreshold, buildStrengths, buildWeaknesses };",
   ].join("\n"),
 )();
 const {
   filterPostObjectiveDeaths, bestObjectiveSummary, bestFightSummary, lowFarmThreshold,
-  buildStrengths, buildWeaknesses, buildActionChecklist,
+  buildStrengths, buildWeaknesses,
 } = env;
 const buildStrengthsSrc = extractFunctionSource(serverSrc, "buildStrengths");
 const buildWeaknessesSrc = extractFunctionSource(serverSrc, "buildWeaknesses");
