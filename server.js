@@ -19,6 +19,7 @@ const {
   sanitizeTeamplayAnalysisV2,
 } = require("./lib/teamplay-coaching-v2");
 const { hydrateStoredTeamplayV2 } = require("./lib/teamplay-stored-v2");
+const { detectCombatEncounters: detectCombatEncountersFromPolicy } = require("./lib/combat-encounters");
 
 const root = __dirname;
 loadEnvFile(path.join(root, ".env"));
@@ -2214,64 +2215,7 @@ function buildRuleBasedAnalysis(normalized, sampleId) {
 // 한타·교전 단위 "encounter"로 만들어 AI에게 컨텍스트로 전달.
 // 플레이어 관여(isPlayerInvolved=true) 이벤트가 1개 이상인 그룹만 채택.
 function detectCombatEncounters(timelineEvents) {
-  const WINDOW_MS = 25000;
-  const MAX_ENCOUNTERS = 8;
-  const eventTime = (event) => rawEventTimestampMs({ timestamp: event.timestampMs });
-
-  const combatEvts = timelineEvents
-    .filter(isPlayerCombatEvent)
-    .sort((a, b) => {
-      const aTime = rawEventTimestampMs({ timestamp: a.timestampMs });
-      const bTime = rawEventTimestampMs({ timestamp: b.timestampMs });
-      return aTime - bTime;
-    });
-
-  const groups = [];
-  let current = null;
-  for (const evt of combatEvts) {
-    const ts = rawEventTimestampMs({ timestamp: evt.timestampMs });
-    if (!current || ts - current.lastMs > WINDOW_MS) {
-      current = { events: [evt], firstMs: ts, lastMs: ts };
-      groups.push(current);
-    } else {
-      current.events.push(evt);
-      current.lastMs = ts;
-    }
-  }
-
-  const encounters = [];
-  for (const g of groups) {
-    const hasPlayer = g.events.some((e) => e.isPlayerInvolved);
-    if (!hasPlayer) continue;
-    const first = g.events[0];
-    const last = g.events[g.events.length - 1];
-    let playerKills = 0;
-    let playerDeaths = 0;
-    for (const e of g.events) {
-      if (!e.isPlayerInvolved) continue;
-      if (isPlayerKillEvent(e)) playerKills += 1;
-      else if (isPlayerDeathEvent(e)) playerDeaths += 1;
-    }
-    let situation;
-    if (playerKills > playerDeaths) situation = "PLAYER_DOMINANT";
-    else if (playerDeaths > playerKills) situation = "PLAYER_DOWN";
-    else situation = "TRADED";
-    const firstTime = eventTime(first);
-    const lastTime = eventTime(last);
-    encounters.push({
-      encounterId: `enc_${String(encounters.length + 1).padStart(3, "0")}`,
-      phase: phaseFor(firstTime),
-      startLabel: timestampLabel(firstTime),
-      endLabel: timestampLabel(lastTime),
-      eventCount: g.events.length,
-      playerKills,
-      playerDeaths,
-      situation,
-      relatedEventIds: g.events.map((e) => e.eventId),
-    });
-    if (encounters.length >= MAX_ENCOUNTERS) break;
-  }
-  return encounters;
+  return detectCombatEncountersFromPolicy(timelineEvents);
 }
 
 // 한타 단계별 분석 — encounter(플레이어 킬/데스 시퀀스)를 진입/딜교환/정리로 분해.

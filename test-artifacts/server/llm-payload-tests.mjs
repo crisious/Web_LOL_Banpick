@@ -17,6 +17,7 @@ import fs from "fs";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
+const { detectCombatEncounters: detectCombatEncountersFromPolicy } = require("../../lib/combat-encounters.js");
 const { buildRecommendationCandidatePayload } = require(
   "../../lib/teamplay-coaching-v2.js",
 );
@@ -98,8 +99,9 @@ const tfConstants = [
 // buildLlmPayload는 detectCombatEncounters + buildTeamfightPhases를 내부에서 호출 → 같은 클로저에 함께 평가
 const { buildLlmPayload, detectCombatEncounters } = new Function(
   "buildRecommendationCandidatePayload",
+  "detectCombatEncountersFromPolicy",
   `${tfConstants}${playerCombatPolicySources}${timestampPolicySources}${detectSrc}\n${teamfightPhasesSrc}\n${buildSrc}\nreturn { buildLlmPayload, detectCombatEncounters };`,
-)(buildRecommendationCandidatePayload);
+)(buildRecommendationCandidatePayload, detectCombatEncountersFromPolicy);
 
 let pass = 0, fail = 0;
 
@@ -454,17 +456,17 @@ function makeCombatEvent(eventId, eventType, timestampMs, isPlayerInvolved = tru
   check("situation: 1 kill + 1 death → TRADED", traded[0].situation, "TRADED");
 }
 
-// 케이스 13: encounterId 패딩 + 8개 cap
+// 케이스 13: 측정 코호트 상한(21)을 수용하는 encounterId 패딩 + 24개 cap
 {
   const events = [];
-  // 10개 분리 그룹 (30초 간격) — 8개로 cap 돼야 함
-  for (let i = 0; i < 10; i += 1) {
+  // 26개 분리 그룹 (60초 간격) — 24개로 cap 돼야 함
+  for (let i = 0; i < 26; i += 1) {
     events.push(makeCombatEvent(`evt_${i}`, "CHAMPION_KILL", 60000 + i * 60000, true));
   }
   const out = detectCombatEncounters(events);
-  checkTrue("encounters: capped at 8", out.length === 8);
+  checkTrue("encounters: capped at 24", out.length === 24);
   check("encounter id padding (1st)", out[0].encounterId, "enc_001");
-  check("encounter id padding (8th)", out[7].encounterId, "enc_008");
+  check("encounter id padding (24th)", out[23].encounterId, "enc_024");
 }
 
 // 케이스 14: playerKills / playerDeaths 카운트 — observer 이벤트는 제외

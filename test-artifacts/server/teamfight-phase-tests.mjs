@@ -1,6 +1,9 @@
 // Phase 34 — server.js 한타 단계별 분석(buildTeamfightPhases 등) 회귀 테스트
 // 텍스트 추출 + new Function 패턴 (llm-payload-tests.mjs / 기존 Phase 33 테스트와 동일).
 import fs from "fs";
+import combatEncounterModule from "../../lib/combat-encounters.js";
+
+const { detectCombatEncounters: detectCombatEncountersFromPolicy } = combatEncounterModule;
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
 function extractFunctionSource(source, name) {
@@ -51,6 +54,7 @@ const playerCombatPolicySources = serverSrc.includes("const PLAYER_COMBAT_EVENT_
     ];
 
 const env = new Function(
+  "detectCombatEncountersFromPolicy",
   [
     extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
     extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
@@ -67,9 +71,8 @@ const env = new Function(
     extractFunctionSource(serverSrc, "mergeTeamfightCoaching"),
     "return { detectCombatEncounters, buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching };",
   ].join("\n"),
-)();
+)(detectCombatEncountersFromPolicy);
 const { detectCombatEncounters, buildTeamfightPhases, teamfightPhaseCoaching, teamfightTakeaway, mergeTeamfightCoaching } = env;
-const detectCombatEncountersSrc = extractFunctionSource(serverSrc, "detectCombatEncounters");
 const buildTeamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
 
 let pass = 0, fail = 0;
@@ -132,18 +135,6 @@ checkTrue(
 checkTrue(
   "server defines isPlayerCombatEvent",
   serverSrc.includes("function isPlayerCombatEvent(event)"),
-);
-checkTrue(
-  "detectCombatEncounters uses isPlayerCombatEvent",
-  detectCombatEncountersSrc.includes(".filter(isPlayerCombatEvent)"),
-);
-checkTrue(
-  "detectCombatEncounters counts kills with isPlayerKillEvent",
-  detectCombatEncountersSrc.includes("if (isPlayerKillEvent(e)) playerKills += 1;"),
-);
-checkTrue(
-  "detectCombatEncounters counts deaths with isPlayerDeathEvent",
-  detectCombatEncountersSrc.includes("else if (isPlayerDeathEvent(e)) playerDeaths += 1;"),
 );
 checkTrue(
   "buildTeamfightPhases counts kills with isPlayerKillEvent",

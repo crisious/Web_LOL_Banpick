@@ -1,6 +1,9 @@
 // server.js combat/teamfight timestamp policy regression tests
 
 import fs from "fs";
+import combatEncounterModule from "../../lib/combat-encounters.js";
+
+const { detectCombatEncounters: detectCombatEncountersFromPolicy } = combatEncounterModule;
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
@@ -30,6 +33,7 @@ const detectCombatEncountersSrc = extractFunctionSource(serverSrc, "detectCombat
 const buildTeamfightPhasesSrc = extractFunctionSource(serverSrc, "buildTeamfightPhases");
 
 const { detectCombatEncounters, buildTeamfightPhases } = new Function(
+  "detectCombatEncountersFromPolicy",
   [
     extractConstSource(serverSrc, "TEAMFIGHT_MIN_EVENTS"),
     extractConstSource(serverSrc, "CLEANUP_GAP_MS"),
@@ -46,7 +50,7 @@ const { detectCombatEncounters, buildTeamfightPhases } = new Function(
     buildTeamfightPhasesSrc,
     "return { detectCombatEncounters, buildTeamfightPhases };",
   ].join("\n"),
-)();
+)(detectCombatEncountersFromPolicy);
 
 let pass = 0;
 let fail = 0;
@@ -163,32 +167,6 @@ check("teamfight outcome policy stays intact", teamfight.phases.map((phase) => p
   "CLOSED_OUT",
 ]);
 
-checkTrue(
-  "detectCombatEncounters normalizes sort timestamps",
-  detectCombatEncountersSrc.includes("rawEventTimestampMs({ timestamp: a.timestampMs })"),
-);
-checkTrue(
-  "detectCombatEncounters normalizes loop timestamp",
-  detectCombatEncountersSrc.includes("const ts = rawEventTimestampMs({ timestamp: evt.timestampMs });"),
-);
-checkTrue(
-  "detectCombatEncounters derives phase from normalized first time",
-  detectCombatEncountersSrc.includes("phase: phaseFor(firstTime),"),
-);
-checkTrue(
-  "detectCombatEncounters derives labels from normalized time",
-  detectCombatEncountersSrc.includes("startLabel: timestampLabel(firstTime),") &&
-    detectCombatEncountersSrc.includes("endLabel: timestampLabel(lastTime),"),
-);
-checkTrue(
-  "detectCombatEncounters no longer copies first.phase",
-  !detectCombatEncountersSrc.includes("phase: first.phase"),
-);
-checkTrue(
-  "detectCombatEncounters no longer copies first/last timestamp labels",
-  !detectCombatEncountersSrc.includes("startLabel: first.timestampLabel") &&
-    !detectCombatEncountersSrc.includes("endLabel: last.timestampLabel"),
-);
 checkTrue(
   "buildTeamfightPhases normalizes sort timestamps",
   buildTeamfightPhasesSrc.includes("rawEventTimestampMs({ timestamp: a.timestampMs })"),
