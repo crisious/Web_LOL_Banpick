@@ -2716,9 +2716,19 @@ async function buildAnalysis(normalized, sampleId) {
   // 노후 CLI / 모델 미호환 / 인증 부재 등으로 Codex가 매번 실패하는 환경에서는
   // 이 hook을 켜 깨끗한 single-agent 모드로 운용. Track C 측정은 Claude 단독으로
   // 유지되며 fallback 체인은 Claude 실패 시 rule-based로 직행.
-  const codexDisabled = parseAgentDisableCodexConfig(process.env.AGENT_DISABLE_CODEX);
+  // 2026-08: AGENT_BACKEND=api 에서도 Codex 레그는 비활성이다 — Codex는 OpenAI CLI이며
+  // Anthropic Messages API에 대응물이 없다. 기존 single-agent 경로를 그대로 재사용한다.
+  //
+  // selectBackend()를 호출하지 않고 정규화를 인라인한 이유: buildAnalysis는
+  // 23개 테스트가 server.js 소스에서 추출해 new Function으로 실행하며, 그
+  // 스코프에는 하네스가 명시적으로 나열한 이름만 존재한다. 새 자유 변수를
+  // 도입하면 전부 ReferenceError로 죽는다. 두 표현이 어긋나지 않도록
+  // agent-adapter-tests.mjs가 selectBackend와의 일치를 고정한다.
+  const codexDisabled =
+    parseAgentDisableCodexConfig(process.env.AGENT_DISABLE_CODEX) ||
+    String(process.env.AGENT_BACKEND ?? "").trim().toLowerCase() === "api";
   if (codexDisabled) {
-    console.log(`[AI] Codex disabled via AGENT_DISABLE_CODEX=1 — Claude only for ${sampleId}`);
+    console.log(`[AI] Codex disabled (AGENT_DISABLE_CODEX or AGENT_BACKEND=api) — Claude only for ${sampleId}`);
   }
 
   const [claudeSettled, codexSettled] = await Promise.allSettled([

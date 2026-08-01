@@ -106,5 +106,35 @@ test("selectBackend defaults to cli for unset or invalid values", () => {
   assert.equal(selectBackend("sdk"), "cli");
 });
 
+// server.js의 buildAnalysis는 selectBackend를 호출하지 않고 같은 판정을 인라인한다.
+// 23개 소스 추출 테스트가 new Function으로 buildAnalysis를 실행하므로 새 자유
+// 변수를 넣을 수 없기 때문이다. 두 표현이 갈라지면 AGENT_BACKEND=api인데도
+// Codex 레그가 살아나 매번 실패하는 요청을 날리게 되므로 여기서 고정한다.
+test("server.js inline api check agrees with selectBackend", () => {
+  const inlineIsApi = (raw) => String(raw ?? "").trim().toLowerCase() === "api";
+  for (const raw of [
+    undefined, null, "", "   ", "api", "API", "  api  ", "cli", "CLI",
+    "sdk", "apix", "ap i", "\tapi\n",
+  ]) {
+    assert.equal(
+      inlineIsApi(raw),
+      selectBackend(raw) === "api",
+      `disagreement for ${JSON.stringify(raw)}`,
+    );
+  }
+});
+
+// 인라인 판정이 server.js에 실제로 그 형태로 남아 있는지 확인한다.
+// 위 테스트는 두 표현의 의미만 비교하므로, 문자열이 바뀌면 조용히 무의미해진다.
+test("server.js still computes codexDisabled from AGENT_BACKEND", () => {
+  const fs = require("node:fs");
+  const src = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
+  assert.match(
+    src,
+    /String\(process\.env\.AGENT_BACKEND \?\? ""\)\.trim\(\)\.toLowerCase\(\) === "api"/,
+    "server.js no longer contains the inline AGENT_BACKEND check this test pins",
+  );
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exitCode = 1;
