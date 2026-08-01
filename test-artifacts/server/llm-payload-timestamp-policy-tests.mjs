@@ -1,6 +1,9 @@
 // server.js LLM payload timestamp policy regression tests
 
 import fs from "fs";
+import combatEncounterModule from "../../lib/combat-encounters.js";
+
+const { detectCombatEncounters: detectCombatEncountersFromPolicy } = combatEncounterModule;
 
 const serverSrc = fs.readFileSync(new URL("../../server.js", import.meta.url), "utf8");
 
@@ -48,6 +51,7 @@ const playerCombatPolicySrc = [
 const buildLlmPayloadSrc = extractFunctionSource(serverSrc, "buildLlmPayload");
 
 const { buildLlmPayload } = new Function(
+  "detectCombatEncountersFromPolicy",
   [
     constantsSrc,
     playerCombatPolicySrc,
@@ -59,7 +63,7 @@ const { buildLlmPayload } = new Function(
     buildLlmPayloadSrc,
     "return { buildLlmPayload };",
   ].join("\n"),
-)();
+)(detectCombatEncountersFromPolicy);
 
 let pass = 0;
 let fail = 0;

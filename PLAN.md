@@ -96,9 +96,11 @@ playerDecision/takeaway/relatedEventIds 정확. 8205002542는 surrender/remake �
 - **Phase 34: `buildKeyMoments` / `buildActionChecklist` fixture** (~1h)
   - 트리거: AI 양쪽 실패 케이스가 실제 발생 (서버 콘솔 `rule-based fallback` 로그)
   - 가치: fallback 안전망의 출력 품질을 회귀 차단 — 현재는 fallback 발화 시 결과 불확실
-- **Phase 32 후속: `detectCombatEncounters` 보강 후보** (~30m)
-  - 트리거: 윈도우(25s) 또는 max(8) 임계값을 조정해야 하는 케이스 발견 — 예: 장기 한타가 두 encounter로 쪼개지거나, 라인전 단계 킬 누적이 cap에 걸려 후반 한타가 누락되는 사례
-  - 가치: 현재 임계값은 합리적 디폴트지만, 실제 코호트 통계로 검증되지 않음
+- **Phase 32 후속: `detectCombatEncounters` 임계값 실측 — DONE (2026-08-01, 27경기)**
+  - 재실행: `node scripts/measure-combat-encounters.mjs --window-ms=25000 --max-encounters=8`. 매치당 uncapped encounter 분포는 `1:1, 2:1, 4:2, 5:1, 6:4, 7:1, 8:4, 10:3, 11:2, 12:1, 14:1, 15:1, 16:1, 17:2, 18:1, 21:1`(encounter 수:매치 수), 중앙값 8 / p90 17 / 최대 21.
+  - **윈도우 25초 유지**: encounter 간 234개 간격 중 25~30초 경계 쌍은 2개(0.85%, 각 26.138s/26.148s)뿐이다. 30초로 넓혀도 두 쌍만 합쳐지고 cap에 잘린 매치는 13개로 동일해, 장기 한타 분할의 코호트 근거가 부족하다.
+  - **max 8 → 24 조정**: 8 이상인 매치 17개 중 실제 truncation은 13개(48.1%), 총 78개가 잘렸고 MID 42 / LATE 36이었다. 13개 중 12개에서 후반 encounter가 누락됐으며, KR_8255072093의 35:13~35:32와 37:31~37:53 두 건은 `eventCount>=3`인 후반 한타 후보였다. 24는 관측 최대 21을 모두 보존하면서 hard bound를 남기며, 변경 후 이 코호트 truncation은 0개다.
+  - 한계: 27경기는 max 8을 기각하기에는 충분히 강한 신호지만 장기적인 상한 분위수를 확정하기에는 작다. 따라서 24를 영구 최적값으로 간주하지 않고, 코호트가 늘면 같은 스크립트로 재측정한다.
 
 ### Tier B — 새 사용자 시나리오에서만 의미
 
